@@ -23,7 +23,8 @@
     "lucide-react": "^0.303.0",
     "@tailwindcss/typography": "^0.5.10",
     "clsx": "^2.0.0",
-    "tailwind-merge": "^2.2.0"
+    "tailwind-merge": "^2.2.0",
+    "cloudinary": "^2.0.1"
   },
   "devDependencies": {
     "typescript": "^5",

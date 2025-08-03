@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import cloudinary from '@/lib/cloudinary'
 
 export async function POST(request: NextRequest) {
   try {
@@ -47,25 +48,39 @@ export async function POST(request: NextRequest) {
 
     console.log('🏷️ Tags parsed:', tags)
     
-    // Generate unique filename  
-    const timestamp = Date.now()
-    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
-    const fileName = `${timestamp}_${originalName}`
+    // Convert file to buffer for Cloudinary upload
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
     
-    // For MVP: just store metadata, not actual file
-    // Note: File upload would need external storage (S3, Cloudinary, etc.)
-    const filePath = `/pdfs/${fileName}`
+    console.log('☁️ Uploading to Cloudinary...')
     
-    console.log('💾 Creating article in database...')
+    // Upload to Cloudinary
+    const uploadResult = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        {
+          resource_type: 'raw', // For PDF files
+          folder: 'athanor-articles', // Organize in folder
+          public_id: `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`,
+          use_filename: true,
+        },
+        (error, result) => {
+          if (error) reject(error)
+          else resolve(result)
+        }
+      ).end(buffer)
+    })
+
+    const cloudinaryResult = uploadResult as any
+    console.log('✅ Cloudinary upload successful:', cloudinaryResult.public_id)
     
-    // Save to database
+    // Save to database with Cloudinary URL
     const article = await prisma.article.create({
       data: {
         title: title.trim(),
         description: description?.trim() || null,
         author: author?.trim() || null,
-        fileName: originalName,
-        filePath: filePath,
+        fileName: file.name,
+        filePath: cloudinaryResult.secure_url, // Store Cloudinary URL
         fileSize: file.size,
         tags: tags,
         category: category?.trim() || null,
@@ -78,11 +93,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true, 
       id: article.id,
-      message: 'Article metadata saved successfully! Note: File storage requires external service for production.',
+      message: 'Article uploaded successfully to Cloudinary!',
       article: {
         id: article.id,
         title: article.title,
-        fileName: article.fileName
+        fileName: article.fileName,
+        fileUrl: cloudinaryResult.secure_url
       }
     })
   } catch (error) {
