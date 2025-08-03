@@ -4,11 +4,20 @@ import { prisma } from '@/lib/prisma'
 
 async function getArticles() {
   try {
-    return await prisma.article.findMany({
+    console.log('🔍 Fetching articles for articles page...')
+    await prisma.$connect()
+    
+    const articles = await prisma.article.findMany({
       where: { isPublished: true },
       orderBy: { publishedAt: 'desc' },
     })
+    
+    console.log(`📄 Found ${articles.length} published articles`)
+    await prisma.$disconnect()
+    
+    return articles
   } catch (error) {
+    console.error('❌ Error fetching articles:', error)
     return []
   }
 }

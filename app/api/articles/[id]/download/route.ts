@@ -8,12 +8,26 @@ export async function GET(
   try {
     console.log('📥 Download request for article:', params.id)
     
-    const article = await prisma.article.findUnique({
-      where: { id: params.id },
+    // Connect to database first
+    await prisma.$connect()
+    
+    const article = await prisma.article.findFirst({
+      where: { 
+        id: params.id,
+        isPublished: true 
+      },
     })
 
-    if (!article || !article.isPublished) {
+    if (!article) {
       console.log('❌ Article not found or not published')
+      console.log('🔍 Searching all articles...')
+      
+      // Debug: list all articles
+      const allArticles = await prisma.article.findMany({
+        select: { id: true, title: true, isPublished: true }
+      })
+      console.log('📋 All articles:', allArticles)
+      
       return new NextResponse('Article not found', { status: 404 })
     }
 
@@ -26,8 +40,14 @@ export async function GET(
       return NextResponse.redirect(article.filePath)
     }
     
-    // If it's a local path or old format, return error for now
-    console.log('❌ File not available - not a Cloudinary URL')
+    // For non-Cloudinary URLs, still try to serve them
+    if (article.filePath) {
+      console.log('🔗 Redirecting to file URL:', article.filePath)
+      return NextResponse.redirect(article.filePath)
+    }
+    
+    // If no file path at all
+    console.log('❌ No file path available')
     return new NextResponse('File not available. Please re-upload the article.', { 
       status: 404,
       headers: {
@@ -37,6 +57,8 @@ export async function GET(
     
   } catch (error) {
     console.error('❌ Download error:', error)
-    return new NextResponse('Download failed', { status: 500 })
+    return new NextResponse(`Download failed: ${error instanceof Error ? error.message : 'Unknown error'}`, { status: 500 })
+  } finally {
+    await prisma.$disconnect()
   }
 }
