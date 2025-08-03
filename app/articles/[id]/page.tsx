@@ -1,9 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, User, Calendar, FileText, Tag, ExternalLink } from 'lucide-react'
+import { ArrowLeft, User, Calendar, FileText, Tag, Download } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
-import { PDFViewer } from '@/components/PDFViewer'
-import { PrintButton } from '@/components/PrintButton'
 
 async function getArticle(id: string) {
   try {
@@ -94,30 +92,71 @@ export default async function ArticlePage({ params }: { params: { id: string } }
           
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
-              href={`/articles/${article.id}/pdf`}
+              href={`/api/articles/${article.id}/download`}
               className="btn-primary inline-flex items-center justify-center space-x-2"
-              target="_blank"
+              download
             >
-              <ExternalLink className="h-4 w-4" />
-              <span>Ouvrir dans un nouvel onglet</span>
+              <Download className="h-4 w-4" />
+              <span>Télécharger le PDF</span>
             </Link>
-            <PrintButton className="btn-secondary">
-              Imprimer
-            </PrintButton>
+            <div className="text-sm text-gray-500 self-center">
+              Fichier: {article.fileName} ({formatFileSize(article.fileSize)})
+            </div>
           </div>
         </div>
       </div>
 
-      {/* PDF Viewer */}
+      {/* Article Summary */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-          <h2 className="font-semibold text-gray-900">Visualiseur PDF</h2>
+          <h2 className="font-semibold text-gray-900">À propos de cet article</h2>
           <p className="text-sm text-gray-600 mt-1">
-            Lisez l'article directement dans votre navigateur
+            Informations sur le document et téléchargement
           </p>
         </div>
         <div className="p-6">
-          <PDFViewer filePath={article.filePath} />
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Détails du document</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Nom du fichier:</span>
+                  <span className="font-medium">{article.fileName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Taille:</span>
+                  <span className="font-medium">{formatFileSize(article.fileSize)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Format:</span>
+                  <span className="font-medium">PDF</span>
+                </div>
+                {article.category && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Catégorie:</span>
+                    <span className="font-medium">{article.category}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Téléchargement</h3>
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  Cliquez sur le bouton ci-dessous pour télécharger ce document PDF sur votre appareil.
+                </p>
+                <Link
+                  href={`/api/articles/${article.id}/download`}
+                  className="btn-primary inline-flex items-center space-x-2 w-full justify-center"
+                  download
+                >
+                  <Download className="h-5 w-5" />
+                  <span>Télécharger {article.fileName}</span>
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { FileText, User, Calendar, Tag } from 'lucide-react'
+import { FileText, User, Calendar, Tag, Download } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 
 async function getArticles() {
@@ -121,11 +121,12 @@ export default async function ArticlesPage() {
                     Lire l'Article
                   </Link>
                   <Link
-                    href={`/articles/${article.id}/pdf`}
-                    className="btn-secondary text-center"
-                    target="_blank"
+                    href={`/api/articles/${article.id}/download`}
+                    className="btn-secondary text-center inline-flex items-center justify-center space-x-2"
+                    download
                   >
-                    Ouvrir PDF
+                    <Download className="h-4 w-4" />
+                    <span>Télécharger PDF</span>
                   </Link>
                 </div>
               </div>
