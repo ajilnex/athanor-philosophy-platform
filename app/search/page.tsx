@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Search, FileText, User, Calendar, Tag } from 'lucide-react'
+import { Search, FileText, User, Calendar, Tag, Download } from 'lucide-react'
 import Fuse from 'fuse.js'
 
 interface Article {
@@ -25,6 +25,10 @@ export default function SearchPage() {
 
   useEffect(() => {
     fetchArticles()
+    
+    // Refresh articles every 30 seconds to stay up to date
+    const interval = setInterval(fetchArticles, 30000)
+    return () => clearInterval(interval)
   }, [])
 
   useEffect(() => {
@@ -197,17 +201,12 @@ export default function SearchPage() {
                 
                 <div className="lg:w-48 flex flex-col space-y-3">
                   <Link
-                    href={`/articles/${article.id}`}
-                    className="btn-primary text-center"
+                    href={`/api/articles/${article.id}/download`}
+                    className="btn-primary text-center inline-flex items-center justify-center space-x-2"
+                    download
                   >
-                    Lire l'Article
-                  </Link>
-                  <Link
-                    href={`/articles/${article.id}/pdf`}
-                    className="btn-secondary text-center"
-                    target="_blank"
-                  >
-                    Ouvrir PDF
+                    <Download className="h-4 w-4" />
+                    <span>Télécharger PDF</span>
                   </Link>
                 </div>
               </div>

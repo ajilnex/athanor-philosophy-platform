@@ -149,14 +149,8 @@ export default async function ArticlesPage() {
                 
                 <div className="lg:w-48 flex flex-col space-y-3">
                   <Link
-                    href={`/articles/${article.id}`}
-                    className="btn-primary text-center"
-                  >
-                    Lire l'Article
-                  </Link>
-                  <Link
                     href={`/api/articles/${article.id}/download`}
-                    className="btn-secondary text-center inline-flex items-center justify-center space-x-2"
+                    className="btn-primary text-center inline-flex items-center justify-center space-x-2"
                     download
                   >
                     <Download className="h-4 w-4" />

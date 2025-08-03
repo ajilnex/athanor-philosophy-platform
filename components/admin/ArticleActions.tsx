@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { MoreHorizontal, Edit, Trash2, Eye, EyeOff, ExternalLink } from 'lucide-react'
+import { Trash2, Eye, EyeOff, ExternalLink } from 'lucide-react'
 
 interface Article {
   id: string
@@ -12,12 +11,12 @@ interface Article {
 
 interface ArticleActionsProps {
   article: Article
+  onDelete: (id: string) => void
+  onTogglePublish: (id: string, isPublished: boolean) => void
 }
 
-export function ArticleActions({ article }: ArticleActionsProps) {
-  const [isOpen, setIsOpen] = useState(false)
+export function ArticleActions({ article, onDelete, onTogglePublish }: ArticleActionsProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
 
   async function togglePublished() {
     setIsLoading(true)
@@ -29,7 +28,7 @@ export function ArticleActions({ article }: ArticleActionsProps) {
       })
 
       if (response.ok) {
-        router.refresh()
+        onTogglePublish(article.id, !article.isPublished)
       } else {
         alert('Erreur lors de la mise à jour')
       }
@@ -37,12 +36,12 @@ export function ArticleActions({ article }: ArticleActionsProps) {
       alert('Erreur réseau')
     } finally {
       setIsLoading(false)
-      setIsOpen(false)
     }
   }
 
   async function deleteArticle() {
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer "${article.title}" ?`)) {
+    const confirmMessage = `Êtes-vous sûr de vouloir supprimer définitivement l'article "${article.title}" ?\n\nCette action est irréversible.`
+    if (!confirm(confirmMessage)) {
       return
     }
 
@@ -53,7 +52,7 @@ export function ArticleActions({ article }: ArticleActionsProps) {
       })
 
       if (response.ok) {
-        router.refresh()
+        onDelete(article.id)
       } else {
         alert('Erreur lors de la suppression')
       }
@@ -61,68 +60,42 @@ export function ArticleActions({ article }: ArticleActionsProps) {
       alert('Erreur réseau')
     } finally {
       setIsLoading(false)
-      setIsOpen(false)
     }
   }
 
   return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        disabled={isLoading}
+    <div className="flex items-center space-x-2">
+      <a
+        href={`/articles/${article.id}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
+        title="Voir l'article"
       >
-        <MoreHorizontal className="h-4 w-4 text-gray-600" />
+        <ExternalLink className="h-4 w-4" />
+      </a>
+      
+      <button
+        onClick={togglePublished}
+        disabled={isLoading}
+        className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+        title={article.isPublished ? 'Dépublier' : 'Publier'}
+      >
+        {article.isPublished ? (
+          <EyeOff className="h-4 w-4" />
+        ) : (
+          <Eye className="h-4 w-4" />
+        )}
       </button>
-
-      {isOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="absolute right-0 top-10 z-20 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2">
-            <a
-              href={`/articles/${article.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-            >
-              <ExternalLink className="h-4 w-4" />
-              <span>Voir</span>
-            </a>
-            
-            <button
-              onClick={togglePublished}
-              disabled={isLoading}
-              className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 w-full text-left disabled:opacity-50"
-            >
-              {article.isPublished ? (
-                <>
-                  <EyeOff className="h-4 w-4" />
-                  <span>Dépublier</span>
-                </>
-              ) : (
-                <>
-                  <Eye className="h-4 w-4" />
-                  <span>Publier</span>
-                </>
-              )}
-            </button>
-            
-            <hr className="my-2" />
-            
-            <button
-              onClick={deleteArticle}
-              disabled={isLoading}
-              className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left disabled:opacity-50"
-            >
-              <Trash2 className="h-4 w-4" />
-              <span>Supprimer</span>
-            </button>
-          </div>
-        </>
-      )}
+      
+      <button
+        onClick={deleteArticle}
+        disabled={isLoading}
+        className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+        title="Supprimer l'article"
+      >
+        <Trash2 className="h-4 w-4" />
+      </button>
     </div>
   )
 }

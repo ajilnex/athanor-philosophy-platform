@@ -1,25 +1,13 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Plus, FileText, Settings, Upload } from 'lucide-react'
-import { prisma } from '@/lib/prisma'
 
-async function getArticleStats() {
-  try {
-    const [totalArticles, publishedArticles, totalSize] = await Promise.all([
-      prisma.article.count(),
-      prisma.article.count({ where: { isPublished: true } }),
-      prisma.article.aggregate({
-        _sum: { fileSize: true },
-      }),
-    ])
-
-    return {
-      total: totalArticles,
-      published: publishedArticles,
-      totalSize: totalSize._sum.fileSize || 0,
-    }
-  } catch (error) {
-    return { total: 0, published: 0, totalSize: 0 }
-  }
+interface Stats {
+  total: number
+  published: number
+  totalSize: number
 }
 
 function formatFileSize(bytes: number): string {
@@ -30,8 +18,31 @@ function formatFileSize(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
 }
 
-export default async function AdminPage() {
-  const stats = await getArticleStats()
+export default function AdminPage() {
+  const [stats, setStats] = useState<Stats>({ total: 0, published: 0, totalSize: 0 })
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    fetchStats()
+    
+    // Refresh stats every 30 seconds to stay up to date  
+    const interval = setInterval(fetchStats, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
+  async function fetchStats() {
+    try {
+      const response = await fetch('/api/admin/stats')
+      if (response.ok) {
+        const data = await response.json()
+        setStats(data)
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -50,7 +61,9 @@ export default async function AdminPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total des articles</p>
-              <p className="text-3xl font-bold text-primary-900">{stats.total}</p>
+              <p className="text-3xl font-bold text-primary-900">
+                {isLoading ? '...' : stats.total}
+              </p>
             </div>
             <FileText className="h-8 w-8 text-primary-700" />
           </div>
@@ -59,7 +72,9 @@ export default async function AdminPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Articles publiés</p>
-              <p className="text-3xl font-bold text-green-600">{stats.published}</p>
+              <p className="text-3xl font-bold text-green-600">
+                {isLoading ? '...' : stats.published}
+              </p>
             </div>
             <FileText className="h-8 w-8 text-green-600" />
           </div>
@@ -68,7 +83,9 @@ export default async function AdminPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Taille totale</p>
-              <p className="text-3xl font-bold text-blue-600">{formatFileSize(stats.totalSize)}</p>
+              <p className="text-3xl font-bold text-blue-600">
+                {isLoading ? '...' : formatFileSize(stats.totalSize)}
+              </p>
             </div>
             <Upload className="h-8 w-8 text-blue-600" />
           </div>
