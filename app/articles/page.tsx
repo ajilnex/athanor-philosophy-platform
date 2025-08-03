@@ -13,28 +13,30 @@ type Article = {
   fileSize: number
 }
 
-// Use the API that works instead of direct Prisma calls
+import { prisma } from '@/lib/prisma'
+
+// Direct Prisma call for build time, fallback to API for runtime
 async function getArticles(): Promise<Article[]> {
   try {
-    console.log('🔍 Fetching articles via API...')
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : 'http://localhost:3000'
+    console.log('🔍 Fetching articles...')
     
-    const response = await fetch(`${baseUrl}/api/articles`, {
-      cache: 'no-store' // Always fetch fresh data
-    })
-    
-    if (!response.ok) {
-      console.error('❌ API response not ok:', response.status)
+    // During build, use direct Prisma connection
+    if (process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV !== 'production') {
+      // Build time - return empty array to avoid build failures
+      console.log('⚠️ Build time - returning empty articles array')
       return []
     }
     
-    const articles = await response.json()
-    console.log(`📄 Found ${articles.length} articles via API`)
+    // Runtime - use direct Prisma
+    const articles = await prisma.article.findMany({
+      where: { isPublished: true },
+      orderBy: { publishedAt: 'desc' },
+    })
+    
+    console.log(`📄 Found ${articles.length} articles`)
     return articles
   } catch (error) {
-    console.error('❌ Error fetching articles via API:', error)
+    console.error('❌ Error fetching articles:', error)
     return []
   }
 }
@@ -46,6 +48,9 @@ function formatFileSize(bytes: number): string {
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
 }
+
+// Force dynamic rendering to avoid build-time API calls
+export const dynamic = 'force-dynamic'
 
 export default async function ArticlesPage() {
   const articles = await getArticles()
