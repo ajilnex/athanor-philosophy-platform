@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "app/api/**/route.ts": {
+      "regions": ["iad1"]
+    }
+  },
+  "regions": ["iad1"]
+}
