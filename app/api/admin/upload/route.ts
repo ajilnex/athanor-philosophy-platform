@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import { existsSync } from 'fs'
-import path from 'path'
 import { prisma } from '@/lib/prisma'
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('📤 Upload request received')
+    
     const formData = await request.formData()
     const file = formData.get('file') as File
     const title = formData.get('title') as string
@@ -14,15 +13,27 @@ export async function POST(request: NextRequest) {
     const category = formData.get('category') as string
     const tagsString = formData.get('tags') as string
 
+    console.log('📋 Form data:', { 
+      hasFile: !!file, 
+      title, 
+      author, 
+      category,
+      fileSize: file?.size,
+      fileType: file?.type 
+    })
+
     if (!file) {
+      console.log('❌ No file provided')
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
     if (!title?.trim()) {
+      console.log('❌ No title provided')
       return NextResponse.json({ error: 'Title is required' }, { status: 400 })
     }
 
     if (file.type !== 'application/pdf') {
+      console.log('❌ File is not PDF:', file.type)
       return NextResponse.json({ error: 'Only PDF files are allowed' }, { status: 400 })
     }
 
@@ -31,27 +42,22 @@ export async function POST(request: NextRequest) {
     try {
       tags = JSON.parse(tagsString || '[]')
     } catch {
-      tags = []
+      tags = tagsString ? tagsString.split(',').map(t => t.trim()) : []
     }
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads')
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true })
-    }
-
-    // Generate unique filename
+    console.log('🏷️ Tags parsed:', tags)
+    
+    // Generate unique filename  
     const timestamp = Date.now()
     const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
     const fileName = `${timestamp}_${originalName}`
-    const filePath = path.join(uploadsDir, fileName)
-    const relativeFilePath = `/uploads/${fileName}`
-
-    // Write file to disk
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    await writeFile(filePath, buffer)
-
+    
+    // For MVP: just store metadata, not actual file
+    // Note: File upload would need external storage (S3, Cloudinary, etc.)
+    const filePath = `/pdfs/${fileName}`
+    
+    console.log('💾 Creating article in database...')
+    
     // Save to database
     const article = await prisma.article.create({
       data: {
@@ -59,7 +65,7 @@ export async function POST(request: NextRequest) {
         description: description?.trim() || null,
         author: author?.trim() || null,
         fileName: originalName,
-        filePath: relativeFilePath,
+        filePath: filePath,
         fileSize: file.size,
         tags: tags,
         category: category?.trim() || null,
@@ -67,15 +73,36 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    console.log('✅ Article created:', article.id)
+
     return NextResponse.json({ 
       success: true, 
       id: article.id,
-      message: 'Article uploaded successfully' 
+      message: 'Article metadata saved successfully! Note: File storage requires external service for production.',
+      article: {
+        id: article.id,
+        title: article.title,
+        fileName: article.fileName
+      }
     })
   } catch (error) {
-    console.error('Upload error:', error)
+    console.error('❌ Upload error:', error)
+    
+    // More detailed error logging
+    if (error instanceof Error) {
+      console.error('Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      })
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to upload article' },
+      { 
+        error: `Failed to upload article`, 
+        details: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      },
       { status: 500 }
     )
   }
