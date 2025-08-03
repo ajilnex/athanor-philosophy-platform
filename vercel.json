@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "app/api/**/route.ts": {
-      "regions": ["cdg1"]
-    }
-  },
   "regions": ["cdg1"],
   "framework": "nextjs"
 }
