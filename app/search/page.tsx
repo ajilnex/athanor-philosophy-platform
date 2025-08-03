@@ -44,7 +44,7 @@ export default function SearchPage() {
         setArticles(data)
         
         // Initialize Fuse.js for fuzzy search
-        const fuseInstance = new Fuse(data, {
+        const fuseInstance = new Fuse(data as Article[], {
           keys: [
             { name: 'title', weight: 0.4 },
             { name: 'description', weight: 0.3 },
