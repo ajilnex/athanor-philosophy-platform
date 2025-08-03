@@ -104,15 +104,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('❌ Upload error:', error)
     
-    // More detailed error logging
-    if (error instanceof Error) {
-      console.error('Error details:', {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      })
-    }
-    
     return NextResponse.json(
       { 
         error: `Failed to upload article`, 
