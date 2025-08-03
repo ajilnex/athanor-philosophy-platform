@@ -1,8 +1,20 @@
 import Link from 'next/link'
 import { FileText, User, Calendar, Tag, Download } from 'lucide-react'
 
+// Article type definition
+type Article = {
+  id: string
+  title: string
+  description: string | null
+  author: string | null
+  fileName: string
+  tags: string[]
+  publishedAt: string
+  fileSize: number
+}
+
 // Use the API that works instead of direct Prisma calls
-async function getArticles() {
+async function getArticles(): Promise<Article[]> {
   try {
     console.log('🔍 Fetching articles via API...')
     const baseUrl = process.env.VERCEL_URL 
@@ -65,7 +77,7 @@ export default async function ArticlesPage() {
         </div>
       ) : (
         <div className="grid gap-6">
-          {articles.map((article) => (
+          {articles.map((article: Article) => (
             <article
               key={article.id}
               className="card hover:shadow-lg transition-shadow duration-200"
