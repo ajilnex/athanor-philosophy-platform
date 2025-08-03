@@ -9,7 +9,7 @@ type Article = {
   author: string | null
   fileName: string
   tags: string[]
-  publishedAt: string
+  publishedAt: string | Date
   fileSize: number
 }
 
@@ -114,7 +114,10 @@ export default async function ArticlesPage() {
                     <div className="flex items-center space-x-1">
                       <Calendar className="h-4 w-4" />
                       <span>
-                        {new Date(article.publishedAt).toLocaleDateString('fr-FR', {
+                        {(article.publishedAt instanceof Date 
+                          ? article.publishedAt 
+                          : new Date(article.publishedAt)
+                        ).toLocaleDateString('fr-FR', {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric',
