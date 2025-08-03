@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Article {
@@ -15,7 +16,7 @@ model Article {
   fileName    String   @unique
   filePath    String
   fileSize    Int
-  tags        String? // JSON string of tags array
+  tags        String[] // PostgreSQL array of strings
   category    String?
   publishedAt DateTime @default(now())
   createdAt   DateTime @default(now())

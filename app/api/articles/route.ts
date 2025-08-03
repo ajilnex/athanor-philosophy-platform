@@ -19,13 +19,7 @@ export async function GET() {
       },
     })
 
-    // Parse tags from JSON strings
-    const articlesWithParsedTags = articles.map(article => ({
-      ...article,
-      tags: parseTags(article.tags)
-    }))
-
-    return NextResponse.json(articlesWithParsedTags)
+    return NextResponse.json(articles)
   } catch (error) {
     console.error('Error fetching articles:', error)
     return NextResponse.json(

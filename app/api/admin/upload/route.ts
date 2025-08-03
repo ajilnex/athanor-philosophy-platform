@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
         fileName: originalName,
         filePath: relativeFilePath,
         fileSize: file.size,
-        tags: JSON.stringify(tags),
+        tags: tags,
         category: category?.trim() || null,
         isPublished: true,
       },
