@@ -1,8 +1,9 @@
 {
   "functions": {
     "app/api/**/route.ts": {
-      "regions": ["iad1"]
+      "regions": ["cdg1"]
     }
   },
-  "regions": ["iad1"]
+  "regions": ["cdg1"],
+  "framework": "nextjs"
 }
