@@ -1,23 +1,7 @@
 import Link from 'next/link'
 import { BookOpen, Search, FileText, Zap } from 'lucide-react'
-import { prisma } from '@/lib/prisma'
-import { parseTags } from '@/lib/utils'
 
-async function getRecentArticles() {
-  try {
-    return await prisma.article.findMany({
-      where: { isPublished: true },
-      orderBy: { publishedAt: 'desc' },
-      take: 3,
-    })
-  } catch (error) {
-    return []
-  }
-}
-
-export default async function HomePage() {
-  const recentArticles = await getRecentArticles()
-
+export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -85,49 +69,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Recent Articles Section */}
-      {recentArticles.length > 0 && (
-        <section className="py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center mb-12">
-              <h2 className="text-3xl font-serif font-semibold text-primary-900">
-                Articles Récents
-              </h2>
-              <Link 
-                href="/articles" 
-                className="text-primary-700 hover:text-primary-800 font-medium"
-              >
-                Voir tous les articles →
-              </Link>
-            </div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {recentArticles.map((article) => (
-                <article key={article.id} className="card hover:shadow-md transition-shadow">
-                  <h3 className="text-xl font-serif font-semibold mb-3 text-primary-900">
-                    {article.title}
-                  </h3>
-                  {article.description && (
-                    <p className="text-gray-600 mb-4 line-clamp-3">
-                      {article.description}
-                    </p>
-                  )}
-                  <div className="flex justify-between items-center text-sm text-gray-500 mb-4">
-                    {article.author && <span>{article.author}</span>}
-                    <span>{new Date(article.publishedAt).toLocaleDateString('fr-FR')}</span>
-                  </div>
-                  <Link
-                    href={`/articles/${article.id}`}
-                    className="text-primary-700 hover:text-primary-800 font-medium"
-                  >
-                    Lire l'article →
-                  </Link>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Call to Action */}
       <section className="py-16 bg-gradient-to-r from-primary-700 to-primary-800">
