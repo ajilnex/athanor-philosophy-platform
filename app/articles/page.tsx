@@ -1,23 +1,28 @@
 import Link from 'next/link'
 import { FileText, User, Calendar, Tag, Download } from 'lucide-react'
-import { prisma } from '@/lib/prisma'
 
+// Use the API that works instead of direct Prisma calls
 async function getArticles() {
   try {
-    console.log('🔍 Fetching articles for articles page...')
-    await prisma.$connect()
+    console.log('🔍 Fetching articles via API...')
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : 'http://localhost:3000'
     
-    const articles = await prisma.article.findMany({
-      where: { isPublished: true },
-      orderBy: { publishedAt: 'desc' },
+    const response = await fetch(`${baseUrl}/api/articles`, {
+      cache: 'no-store' // Always fetch fresh data
     })
     
-    console.log(`📄 Found ${articles.length} published articles`)
-    await prisma.$disconnect()
+    if (!response.ok) {
+      console.error('❌ API response not ok:', response.status)
+      return []
+    }
     
+    const articles = await response.json()
+    console.log(`📄 Found ${articles.length} articles via API`)
     return articles
   } catch (error) {
-    console.error('❌ Error fetching articles:', error)
+    console.error('❌ Error fetching articles via API:', error)
     return []
   }
 }

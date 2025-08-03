@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     
     console.log('☁️ Uploading to Cloudinary...')
     
-    // Upload to Cloudinary
+    // Upload to Cloudinary with public access
     const uploadResult = await new Promise((resolve, reject) => {
       cloudinary.uploader.upload_stream(
         {
@@ -62,6 +62,8 @@ export async function POST(request: NextRequest) {
           folder: 'athanor-articles', // Organize in folder
           public_id: `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`,
           use_filename: true,
+          access_mode: 'public', // Make files publicly accessible
+          type: 'upload' // Ensure upload type
         },
         (error, result) => {
           if (error) reject(error)
