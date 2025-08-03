@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { FileText, User, Calendar, Tag } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
-import { parseTags } from '@/lib/utils'
 
 async function getArticles() {
   try {
@@ -97,24 +96,21 @@ export default async function ArticlesPage() {
                     </div>
                   </div>
                   
-                  {(() => {
-                    const tags = parseTags(article.tags)
-                    return tags.length > 0 && (
-                      <div className="flex items-center space-x-2 mb-4">
-                        <Tag className="h-4 w-4 text-gray-400" />
-                        <div className="flex flex-wrap gap-2">
-                          {tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="px-2 py-1 text-xs bg-primary-100 text-primary-700 rounded-full"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
+                  {article.tags && article.tags.length > 0 && (
+                    <div className="flex items-center space-x-2 mb-4">
+                      <Tag className="h-4 w-4 text-gray-400" />
+                      <div className="flex flex-wrap gap-2">
+                        {article.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="px-2 py-1 text-xs bg-primary-100 text-primary-700 rounded-full"
+                          >
+                            {tag}
+                          </span>
+                        ))}
                       </div>
-                    )
-                  })()}
+                    </div>
+                  )}
                 </div>
                 
                 <div className="lg:w-48 flex flex-col space-y-3">

@@ -4,7 +4,6 @@ import { ArrowLeft, User, Calendar, FileText, Tag, ExternalLink } from 'lucide-r
 import { prisma } from '@/lib/prisma'
 import { PDFViewer } from '@/components/PDFViewer'
 import { PrintButton } from '@/components/PrintButton'
-import { parseTags } from '@/lib/utils'
 
 async function getArticle(id: string) {
   try {
@@ -77,24 +76,21 @@ export default async function ArticlePage({ params }: { params: { id: string } }
             </div>
           </div>
           
-          {(() => {
-            const tags = parseTags(article.tags)
-            return tags.length > 0 && (
-              <div className="flex items-center space-x-2 mb-6">
-                <Tag className="h-4 w-4 text-gray-400" />
-                <div className="flex flex-wrap gap-2">
-                  {tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-3 py-1 text-sm bg-primary-100 text-primary-700 rounded-full"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+          {article.tags && article.tags.length > 0 && (
+            <div className="flex items-center space-x-2 mb-6">
+              <Tag className="h-4 w-4 text-gray-400" />
+              <div className="flex flex-wrap gap-2">
+                {article.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-3 py-1 text-sm bg-primary-100 text-primary-700 rounded-full"
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
-            )
-          })()}
+            </div>
+          )}
           
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
