@@ -85,7 +85,14 @@ export default function UploadPage() {
         setError(result.error || 'Erreur lors de l\'upload')
       } else {
         setSuccess('Article ajouté avec succès!')
-        // Redirect will be handled by the server action
+        // Redirect to the new article after success
+        setTimeout(() => {
+          if (result?.articleId) {
+            router.push(`/articles/${result.articleId}`)
+          } else {
+            router.push('/admin/articles')
+          }
+        }, 1500)
       }
     } catch (error) {
       setError('Erreur réseau. Veuillez réessayer.')

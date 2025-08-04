@@ -1,7 +1,6 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import cloudinary from '@/lib/cloudinary'
 
@@ -70,9 +69,14 @@ export async function uploadArticle(formData: FormData) {
       return { success: false, error: 'La taille du fichier doit être inférieure à 50MB' }
     }
 
-    // 🛡️ PROTECTION: Vérifier le nom de fichier
-    if (!file.name.match(/^[a-zA-Z0-9._-]+\.pdf$/)) {
-      return { success: false, error: 'Nom de fichier invalide. Utilisez uniquement lettres, chiffres, points, tirets et underscores.' }
+    // 🛡️ PROTECTION: Vérifier le nom de fichier (plus permissif)
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      return { success: false, error: 'Le fichier doit avoir l\'extension .pdf' }
+    }
+    
+    // Vérifier la longueur du nom de fichier
+    if (file.name.length > 255) {
+      return { success: false, error: 'Le nom de fichier est trop long (maximum 255 caractères)' }
     }
 
     // Parse tags
@@ -87,14 +91,21 @@ export async function uploadArticle(formData: FormData) {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
     
+    // Nettoyer le nom de fichier pour Cloudinary (conserver les caractères français)
+    const cleanFileName = file.name
+      .normalize('NFD') // Décomposer les caractères accentués
+      .replace(/[\u0300-\u036f]/g, '') // Supprimer les diacritiques
+      .replace(/[^a-zA-Z0-9.-]/g, '_') // Remplacer les caractères spéciaux par des underscores
+      .toLowerCase()
+    
     // Upload to Cloudinary with public access
     const uploadResult = await new Promise((resolve, reject) => {
       cloudinary.uploader.upload_stream(
         {
           resource_type: 'raw', // For PDF files
           folder: 'athanor-articles', // Organize in folder
-          public_id: `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`,
-          use_filename: true,
+          public_id: `${Date.now()}_${cleanFileName}`,
+          use_filename: false, // Use our cleaned public_id instead
           access_mode: 'public', // Make files publicly accessible
           type: 'upload' // Ensure upload type
         },
@@ -123,7 +134,7 @@ export async function uploadArticle(formData: FormData) {
     })
 
     revalidatePath('/admin/articles')
-    redirect(`/articles/${article.id}`)
+    return { success: true, articleId: article.id }
   } catch (error) {
     console.error('Upload error:', error)
     return { 
