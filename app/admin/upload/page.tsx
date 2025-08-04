@@ -84,14 +84,10 @@ export default function UploadPage() {
       if (result && !result.success) {
         setError(result.error || 'Erreur lors de l\'upload')
       } else {
-        setSuccess('Article ajouté avec succès!')
-        // Redirect to the new article after success
+        setSuccess('Publication ajoutée avec succès!')
+        // Redirect to publications page after success
         setTimeout(() => {
-          if (result?.articleId) {
-            router.push(`/articles/${result.articleId}`)
-          } else {
-            router.push('/admin/articles')
-          }
+          router.push('/publications')
         }, 1500)
       }
     } catch (error) {
@@ -102,25 +98,25 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-4xl mx-auto px-6 py-12">
       <div className="mb-8">
         <Link
           href="/admin"
-          className="inline-flex items-center text-primary-700 hover:text-primary-800 mb-6"
+          className="inline-flex items-center text-subtle hover:text-foreground mb-6 font-light"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour à l'administration
         </Link>
         
-        <h1 className="text-4xl font-serif font-bold text-primary-900 mb-4">
-          Ajouter un Article
+        <h1 className="text-3xl font-light text-foreground mb-4">
+          Ajouter une Publication
         </h1>
-        <p className="text-lg text-gray-600">
+        <p className="text-base text-subtle font-light">
           Uploadez un nouveau fichier PDF et renseignez ses métadonnées.
         </p>
       </div>
 
-      <div className="card">
+      <div className="card border-subtle">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* File Upload */}
           <div>
@@ -143,7 +139,7 @@ export default function UploadPage() {
                       <p className="text-lg font-medium text-gray-900">
                         {selectedFile.name}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-subtle">
                         {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                       </p>
                     </div>
@@ -297,7 +293,7 @@ export default function UploadPage() {
               ) : (
                 <>
                   <Plus className="h-4 w-4" />
-                  <span>Ajouter l'Article</span>
+                  <span>Ajouter la Publication</span>
                 </>
               )}
             </button>

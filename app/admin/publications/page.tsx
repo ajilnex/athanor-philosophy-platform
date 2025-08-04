@@ -3,7 +3,7 @@ import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { AdminArticleActions } from '@/components/admin/AdminArticleActions'
 
-async function getAllArticles() {
+async function getAllPublications() {
   try {
     return await prisma.article.findMany({
       orderBy: { createdAt: 'desc' },
@@ -21,15 +21,15 @@ function formatFileSize(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
 }
 
-export default async function AdminArticlesPage() {
-  const articles = await getAllArticles()
+export default async function AdminPublicationsPage() {
+  const publications = await getAllPublications()
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-4xl mx-auto px-6 py-12">
       <div className="mb-8">
         <Link
           href="/admin"
-          className="inline-flex items-center text-primary-700 hover:text-primary-800 mb-6"
+          className="inline-flex items-center text-subtle hover:text-foreground mb-6 font-light"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour à l'administration
@@ -37,108 +37,108 @@ export default async function AdminArticlesPage() {
         
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-4xl font-serif font-bold text-primary-900 mb-4">
-              Gestion des Articles
+            <h1 className="text-3xl font-light text-foreground mb-4">
+              Gestion des Publications
             </h1>
-            <p className="text-lg text-gray-600">
-              Gérez tous vos articles: modifier, publier/dépublier, supprimer.
+            <p className="text-base text-subtle font-light">
+              Gérez toutes vos publications: modifier, publier/dépublier, supprimer.
             </p>
           </div>
           <Link
             href="/admin/upload"
-            className="btn-primary"
+            className="text-foreground hover:text-subtle transition-colors font-light underline"
           >
-            Ajouter un Article
+            Ajouter une Publication
           </Link>
         </div>
       </div>
 
-      {articles.length === 0 ? (
-        <div className="card text-center py-12">
-          <h3 className="text-xl font-semibold text-gray-600 mb-4">
-            Aucun article trouvé
+      {publications.length === 0 ? (
+        <div className="card border-subtle text-center py-12">
+          <h3 className="text-lg font-light text-foreground mb-4">
+            Aucune publication trouvée
           </h3>
-          <p className="text-gray-500 mb-6">
-            Commencez par ajouter votre premier article.
+          <p className="text-subtle mb-6 font-light">
+            Commencez par ajouter votre première publication.
           </p>
           <Link
             href="/admin/upload"
-            className="btn-primary"
+            className="text-foreground hover:text-subtle transition-colors font-light underline"
           >
-            Ajouter un Article
+            Ajouter une Publication
           </Link>
         </div>
       ) : (
-        <div className="card">
+        <div className="card border-subtle">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-4 px-2 font-semibold text-gray-900">
+                <tr className="border-b border-subtle">
+                  <th className="text-left py-4 px-2 font-light text-foreground">
                     Titre
                   </th>
-                  <th className="text-left py-4 px-2 font-semibold text-gray-900">
+                  <th className="text-left py-4 px-2 font-light text-foreground">
                     Auteur
                   </th>
-                  <th className="text-left py-4 px-2 font-semibold text-gray-900">
+                  <th className="text-left py-4 px-2 font-light text-foreground">
                     Statut
                   </th>
-                  <th className="text-left py-4 px-2 font-semibold text-gray-900">
+                  <th className="text-left py-4 px-2 font-light text-foreground">
                     Taille
                   </th>
-                  <th className="text-left py-4 px-2 font-semibold text-gray-900">
+                  <th className="text-left py-4 px-2 font-light text-foreground">
                     Date
                   </th>
-                  <th className="text-right py-4 px-2 font-semibold text-gray-900">
+                  <th className="text-right py-4 px-2 font-light text-foreground">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
-                {articles.map((article) => (
-                  <tr key={article.id} className="hover:bg-gray-50">
+              <tbody className="divide-y divide-subtle">
+                {publications.map((publication) => (
+                  <tr key={publication.id} className="hover:bg-gray-50">
                     <td className="py-4 px-2">
                       <div>
-                        <h3 className="font-medium text-gray-900 mb-1">
-                          {article.title}
+                        <h3 className="font-light text-foreground mb-1">
+                          {publication.title}
                         </h3>
-                        {article.description && (
-                          <p className="text-sm text-gray-500 line-clamp-2">
-                            {article.description}
+                        {publication.description && (
+                          <p className="text-sm text-subtle line-clamp-2 font-light">
+                            {publication.description}
                           </p>
                         )}
                       </div>
                     </td>
-                    <td className="py-4 px-2 text-gray-600">
-                      {article.author || '-'}
+                    <td className="py-4 px-2 text-subtle font-light">
+                      {publication.author || '-'}
                     </td>
                     <td className="py-4 px-2">
                       <div className="flex items-center space-x-2">
-                        {article.isPublished ? (
+                        {publication.isPublished ? (
                           <>
-                            <Eye className="h-4 w-4 text-green-600" />
-                            <span className="text-sm text-green-600 font-medium">
+                            <Eye className="h-4 w-4 text-foreground" />
+                            <span className="text-sm text-foreground font-light">
                               Publié
                             </span>
                           </>
                         ) : (
                           <>
-                            <EyeOff className="h-4 w-4 text-gray-400" />
-                            <span className="text-sm text-gray-500 font-medium">
+                            <EyeOff className="h-4 w-4 text-subtle" />
+                            <span className="text-sm text-subtle font-light">
                               Brouillon
                             </span>
                           </>
                         )}
                       </div>
                     </td>
-                    <td className="py-4 px-2 text-gray-600 text-sm">
-                      {formatFileSize(article.fileSize)}
+                    <td className="py-4 px-2 text-subtle text-sm font-light">
+                      {formatFileSize(publication.fileSize)}
                     </td>
-                    <td className="py-4 px-2 text-gray-600 text-sm">
-                      {new Date(article.createdAt).toLocaleDateString('fr-FR')}
+                    <td className="py-4 px-2 text-subtle text-sm font-light">
+                      {new Date(publication.createdAt).toLocaleDateString('fr-FR')}
                     </td>
                     <td className="py-4 px-2">
-                      <AdminArticleActions article={article} />
+                      <AdminArticleActions article={publication} />
                     </td>
                   </tr>
                 ))}
