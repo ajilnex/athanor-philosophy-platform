@@ -16,7 +16,7 @@ export default async function BilletPage({ params }: { params: { slug: string } 
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
       {/* Header */}
       <div className="mb-8">
         <Link
@@ -28,11 +28,11 @@ export default async function BilletPage({ params }: { params: { slug: string } 
         </Link>
         
         <div className="mb-6">
-          <h1 className="text-3xl font-light text-foreground mb-4">
+          <h1 className="text-2xl sm:text-3xl font-light text-foreground mb-4">
             {billet.title}
           </h1>
           
-          <div className="flex flex-wrap items-center gap-4 text-sm text-subtle mb-4">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-subtle mb-4">
             <div className="flex items-center space-x-2">
               <Calendar className="h-4 w-4" />
               <span>
@@ -64,7 +64,7 @@ export default async function BilletPage({ params }: { params: { slug: string } 
       </div>
 
       {/* Content */}
-      <article className="prose max-w-none">
+      <article className="prose prose-sm sm:prose max-w-none">
         <div 
           dangerouslySetInnerHTML={{ __html: billet.content }}
           className=""
@@ -72,10 +72,10 @@ export default async function BilletPage({ params }: { params: { slug: string } 
       </article>
 
       {/* Navigation */}
-      <div className="mt-12 pt-8 border-t border-subtle">
+      <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-subtle">
         <Link
           href="/billets"
-          className="text-subtle hover:text-foreground transition-colors font-light inline-flex items-center space-x-2"
+          className="text-subtle hover:text-foreground transition-colors font-light inline-flex items-center space-x-2 text-sm sm:text-base"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Tous les billets</span>

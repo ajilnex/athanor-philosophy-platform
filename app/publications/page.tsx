@@ -55,12 +55,12 @@ export default async function PublicationsPage() {
   const publications = await getPublications()
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-light text-foreground mb-4">
+        <h1 className="text-2xl sm:text-3xl font-light text-foreground mb-4">
           Publications
         </h1>
-        <p className="text-base text-subtle max-w-3xl font-light">
+        <p className="text-sm sm:text-base text-subtle max-w-3xl font-light">
           Articles et documents publiés, couvrant une large gamme de sujets philosophiques.
         </p>
       </div>
@@ -79,15 +79,15 @@ export default async function PublicationsPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid gap-6">
+        <div className="space-y-6">
           {publications.map((publication: Publication) => (
             <article
               key={publication.id}
-              className="card border-subtle mb-8"
+              className="card border-subtle"
             >
-              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-6">
                 <div className="flex-1">
-                  <h2 className="text-xl font-light text-foreground mb-3">
+                  <h2 className="text-lg sm:text-xl font-light text-foreground mb-2 sm:mb-3">
                     <Link
                       href={`/publications/${publication.id}`}
                       className="hover:text-subtle transition-colors"
@@ -102,7 +102,7 @@ export default async function PublicationsPage() {
                     </p>
                   )}
                   
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-subtle mb-4">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-subtle mb-4">
                     {publication.author && (
                       <div className="flex items-center space-x-1">
                         <User className="h-4 w-4" />
@@ -145,10 +145,10 @@ export default async function PublicationsPage() {
                   )}
                 </div>
                 
-                <div className="lg:w-48 flex flex-col space-y-3">
+                <div className="lg:w-48 flex flex-col space-y-2 lg:space-y-3">
                   <Link
                     href={`/api/articles/${publication.id}/download`}
-                    className="text-foreground hover:text-subtle transition-colors font-light underline text-center"
+                    className="text-foreground hover:text-subtle transition-colors font-light underline text-center text-sm sm:text-base"
                     download
                   >
                     <Download className="h-4 w-4 inline mr-2" />

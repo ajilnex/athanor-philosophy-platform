@@ -49,8 +49,8 @@ export default async function AdminPage() {
         <div className="card border-subtle">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-subtle">Total des publications</p>
-              <p className="text-2xl font-light text-foreground">{stats.total}</p>
+              <p className="text-xs sm:text-sm text-subtle">Total des publications</p>
+              <p className="text-xl sm:text-2xl font-light text-foreground">{stats.total}</p>
             </div>
             <FileText className="h-6 w-6 text-subtle" />
           </div>
@@ -58,8 +58,8 @@ export default async function AdminPage() {
         <div className="card border-subtle">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-subtle">Publications publiées</p>
-              <p className="text-2xl font-light text-foreground">{stats.published}</p>
+              <p className="text-xs sm:text-sm text-subtle">Publications publiées</p>
+              <p className="text-xl sm:text-2xl font-light text-foreground">{stats.published}</p>
             </div>
             <FileText className="h-6 w-6 text-subtle" />
           </div>
@@ -67,8 +67,8 @@ export default async function AdminPage() {
         <div className="card border-subtle">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-subtle">Taille totale</p>
-              <p className="text-2xl font-light text-foreground">{formatFileSize(stats.totalSize)}</p>
+              <p className="text-xs sm:text-sm text-subtle">Taille totale</p>
+              <p className="text-xl sm:text-2xl font-light text-foreground">{formatFileSize(stats.totalSize)}</p>
             </div>
             <Upload className="h-6 w-6 text-subtle" />
           </div>

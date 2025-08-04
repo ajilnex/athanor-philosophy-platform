@@ -6,12 +6,12 @@ export default async function BilletsPage() {
   const billets = await getAllBillets()
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-light text-foreground mb-4">
+        <h1 className="text-2xl sm:text-3xl font-light text-foreground mb-4">
           Billets
         </h1>
-        <p className="text-base text-subtle max-w-3xl font-light">
+        <p className="text-sm sm:text-base text-subtle max-w-3xl font-light">
           Pensées, réflexions et explorations philosophiques publiées au fil des jours. 
           Un laboratoire d'idées en mouvement.
         </p>
@@ -28,15 +28,15 @@ export default async function BilletsPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-8">
+        <div className="space-y-6 sm:space-y-8">
           {billets.map((billet) => (
             <article
               key={billet.slug}
-              className="card border-subtle mb-8"
+              className="card border-subtle"
             >
               <div className="flex flex-col space-y-4">
                 <div>
-                  <h2 className="text-xl font-light text-foreground mb-2">
+                  <h2 className="text-lg sm:text-xl font-light text-foreground mb-2">
                     <Link
                       href={`/billets/${billet.slug}`}
                       className="hover:text-subtle transition-colors"
@@ -46,12 +46,12 @@ export default async function BilletsPage() {
                   </h2>
                   
                   {billet.excerpt && (
-                    <p className="text-subtle mb-4 leading-relaxed font-light">
+                    <p className="text-sm sm:text-base text-subtle mb-4 leading-relaxed font-light">
                       {billet.excerpt}
                     </p>
                   )}
                   
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-subtle mb-4">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-subtle mb-4">
                     <div className="flex items-center space-x-1">
                       <Calendar className="h-4 w-4" />
                       <span>
@@ -84,7 +84,7 @@ export default async function BilletsPage() {
                 <div>
                   <Link
                     href={`/billets/${billet.slug}`}
-                    className="text-foreground hover:text-subtle transition-colors font-light underline"
+                    className="text-foreground hover:text-subtle transition-colors font-light underline text-sm sm:text-base"
                   >
                     Lire →
                   </Link>

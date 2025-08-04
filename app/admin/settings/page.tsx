@@ -21,7 +21,7 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
       <div className="mb-8">
         <Link
           href="/admin"
@@ -31,24 +31,24 @@ export default function AdminSettingsPage() {
           Retour à l'administration
         </Link>
         
-        <h1 className="text-3xl font-light text-foreground mb-4">
+        <h1 className="text-2xl sm:text-3xl font-light text-foreground mb-4">
           Paramètres
         </h1>
-        <p className="text-base text-subtle font-light">
+        <p className="text-sm sm:text-base text-subtle font-light">
           Configuration et préférences du site.
         </p>
       </div>
 
       <div className="card border-subtle">
-        <div className="p-6">
-          <h2 className="text-lg font-light text-foreground mb-6">
+        <div className="p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-light text-foreground mb-4 sm:mb-6">
             Apparence
           </h2>
           
-          <div className="flex items-center justify-between py-4 border-b border-subtle">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-4 border-b border-subtle gap-3 sm:gap-0">
             <div>
-              <h3 className="font-light text-foreground">Mode sombre</h3>
-              <p className="text-sm text-subtle font-light mt-1">
+              <h3 className="text-sm sm:text-base font-light text-foreground">Mode sombre</h3>
+              <p className="text-xs sm:text-sm text-subtle font-light mt-1">
                 Activer le thème sombre pour une meilleure lisibilité en faible luminosité
               </p>
             </div>
@@ -71,8 +71,8 @@ export default function AdminSettingsPage() {
             </button>
           </div>
 
-          <div className="mt-6">
-            <p className="text-xs text-subtle font-light">
+          <div className="mt-4 sm:mt-6">
+            <p className="text-xs sm:text-xs text-subtle font-light">
               Note: Le mode sombre est en cours de développement et s'appliquera à toute l'interface dans une future mise à jour.
             </p>
           </div>

@@ -98,7 +98,7 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
       <div className="mb-8">
         <Link
           href="/admin"
@@ -108,10 +108,10 @@ export default function UploadPage() {
           Retour à l'administration
         </Link>
         
-        <h1 className="text-3xl font-light text-foreground mb-4">
+        <h1 className="text-2xl sm:text-3xl font-light text-foreground mb-4">
           Ajouter une Publication
         </h1>
-        <p className="text-base text-subtle font-light">
+        <p className="text-sm sm:text-base text-subtle font-light">
           Uploadez un nouveau fichier PDF et renseignez ses métadonnées.
         </p>
       </div>
@@ -120,10 +120,10 @@ export default function UploadPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* File Upload */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
               Fichier PDF *
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center hover:border-primary-400 transition-colors">
               <input
                 type="file"
                 accept=".pdf"
@@ -136,10 +136,10 @@ export default function UploadPage() {
                   <div className="flex items-center justify-center space-x-2">
                     <FileText className="h-8 w-8 text-primary-600" />
                     <div>
-                      <p className="text-lg font-medium text-gray-900">
+                      <p className="text-sm sm:text-lg font-medium text-gray-900">
                         {selectedFile.name}
                       </p>
-                      <p className="text-sm text-subtle">
+                      <p className="text-xs sm:text-sm text-subtle">
                         {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                       </p>
                     </div>
@@ -154,10 +154,10 @@ export default function UploadPage() {
                 ) : (
                   <div>
                     <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-lg font-medium text-gray-900 mb-2">
+                    <p className="text-sm sm:text-lg font-medium text-gray-900 mb-2">
                       Cliquez pour sélectionner un fichier PDF
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-xs sm:text-sm text-gray-500">
                       Taille maximale: 50MB
                     </p>
                   </div>
@@ -168,7 +168,7 @@ export default function UploadPage() {
 
           {/* Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="title" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
               Titre *
             </label>
             <input
@@ -185,7 +185,7 @@ export default function UploadPage() {
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="description" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
               Description
             </label>
             <textarea
@@ -201,7 +201,7 @@ export default function UploadPage() {
 
           {/* Author */}
           <div>
-            <label htmlFor="author" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="author" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
               Auteur
             </label>
             <input
@@ -217,7 +217,7 @@ export default function UploadPage() {
 
           {/* Tags */}
           <div>
-            <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="tags" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
               Mots-clés
             </label>
             <input
@@ -229,14 +229,14 @@ export default function UploadPage() {
               className="input-field"
               placeholder="philosophie, éthique, métaphysique (séparés par des virgules)"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs sm:text-xs text-gray-500 mt-1">
               Séparez les mots-clés par des virgules
             </p>
           </div>
 
           {/* Category */}
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="category" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
               Catégorie
             </label>
             <select
@@ -273,7 +273,7 @@ export default function UploadPage() {
           )}
 
           {/* Submit Button */}
-          <div className="flex justify-end space-x-4">
+          <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
             <Link
               href="/admin"
               className="btn-secondary"
