@@ -45,7 +45,7 @@ export async function getAllBillets(): Promise<Billet[]> {
     )
 
     return billets
-      .filter(Boolean)
+      .filter((billet): billet is Billet => billet !== null)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   } catch (error) {
     console.error('Error reading billets:', error)
