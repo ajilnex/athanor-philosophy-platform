@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { FileText, User, Calendar, Tag, Download } from 'lucide-react'
 
-// Article type definition
-type Article = {
+// Publication type definition
+type Publication = {
   id: string
   title: string
   description: string | null
@@ -16,27 +16,27 @@ type Article = {
 import { prisma } from '@/lib/prisma'
 
 // Direct Prisma call for build time, fallback to API for runtime
-async function getArticles(): Promise<Article[]> {
+async function getPublications(): Promise<Publication[]> {
   try {
-    console.log('🔍 Fetching articles...')
+    console.log('🔍 Fetching publications...')
     
     // During build, use direct Prisma connection
     if (process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV !== 'production') {
       // Build time - return empty array to avoid build failures
-      console.log('⚠️ Build time - returning empty articles array')
+      console.log('⚠️ Build time - returning empty publications array')
       return []
     }
     
     // Runtime - use direct Prisma
-    const articles = await prisma.article.findMany({
+    const publications = await prisma.article.findMany({
       where: { isPublished: true },
       orderBy: { publishedAt: 'desc' },
     })
     
-    console.log(`📄 Found ${articles.length} articles`)
-    return articles
+    console.log(`📄 Found ${publications.length} publications`)
+    return publications
   } catch (error) {
-    console.error('❌ Error fetching articles:', error)
+    console.error('❌ Error fetching publications:', error)
     return []
   }
 }
@@ -52,8 +52,8 @@ function formatFileSize(bytes: number): string {
 // Force dynamic rendering to avoid build-time API calls
 export const dynamic = 'force-dynamic'
 
-export default async function ArticlesPage() {
-  const articles = await getArticles()
+export default async function PublicationsPage() {
+  const publications = await getPublications()
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-12">
@@ -66,7 +66,7 @@ export default async function ArticlesPage() {
         </p>
       </div>
 
-      {articles.length === 0 ? (
+      {publications.length === 0 ? (
         <div className="text-center py-12">
           <FileText className="h-12 w-12 text-subtle mx-auto mb-4" />
           <h3 className="text-lg font-light text-foreground mb-2">
@@ -81,41 +81,41 @@ export default async function ArticlesPage() {
         </div>
       ) : (
         <div className="grid gap-6">
-          {articles.map((article: Article) => (
+          {publications.map((publication: Publication) => (
             <article
-              key={article.id}
+              key={publication.id}
               className="card border-subtle mb-8"
             >
               <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                 <div className="flex-1">
                   <h2 className="text-xl font-light text-foreground mb-3">
                     <Link
-                      href={`/articles/${article.id}`}
+                      href={`/publications/${publication.id}`}
                       className="hover:text-subtle transition-colors"
                     >
-                      {article.title}
+                      {publication.title}
                     </Link>
                   </h2>
                   
-                  {article.description && (
+                  {publication.description && (
                     <p className="text-subtle mb-4 line-clamp-3 font-light">
-                      {article.description}
+                      {publication.description}
                     </p>
                   )}
                   
                   <div className="flex flex-wrap items-center gap-4 text-sm text-subtle mb-4">
-                    {article.author && (
+                    {publication.author && (
                       <div className="flex items-center space-x-1">
                         <User className="h-4 w-4" />
-                        <span>{article.author}</span>
+                        <span>{publication.author}</span>
                       </div>
                     )}
                     <div className="flex items-center space-x-1">
                       <Calendar className="h-4 w-4" />
                       <span>
-                        {(article.publishedAt instanceof Date 
-                          ? article.publishedAt 
-                          : new Date(article.publishedAt)
+                        {(publication.publishedAt instanceof Date 
+                          ? publication.publishedAt 
+                          : new Date(publication.publishedAt)
                         ).toLocaleDateString('fr-FR', {
                           year: 'numeric',
                           month: 'long',
@@ -125,15 +125,15 @@ export default async function ArticlesPage() {
                     </div>
                     <div className="flex items-center space-x-1">
                       <FileText className="h-4 w-4" />
-                      <span>{formatFileSize(article.fileSize)}</span>
+                      <span>{formatFileSize(publication.fileSize)}</span>
                     </div>
                   </div>
                   
-                  {article.tags && article.tags.length > 0 && (
+                  {publication.tags && publication.tags.length > 0 && (
                     <div className="flex items-center space-x-2 mb-4">
                       <Tag className="h-4 w-4 text-subtle" />
                       <div className="flex flex-wrap gap-2">
-                        {article.tags.map((tag) => (
+                        {publication.tags.map((tag) => (
                           <span
                             key={tag}
                             className="px-2 py-1 text-xs bg-gray-100 text-foreground"
@@ -148,7 +148,7 @@ export default async function ArticlesPage() {
                 
                 <div className="lg:w-48 flex flex-col space-y-3">
                   <Link
-                    href={`/api/articles/${article.id}/download`}
+                    href={`/api/articles/${publication.id}/download`}
                     className="text-foreground hover:text-subtle transition-colors font-light underline text-center"
                     download
                   >

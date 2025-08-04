@@ -13,7 +13,7 @@ export function Navbar() {
               Billets
             </Link>
             <Link
-              href="/articles"
+              href="/publications"
               className="text-foreground hover:text-subtle transition-colors font-light"
             >
               Publications

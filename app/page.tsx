@@ -14,7 +14,7 @@ export default function HomePage() {
           <Link href="/billets" className="hover:text-subtle transition-colors">
             Billets
           </Link>
-          <Link href="/articles" className="hover:text-subtle transition-colors">
+          <Link href="/publications" className="hover:text-subtle transition-colors">
             Publications
           </Link>
           <Link href="/a-propos" className="hover:text-subtle transition-colors">

@@ -46,7 +46,7 @@ export default async function AdminPage() {
 
       {/* Stats Cards */}
       <div className="grid md:grid-cols-3 gap-6 mb-8">
-        <div className="card">
+        <div className="card border-subtle">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total des articles</p>
@@ -55,7 +55,7 @@ export default async function AdminPage() {
             <FileText className="h-8 w-8 text-primary-700" />
           </div>
         </div>
-        <div className="card">
+        <div className="card border-subtle">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Articles publiés</p>
@@ -64,7 +64,7 @@ export default async function AdminPage() {
             <FileText className="h-8 w-8 text-green-600" />
           </div>
         </div>
-        <div className="card">
+        <div className="card border-subtle">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Taille totale</p>
