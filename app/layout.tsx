@@ -4,8 +4,8 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
-  title: 'Plateforme Philosophique',
-  description: 'Une collection d\'articles de philosophie contemporaine',
+  title: 'Athanor - Plateforme Philosophique',
+  description: 'Athanor - Une collection d\'articles de philosophie contemporaine',
 }
 
 export default function RootLayout({

@@ -26,7 +26,7 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
 1. **Clonez le dépôt**
    ```bash
    git clone <url-du-repo>
-   cd philosophy-platform
+   cd athanor
    ```
 
 2. **Installez les dépendances**
@@ -57,10 +57,10 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
 ## Structure du projet
 
 ```
-philosophy-platform/
+athanor/
 ├── app/                    # App Router de Next.js
 │   ├── admin/             # Interface d'administration
-│   ├── articles/          # Pages des articles
+│   ├── publications/      # Pages des publications
 │   ├── search/            # Page de recherche
 │   └── api/              # Routes API
 ├── components/            # Composants React réutilisables

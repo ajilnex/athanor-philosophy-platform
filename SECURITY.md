@@ -12,7 +12,7 @@
 
 ### Variables d'Environnement sur Vercel
 
-Connectez-vous à votre [Dashboard Vercel](https://vercel.com/dashboard) → Projet "athanor-philosophy-platform" → Settings → Environment Variables :
+Connectez-vous à votre [Dashboard Vercel](https://vercel.com/dashboard) → Projet "athanor" → Settings → Environment Variables :
 
 **Variables OBLIGATOIRES :**
 ```bash
