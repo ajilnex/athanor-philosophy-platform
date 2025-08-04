@@ -102,7 +102,7 @@ export default async function AdminPage() {
             </div>
             <div>
               <h3 className="font-light text-foreground">Gérer les Publications</h3>
-              <p className="text-sm text-subtle font-light">Modifier, supprimer, publier</p>
+              <p className="text-sm text-subtle font-light">Voir et supprimer</p>
             </div>
           </div>
         </Link>

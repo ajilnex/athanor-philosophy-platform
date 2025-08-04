@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { AdminArticleActions } from '@/components/admin/AdminArticleActions'
 
@@ -41,7 +41,7 @@ export default async function AdminPublicationsPage() {
               Gestion des Publications
             </h1>
             <p className="text-base text-subtle font-light">
-              Gérez toutes vos publications: modifier, publier/dépublier, supprimer.
+              Gérez toutes vos publications: voir et supprimer.
             </p>
           </div>
           <Link
@@ -81,9 +81,6 @@ export default async function AdminPublicationsPage() {
                     Auteur
                   </th>
                   <th className="text-left py-4 px-2 font-light text-foreground">
-                    Statut
-                  </th>
-                  <th className="text-left py-4 px-2 font-light text-foreground">
                     Taille
                   </th>
                   <th className="text-left py-4 px-2 font-light text-foreground">
@@ -111,25 +108,6 @@ export default async function AdminPublicationsPage() {
                     </td>
                     <td className="py-4 px-2 text-subtle font-light">
                       {publication.author || '-'}
-                    </td>
-                    <td className="py-4 px-2">
-                      <div className="flex items-center space-x-2">
-                        {publication.isPublished ? (
-                          <>
-                            <Eye className="h-4 w-4 text-foreground" />
-                            <span className="text-sm text-foreground font-light">
-                              Publié
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <EyeOff className="h-4 w-4 text-subtle" />
-                            <span className="text-sm text-subtle font-light">
-                              Brouillon
-                            </span>
-                          </>
-                        )}
-                      </div>
                     </td>
                     <td className="py-4 px-2 text-subtle text-sm font-light">
                       {formatFileSize(publication.fileSize)}

@@ -27,9 +27,8 @@ async function getPublications(): Promise<Publication[]> {
       return []
     }
     
-    // Runtime - use direct Prisma
+    // Runtime - use direct Prisma (show all publications)
     const publications = await prisma.article.findMany({
-      where: { isPublished: true },
       orderBy: { publishedAt: 'desc' },
     })
     

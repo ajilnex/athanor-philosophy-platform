@@ -1,38 +1,23 @@
 'use client'
 
 import { useState } from 'react'
-import { Trash2, Eye, EyeOff, ExternalLink } from 'lucide-react'
-import { toggleArticlePublished, deleteArticle } from '@/app/admin/actions'
+import { Trash2, ExternalLink } from 'lucide-react'
+import { deleteArticle } from '@/app/admin/actions'
 
-interface Article {
+interface Publication {
   id: string
   title: string
-  isPublished: boolean
 }
 
 interface AdminArticleActionsProps {
-  article: Article
+  article: Publication
 }
 
 export function AdminArticleActions({ article }: AdminArticleActionsProps) {
   const [isLoading, setIsLoading] = useState(false)
 
-  async function handleTogglePublished() {
-    setIsLoading(true)
-    try {
-      const result = await toggleArticlePublished(article.id)
-      if (!result.success) {
-        alert('Erreur lors de la mise à jour')
-      }
-    } catch (error) {
-      alert('Erreur réseau')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  async function handleDeleteArticle() {
-    const confirmMessage = `Êtes-vous sûr de vouloir supprimer définitivement l'article "${article.title}" ?\n\nCette action est irréversible.`
+  async function handleDeletePublication() {
+    const confirmMessage = `Êtes-vous sûr de vouloir supprimer définitivement la publication "${article.title}" ?\n\nCette action est irréversible.`
     if (!confirm(confirmMessage)) {
       return
     }
@@ -53,33 +38,20 @@ export function AdminArticleActions({ article }: AdminArticleActionsProps) {
   return (
     <div className="flex items-center space-x-2">
       <a
-        href={`/articles/${article.id}`}
+        href={`/publications/${article.id}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
-        title="Voir l'article"
+        className="p-2 text-subtle hover:text-foreground hover:bg-gray-100 rounded-lg transition-colors"
+        title="Voir la publication"
       >
         <ExternalLink className="h-4 w-4" />
       </a>
       
       <button
-        onClick={handleTogglePublished}
+        onClick={handleDeletePublication}
         disabled={isLoading}
-        className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
-        title={article.isPublished ? 'Dépublier' : 'Publier'}
-      >
-        {article.isPublished ? (
-          <EyeOff className="h-4 w-4" />
-        ) : (
-          <Eye className="h-4 w-4" />
-        )}
-      </button>
-      
-      <button
-        onClick={handleDeleteArticle}
-        disabled={isLoading}
-        className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-        title="Supprimer l'article"
+        className="p-2 text-subtle hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+        title="Supprimer la publication"
       >
         <Trash2 className="h-4 w-4" />
       </button>

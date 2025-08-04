@@ -24,7 +24,7 @@ function formatFileSize(bytes: number): string {
 export default async function PublicationPage({ params }: { params: { id: string } }) {
   const publication = await getPublication(params.id)
 
-  if (!publication || !publication.isPublished) {
+  if (!publication) {
     notFound()
   }
 
