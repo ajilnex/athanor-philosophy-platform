@@ -35,6 +35,12 @@ export function Navbar() {
               Articles
             </Link>
             <Link
+              href="/billets"
+              className="text-gray-700 hover:text-primary-700 px-3 py-2 text-sm font-medium transition-colors"
+            >
+              Billets
+            </Link>
+            <Link
               href="/search"
               className="text-gray-700 hover:text-primary-700 px-3 py-2 text-sm font-medium transition-colors flex items-center space-x-1"
             >
@@ -77,6 +83,13 @@ export function Navbar() {
                 onClick={() => setIsOpen(false)}
               >
                 Articles
+              </Link>
+              <Link
+                href="/billets"
+                className="text-gray-700 hover:text-primary-700 px-3 py-2 text-sm font-medium"
+                onClick={() => setIsOpen(false)}
+              >
+                Billets
               </Link>
               <Link
                 href="/search"
