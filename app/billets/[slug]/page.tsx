@@ -16,23 +16,23 @@ export default async function BilletPage({ params }: { params: { slug: string } 
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-4xl mx-auto px-6 py-8">
       {/* Header */}
       <div className="mb-8">
         <Link
           href="/billets"
-          className="inline-flex items-center text-primary-700 hover:text-primary-800 mb-6"
+          className="inline-flex items-center text-subtle hover:text-foreground mb-6 font-light"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour aux billets
         </Link>
         
         <div className="mb-6">
-          <h1 className="text-4xl font-serif font-bold text-primary-900 mb-4">
+          <h1 className="text-3xl font-light text-foreground mb-4">
             {billet.title}
           </h1>
           
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
+          <div className="flex flex-wrap items-center gap-4 text-sm text-subtle mb-4">
             <div className="flex items-center space-x-2">
               <Calendar className="h-4 w-4" />
               <span>
@@ -47,12 +47,12 @@ export default async function BilletPage({ params }: { params: { slug: string } 
           
           {billet.tags && billet.tags.length > 0 && (
             <div className="flex items-center space-x-2">
-              <Tag className="h-4 w-4 text-gray-400" />
+              <Tag className="h-4 w-4 text-subtle" />
               <div className="flex flex-wrap gap-2">
                 {billet.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-3 py-1 text-sm bg-primary-100 text-primary-700 rounded-full"
+                    className="px-3 py-1 text-sm bg-gray-100 text-foreground"
                   >
                     {tag}
                   </span>
@@ -64,18 +64,18 @@ export default async function BilletPage({ params }: { params: { slug: string } 
       </div>
 
       {/* Content */}
-      <article className="prose prose-lg max-w-none">
+      <article className="prose max-w-none">
         <div 
           dangerouslySetInnerHTML={{ __html: billet.content }}
-          className="prose-headings:font-serif prose-headings:text-primary-900 prose-a:text-primary-700 prose-a:no-underline hover:prose-a:underline"
+          className=""
         />
       </article>
 
       {/* Navigation */}
-      <div className="mt-12 pt-8 border-t border-gray-200">
+      <div className="mt-12 pt-8 border-t border-subtle">
         <Link
           href="/billets"
-          className="btn-secondary inline-flex items-center space-x-2"
+          className="text-subtle hover:text-foreground transition-colors font-light inline-flex items-center space-x-2"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Tous les billets</span>

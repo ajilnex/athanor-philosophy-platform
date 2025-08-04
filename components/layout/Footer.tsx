@@ -1,13 +1,12 @@
 export function Footer() {
   return (
-    <footer className="bg-white border-t border-gray-200 mt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <footer className="bg-background border-t border-subtle mt-16">
+      <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="text-center">
-          <p className="text-gray-600 text-sm">
-            © {new Date().getFullYear()} Athanor - Plateforme Philosophique
-          </p>
-          <p className="text-gray-500 text-xs mt-2">
-            Une collection d'articles de philosophie contemporaine
+          <p className="text-subtle text-sm font-light">
+            <a href="mailto:aub.robert@gmail.com" className="hover:text-foreground transition-colors">
+              aub.robert@gmail.com
+            </a>
           </p>
         </div>
       </div>

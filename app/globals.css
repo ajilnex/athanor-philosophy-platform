@@ -1,52 +1,52 @@
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  html {
-    font-family: 'Inter', system-ui, sans-serif;
+  body {
+    @apply bg-background text-foreground font-serif;
   }
   
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Crimson Text', Georgia, serif;
+  a {
+    @apply hover:underline;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-700 hover:bg-primary-800 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200;
+    @apply bg-foreground hover:bg-opacity-80 text-white px-4 py-2 font-light transition-opacity duration-200;
   }
   
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 text-primary-700 border border-primary-300 px-6 py-3 rounded-lg font-medium transition-colors duration-200;
+    @apply bg-white hover:bg-gray-50 text-foreground border border-subtle px-4 py-2 font-light transition-colors duration-200;
   }
   
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+    @apply bg-white border border-gray-200 p-6;
   }
   
   .input-field {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200;
+    @apply w-full px-3 py-2 border border-subtle focus:outline-none focus:border-foreground transition-colors duration-200;
   }
 
   /* Styles pour les backlinks [[mot]] */
   .backlink {
-    @apply text-primary-600 hover:text-primary-800 font-medium border-b border-primary-300 hover:border-primary-500 transition-colors duration-200;
-    text-decoration: none;
+    @apply text-foreground hover:opacity-70 font-normal underline transition-opacity duration-200;
+    text-decoration: underline;
   }
 
   .backlink[data-missing="true"] {
-    @apply text-red-500 hover:text-red-700 border-red-300 hover:border-red-500;
+    @apply text-subtle hover:opacity-70;
   }
 
   /* Prose styles pour les billets */
   .prose {
-    @apply text-gray-800 leading-relaxed;
+    @apply text-foreground leading-relaxed;
   }
 
   .prose h1, .prose h2, .prose h3 {
-    @apply font-serif text-primary-900 mb-4;
+    @apply font-serif text-foreground mb-4 font-light;
   }
 
   .prose h1 {
@@ -66,7 +66,7 @@
   }
 
   .prose blockquote {
-    @apply border-l-4 border-primary-200 pl-4 italic text-gray-700 my-6;
+    @apply border-l-2 border-subtle pl-4 italic text-subtle my-6;
   }
 
   .prose ul, .prose ol {
