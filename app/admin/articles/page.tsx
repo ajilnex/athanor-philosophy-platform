@@ -1,18 +1,16 @@
-'use client'
-
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
-import { ArticleActions } from '@/components/admin/ArticleActions'
+import { prisma } from '@/lib/prisma'
+import { AdminArticleActions } from '@/components/admin/AdminArticleActions'
 
-interface Article {
-  id: string
-  title: string
-  description: string | null
-  author: string | null
-  isPublished: boolean
-  fileSize: number
-  createdAt: string
+async function getAllArticles() {
+  try {
+    return await prisma.article.findMany({
+      orderBy: { createdAt: 'desc' },
+    })
+  } catch (error) {
+    return []
+  }
 }
 
 function formatFileSize(bytes: number): string {
@@ -23,55 +21,8 @@ function formatFileSize(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
 }
 
-export default function AdminArticlesPage() {
-  const [articles, setArticles] = useState<Article[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    fetchArticles()
-  }, [])
-
-  async function fetchArticles() {
-    try {
-      const response = await fetch('/api/admin/articles', {
-        headers: {
-          'x-admin-key': process.env.NEXT_PUBLIC_ADMIN_KEY || 'default-dev-key'
-        }
-      })
-      if (response.ok) {
-        const data = await response.json()
-        setArticles(data)
-      }
-    } catch (error) {
-      console.error('Error fetching articles:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  function handleDelete(articleId: string) {
-    setArticles(prev => prev.filter(article => article.id !== articleId))
-  }
-
-  function handleTogglePublish(articleId: string, isPublished: boolean) {
-    setArticles(prev => 
-      prev.map(article => 
-        article.id === articleId 
-          ? { ...article, isPublished }
-          : article
-      )
-    )
-  }
-
-  if (isLoading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center py-12">
-          <p className="text-gray-500">Chargement des articles...</p>
-        </div>
-      </div>
-    )
-  }
+export default async function AdminArticlesPage() {
+  const articles = await getAllArticles()
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -187,11 +138,7 @@ export default function AdminArticlesPage() {
                       {new Date(article.createdAt).toLocaleDateString('fr-FR')}
                     </td>
                     <td className="py-4 px-2">
-                      <ArticleActions 
-                        article={article} 
-                        onDelete={handleDelete}
-                        onTogglePublish={handleTogglePublish}
-                      />
+                      <AdminArticleActions article={article} />
                     </td>
                   </tr>
                 ))}

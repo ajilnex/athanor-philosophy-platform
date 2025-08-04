@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Trash2, Eye, EyeOff, ExternalLink } from 'lucide-react'
+import { toggleArticlePublished, deleteArticle } from '@/app/admin/actions'
 
 interface Article {
   id: string
@@ -9,30 +10,18 @@ interface Article {
   isPublished: boolean
 }
 
-interface ArticleActionsProps {
+interface AdminArticleActionsProps {
   article: Article
-  onDelete: (id: string) => void
-  onTogglePublish: (id: string, isPublished: boolean) => void
 }
 
-export function ArticleActions({ article, onDelete, onTogglePublish }: ArticleActionsProps) {
+export function AdminArticleActions({ article }: AdminArticleActionsProps) {
   const [isLoading, setIsLoading] = useState(false)
 
-  async function togglePublished() {
+  async function handleTogglePublished() {
     setIsLoading(true)
     try {
-      const response = await fetch(`/api/admin/articles/${article.id}`, {
-        method: 'PATCH',
-        headers: { 
-          'Content-Type': 'application/json',
-          'x-admin-key': process.env.NEXT_PUBLIC_ADMIN_KEY || 'default-dev-key'
-        },
-        body: JSON.stringify({ isPublished: !article.isPublished }),
-      })
-
-      if (response.ok) {
-        onTogglePublish(article.id, !article.isPublished)
-      } else {
+      const result = await toggleArticlePublished(article.id)
+      if (!result.success) {
         alert('Erreur lors de la mise à jour')
       }
     } catch (error) {
@@ -42,7 +31,7 @@ export function ArticleActions({ article, onDelete, onTogglePublish }: ArticleAc
     }
   }
 
-  async function deleteArticle() {
+  async function handleDeleteArticle() {
     const confirmMessage = `Êtes-vous sûr de vouloir supprimer définitivement l'article "${article.title}" ?\n\nCette action est irréversible.`
     if (!confirm(confirmMessage)) {
       return
@@ -50,16 +39,8 @@ export function ArticleActions({ article, onDelete, onTogglePublish }: ArticleAc
 
     setIsLoading(true)
     try {
-      const response = await fetch(`/api/admin/articles/${article.id}`, {
-        method: 'DELETE',
-        headers: {
-          'x-admin-key': process.env.NEXT_PUBLIC_ADMIN_KEY || 'default-dev-key'
-        }
-      })
-
-      if (response.ok) {
-        onDelete(article.id)
-      } else {
+      const result = await deleteArticle(article.id)
+      if (!result.success) {
         alert('Erreur lors de la suppression')
       }
     } catch (error) {
@@ -82,7 +63,7 @@ export function ArticleActions({ article, onDelete, onTogglePublish }: ArticleAc
       </a>
       
       <button
-        onClick={togglePublished}
+        onClick={handleTogglePublished}
         disabled={isLoading}
         className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
         title={article.isPublished ? 'Dépublier' : 'Publier'}
@@ -95,7 +76,7 @@ export function ArticleActions({ article, onDelete, onTogglePublish }: ArticleAc
       </button>
       
       <button
-        onClick={deleteArticle}
+        onClick={handleDeleteArticle}
         disabled={isLoading}
         className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
         title="Supprimer l'article"

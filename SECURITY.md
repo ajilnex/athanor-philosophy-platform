@@ -1,18 +1,23 @@
 # 🛡️ Guide de Sécurité - Athanor
 
-## ⚠️ Configuration Obligatoire
+## ✅ **ARCHITECTURE SÉCURISÉE IMPLÉMENTÉE**
 
-### 1. Variables d'Environnement à Configurer sur Vercel
+### **Sécurité par Design :**
+- 🛡️ **Server Components** - Accès direct à la base de données côté serveur
+- 🔐 **Server Actions** - Actions sécurisées sans exposition de clés  
+- 🚫 **Aucune clé publique** - Plus de secrets exposés au navigateur
+- ⚡ **APIs protégées** - Endpoints externes verrouillés par clé
+
+## ⚠️ Configuration Minimale Requise
+
+### Variables d'Environnement sur Vercel
 
 Connectez-vous à votre [Dashboard Vercel](https://vercel.com/dashboard) → Projet "athanor-philosophy-platform" → Settings → Environment Variables :
 
 **Variables OBLIGATOIRES :**
 ```bash
-# 🔐 Clé d'administration (URGENT - Générez une clé forte)
+# 🔐 Clé d'administration (pour APIs externes uniquement)
 ADMIN_API_KEY=votre-cle-secrete-tres-longue-et-complexe
-
-# 🔐 Clé publique pour le frontend (même valeur)  
-NEXT_PUBLIC_ADMIN_KEY=votre-cle-secrete-tres-longue-et-complexe
 
 # 🗄️ Base de données PostgreSQL (déjà configuré)
 DATABASE_URL=postgresql://...
@@ -22,6 +27,8 @@ CLOUDINARY_CLOUD_NAME=...
 CLOUDINARY_API_KEY=...
 CLOUDINARY_API_SECRET=...
 ```
+
+⚠️ **IMPORTANT:** Plus besoin de `NEXT_PUBLIC_ADMIN_KEY` - c'était dangereux !
 
 ### 2. Comment Générer une Clé Sécurisée
 
@@ -39,47 +46,42 @@ openssl rand -base64 32
 K8mN2pQ7sT9vW4xZ1eR6yU3oI5lA8bC0dF7gH9jM2nP5q
 ```
 
-## 🛡️ Protections Implémentées
+## 🛡️ Protections Actives
 
-### 1. APIs d'Administration Sécurisées
-- ✅ Tous les endpoints `/api/admin/*` nécessitent la clé API
-- ✅ Validation de la clé sur chaque requête  
-- ✅ Messages d'erreur sécurisés (pas de fuite d'info)
+### 1. Architecture Sécurisée
+- ✅ **Server Components** - Données chargées côté serveur uniquement
+- ✅ **Server Actions** - Actions exécutées côté serveur sans clés exposées
+- ✅ **APIs verrouillées** - Endpoints `/api/admin/*` protégés par clé (usage externe uniquement)
+- ✅ **Validation stricte** - Toutes les entrées utilisateur validées
 
-### 2. Protection Upload
-- ✅ Fichiers PDF uniquement
+### 2. Protection Upload Renforcée
+- ✅ Fichiers PDF uniquement (validation MIME type)
 - ✅ Limite de taille : 50MB maximum
-- ✅ Validation des noms de fichiers
-- ✅ Authentification obligatoire
+- ✅ Noms de fichiers sécurisés (regex strict)
+- ✅ Upload direct via Server Action (pas d'API publique)
 
 ### 3. Sécurité Base de Données
-- ✅ Variables d'environnement (pas de secrets hardcodés)
-- ✅ Connexions chiffrées PostgreSQL
-- ✅ Pas d'accès direct public à la DB
+- ✅ Accès direct Prisma côté serveur uniquement
+- ✅ Variables d'environnement sécurisées
+- ✅ Connexions PostgreSQL chiffrées
+- ✅ Aucune requête depuis le navigateur
 
-## 🚨 Actions Urgentes Requises
+## ✅ **ÉTAT ACTUEL : SÉCURISÉ !**
 
-### ÉTAPE 1 : Configurer la Clé API (IMMÉDIAT)
+### **Rien à faire - Architecture sécurisée active :**
 
-1. Allez sur [Vercel Dashboard](https://vercel.com/dashboard)
-2. Sélectionnez votre projet "athanor-philosophy-platform"  
-3. Settings → Environment Variables
-4. Ajoutez ces 2 variables :
-   - `ADMIN_API_KEY` = votre-clé-générée
-   - `NEXT_PUBLIC_ADMIN_KEY` = même-clé
+1. ✅ **Pages admin sécurisées** - Server Components avec accès direct base de données
+2. ✅ **Actions protégées** - Server Actions sans exposition de clés
+3. ✅ **Upload sécurisé** - Validation complète côté serveur
+4. ✅ **APIs verrouillées** - Protection par clé pour usage externe uniquement
 
-5. **REDÉPLOYEZ** le site (le déploiement se fera automatiquement)
+### **Optionnel : Supprimer NEXT_PUBLIC_ADMIN_KEY de Vercel**
 
-### ÉTAPE 2 : Vérifier la Protection
-
-Testez que l'API est protégée :
-```bash
-# Cette requête DOIT échouer (401 Unauthorized)
-curl https://athanor-philosophy-platform.vercel.app/api/admin/stats
-
-# Cette requête DOIT réussir (avec votre clé)
-curl -H "x-admin-key: votre-cle" https://athanor-philosophy-platform.vercel.app/api/admin/stats
-```
+Si tu l'as déjà ajoutée :
+1. Va sur [Vercel Dashboard](https://vercel.com/dashboard) → ton projet
+2. Settings → Environment Variables  
+3. **Supprime** `NEXT_PUBLIC_ADMIN_KEY` (c'était dangereux)
+4. **Garde** seulement `ADMIN_API_KEY` (pour APIs externes)
 
 ## 📋 Checklist de Sécurité
 

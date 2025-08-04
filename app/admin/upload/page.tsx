@@ -70,30 +70,22 @@ export default function UploadPage() {
       uploadFormData.append('author', formData.author.trim())
       uploadFormData.append('category', formData.category.trim())
       
-      // Convert tags string to array
+      // Convert tags string to array for the server action
       const tagsArray = formData.tags
         .split(',')
         .map(tag => tag.trim())
         .filter(tag => tag.length > 0)
       uploadFormData.append('tags', JSON.stringify(tagsArray))
 
-      const response = await fetch('/api/admin/upload', {
-        method: 'POST',
-        headers: {
-          'x-admin-key': process.env.NEXT_PUBLIC_ADMIN_KEY || 'default-dev-key'
-        },
-        body: uploadFormData,
-      })
+      // Call server action directly
+      const { uploadArticle } = await import('@/app/admin/actions')
+      const result = await uploadArticle(uploadFormData)
 
-      if (response.ok) {
-        const result = await response.json()
-        setSuccess('Article ajouté avec succès!')
-        setTimeout(() => {
-          router.push(`/articles/${result.id}`)
-        }, 2000)
+      if (result && !result.success) {
+        setError(result.error || 'Erreur lors de l\'upload')
       } else {
-        const errorData = await response.json()
-        setError(errorData.error || 'Erreur lors de l\'upload')
+        setSuccess('Article ajouté avec succès!')
+        // Redirect will be handled by the server action
       }
     } catch (error) {
       setError('Erreur réseau. Veuillez réessayer.')
