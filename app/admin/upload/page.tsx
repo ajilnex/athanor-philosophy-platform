@@ -79,6 +79,9 @@ export default function UploadPage() {
 
       const response = await fetch('/api/admin/upload', {
         method: 'POST',
+        headers: {
+          'x-admin-key': process.env.NEXT_PUBLIC_ADMIN_KEY || 'default-dev-key'
+        },
         body: uploadFormData,
       })
 

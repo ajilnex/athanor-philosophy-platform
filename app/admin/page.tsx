@@ -32,7 +32,11 @@ export default function AdminPage() {
 
   async function fetchStats() {
     try {
-      const response = await fetch('/api/admin/stats')
+      const response = await fetch('/api/admin/stats', {
+        headers: {
+          'x-admin-key': process.env.NEXT_PUBLIC_ADMIN_KEY || 'default-dev-key'
+        }
+      })
       if (response.ok) {
         const data = await response.json()
         setStats(data)

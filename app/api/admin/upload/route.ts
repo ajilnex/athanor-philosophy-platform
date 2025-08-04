@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import cloudinary from '@/lib/cloudinary'
+import { validateAdminAccess, createUnauthorizedResponse } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
+  // 🛡️ PROTECTION: Vérifier l'autorisation admin
+  if (!validateAdminAccess(request)) {
+    return createUnauthorizedResponse()
+  }
+
   try {
     console.log('📤 Upload request received')
     
@@ -36,6 +42,19 @@ export async function POST(request: NextRequest) {
     if (file.type !== 'application/pdf') {
       console.log('❌ File is not PDF:', file.type)
       return NextResponse.json({ error: 'Only PDF files are allowed' }, { status: 400 })
+    }
+
+    // 🛡️ PROTECTION: Limite de taille (50MB max)
+    const maxSize = 50 * 1024 * 1024 // 50MB
+    if (file.size > maxSize) {
+      console.log('❌ File too large:', file.size)
+      return NextResponse.json({ error: 'File size must be less than 50MB' }, { status: 400 })
+    }
+
+    // 🛡️ PROTECTION: Vérifier le nom de fichier
+    if (!file.name.match(/^[a-zA-Z0-9._-]+\.pdf$/)) {
+      console.log('❌ Invalid filename:', file.name)
+      return NextResponse.json({ error: 'Invalid filename. Use only letters, numbers, dots, hyphens and underscores.' }, { status: 400 })
     }
 
     // Parse tags

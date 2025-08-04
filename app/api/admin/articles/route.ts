@@ -1,7 +1,13 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { validateAdminAccess, createUnauthorizedResponse } from '@/lib/auth'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // 🛡️ PROTECTION: Vérifier l'autorisation admin
+  if (!validateAdminAccess(request)) {
+    return createUnauthorizedResponse()
+  }
+
   try {
     const articles = await prisma.article.findMany({
       orderBy: { createdAt: 'desc' },

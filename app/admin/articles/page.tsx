@@ -33,7 +33,11 @@ export default function AdminArticlesPage() {
 
   async function fetchArticles() {
     try {
-      const response = await fetch('/api/admin/articles')
+      const response = await fetch('/api/admin/articles', {
+        headers: {
+          'x-admin-key': process.env.NEXT_PUBLIC_ADMIN_KEY || 'default-dev-key'
+        }
+      })
       if (response.ok) {
         const data = await response.json()
         setArticles(data)

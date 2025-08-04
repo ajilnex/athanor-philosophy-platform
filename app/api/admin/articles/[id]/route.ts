@@ -3,11 +3,17 @@ import { unlink } from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
 import { prisma } from '@/lib/prisma'
+import { validateAdminAccess, createUnauthorizedResponse } from '@/lib/auth'
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  // 🛡️ PROTECTION: Vérifier l'autorisation admin
+  if (!validateAdminAccess(request)) {
+    return createUnauthorizedResponse()
+  }
+
   try {
     const { isPublished } = await request.json()
 
@@ -30,6 +36,11 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  // 🛡️ PROTECTION: Vérifier l'autorisation admin
+  if (!validateAdminAccess(request)) {
+    return createUnauthorizedResponse()
+  }
+
   try {
     // Get article info first
     const article = await prisma.article.findUnique({

@@ -23,7 +23,10 @@ export function ArticleActions({ article, onDelete, onTogglePublish }: ArticleAc
     try {
       const response = await fetch(`/api/admin/articles/${article.id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-admin-key': process.env.NEXT_PUBLIC_ADMIN_KEY || 'default-dev-key'
+        },
         body: JSON.stringify({ isPublished: !article.isPublished }),
       })
 
@@ -49,6 +52,9 @@ export function ArticleActions({ article, onDelete, onTogglePublish }: ArticleAc
     try {
       const response = await fetch(`/api/admin/articles/${article.id}`, {
         method: 'DELETE',
+        headers: {
+          'x-admin-key': process.env.NEXT_PUBLIC_ADMIN_KEY || 'default-dev-key'
+        }
       })
 
       if (response.ok) {
