@@ -17,17 +17,30 @@ export interface Billet {
 
 // Transformer les backlinks [[mot]] en liens
 function transformBacklinks(content: string): string {
+  const allSlugs = getBilletSlugs()
+  
   return content.replace(
     /\[\[([^\]]+)\]\]/g, 
     (match, linkText) => {
-      const slug = linkText
+      // Essayer de trouver un slug existant qui correspond
+      const targetSlug = linkText
         .toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '')
       
-      return `<a href="/billets/${slug}" class="backlink" data-backlink="${linkText}">${linkText}</a>`
+      // Chercher un slug qui contient le terme recherché
+      const foundSlug = allSlugs.find(slug => 
+        slug.includes(targetSlug) || 
+        slug.endsWith(targetSlug) ||
+        slug.replace(/^\d{4}-\d{2}-\d{2}-/, '') === targetSlug
+      )
+      
+      const href = foundSlug ? `/billets/${foundSlug}` : `/billets/${targetSlug}`
+      const missing = !foundSlug
+      
+      return `<a href="${href}" class="backlink" data-backlink="${linkText}" ${missing ? 'data-missing="true"' : ''}>${linkText}</a>`
     }
   )
 }
