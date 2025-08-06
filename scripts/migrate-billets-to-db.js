@@ -76,27 +76,27 @@ async function migrateBilletsToDatabase() {
 
       console.log(`📅 Date retenue pour ${slug}: ${parsedDate.toISOString()}`)
       
-      // Créer ou mettre à jour le billet dans la DB
-      await prisma.billet.upsert({
-        where: { slug },
-        update: {
-          title: frontmatter.title || slug,
-          content: markdownContent,
-          excerpt: excerpt || null,
-          tags: frontmatter.tags || [],
-          date: parsedDate,
-        },
-        create: {
-          slug,
-          title: frontmatter.title || slug,
-          content: markdownContent,
-          excerpt: excerpt || null,
-          tags: frontmatter.tags || [],
-          date: parsedDate,
-        }
+      // Vérifier si le billet existe déjà en DB
+      const existingBillet = await prisma.billet.findUnique({
+        where: { slug }
       })
       
-      console.log(`✅ Billet "${slug}" migré avec succès`)
+      if (existingBillet) {
+        console.log(`⏭️  Billet "${slug}" existe déjà en DB - pas de re-création`)
+      } else {
+        // Créer SEULEMENT s'il n'existe pas (pas d'update pour préserver les suppressions)
+        await prisma.billet.create({
+          data: {
+            slug,
+            title: frontmatter.title || slug,
+            content: markdownContent,
+            excerpt: excerpt || null,
+            tags: frontmatter.tags || [],
+            date: parsedDate,
+          }
+        })
+        console.log(`✅ Nouveau billet "${slug}" créé en DB`)
+      }
     }
     
     console.log('🎉 Migration terminée avec succès!')

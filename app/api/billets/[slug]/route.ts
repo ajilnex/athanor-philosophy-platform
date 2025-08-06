@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 
 export async function DELETE(
@@ -31,6 +32,10 @@ export async function DELETE(
     await prisma.billet.delete({
       where: { slug }
     })
+    
+    // Invalider les caches pour que l'UI se mette à jour
+    revalidatePath('/billets')
+    revalidatePath(`/billets/${slug}`)
     
     console.log(`🗑️ Billet supprimé: ${slug}`)
 
