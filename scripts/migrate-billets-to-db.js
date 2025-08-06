@@ -52,7 +52,19 @@ async function migrateBilletsToDatabase() {
       console.log(`📝 Migration du billet: ${slug}`)
       
       // Lire et parser le fichier Markdown
-      const fileContent = fs.readFileSync(filePath, 'utf8')
+      let fileContent = fs.readFileSync(filePath, 'utf8')
+      
+      // Nettoyer les doubles front-matters (éliminer le premier s'il contient created/modified)
+      if (fileContent.startsWith('---')) {
+        const firstEnd = fileContent.indexOf('---', 3)
+        if (firstEnd !== -1) {
+          const firstFrontmatter = fileContent.slice(4, firstEnd)
+          if (firstFrontmatter.includes('created:') || firstFrontmatter.includes('modified:')) {
+            fileContent = fileContent.slice(firstEnd + 4).trim()
+          }
+        }
+      }
+      
       const { data: frontmatter, content: markdownContent } = matter(fileContent)
       
       // Générer un excerpt à partir du contenu
@@ -85,10 +97,18 @@ async function migrateBilletsToDatabase() {
         console.log(`⏭️  Billet "${slug}" existe déjà en DB - pas de re-création`)
       } else {
         // Créer SEULEMENT s'il n'existe pas (pas d'update pour préserver les suppressions)
+        // Gérer le titre selon les 3 cas
+        let finalTitle
+        if (frontmatter.title) {
+          finalTitle = frontmatter.title
+        } else {
+          finalTitle = `No name (${parsedDate.toISOString().split('T')[0]})`
+        }
+        
         await prisma.billet.create({
           data: {
             slug,
-            title: frontmatter.title || slug,
+            title: finalTitle,
             content: markdownContent,
             excerpt: excerpt || null,
             tags: frontmatter.tags || [],
