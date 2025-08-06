@@ -23,6 +23,18 @@ model Article {
   isPublished Boolean  @default(true)
 }
 
+model Billet {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  content   String   @db.Text // Contenu Markdown complet
+  excerpt   String?
+  tags      String[] // PostgreSQL array of strings
+  date      DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?

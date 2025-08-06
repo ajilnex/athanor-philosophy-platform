@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import fs from 'fs'
-import path from 'path'
-
-const billetsDirectory = path.join(process.cwd(), 'content/billets')
+import { prisma } from '@/lib/prisma'
 
 export async function DELETE(
   request: NextRequest,
@@ -18,18 +15,22 @@ export async function DELETE(
       )
     }
 
-    const filePath = path.join(billetsDirectory, `${slug}.md`)
+    // Vérifier si le billet existe
+    const existingBillet = await prisma.billet.findUnique({
+      where: { slug }
+    })
     
-    // Vérifier si le fichier existe
-    if (!fs.existsSync(filePath)) {
+    if (!existingBillet) {
       return NextResponse.json(
         { error: 'Billet introuvable' },
         { status: 404 }
       )
     }
 
-    // Supprimer le fichier
-    fs.unlinkSync(filePath)
+    // Supprimer le billet de la base de données
+    await prisma.billet.delete({
+      where: { slug }
+    })
     
     console.log(`🗑️ Billet supprimé: ${slug}`)
 

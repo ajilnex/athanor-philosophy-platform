@@ -4,7 +4,7 @@ import { ArrowLeft, Calendar, Tag } from 'lucide-react'
 import { getBilletBySlug, getBilletSlugs } from '@/lib/billets'
 
 export async function generateStaticParams() {
-  const slugs = getBilletSlugs()
+  const slugs = await getBilletSlugs()
   return slugs.map((slug) => ({ slug }))
 }
 

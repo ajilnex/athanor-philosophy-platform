@@ -1,10 +1,6 @@
-import fs from 'fs'
-import path from 'path'
-import matter from 'gray-matter'
 import { remark } from 'remark'
 import html from 'remark-html'
-
-const billetsDirectory = path.join(process.cwd(), 'content/billets')
+import { prisma } from '@/lib/prisma'
 
 export interface Billet {
   slug: string
@@ -16,8 +12,8 @@ export interface Billet {
 }
 
 // Transformer les backlinks [[mot]] en liens
-function transformBacklinks(content: string): string {
-  const allSlugs = getBilletSlugs()
+async function transformBacklinks(content: string): Promise<string> {
+  const allSlugs = await getBilletSlugs()
   
   return content.replace(
     /\[\[([^\]]+)\]\]/g, 
@@ -47,70 +43,64 @@ function transformBacklinks(content: string): string {
 
 export async function getAllBillets(): Promise<Billet[]> {
   try {
-    const fileNames = fs.readdirSync(billetsDirectory)
-    const billets = await Promise.all(
-      fileNames
-        .filter(name => name.endsWith('.md'))
-        .map(async (fileName) => {
-          const slug = fileName.replace(/\.md$/, '')
-          return await getBilletBySlug(slug)
-        })
-    )
+    const dbBillets = await prisma.billet.findMany({
+      orderBy: { date: 'desc' }
+    })
 
-    return billets
-      .filter((billet): billet is Billet => billet !== null)
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    return dbBillets.map(dbBillet => ({
+      slug: dbBillet.slug,
+      title: dbBillet.title,
+      date: dbBillet.date.toISOString().split('T')[0], // Format YYYY-MM-DD
+      tags: dbBillet.tags,
+      content: dbBillet.content,
+      excerpt: dbBillet.excerpt || undefined
+    }))
   } catch (error) {
-    console.error('Error reading billets:', error)
+    console.error('Error reading billets from database:', error)
     return []
   }
 }
 
 export async function getBilletBySlug(slug: string): Promise<Billet | null> {
   try {
-    const fullPath = path.join(billetsDirectory, `${slug}.md`)
-    
-    if (!fs.existsSync(fullPath)) {
+    const dbBillet = await prisma.billet.findUnique({
+      where: { slug }
+    })
+
+    if (!dbBillet) {
       return null
     }
 
-    const fileContents = fs.readFileSync(fullPath, 'utf8')
-    const { data, content } = matter(fileContents)
-
     // Transformer les backlinks avant le rendu Markdown
-    const contentWithBacklinks = transformBacklinks(content)
+    const contentWithBacklinks = await transformBacklinks(dbBillet.content)
     
     // Convertir en HTML
     const processedContent = await remark()
       .use(html, { sanitize: false })
       .process(contentWithBacklinks)
 
-    // Générer un extrait
-    const plainText = content.replace(/[#*`\[\]]/g, '').substring(0, 200)
-    const excerpt = plainText.length === 200 ? plainText + '...' : plainText
-
     return {
-      slug,
-      title: data.title || slug,
-      date: data.date || '',
-      tags: data.tags || [],
+      slug: dbBillet.slug,
+      title: dbBillet.title,
+      date: dbBillet.date.toISOString().split('T')[0], // Format YYYY-MM-DD
+      tags: dbBillet.tags,
       content: processedContent.toString(),
-      excerpt
+      excerpt: dbBillet.excerpt || undefined
     }
   } catch (error) {
-    console.error(`Error reading billet ${slug}:`, error)
+    console.error(`Error reading billet ${slug} from database:`, error)
     return null
   }
 }
 
-export function getBilletSlugs(): string[] {
+export async function getBilletSlugs(): Promise<string[]> {
   try {
-    const fileNames = fs.readdirSync(billetsDirectory)
-    return fileNames
-      .filter(name => name.endsWith('.md'))
-      .map(name => name.replace(/\.md$/, ''))
+    const billets = await prisma.billet.findMany({
+      select: { slug: true }
+    })
+    return billets.map(billet => billet.slug)
   } catch (error) {
-    console.error('Error reading billet slugs:', error)
+    console.error('Error reading billet slugs from database:', error)
     return []
   }
 }
