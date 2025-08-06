@@ -29,6 +29,40 @@ async function migrateBilletsToDatabase() {
       const plainText = markdownContent.replace(/[#*`\[\]]/g, '').substring(0, 200).trim()
       const excerpt = plainText.length === 200 ? plainText + '...' : plainText
       
+      // Parser la date de manière robuste
+      let parsedDate
+      if (frontmatter.date) {
+        // Nettoyer la date (enlever les guillemets français et autres caractères)
+        const cleanDate = String(frontmatter.date)
+          .replace(/[«»"'"]/g, '') // Enlever guillemets français et anglais
+          .trim()
+        
+        // Essayer de parser la date
+        const dateAttempt = new Date(cleanDate)
+        
+        // Si la date est invalide, essayer avec le slug
+        if (isNaN(dateAttempt.getTime())) {
+          const slugDateMatch = slug.match(/^(\d{4}-\d{2}-\d{2})/)
+          if (slugDateMatch) {
+            parsedDate = new Date(slugDateMatch[1])
+          } else {
+            parsedDate = new Date('2025-01-01')
+          }
+        } else {
+          parsedDate = dateAttempt
+        }
+      } else {
+        // Pas de date dans frontmatter, essayer d'extraire du slug
+        const slugDateMatch = slug.match(/^(\d{4}-\d{2}-\d{2})/)
+        if (slugDateMatch) {
+          parsedDate = new Date(slugDateMatch[1])
+        } else {
+          parsedDate = new Date('2025-01-01')
+        }
+      }
+      
+      console.log(`📅 Date parsée pour ${slug}: ${parsedDate.toISOString().split('T')[0]}`)
+      
       // Créer ou mettre à jour le billet dans la DB
       await prisma.billet.upsert({
         where: { slug },
@@ -37,7 +71,7 @@ async function migrateBilletsToDatabase() {
           content: markdownContent,
           excerpt: excerpt || null,
           tags: frontmatter.tags || [],
-          date: new Date(frontmatter.date || '2025-01-01'),
+          date: parsedDate,
         },
         create: {
           slug,
@@ -45,7 +79,7 @@ async function migrateBilletsToDatabase() {
           content: markdownContent,
           excerpt: excerpt || null,
           tags: frontmatter.tags || [],
-          date: new Date(frontmatter.date || '2025-01-01'),
+          date: parsedDate,
         }
       })
       
