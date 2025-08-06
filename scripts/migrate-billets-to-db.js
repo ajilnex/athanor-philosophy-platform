@@ -2,11 +2,41 @@ const { PrismaClient } = require('@prisma/client')
 const fs = require('fs')
 const path = require('path')
 const matter = require('gray-matter')
+const { execSync } = require('child_process')
 
 const prisma = new PrismaClient()
 
+function ensureGitHistory() {
+  try {
+    // Sur Vercel le clone peut être shallow : on étend si possible, sans casser si déjà complet
+    execSync('git fetch --unshallow', { stdio: 'ignore' });
+  } catch {}
+  try {
+    // À défaut, on s'assure d'avoir un minimum d'historique
+    execSync('git fetch --depth=1000', { stdio: 'ignore' });
+  } catch {}
+}
+
+function gitCommitDateFor(absPath) {
+  try {
+    const iso = execSync(`git log -1 --format=%cI -- "${absPath}"`, { stdio: ['ignore','pipe','ignore'] })
+      .toString()
+      .trim();
+    if (iso) return new Date(iso);
+  } catch {}
+  return null;
+}
+
+function dateFromSlug(slug) {
+  const m = slug.match(/^(\d{4}-\d{2}-\d{2})/);
+  return m ? new Date(m[1]) : null;
+}
+
 async function migrateBilletsToDatabase() {
   console.log('🚀 Démarrage de la migration des billets vers la base de données...')
+  
+  // Assurer l'historique Git pour les dates
+  ensureGitHistory()
   
   const billetsDir = path.join(process.cwd(), 'content/billets')
   
@@ -29,39 +59,22 @@ async function migrateBilletsToDatabase() {
       const plainText = markdownContent.replace(/[#*`\[\]]/g, '').substring(0, 200).trim()
       const excerpt = plainText.length === 200 ? plainText + '...' : plainText
       
-      // Parser la date de manière robuste
-      let parsedDate
-      if (frontmatter.date) {
-        // Nettoyer la date (enlever les guillemets français et autres caractères)
-        const cleanDate = String(frontmatter.date)
-          .replace(/[«»"'"]/g, '') // Enlever guillemets français et anglais
-          .trim()
-        
-        // Essayer de parser la date
-        const dateAttempt = new Date(cleanDate)
-        
-        // Si la date est invalide, essayer avec le slug
-        if (isNaN(dateAttempt.getTime())) {
-          const slugDateMatch = slug.match(/^(\d{4}-\d{2}-\d{2})/)
-          if (slugDateMatch) {
-            parsedDate = new Date(slugDateMatch[1])
-          } else {
-            parsedDate = new Date('2025-01-01')
-          }
-        } else {
-          parsedDate = dateAttempt
-        }
-      } else {
-        // Pas de date dans frontmatter, essayer d'extraire du slug
-        const slugDateMatch = slug.match(/^(\d{4}-\d{2}-\d{2})/)
-        if (slugDateMatch) {
-          parsedDate = new Date(slugDateMatch[1])
-        } else {
-          parsedDate = new Date('2025-01-01')
-        }
+      const absPath = path.join(billetsDir, fileName);
+
+      // 1) Git (dernier commit du fichier)
+      let parsedDate = gitCommitDateFor(absPath);
+
+      // 2) Slug (YYYY-MM-DD-...)
+      if (!parsedDate || isNaN(parsedDate.getTime())) {
+        parsedDate = dateFromSlug(slug);
       }
-      
-      console.log(`📅 Date parsée pour ${slug}: ${parsedDate.toISOString().split('T')[0]}`)
+
+      // 3) Now (fallback final)
+      if (!parsedDate || isNaN(parsedDate.getTime())) {
+        parsedDate = new Date();
+      }
+
+      console.log(`📅 Date retenue pour ${slug}: ${parsedDate.toISOString()}`)
       
       // Créer ou mettre à jour le billet dans la DB
       await prisma.billet.upsert({
