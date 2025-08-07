@@ -1,25 +1,23 @@
-import { NextRequest } from 'next/server'
+import GitHubProvider from 'next-auth/providers/github';
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import { prisma } from '@/lib/prisma';
 
-export function validateAdminAccess(request: NextRequest): boolean {
-  const adminKey = request.headers.get('x-admin-key')
-  const expectedKey = process.env.ADMIN_API_KEY
-  
-  if (!adminKey || !expectedKey) {
-    return false
-  }
-  
-  return adminKey === expectedKey
-}
-
-export function createUnauthorizedResponse() {
-  return new Response(
-    JSON.stringify({ 
-      error: 'Accès non autorisé',
-      message: 'Clé d\'administration requise' 
+export const authOptions = {
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID!,
+      clientSecret: process.env.GITHUB_SECRET!,
     }),
-    { 
-      status: 401,
-      headers: { 'Content-Type': 'application/json' }
-    }
-  )
-}
+  ],
+  callbacks: {
+    session({ session, user }) {
+      // Inclure l'ID de l'utilisateur et son rôle dans la session
+      if (session.user) {
+        session.user.id = user.id;
+        session.user.role = user.role; // Le champ 'role' vient de notre schéma Prisma
+      }
+      return session;
+    },
+  },
+};

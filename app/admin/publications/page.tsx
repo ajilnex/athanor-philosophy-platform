@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { AdminArticleActions } from '@/components/admin/AdminArticleActions'
 import { getServerSession } from 'next-auth/next'
 import { redirect } from 'next/navigation'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 
 async function getAllPublications() {
   try {
