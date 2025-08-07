@@ -3,6 +3,10 @@ import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { unlink } from 'fs/promises'
 import { join } from 'path'
+import { exec } from 'child_process'
+import { promisify } from 'util'
+
+const execAsync = promisify(exec)
 
 export async function DELETE(
   request: NextRequest,
@@ -36,10 +40,20 @@ export async function DELETE(
     })
     
     // Supprimer le fichier Markdown du disque
+    const filePath = join(process.cwd(), 'content', 'billets', `${slug}.md`)
     try {
-      const filePath = join(process.cwd(), 'content', 'billets', `${slug}.md`)
       await unlink(filePath)
       console.log(`📁 Fichier supprimé: ${slug}.md`)
+      
+      // Commit automatique de la suppression
+      try {
+        await execAsync(`git add "${filePath}"`)
+        await execAsync(`git commit -m "🗑️ Suppression automatique du billet: ${slug}"`)
+        console.log(`📝 Commit automatique effectué pour: ${slug}`)
+      } catch (gitError) {
+        console.warn(`⚠️ Erreur lors du commit automatique pour ${slug}:`, gitError)
+        // Continue même si le commit échoue
+      }
     } catch (fileError) {
       console.warn(`⚠️ Impossible de supprimer le fichier ${slug}.md:`, fileError)
       // On continue même si le fichier n'existe pas ou n'a pas pu être supprimé

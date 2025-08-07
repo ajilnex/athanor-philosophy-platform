@@ -33,7 +33,7 @@ function dateFromSlug(slug) {
 }
 
 async function migrateBilletsToDatabase() {
-  console.log('🚀 Démarrage de la migration des billets vers la base de données...')
+  console.log('🚀 Démarrage de la synchronisation bidirectionnelle des billets...')
   
   // Assurer l'historique Git pour les dates
   ensureGitHistory()
@@ -119,11 +119,27 @@ async function migrateBilletsToDatabase() {
       }
     }
     
-    console.log('🎉 Migration terminée avec succès!')
+    // Synchronisation inverse : supprimer de la DB les billets dont le fichier .md n'existe plus
+    console.log('🔄 Vérification des billets à supprimer...')
+    const allDbBillets = await prisma.billet.findMany({ select: { slug: true } })
+    const fileBasedSlugs = files.map(fileName => fileName.replace('.md', ''))
+    
+    let deletedCount = 0
+    for (const dbBillet of allDbBillets) {
+      if (!fileBasedSlugs.includes(dbBillet.slug)) {
+        await prisma.billet.delete({ where: { slug: dbBillet.slug } })
+        console.log(`🗑️ Billet "${dbBillet.slug}" supprimé de la DB (fichier .md absent)`)
+        deletedCount++
+      }
+    }
+    
+    console.log('🎉 Synchronisation terminée avec succès!')
     
     // Afficher un résumé
     const totalBillets = await prisma.billet.count()
     console.log(`📊 Total des billets en base: ${totalBillets}`)
+    console.log(`📁 Fichiers .md trouvés: ${files.length}`)
+    console.log(`🗑️ Billets supprimés: ${deletedCount}`)
     
   } catch (error) {
     console.error('❌ Erreur durant la migration:', error)
