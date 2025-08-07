@@ -2,6 +2,9 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { AdminArticleActions } from '@/components/admin/AdminArticleActions'
+import { getServerSession } from 'next-auth/next'
+import { redirect } from 'next/navigation'
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 
 async function getAllPublications() {
   try {
@@ -22,6 +25,12 @@ function formatFileSize(bytes: number): string {
 }
 
 export default async function AdminPublicationsPage() {
+  const session = await getServerSession(authOptions)
+
+  if (!session || session.user?.role !== 'admin') {
+    redirect('/')
+  }
+
   const publications = await getAllPublications()
 
   return (

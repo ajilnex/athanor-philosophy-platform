@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { ArrowLeft, Upload, FileText, Plus, X } from 'lucide-react'
 
 export default function UploadPage() {
+  const { data: session, status } = useSession()
   const [isUploading, setIsUploading] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [formData, setFormData] = useState({
@@ -18,6 +20,25 @@ export default function UploadPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const router = useRouter()
+
+  // 🛡️ PROTECTION: Vérifier l'autorisation admin
+  useEffect(() => {
+    if (status === 'loading') return // Attendre le chargement
+    
+    if (!session || session.user?.role !== 'admin') {
+      router.push('/') // Rediriger vers la page d'accueil
+    }
+  }, [session, status, router])
+
+  // Afficher un loading pendant la vérification
+  if (status === 'loading') {
+    return <div className="max-w-4xl mx-auto px-6 py-12">Chargement...</div>
+  }
+
+  // Ne rien afficher si pas autorisé (la redirection va s'effectuer)
+  if (!session || session.user?.role !== 'admin') {
+    return null
+  }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]

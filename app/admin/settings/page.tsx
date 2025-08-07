@@ -1,11 +1,31 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Moon, Sun } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
 export default function AdminSettingsPage() {
   const [isDarkMode, setIsDarkMode] = useState(false)
+  const { data: session, status } = useSession()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (status === 'loading') return
+    
+    if (!session || session.user?.role !== 'admin') {
+      router.push('/')
+    }
+  }, [session, status, router])
+
+  if (status === 'loading') {
+    return <div>Chargement...</div>
+  }
+
+  if (!session || session.user?.role !== 'admin') {
+    return null
+  }
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode)

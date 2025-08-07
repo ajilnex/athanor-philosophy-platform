@@ -74,11 +74,27 @@ athanor/
 
 ## Administration
 
+### Publications (PDF - Dynamique)
+
 Accédez à l'interface d'administration via `/admin` pour :
 
-- **Ajouter des articles** - Upload de fichiers PDF avec métadonnées
+- **Ajouter des articles** - Upload de fichiers PDF avec métadonnées sur Cloudinary
 - **Gérer les articles** - Publier/dépublier, modifier, supprimer
 - **Voir les statistiques** - Nombre d'articles, taille totale, etc.
+
+### Gestion des Billets (Workflow Git)
+
+La section "Billets" fonctionne sur un principe de "Git-as-a-CMS". Toute gestion de contenu se fait directement via des commandes Git.
+
+- **Pour créer un billet :** Ajoutez un nouveau fichier `.md` dans le dossier `content/billets/`, puis exécutez `git add`, `git commit`, et `git push`.
+- **Pour modifier un billet :** Éditez le fichier `.md` correspondant, puis exécutez `git add`, `git commit`, et `git push`.
+- **Pour supprimer un billet :** Utilisez la commande `git rm` pour supprimer le fichier, puis exécutez `git commit` et `git push`.
+    ```bash
+    # Exemple de suppression de billet
+    git rm content/billets/2025-08-05-dialectique-du-pomodoro.md
+    git commit -m "Suppression: billet sur le pomodoro"
+    git push
+    ```
 
 ## Développement
 

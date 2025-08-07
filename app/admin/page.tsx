@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import { Plus, FileText, Settings, Upload } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
+import { getServerSession } from 'next-auth/next'
+import { redirect } from 'next/navigation'
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 
 async function getPublicationStats() {
   try {
@@ -31,6 +34,13 @@ function formatFileSize(bytes: number): string {
 }
 
 export default async function AdminPage() {
+  // 🛡️ PROTECTION: Vérifier l'autorisation admin
+  const session = await getServerSession(authOptions)
+  
+  if (!session || session.user?.role !== 'admin') {
+    redirect('/') // Redirige vers la page d'accueil
+  }
+  
   const stats = await getPublicationStats()
 
   return (

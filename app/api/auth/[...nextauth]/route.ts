@@ -1,0 +1,28 @@
+import NextAuth from 'next-auth';
+import GitHubProvider from 'next-auth/providers/github';
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import { prisma } from '@/lib/prisma';
+
+export const authOptions = {
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID!,
+      clientSecret: process.env.GITHUB_SECRET!,
+    }),
+  ],
+  callbacks: {
+    session({ session, user }) {
+      // Inclure l'ID de l'utilisateur et son rôle dans la session
+      if (session.user) {
+        session.user.id = user.id;
+        session.user.role = user.role; // Le champ 'role' vient de notre schéma Prisma
+      }
+      return session;
+    },
+  },
+};
+
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };

@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Calendar, Tag, FileText } from 'lucide-react'
-import { ForgetButton } from './ForgetButton'
 import type { Billet } from '@/lib/billets'
 
 interface BilletsListProps {
@@ -13,9 +12,6 @@ interface BilletsListProps {
 export function BilletsList({ initialBillets }: BilletsListProps) {
   const [billets, setBillets] = useState<Billet[]>(initialBillets)
 
-  const handleBilletDeleted = (deletedSlug: string) => {
-    setBillets(prev => prev.filter(billet => billet.slug !== deletedSlug))
-  }
 
   if (billets.length === 0) {
     return (
@@ -40,7 +36,7 @@ export function BilletsList({ initialBillets }: BilletsListProps) {
         >
           <div className="flex flex-col space-y-4">
             <div>
-              <div className="flex justify-between items-start mb-2">
+              <div className="mb-2">
                 <h2 className="text-lg sm:text-xl font-light text-foreground">
                   <Link
                     href={`/billets/${billet.slug}`}
@@ -49,11 +45,6 @@ export function BilletsList({ initialBillets }: BilletsListProps) {
                     {billet.title}
                   </Link>
                 </h2>
-                <ForgetButton
-                  slug={billet.slug}
-                  title={billet.title}
-                  onBilletDeleted={() => handleBilletDeleted(billet.slug)}
-                />
               </div>
               
               {billet.excerpt && (
