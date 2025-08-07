@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
+import { unlink } from 'fs/promises'
+import { join } from 'path'
 
 export async function DELETE(
   request: NextRequest,
@@ -32,6 +34,16 @@ export async function DELETE(
     await prisma.billet.delete({
       where: { slug }
     })
+    
+    // Supprimer le fichier Markdown du disque
+    try {
+      const filePath = join(process.cwd(), 'content', 'billets', `${slug}.md`)
+      await unlink(filePath)
+      console.log(`📁 Fichier supprimé: ${slug}.md`)
+    } catch (fileError) {
+      console.warn(`⚠️ Impossible de supprimer le fichier ${slug}.md:`, fileError)
+      // On continue même si le fichier n'existe pas ou n'a pas pu être supprimé
+    }
     
     // Invalider les caches pour que l'UI se mette à jour
     revalidatePath('/billets')
