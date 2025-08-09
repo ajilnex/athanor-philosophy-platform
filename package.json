@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma db push && node scripts/migrate-billets-to-db.js && next build",
+    "build": "node scripts/build.cjs",
     "start": "next start",
     "lint": "next lint",
     "db:push": "prisma db push",
