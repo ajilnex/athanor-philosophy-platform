@@ -5,7 +5,14 @@ description: >-
   Photos prises au département Recherche de la BnF : brève cartographie des
   volumes de Peirce, Roy Wood Sellars et Wilfrid Sellars, avec indication de
   contenu, réception et contexte éditorial.
-excerpt: " \U0001F4CD B réé  6 oû 2025 à rr ’ cé   ro u ér Rcrc – Poo   Boèqu o  Frc,  rooé r u rvé coér ’ouvr é à  ê coo éorqu.  \nC  ocu ’ou cu écr à u roc équ  Prc   ux Sr (Ro Woo & Wfr),  v à rcur  cou équ, réco crqu, cox éor."
+excerpt: "\U0001F4CD B réé  6 oû 2025 à rr ’ cé   ro u ér Rcrc – Poo   Boèqu o  Frc,  rooé r u rvé coér ’ouvr é à  ê coo éorqu.  \nC  ocu ’ou cu écr à u roc équ  Prc   ux Sr (Ro Woo & Wfr),  v à rcur  cou équ, réco crqu, cox éor."
+tags:
+  - peirce
+  - philosophie
+  - sellars
+  - bnf
+  - rayon
+  - etagere
 ---
 > 📍 **Billet rédigé le 6 août 2025** à partir d’images captées dans les rayonnages du **département Recherche – Philosophie** de la **Bibliothèque nationale de France**, et prolongé par un relevé complémentaire d’ouvrages liés à la même constellation théorique.  
 Ce billet documente **l’outillage intellectuel** nécessaire à une approche systématique de Peirce et des deux Sellars (Roy Wood & Wilfrid), en veillant à articuler : contenu synthétique, réception critique, contexte éditorial.

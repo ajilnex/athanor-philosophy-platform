@@ -2,6 +2,61 @@ import fs from 'fs/promises';
 import path from 'path';
 import matterImport from 'gray-matter';
 
+// ——— AJOUTER EN HAUT DU FICHIER, après les imports ———
+const FR_STOPWORDS = new Set([
+  "alors","au","aucun","aussi","autre","avant","avec","avoir","bon","car","ce","cela","ces","cet","cette","ceci","comme","comment",
+  "dans","de","des","du","donc","dos","déjà","elle","elles","en","encore","entre","er","est","et","eu","façon","faire","fois","font",
+  "hors","ici","il","ils","je","jusqu","l","la","le","les","leur","là","ma","mais","me","même","mes","moi","mon","ne","ni","non",
+  "nos","notre","nous","on","ou","où","par","parce","pas","peu","peut","plutôt","pour","pourquoi","qu","quand","que","quel","quelle",
+  "quelles","quels","qui","quoi","sans","se","ses","si","sien","son","sont","sous","sur","ta","te","tes","toi","ton","toujours",
+  "tout","tous","très","tu","un","une","vos","votre","vous","ça","c’est","c'", "d'", "l'", "n'", "qu'", "s'", "t'", "y","être","avoir"
+]);
+
+function tokenize(s) {
+  return s
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\p{L}\p{N}\s-]/gu, " ")
+    .split(/\s+/)
+    .filter(w => w && w.length >= 3 && !FR_STOPWORDS.has(w));
+}
+
+// capture les [[liens]] comme tags utiles
+function backlinksAsTags(content) {
+  const tags = new Set();
+  const re = /\[\[([^\]]+)\]\]/g;
+  let m;
+  while ((m = re.exec(content))) {
+    const label = m[1].trim();
+    if (label) tags.add(label);
+  }
+  return Array.from(tags);
+}
+
+function deriveTags(content, title, existingTags = []) {
+  if (Array.isArray(existingTags) && existingTags.length) return existingTags;
+
+  const fromBacklinks = backlinksAsTags(content);
+  const bag = new Map();
+  // booster le titre
+  for (const t of tokenize(title)) bag.set(t, (bag.get(t) || 0) + 3);
+  // premier ~500 caractères du contenu
+  const first = content.slice(0, 1200);
+  for (const t of tokenize(first)) bag.set(t, (bag.get(t) || 0) + 1);
+
+  // top N
+  const top = Array.from(bag.entries())
+    .sort((a,b) => b[1] - a[1])
+    .map(([w]) => w)
+    .filter(w => !/^\d+$/.test(w))
+    .slice(0, 6);
+
+  // fusion backlinks + top
+  const merged = Array.from(new Set([...fromBacklinks, ...top]));
+  // garde 3–6 tags
+  const limited = merged.slice(0, Math.max(3, Math.min(6, merged.length)));
+  return limited;
+}
 const matter = matterImport;
 const CONTENT_DIR = path.join(process.cwd(), 'content', 'billets');
 
@@ -49,10 +104,23 @@ for (const file of (await fs.readdir(CONTENT_DIR)).filter(f => f.toLowerCase().e
   const excerpt = deriveExcerpt(content, data.excerpt);
 
   // tags (préserve si déjà un tableau)
-  const tags = Array.isArray(data.tags) ? data.tags : [];
+// ancien:
+// const tags = Array.isArray(data.tags) ? data.tags : [];
 
-  // si rien ne change on passe
-  const nextData = { ...data, title, date: isoDate, ...(excerpt ? { excerpt } : {}), ...(tags.length ? { tags } : {}) };
+// nouveau:
+const tags = Array.isArray(data.tags) ? data.tags : [];
+const autoTags = deriveTags(content, title, tags);
+const finalTags = (Array.isArray(tags) && tags.length) ? tags : autoTags;
+
+// ...
+const nextData = {
+  ...data,
+  title,
+  date: isoDate,
+  ...(excerpt ? { excerpt } : {}),
+  ...(finalTags.length ? { tags: finalTags } : {}),
+};
+
   const same =
     data.title === nextData.title &&
     String(data.date || '') === String(nextData.date || '') &&
