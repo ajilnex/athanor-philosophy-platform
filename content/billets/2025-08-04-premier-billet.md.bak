@@ -1,12 +1,9 @@
 ---
-title: Premier billet - Test du système
-date: '2025-08-04T00:00:00.000Z'
-tags:
-  - test
-  - markdown
-  - athanor
-excerpt: 'C rr   or ouvu è  uco Mrkow. L''é    écrr  Mrkow, our v G,  vor rîr é ur Aor.'
+title: "Premier billet - Test du système"
+date: "2025-08-04"
+tags: ["test", "markdown", "athanor"]
 ---
+
 # Bienvenue dans la fabrique de billets
 
 Ce premier billet teste notre nouveau système de publication Markdown. L'idée est simple : écrire en Markdown, pousser via Git, et voir apparaître instantanément sur Athanor.

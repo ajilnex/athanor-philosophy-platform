@@ -1,11 +1,6 @@
 ---
-title: Test suppression physique
-tags:
-  - test
-  - maintenance
-date: '2025-08-07T00:00:00.000Z'
-excerpt: >-
-  C  r à r  uro qu ’u fcr Mrkow or ’u ffc r ’rfc. S’ rv rè éo, c’ qu  f u. So 
-  vcor u rocu.
+title: "Test suppression physique"
+tags: [test, maintenance]
 ---
+
 Ce billet sert à tester la suppression physique d’un fichier Markdown lors d’un effacement par l’interface. S’il revient après déploiement, c’est que la faille subsiste. Sinon : victoire du processus.
