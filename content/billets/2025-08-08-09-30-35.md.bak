@@ -1,17 +1,33 @@
 ---
-created: 2025-08-08T09:30:35+02:00
-modified: 2025-08-08T09:30:39+02:00
+title: '---'
+tags:
+  - '---'
+  - mdx
+  - athanor
+  - format
+  - markdown
+  - edition
+date: '2025-08-08T00:00:00.000Z'
+created: 2025-08-08T07:30:35.000Z
+modified: 2025-08-08T07:30:39.000Z
+excerpt: |-
+  ---
+   "Coorr ur Aor u for .x  fu  rou our u éo fuur"
+
+    - x
+    - -c
+    - cooro
+    - rccur
+    - oo
+    - cour
+   "2025-08-08T093035.000Z"
+  ---
 ---
 
----
-title: "Collaborer sur Athanor au format .mdx : feuille de route pour une implementation future"
-tags: [mdx, tina-cms, collaboration, architecture, philosophie, cloudinary]
----
-
-*Athanor* s’est d’abord présenté comme un site de publication philosophique fondé sur des fichiers Markdown, stockés localement, versionnés par Git, déployés automatiquement via Vercel. Le choix du Markdown (.md) garantissait la simplicité, la pérennité, l’indexabilité, et l’édition hors-ligne. Mais le site évolue désormais vers une ambition plus vaste : offrir un véritable environnement d’édition collaborative et réflexive en ligne.
+*L'athanor* s’est d’abord présenté comme un site de publication philosophique fondé sur des fichiers Markdown, stockés localement, versionnés par Git, déployés automatiquement via Vercel. Le choix du Markdown (.md) garantissait la simplicité, la pérennité, l’indexabilité, et l’édition hors-ligne. Mais le site évolue désormais vers une ambition plus vaste : offrir un véritable environnement d’édition collaborative et réflexive en ligne.
 
 **Objectif :**  
-Transformer *Athanor* en plateforme d’écriture partagée, où chacun peut contribuer à des textes philosophiques — ajout, édition, insertion d’images — dans une logique d’hospitalité intellectuelle, sans sacrifier la rigueur technique.
+Transformer *L'athanor* en plateforme d’écriture partagée, où chacun peut contribuer à des textes philosophiques — ajout, édition, insertion d’images — dans une logique d’hospitalité intellectuelle, sans sacrifier la rigueur technique.
 
 ## Feuille de route technique
 
@@ -51,7 +67,7 @@ Transformer *Athanor* en plateforme d’écriture partagée, où chacun peut con
 
 ## Vision
 
-Athanor devient un espace de dialogue philosophique incarné :  
+L'athanor devient un espace de dialogue philosophique incarné :  
 les billets ne sont plus figés mais *exposés à l’altération*, comme dans un palimpseste numérique. La combinaison de `.mdx`, de TinaCMS et d’une architecture Git-first garantit à la fois traçabilité, ouverture et sobriété technique.
 
 Ce dispositif vise une communauté de pensée plus qu’un réseau social :  

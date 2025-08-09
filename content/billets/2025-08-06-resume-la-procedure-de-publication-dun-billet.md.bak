@@ -1,0 +1,17 @@
+---
+title: Résume la procédure de publication d'un billet
+tags:
+  - publication
+  - site
+  - markdown
+  - git
+date: '2025-08-06T00:00:00.000Z'
+excerpt: >-
+  Pour ur u  ur  ,  uff  rér u fcr Mrkow   ’rrr   or co// u éô oc,   o o  for
+  YYYY-MM-DD-r..
+---
+Pour publier un billet sur le site, il suffit de rédiger un fichier Markdown et de l’enregistrer dans le dossier `content/billets/` du dépôt local, en le nommant selon le format `YYYY-MM-DD-titre.md`.
+
+Lors du `git push`, Vercel le détecte automatiquement et publie le billet. Il est ensuite disponible à l’URL :
+
+`https://athanor.vercel.app/billets/slug-du-billet`
