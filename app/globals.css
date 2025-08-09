@@ -76,4 +76,60 @@
   .prose li {
     @apply mb-2;
   }
+}/* motif de grille très léger pour le hero */
+.grid-pattern{
+  background-image:
+    radial-gradient(currentColor 1px, transparent 1px),
+    radial-gradient(currentColor 1px, transparent 1px);
+  background-size:24px 24px,24px 24px;
+  background-position:0 0,12px 12px;
+  color:rgba(0,0,0,0.05);
 }
+:root .dark .grid-pattern{ color:rgba(255,255,255,0.06); }
+/* QuoteTicker animation */
+.ticker { animation: ticker-scroll 40s linear infinite; }
+@keyframes ticker-scroll {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) { .ticker { animation: none; } }
+/* --- L’athanor accents (S1 minimal) --- */
+.accent-card { position: relative; }
+.accent-card::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0; width: 2px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0));
+}
+.dark .accent-card::before {
+  background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0));
+}
+
+/* Lecture un peu plus souple */
+p, li { text-wrap: pretty; }
+
+/* Légère amélioration des hover sur liens */
+a:hover { text-underline-offset: 4px; text-decoration-thickness: from-font; }
+
+/* Utilitaire pour zone de lecture étroite (à activer au besoin) */
+.reading { max-width: 72ch; }
+
+/* >>> admin pill >>> */
+@layer components {
+  a[href="/admin"] {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium no-underline transition
+           border border-transparent shadow-sm
+           bg-foreground text-white hover:opacity-90;
+  }
+  a[href="/admin"]::before {
+    content: "🔒";
+    display: inline-block;
+    margin-right: .4rem;
+    transform: translateY(1px);
+  }
+  a[href="/admin"]:focus-visible {
+    outline: none;
+    @apply ring-2 ring-foreground/30 ring-offset-1 ring-offset-background;
+  }
+}
+/* <<< admin pill <<< */
