@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 
+const isPreview = process.env.VERCEL_ENV === 'preview';
+
 async function getPublicationStats() {
   try {
     const [totalPublications, publishedPublications, totalSize] = await Promise.all([
@@ -30,7 +32,7 @@ function formatFileSize(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
 }
 
-export default async function AdminPage() {
+async function AdminNormalPage() {
   const session = await getServerSession(authOptions)
 
   // 1) Pas connecté -> écran "Se connecter"
@@ -164,4 +166,15 @@ export default async function AdminPage() {
       </div>
     </div>
   )
+}
+export default async function AdminPage() {
+  if (isPreview) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <h1>Zone admin désactivée en mode Preview</h1>
+        <p>Utilise la version locale ou la production.</p>
+      </div>
+    )
+  }
+  return AdminNormalPage()
 }
