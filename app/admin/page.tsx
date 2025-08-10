@@ -1,8 +1,7 @@
 import Link from 'next/link'
-import { Plus, FileText, Settings, Upload } from 'lucide-react'
+import { Plus, FileText, Settings, Upload, Lock, ShieldAlert, LogOut } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth/next'
-import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
 
 async function getPublicationStats() {
@@ -10,9 +9,7 @@ async function getPublicationStats() {
     const [totalPublications, publishedPublications, totalSize] = await Promise.all([
       prisma.article.count(),
       prisma.article.count({ where: { isPublished: true } }),
-      prisma.article.aggregate({
-        _sum: { fileSize: true },
-      }),
+      prisma.article.aggregate({ _sum: { fileSize: true } }),
     ])
 
     return {
@@ -20,7 +17,7 @@ async function getPublicationStats() {
       published: publishedPublications,
       totalSize: totalSize._sum.fileSize || 0,
     }
-  } catch (error) {
+  } catch {
     return { total: 0, published: 0, totalSize: 0 }
   }
 }
@@ -34,21 +31,53 @@ function formatFileSize(bytes: number): string {
 }
 
 export default async function AdminPage() {
-  // 🛡️ PROTECTION: Vérifier l'autorisation admin
   const session = await getServerSession(authOptions)
-  
-  if (!session || session.user?.role !== 'admin') {
-    redirect('/') // Redirige vers la page d'accueil
+
+  // 1) Pas connecté -> écran "Se connecter"
+  if (!session) {
+    return (
+      <div className="max-w-md mx-auto px-6 py-16 text-center">
+        <Lock className="h-10 w-10 mx-auto mb-4 text-subtle" />
+        <h1 className="text-2xl font-light text-foreground mb-2">Espace administration</h1>
+        <p className="text-subtle mb-6 font-light">Connecte-toi pour continuer.</p>
+        <a
+          href="/api/auth/signin?callbackUrl=/admin"
+          className="inline-flex items-center px-4 py-2 border border-foreground hover:bg-foreground hover:text-background transition-colors"
+        >
+          Se connecter avec GitHub
+        </a>
+        <p className="text-xs text-subtle mt-4 font-light">Après connexion, tu reviendras ici automatiquement.</p>
+      </div>
+    )
   }
-  
+
+  // 2) Connecté mais pas admin -> 403 propre
+  if (session.user?.role !== 'admin') {
+    return (
+      <div className="max-w-xl mx-auto px-6 py-16 text-center">
+        <ShieldAlert className="h-10 w-10 mx-auto mb-4 text-subtle" />
+        <h1 className="text-2xl font-light text-foreground mb-2">Accès refusé (403)</h1>
+        <p className="text-subtle mb-4 font-light">
+          Connecté en tant que <span className="font-medium">{session.user?.email ?? 'utilisateur'}</span>, mais sans droits admin.
+        </p>
+        <div className="bg-gray-50 text-left text-xs p-3 border border-subtle mb-6 overflow-x-auto">
+          <p className="mb-2">Pour te promouvoir admin (à exécuter côté base) :</p>
+          <code>UPDATE "User" SET role = 'admin' WHERE email = 'ton-email@github';</code>
+        </div>
+        <a href="/api/auth/signout?callbackUrl=/" className="inline-flex items-center gap-2 underline text-sm">
+          <LogOut className="h-4 w-4" /> Se déconnecter
+        </a>
+      </div>
+    )
+  }
+
+  // 3) Admin -> dashboard
   const stats = await getPublicationStats()
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-light text-foreground mb-4">
-          Administration
-        </h1>
+        <h1 className="text-3xl font-light text-foreground mb-4">Administration</h1>
         <p className="text-base text-subtle font-light">
           Gérez vos publications et les paramètres de la plateforme.
         </p>
@@ -87,10 +116,7 @@ export default async function AdminPage() {
 
       {/* Quick Actions */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <Link
-          href="/admin/upload"
-          className="card border-subtle hover:border-foreground transition-colors group"
-        >
+        <Link href="/admin/upload" className="card border-subtle hover:border-foreground transition-colors group">
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 flex items-center justify-center">
               <Plus className="h-5 w-5 text-foreground" />
@@ -102,10 +128,7 @@ export default async function AdminPage() {
           </div>
         </Link>
 
-        <Link
-          href="/admin/publications"
-          className="card border-subtle hover:border-foreground transition-colors group"
-        >
+        <Link href="/admin/publications" className="card border-subtle hover:border-foreground transition-colors group">
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 flex items-center justify-center">
               <FileText className="h-5 w-5 text-foreground" />
@@ -117,10 +140,7 @@ export default async function AdminPage() {
           </div>
         </Link>
 
-        <Link
-          href="/admin/settings"
-          className="card border-subtle hover:border-foreground transition-colors group"
-        >
+        <Link href="/admin/settings" className="card border-subtle hover:border-foreground transition-colors group">
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 flex items-center justify-center">
               <Settings className="h-5 w-5 text-foreground" />
@@ -135,15 +155,11 @@ export default async function AdminPage() {
 
       {/* Recent Activity */}
       <div className="card border-subtle">
-        <h2 className="text-lg font-light text-foreground mb-6">
-          Activité Récente
-        </h2>
+        <h2 className="text-lg font-light text-foreground mb-6">Activité Récente</h2>
         <div className="text-center py-8 text-subtle">
           <FileText className="h-8 w-8 mx-auto mb-4 text-subtle" />
           <p>Aucune activité récente à afficher</p>
-          <p className="text-sm mt-2 font-light">
-            Les actions d'administration apparaîtront ici
-          </p>
+          <p className="text-sm mt-2 font-light">Les actions d'administration apparaîtront ici</p>
         </div>
       </div>
     </div>

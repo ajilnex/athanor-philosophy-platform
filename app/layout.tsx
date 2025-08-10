@@ -5,8 +5,8 @@ import { Footer } from '@/components/layout/Footer'
 import AppSessionProvider from '@/components/SessionProvider'
 
 export const metadata: Metadata = {
-  title: 'L’athanor - Plateforme Philosophique',
-  description: 'L’athanor - Une collection d\'articles de philosophie contemporaine',
+  title: "L’athanor — Plateforme philosophique",
+  description: "L’athanor — Une collection d’articles de philosophie contemporaine",
 }
 
 export default function RootLayout({
