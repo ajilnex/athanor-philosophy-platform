@@ -1,157 +1,71 @@
-const { PrismaClient } = require('@prisma/client')
+/**
+ * Sync billets from filesystem into DB (UPsert).
+ * - If a billet exists, update its title/excerpt/tags (keeps slug & createdAt).
+ * - If not, create it.
+ */
 const fs = require('fs')
 const path = require('path')
 const matter = require('gray-matter')
-const { execSync } = require('child_process')
-
+const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
-function ensureGitHistory() {
-  try {
-    // Sur Vercel le clone peut être shallow : on étend si possible, sans casser si déjà complet
-    execSync('git fetch --unshallow', { stdio: 'ignore' });
-  } catch {}
-  try {
-    // À défaut, on s'assure d'avoir un minimum d'historique
-    execSync('git fetch --depth=1000', { stdio: 'ignore' });
-  } catch {}
+const BILLETS_DIR = path.join(process.cwd(), 'content', 'billets')
+
+function deriveExcerpt(md, max = 220) {
+  const noYaml = md.replace(/^---[\s\S]*?---\s*/, '')
+  const text = noYaml.replace(/<!--.*?-->/gs, '').replace(/[*_`#>$begin:math:display$$end:math:display$()!-]/g, ' ').replace(/\s+/g,' ').trim()
+  return text.slice(0, max)
 }
 
-function gitCommitDateFor(absPath) {
-  try {
-    const iso = execSync(`git log -1 --format=%cI -- "${absPath}"`, { stdio: ['ignore','pipe','ignore'] })
-      .toString()
-      .trim();
-    if (iso) return new Date(iso);
-  } catch {}
-  return null;
-}
-
-function dateFromSlug(slug) {
-  const m = slug.match(/^(\d{4}-\d{2}-\d{2})/);
-  return m ? new Date(m[1]) : null;
-}
-
-async function migrateBilletsToDatabase() {
+async function main() {
   console.log('🚀 Démarrage de la synchronisation bidirectionnelle des billets...')
-  
-  // Assurer l'historique Git pour les dates
-  ensureGitHistory()
-  
-  const billetsDir = path.join(process.cwd(), 'content/billets')
-  
-  try {
-    // Lire tous les fichiers .md
-    const files = fs.readdirSync(billetsDir).filter(file => file.endsWith('.md'))
-    console.log(`📁 Trouvé ${files.length} fichiers de billets`)
-    
-    for (const fileName of files) {
-      const slug = fileName.replace('.md', '')
-      const filePath = path.join(billetsDir, fileName)
-      
-      console.log(`📝 Migration du billet: ${slug}`)
-      
-      // Lire et parser le fichier Markdown
-      let fileContent = fs.readFileSync(filePath, 'utf8')
-      
-      // Nettoyer les doubles front-matters (éliminer le premier s'il contient created/modified)
-      if (fileContent.startsWith('---')) {
-        const firstEnd = fileContent.indexOf('---', 3)
-        if (firstEnd !== -1) {
-          const firstFrontmatter = fileContent.slice(4, firstEnd)
-          if (firstFrontmatter.includes('created:') || firstFrontmatter.includes('modified:')) {
-            fileContent = fileContent.slice(firstEnd + 4).trim()
-          }
-        }
-      }
-      
-      const { data: frontmatter, content: markdownContent } = matter(fileContent)
-      
-      // Générer un excerpt à partir du contenu
-      const plainText = markdownContent.replace(/[#*`\[\]]/g, '').substring(0, 200).trim()
-      const excerpt = plainText.length === 200 ? plainText + '...' : plainText
-      
-      const absPath = path.join(billetsDir, fileName);
+  const files = fs.readdirSync(BILLETS_DIR).filter(f => f.endsWith('.md'))
+  console.log(`📁 Trouvé ${files.length} fichiers de billets`)
 
-      // 1) Git (dernier commit du fichier)
-      let parsedDate = gitCommitDateFor(absPath);
+  for (const filename of files) {
+    const full = path.join(BILLETS_DIR, filename)
+    const slug = filename.replace(/\.md$/, '')
+    const fileContent = fs.readFileSync(full, 'utf8')
+    const { data: frontmatter, content } = matter(fileContent)
 
-      // 2) Slug (YYYY-MM-DD-...)
-      if (!parsedDate || isNaN(parsedDate.getTime())) {
-        parsedDate = dateFromSlug(slug);
-      }
+    // Title: prefer YAML title; fallback to slug
+    const finalTitle = (frontmatter?.title && String(frontmatter.title).trim()) || slug
+    const excerpt = deriveExcerpt(fileContent)
+    const tags = Array.isArray(frontmatter?.tags) ? frontmatter.tags : []
 
-      // 3) Now (fallback final)
-      if (!parsedDate || isNaN(parsedDate.getTime())) {
-        parsedDate = new Date();
-      }
-
-      console.log(`📅 Date retenue pour ${slug}: ${parsedDate.toISOString()}`)
-      
-      // Vérifier si le billet existe déjà en DB
-      const existingBillet = await prisma.billet.findUnique({
-        where: { slug }
-      })
-      
-      if (existingBillet) {
-        console.log(`⏭️  Billet "${slug}" existe déjà en DB - pas de re-création`)
-      } else {
-        // Créer SEULEMENT s'il n'existe pas (pas d'update pour préserver les suppressions)
-        // Gérer le titre selon les 3 cas
-        let finalTitle
-        if (frontmatter.title) {
-          finalTitle = frontmatter.title
-        } else {
-          finalTitle = `No name (${parsedDate.toISOString().split('T')[0]})`
-        }
-        
-        await prisma.billet.create({
-          data: {
-            slug,
-            title: finalTitle,
-            content: markdownContent,
-            excerpt: excerpt || null,
-            tags: frontmatter.tags || [],
-            date: parsedDate,
-          }
-        })
-        console.log(`✅ Nouveau billet "${slug}" créé en DB`)
-      }
+    // Keep createdAt from filename prefix if present (YYYY-MM-DD-... or ISO-ish)
+    let createdAt = undefined
+    const m = slug.match(/^\d{4}-\d{2}-\d{2}/)
+    if (m) {
+      const iso = `${m[0]}T00:00:00.000Z`
+      createdAt = new Date(iso)
     }
-    
-    // Synchronisation inverse : supprimer de la DB les billets dont le fichier .md n'existe plus
-    console.log('🔄 Vérification des billets à supprimer...')
-    const allDbBillets = await prisma.billet.findMany({ select: { slug: true } })
-    const fileBasedSlugs = files.map(fileName => fileName.replace('.md', ''))
-    
-    let deletedCount = 0
-    for (const dbBillet of allDbBillets) {
-      if (!fileBasedSlugs.includes(dbBillet.slug)) {
-        await prisma.billet.delete({ where: { slug: dbBillet.slug } })
-        console.log(`🗑️ Billet "${dbBillet.slug}" supprimé de la DB (fichier .md absent)`)
-        deletedCount++
-      }
+
+    const res = await prisma.billet.upsert({
+      where: { slug },
+      create: {
+        slug,
+        title: finalTitle,
+        excerpt,
+        tags,
+        ...(createdAt ? { createdAt } : {}),
+      },
+      update: {
+        title: finalTitle,
+        excerpt,
+        tags,
+        updatedAt: new Date(),
+      },
+    })
+
+    if (res) {
+      console.log(`↻ Upsert "${slug}" → title="${finalTitle}"`)
     }
-    
-    console.log('🎉 Synchronisation terminée avec succès!')
-    
-    // Afficher un résumé
-    const totalBillets = await prisma.billet.count()
-    console.log(`📊 Total des billets en base: ${totalBillets}`)
-    console.log(`📁 Fichiers .md trouvés: ${files.length}`)
-    console.log(`🗑️ Billets supprimés: ${deletedCount}`)
-    
-  } catch (error) {
-    console.error('❌ Erreur durant la migration:', error)
-    process.exit(1)
-  } finally {
-    await prisma.$disconnect()
   }
+
+  console.log('🎉 Synchronisation terminée avec succès!')
 }
 
-// Exécuter la migration si le script est appelé directement
-if (require.main === module) {
-  migrateBilletsToDatabase()
-}
-
-module.exports = { migrateBilletsToDatabase }
+main()
+  .catch(e => { console.error(e); process.exit(1) })
+  .finally(async () => { await prisma.$disconnect() })
