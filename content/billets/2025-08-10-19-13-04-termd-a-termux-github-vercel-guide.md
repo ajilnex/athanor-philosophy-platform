@@ -1,3 +1,7 @@
+---
+title: "Publier un billet avec termd → Termux → GitHub → Vercel (procédure compacte)"
+---
+
 # Publier un billet avec **termd → Termux → GitHub → Vercel** (procédure compacte)
 
 Ce billet documente le flux complet que j’utilise sur mobile :

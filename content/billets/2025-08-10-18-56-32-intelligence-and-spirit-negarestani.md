@@ -1,3 +1,7 @@
+---
+title: "Notes sur *Intelligence and Spirit* (Reza Negarestani) — continuité, apprentissage, esprit collectif"
+---
+
 # Notes sur *Intelligence and Spirit* (Reza Negarestani) — continuité, apprentissage, esprit collectif
 
 Dans *Intelligence and Spirit*, Reza Negarestani propose une reconstruction « rationaliste » de l’esprit à partir de l’apprentissage, du normatif et de l’auto-correction publique. L’intelligence n’est pas un donné intérieur, mais une **pratique sociale** : on devient sujet en entrant dans l’espace des **raisons**, c’est-à-dire un milieu où l’on peut répondre de ce qu’on affirme, corriger, et se laisser corriger.
