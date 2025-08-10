@@ -5,7 +5,7 @@ export default function HomePage() {
     <div className="flex flex-col items-center justify-center min-h-screen text-center px-4 sm:px-6">
       <main className="max-w-2xl w-full">
         <h1 className="text-3xl sm:text-4xl font-light tracking-tight text-foreground mb-4">
-          Athanor
+          L’athanor
         </h1>
         <p className="text-base sm:text-lg mb-8 sm:mb-12 text-subtle font-light">
          Philosopher - Ecrire - Editer

@@ -44,7 +44,7 @@ export function Navbar() {
         <div className="md:hidden">
           <div className="flex items-center justify-between py-4">
             <Link href="/" className="text-foreground font-light text-lg">
-              Athanor
+              L’athanor
             </Link>
             <button
               onClick={() => setIsOpen(!isOpen)}
