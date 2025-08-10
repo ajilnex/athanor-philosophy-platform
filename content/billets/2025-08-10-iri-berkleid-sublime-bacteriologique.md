@@ -1,4 +1,8 @@
 ---
+title: "Publier un billet avec termd → Termux → GitHub → Vercel (procédure compacte)"
+---
+
+---
 title: "Iri Berkleid — À la recherche d’un sublime bactériologique"
 tags: ["esthétique", "biologie", "art", "rituel", "néo-matérialisme"]
 summary: "Notes de lecture autour des « Extractions » d’Iri Berkleid : peaux de cellulose, rituels post-anthropocentriques et hypothèse d’un sublime à l’échelle microbienne."
