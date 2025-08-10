@@ -1,0 +1,154 @@
+import { remark } from 'remark'
+import html from 'remark-html'
+import { prisma } from '@/lib/prisma'
+import path from 'path'
+import fs from 'fs/promises'
+import matter from 'gray-matter'
+
+export interface Billet {
+  slug: string
+  title: string
+  date: string
+  tags: string[]
+  content: string
+  excerpt?: string
+}
+
+const CONTENT_DIR = path.join(process.cwd(), 'content', 'billets')
+
+async function readAllFromFS(): Promise<Billet[]> {
+  try {
+    const entries = await fs.readdir(CONTENT_DIR)
+    const mdFiles = entries.filter(f => f.toLowerCase().endsWith('.md'))
+    const billets = await Promise.all(
+      mdFiles.map(async (file) => {
+        const full = path.join(CONTENT_DIR, file)
+        const raw = await fs.readFile(full, 'utf8')
+        const { data, content } = matter(raw)
+
+        const slug = file.replace(/\.md$/i, '')
+        const title = (data.title as string) ?? slug
+        const date = (() => {
+          if (data.date) return new Date(data.date as string).toISOString().split('T')[0]
+          // fallback: essaye d'extraire AAAA-MM-JJ du nom
+          const m = slug.match(/^(\d{4}-\d{2}-\d{2})/)
+          return m ? m[1] : new Date().toISOString().split('T')[0]
+        })()
+        const tags = Array.isArray(data.tags) ? data.tags as string[] : []
+        const excerpt =
+          (data.excerpt as string) ??
+          content.trim().replace(/\n+/g, ' ').slice(0, 180)
+
+        return { slug, title, date, tags, content, excerpt }
+      })
+    )
+
+    // Trie du plus récent au plus ancien
+    billets.sort((a, b) => (a.date < b.date ? 1 : -1))
+    return billets
+  } catch (e) {
+    console.error('FS fallback failed:', e)
+    return []
+  }
+}
+
+export async function getBilletSlugs(): Promise<string[]> {
+  // DB d’abord
+  try {
+    const billets = await prisma.billet.findMany({ select: { slug: true } })
+    if (billets.length > 0) return billets.map(b => b.slug)
+  } catch (_) {}
+  // FS sinon
+  try {
+    const entries = await fs.readdir(CONTENT_DIR)
+    return entries
+      .filter(f => f.toLowerCase().endsWith('.md'))
+      .map(f => f.replace(/\.md$/i, ''))
+  } catch (e) {
+    console.error('Error reading slugs from FS:', e)
+    return []
+  }
+}
+
+// Transformer les backlinks [[mot]] en liens
+async function transformBacklinks(content: string): Promise<string> {
+  const allSlugs = await getBilletSlugs()
+  return content.replace(/\[\[([^\]]+)\]\]/g, (_m, linkText) => {
+    const targetSlug = String(linkText)
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+    const foundSlug = allSlugs.find(slug =>
+      slug.includes(targetSlug) ||
+      slug.endsWith(targetSlug) ||
+      slug.replace(/^\d{4}-\d{2}-\d{2}-/, '') === targetSlug
+    )
+    const href = foundSlug ? `/billets/${foundSlug}` : `/billets/${targetSlug}`
+    const missing = !foundSlug
+    return `<a href="${href}" class="backlink" data-backlink="${linkText}" ${missing ? 'data-missing="true"' : ''}>${linkText}</a>`
+  })
+}
+
+export async function getAllBillets(): Promise<Billet[]> {
+  // 1) Essaie la DB
+  try {
+    const dbBillets = await prisma.billet.findMany({ orderBy: { date: 'desc' } })
+    if (dbBillets.length > 0) {
+      return dbBillets.map(dbBillet => ({
+        slug: dbBillet.slug,
+        title: dbBillet.title,
+        date: dbBillet.date.toISOString().split('T')[0],
+        tags: dbBillet.tags,
+        content: dbBillet.content,
+        excerpt: dbBillet.excerpt || undefined
+      }))
+    }
+  } catch (error) {
+    console.warn('DB unavailable, falling back to FS…', error)
+  }
+
+  // 2) Fallback FS
+  return readAllFromFS()
+}
+
+export async function getBilletBySlug(slug: string): Promise<Billet | null> {
+  // 1) DB d’abord
+  try {
+    const dbBillet = await prisma.billet.findUnique({ where: { slug } })
+    if (dbBillet) {
+      const contentWithBacklinks = await transformBacklinks(dbBillet.content)
+      const processedContent = await remark().use(html, { sanitize: false }).process(contentWithBacklinks)
+      return {
+        slug: dbBillet.slug,
+        title: dbBillet.title,
+        date: dbBillet.date.toISOString().split('T')[0],
+        tags: dbBillet.tags,
+        content: processedContent.toString(),
+        excerpt: dbBillet.excerpt || undefined
+      }
+    }
+  } catch (_) {}
+
+  // 2) Fallback FS
+  try {
+    const filePath = path.join(CONTENT_DIR, `${slug}.md`)
+    const raw = await fs.readFile(filePath, 'utf8')
+    const { data, content } = matter(raw)
+
+    const contentWithBacklinks = await transformBacklinks(content)
+    const processedContent = await remark().use(html, { sanitize: false }).process(contentWithBacklinks)
+
+    return {
+      slug,
+      title: (data.title as string) ?? slug,
+      date: (data.date ? new Date(data.date as string).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]),
+      tags: Array.isArray(data.tags) ? (data.tags as string[]) : [],
+      content: processedContent.toString(),
+      excerpt: (data.excerpt as string) ?? undefined
+    }
+  } catch (error) {
+    console.error(`Error reading billet ${slug} from FS:`, error)
+    return null
+  }
+}
