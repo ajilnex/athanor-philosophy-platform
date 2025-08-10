@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAllBillets } from '@/lib/billets'
 
+// Force this API to be dynamic - never prerender at build time
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 interface BilletResult {
   type: 'billet'
   slug: string
@@ -87,7 +91,8 @@ function calculateScore(billet: any, normalizedQuery: string): number {
 
 export async function GET(request: NextRequest) {
   try {
-    const query = request.nextUrl.searchParams.get('q')
+    // Safely extract query parameter
+    const query = request.nextUrl?.searchParams?.get('q') || null
 
     // Validate query
     if (!query || typeof query !== 'string') {
