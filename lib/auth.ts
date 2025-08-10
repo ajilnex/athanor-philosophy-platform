@@ -1,24 +1,44 @@
-import GitHubProvider from 'next-auth/providers/github';
-import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { prisma } from '@/lib/prisma';
-import type { NextAuthOptions } from 'next-auth';
+import GitHubProvider from 'next-auth/providers/github'
+import { PrismaAdapter } from '@next-auth/prisma-adapter'
+import { prisma } from '@/lib/prisma'
+import type { NextAuthOptions } from 'next-auth'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
+  secret: process.env.NEXTAUTH_SECRET,
+
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
     }),
   ],
+
+  session: { strategy: 'jwt' },
+
   callbacks: {
-    session({ session, user }: any) {
-      // Inclure l'ID de l'utilisateur et son rôle dans la session
-      if (session.user) {
-        session.user.id = user.id;
-        session.user.role = user.role; // Le champ 'role' vient de notre schéma Prisma
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = (user as any).id
+        token.role = (user as any).role
+      } else if (!token.role && token.email) {
+        const u = await prisma.user.findUnique({
+          where: { email: token.email as string },
+          select: { id: true, role: true },
+        })
+        if (u) {
+          token.id = u.id
+          token.role = u.role
+        }
       }
-      return session;
+      return token
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        ;(session.user as any).id = token.id
+        ;(session.user as any).role = token.role
+      }
+      return session
     },
   },
-};
+}
