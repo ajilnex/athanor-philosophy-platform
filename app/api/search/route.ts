@@ -87,8 +87,7 @@ function calculateScore(billet: any, normalizedQuery: string): number {
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
-    const query = searchParams.get('q')
+    const query = request.nextUrl.searchParams.get('q')
 
     // Validate query
     if (!query || typeof query !== 'string') {
