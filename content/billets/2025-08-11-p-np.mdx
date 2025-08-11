@@ -1,0 +1,44 @@
+---
+title: "P = NP ?"
+date: "2025-08-11"
+tags: ["Math", "philo"]
+excerpt: "je vote pour l'inégalité"
+---
+
+![Sans titre](https://res.cloudinary.com/defnbqt67/image/upload/v1754921350/athanor/billets/file_neewhd.png)
+
+En une phrase sèche : P = NP ? revient à demander si tout problème dont on peut vérifier vite la solution peut aussi se résoudre vite.
+
+Partons des images simples. Vérifier une solution, c’est inspecter un Sudoku déjà rempli : en quelques gestes, vous savez si les règles tiennent. Trouver la solution, c’est traverser un labyrinthe de possibilités. La question oppose ces deux gestes : le contrôle expéditif et la recherche coûteuse.
+
+En langage de complexité :
+	•	P = problèmes décidables en temps polynomial par un algorithme déterministe — un temps qui croît “raisonnablement” (n^k) quand la taille de l’entrée augmente.
+	•	NP = problèmes pour lesquels un certificat (solution candidate) peut être vérifié en temps polynomial.
+
+On sait que P \subseteq NP. La question : existe-t-il des problèmes qu’on peut vérifier vite mais pas résoudre vite ?
+	•	Si P = NP : trouver est fondamentalement équivalent à vérifier.
+	•	Si P \neq NP : trouver peut être structurellement plus dur que vérifier — pour Peirce, l’abduction (invention d’hypothèses) resterait d’une autre nature que la déduction.
+
+Exemples :
+	•	Sudoku : vérifier une grille correcte est trivial ; en générer une parfaite est beaucoup plus ardu.
+	•	Voyageur de commerce : calculer la longueur d’une tournée donnée est immédiat ; trouver la plus courte parmi toutes croît en difficulté de façon explosive.
+
+Pivot historique : début 1970, Cook et Levin identifient des “problèmes carrefours” — NP-complets — dont SAT (satisfiabilité booléenne). Si l’un d’eux tombe en polynomial, tous les problèmes de NP tombent avec.
+
+Conséquences si P = NP :
+	1.	Cryptographie : RSA, ECC, etc., s’effondrent — leur sécurité repose sur l’asymétrie entre trouver et vérifier.
+	2.	Optimisation : planification, conception, design moléculaire — tout deviendrait calculable à l’optimal comme routine.
+	3.	Preuves : si vérifier est rapide, trouver des preuves complètes le deviendrait aussi.
+
+Conséquences si P \neq NP :
+	•	Justification des heuristiques, algorithmes d’approximation, paramétrisations fines, et recours stratégique au hasard ou à l’apprentissage automatique : palliatifs efficaces mais non universels.
+
+Pourquoi indécidable aujourd’hui ? Les approches connues se heurtent à des barrières théoriques (relativisation, natural proofs, algebrization). Toute percée exigera une idée radicalement neuve.
+
+Consensus : la communauté penche pour P \neq NP, sans preuve formelle. Le Clay Mathematics Institute offre 1 M$ pour une démonstration.
+
+Image finale :
+	•	P = NP : chaque serrure a sa clé rangée juste dessous le paillasson.
+	•	P \neq NP : la clé existe, mais la forger exige patience, invention et détour — et l’intelligence, humaine ou machinique, s’y exerce dans l’entre-deux du possible et du vérifiable.
+
+⸻
