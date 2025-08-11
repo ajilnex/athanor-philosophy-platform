@@ -1,8 +1,7 @@
 import { getAllBillets } from '@/lib/billets'
 import { BilletsList } from '@/components/billets/BilletsList'
 
-// Force dynamic rendering to reflect DB changes immediately
-export const dynamic = 'force-dynamic'
+// Billets sont statiques (filesystem uniquement)
 
 export default async function BilletsPage() {
   const billets = await getAllBillets()

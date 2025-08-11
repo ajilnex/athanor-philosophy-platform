@@ -23,7 +23,7 @@ function dateFrom(front: any, slug: string): string {
     (front?.date ? new Date(front.date) : null)
     || (/^\d{4}-\d{2}-\d{2}/.test(slug) ? new Date(slug.slice(0,10)) : null)
     || new Date()
-  return new Date(d).toISOString().split('T')[0]
+  return d.toISOString().split('T')[0]
 }
 
 async function fsAll(): Promise<Billet[]> {
@@ -73,40 +73,12 @@ async function transformBacklinks(content: string): Promise<string> {
 }
 
 export async function getAllBillets(): Promise<Billet[]> {
-  try {
-    const dbBillets = await prisma.billet.findMany({ orderBy: { date: 'desc' } })
-    if (dbBillets.length) {
-      return dbBillets.map(b => ({
-        slug: b.slug,
-        title: b.title,
-        date: b.date.toISOString().split('T')[0],
-        tags: b.tags,
-        content: b.content,
-        excerpt: b.excerpt || undefined,
-      }))
-    }
-  } catch (e) {
-    console.log('DB unavailable, using FS:', (e as any)?.code ?? '')
-  }
+  // Billets = 100% statiques, toujours depuis le filesystem
   return fsAll()
 }
 
 export async function getBilletBySlug(slug: string) {
-  try {
-    const b = await prisma.billet.findUnique({ where: { slug } })
-    if (b) {
-      const contentWithBacklinks = await transformBacklinks(b.content)
-      return {
-        slug: b.slug,
-        title: b.title,
-        date: b.date.toISOString().split('T')[0],
-        tags: b.tags,
-        content: contentWithBacklinks,
-        excerpt: b.excerpt || undefined,
-      }
-    }
-  } catch {}
-
+  // Billets = 100% statiques, toujours depuis le filesystem
   try {
     const filePath = path.join(CONTENT_DIR, `${slug}.mdx`)
     const raw = await fs.readFile(filePath, 'utf8')
