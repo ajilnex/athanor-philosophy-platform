@@ -42,8 +42,8 @@ const mdxComponents = {
   // Blockquotes
   blockquote: (props: any) => <blockquote className="border-l-4 border-gray-200 pl-4 my-4 italic text-subtle" {...props} />,
   
-  // Composants personnalisés Athanor
-  ImageUpload: (props: any) => <ImageUpload className="my-6" autoInsert={true} {...props} />,
+  // Composants personnalisés Athanor  
+  ImageUpload: (props: any) => <ImageUpload className="my-6" autoInsert={false} {...props} />,
 }
 
 // Compilateur mixte MDX/MD côté serveur

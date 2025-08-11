@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { generateBilletContent, updateFileOnGitHub } from '@/lib/github-api'
+import { generateBilletContent, updateFileOnGitHub } from '@/lib/github.server'
 
 export async function POST(request: NextRequest) {
   try {
