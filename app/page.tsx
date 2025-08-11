@@ -17,7 +17,7 @@ export default async function HomePage() {
 
         {/* Barre de recherche (compacte et centrée) */}
         <div className="w-full max-w-lg mx-auto mt-6 mb-8">
-          <form action="/recherche" method="GET" className="relative">
+          <form action="/search" method="GET" className="relative">
             <input
               type="search"
               name="q"
@@ -32,7 +32,7 @@ export default async function HomePage() {
           <Link href="/billets" className="hover:text-subtle transition-colors py-2">Billets</Link>
           <Link href="/publications" className="hover:text-subtle transition-colors py-2">Publications</Link>
           <Link href="/a-propos" className="hover:text-subtle transition-colors py-2">À propos</Link>
-          <Link href="/recherche" className="hover:text-subtle transition-colors py-2">Recherche</Link>
+          <Link href="/search" className="hover:text-subtle transition-colors py-2">Recherche</Link>
         </nav>
 
         {/* Navigation desktop */}
@@ -40,7 +40,7 @@ export default async function HomePage() {
           <Link href="/billets" className="hover:text-subtle transition-colors">Billets</Link>
           <Link href="/publications" className="hover:text-subtle transition-colors">Publications</Link>
           <Link href="/a-propos" className="hover:text-subtle transition-colors">À propos</Link>
-          <Link href="/recherche" className="hover:text-subtle transition-colors">Recherche</Link>
+          <Link href="/search" className="hover:text-subtle transition-colors">Recherche</Link>
         </nav>
 
         {/* Dernière activité */}

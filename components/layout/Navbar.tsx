@@ -30,13 +30,13 @@ export function Navbar() {
           <NavItem href="/billets">Billets</NavItem>
           <NavItem href="/publications">Publications</NavItem>
           <NavItem href="/a-propos">À propos</NavItem>
-          <NavItem href="/recherche">Recherche</NavItem>
+          <NavItem href="/search">Recherche</NavItem>
           <NavItem href="/admin">Admin</NavItem>
         </nav>
 
         {/* Mobile: simple lien recherche (optionnel) */}
         <nav className="sm:hidden">
-          <Link href="/recherche" className="text-sm underline underline-offset-4">Recherche</Link>
+          <Link href="/search" className="text-sm underline underline-offset-4">Recherche</Link>
         </nav>
       </div>
     </header>

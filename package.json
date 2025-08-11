@@ -21,9 +21,11 @@
     "@tailwindcss/typography": "^0.5.10",
     "cloudinary": "^2.0.1",
     "clsx": "^2.0.0",
+    "dotenv": "^17.2.1",
     "fuse.js": "^7.0.0",
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.303.0",
+    "lunr": "^2.3.9",
     "next": "14.0.4",
     "next-auth": "^4.24.5",
     "next-mdx-remote": "^5.0.0",
@@ -34,9 +36,11 @@
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
     "remark-parse": "^11.0.0",
-    "tailwind-merge": "^2.2.0"
+    "tailwind-merge": "^2.2.0",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
+    "@types/lunr": "^2.3.7",
     "@types/node": "^20",
     "@types/pdf-parse": "^1.1.5",
     "@types/react": "^18",
@@ -47,6 +51,7 @@
     "postcss": "^8",
     "prisma": "5.22.0",
     "tailwindcss": "^3.3.0",
+    "tsx": "^4.20.3",
     "typescript": "^5"
   }
 }
