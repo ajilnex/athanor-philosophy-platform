@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
-import { prisma } from '@/lib/prisma'
+import { getBilletBySlug } from '@/lib/billets'
 import { unlink } from 'fs/promises'
 import { join } from 'path'
 
@@ -18,10 +18,8 @@ export async function DELETE(
       )
     }
 
-    // Vérifier si le billet existe
-    const existingBillet = await prisma.billet.findUnique({
-      where: { slug }
-    })
+    // Vérifier si le billet existe dans le filesystem
+    const existingBillet = await getBilletBySlug(slug)
     
     if (!existingBillet) {
       return NextResponse.json(
@@ -30,19 +28,28 @@ export async function DELETE(
       )
     }
 
-    // Supprimer le billet de la base de données
-    await prisma.billet.delete({
-      where: { slug }
-    })
+    // Supprimer le fichier Markdown (essayer .md et .mdx)
+    const extensions = ['md', 'mdx']
+    let deleted = false
     
-    // Supprimer le fichier Markdown du disque
-    try {
-      const filePath = join(process.cwd(), 'content', 'billets', `${slug}.md`)
-      await unlink(filePath)
-      console.log(`📁 Fichier supprimé: ${slug}.md`)
-    } catch (fileError) {
-      console.warn(`⚠️ Impossible de supprimer le fichier ${slug}.md:`, fileError)
-      // On continue même si le fichier n'existe pas ou n'a pas pu être supprimé
+    for (const ext of extensions) {
+      try {
+        const filePath = join(process.cwd(), 'content', 'billets', `${slug}.${ext}`)
+        await unlink(filePath)
+        console.log(`📁 Fichier supprimé: ${slug}.${ext}`)
+        deleted = true
+        break
+      } catch (fileError) {
+        // Fichier n'existe pas avec cette extension, essayer la suivante
+      }
+    }
+    
+    if (!deleted) {
+      console.warn(`⚠️ Aucun fichier trouvé pour le slug: ${slug}`)
+      return NextResponse.json(
+        { error: 'Fichier de billet introuvable' },
+        { status: 404 }
+      )
     }
     
     // Invalider les caches pour que l'UI se mette à jour

@@ -1,7 +1,6 @@
 import path from 'path'
 import fs from 'fs/promises'
 import matter from 'gray-matter'
-import { prisma } from '@/lib/prisma'
 
 const CONTENT_DIR = path.join(process.cwd(), 'content', 'billets')
 
