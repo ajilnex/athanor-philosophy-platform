@@ -21,6 +21,9 @@ const config: Config = {
         serif: ['IBM Plex Serif', 'Georgia', 'serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
+      backgroundImage: {
+        'aurore-gradient': 'radial-gradient(120% 120% at 50% 0%, hsl(var(--background)) 50%, hsl(var(--accent) / 0.1))',
+      },
       typography: {
         DEFAULT: {
           css: {

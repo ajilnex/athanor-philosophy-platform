@@ -135,3 +135,15 @@ a:hover { text-underline-offset: 4px; text-decoration-thickness: from-font; }
 
 /* Utilitaire pour zone de lecture étroite (à activer au besoin) */
 .reading { max-width: 72ch; }
+
+/* Animation pour l'effet Ripple */
+@keyframes ripple-effect {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}

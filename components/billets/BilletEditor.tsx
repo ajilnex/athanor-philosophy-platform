@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { X, Save, Eye, EyeOff, Image as ImageIcon } from 'lucide-react'
 import { ImageUpload } from './ImageUpload'
+import { ShimmerButton } from '@/components/ui/ShimmerButton'
 
 interface BilletEditorProps {
   isOpen: boolean
@@ -136,13 +137,13 @@ export function BilletEditor({ isOpen, onClose, mode, initialData, onSave }: Bil
         {/* Toolbar */}
         <div className="flex items-center justify-between p-4 border-b bg-gray-50">
           <div className="flex items-center space-x-2">
-            <button
+            <ShimmerButton
               onClick={() => setShowImageUpload(true)}
-              className="btn btn-secondary"
+              variant="secondary"
             >
               <ImageIcon className="h-4 w-4" />
               <span>Image</span>
-            </button>
+            </ShimmerButton>
           </div>
           
           <div className="flex items-center space-x-2">
@@ -154,14 +155,15 @@ export function BilletEditor({ isOpen, onClose, mode, initialData, onSave }: Bil
               <span>{showPreview ? 'Éditer' : 'Preview'}</span>
             </button>
             
-            <button
+            <ShimmerButton
               onClick={handleSave}
               disabled={isSaving}
-              className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              variant="primary"
+              className="disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save className="h-4 w-4" />
               <span>{isSaving ? 'Sauvegarde...' : 'Sauvegarder'}</span>
-            </button>
+            </ShimmerButton>
           </div>
         </div>
 

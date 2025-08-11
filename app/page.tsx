@@ -1,6 +1,10 @@
 import Link from 'next/link'
+import { getAllBillets } from '@/lib/billets'
+import { LatestBilletCard } from '@/components/home/LatestBilletCard'
 
-export default function HomePage() {
+export default async function HomePage() {
+  const allBillets = await getAllBillets()
+  const latestBillet = allBillets.length > 0 ? allBillets[0] : null
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-center px-4 sm:px-6">
       <main className="max-w-2xl w-full">
@@ -18,9 +22,9 @@ export default function HomePage() {
             id="home-search"
             name="q"
             placeholder="Rechercher sur le site…"
-            className="block mx-auto w-full max-w-sm rounded-xl border border-subtle bg-white px-4 py-2.5
-                       text-base outline-none shadow-sm focus:border-foreground focus:ring-2
-                       focus:ring-foreground/10 transition"
+            className="block mx-auto w-full max-w-sm rounded-full border-l-foreground/50 border-t-foreground/50 border-b-foreground/50 border-r-transparent bg-transparent px-4 py-3
+                       text-lg outline-none shadow-sm focus:border-accent focus:ring-2
+                       focus:ring-accent/20 transition-all duration-300"
             autoComplete="off"
           />
         </form>
@@ -40,6 +44,14 @@ export default function HomePage() {
           <Link href="/a-propos" className="hover:text-subtle transition-colors">À propos</Link>
           <Link href="/recherche" className="hover:text-subtle transition-colors">Recherche</Link>
         </nav>
+
+        {/* Dernière activité */}
+        {latestBillet && (
+          <div className="mt-16 w-full max-w-2xl">
+            <h2 className="font-serif text-xl text-subtle mb-6 text-left">Dernière activité</h2>
+            <LatestBilletCard billet={latestBillet} />
+          </div>
+        )}
       </main>
     </div>
   )
