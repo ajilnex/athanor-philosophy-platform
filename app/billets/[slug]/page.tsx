@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Calendar, Tag } from 'lucide-react'
 import { getBilletBySlug, getBilletSlugs } from '@/lib/billets'
+import { compileMDX } from '@/lib/mdx'
 
 export async function generateStaticParams() {
   const slugs = await getBilletSlugs()
@@ -64,11 +65,8 @@ export default async function BilletPage({ params }: { params: { slug: string } 
       </div>
 
       {/* Content */}
-      <article className="prose prose-sm sm:prose max-w-none">
-        <div 
-          dangerouslySetInnerHTML={{ __html: billet.content }}
-          className=""
-        />
+      <article className="max-w-none">
+        {await compileMDX(billet.content)}
       </article>
 
       {/* Navigation */}

@@ -1,8 +1,6 @@
 import path from 'path'
 import fs from 'fs/promises'
 import matter from 'gray-matter'
-import { remark } from 'remark'
-import html from 'remark-html'
 import { prisma } from '@/lib/prisma'
 
 const CONTENT_DIR = path.join(process.cwd(), 'content', 'billets')
@@ -17,7 +15,7 @@ export interface Billet {
 }
 
 function slugFromFilename(file: string) {
-  return file.replace(/\.md$/i, '')
+  return file.replace(/\.mdx$/i, '')
 }
 
 function dateFrom(front: any, slug: string): string {
@@ -31,7 +29,7 @@ function dateFrom(front: any, slug: string): string {
 async function fsAll(): Promise<Billet[]> {
   try {
     const entries = await fs.readdir(CONTENT_DIR)
-    const files = entries.filter(f => f.toLowerCase().endsWith('.md'))
+    const files = entries.filter(f => f.toLowerCase().endsWith('.mdx'))
     const items: Billet[] = []
     for (const file of files) {
       const slug = slugFromFilename(file)
@@ -70,7 +68,7 @@ async function transformBacklinks(content: string): Promise<string> {
     )
     const href = `/billets/${found ?? targetSlug}`
     const missing = !found
-    return `<a href="${href}" class="backlink" data-backlink="${linkText}" ${missing ? 'data-missing="true"' : ''}>${linkText}</a>`
+    return `<a href="${href}" className="backlink" data-backlink="${linkText}" ${missing ? 'data-missing="true"' : ''}>${linkText}</a>`
   })
 }
 
@@ -98,30 +96,28 @@ export async function getBilletBySlug(slug: string) {
     const b = await prisma.billet.findUnique({ where: { slug } })
     if (b) {
       const contentWithBacklinks = await transformBacklinks(b.content)
-      const processed = await remark().use(html, { sanitize: false }).process(contentWithBacklinks)
       return {
         slug: b.slug,
         title: b.title,
         date: b.date.toISOString().split('T')[0],
         tags: b.tags,
-        content: processed.toString(),
+        content: contentWithBacklinks,
         excerpt: b.excerpt || undefined,
       }
     }
   } catch {}
 
   try {
-    const filePath = path.join(CONTENT_DIR, `${slug}.md`)
+    const filePath = path.join(CONTENT_DIR, `${slug}.mdx`)
     const raw = await fs.readFile(filePath, 'utf8')
     const { data, content } = matter(raw)
     const contentWithBacklinks = await transformBacklinks(content)
-    const processed = await remark().use(html, { sanitize: false }).process(contentWithBacklinks)
     return {
       slug,
       title: (data?.title as string) || slug,
       date: dateFrom(data, slug),
       tags: Array.isArray(data?.tags) ? data.tags as string[] : [],
-      content: processed.toString(),
+      content: contentWithBacklinks,
       excerpt: (data?.excerpt as string) || undefined,
     }
   } catch (e) {
@@ -137,7 +133,7 @@ export async function getBilletSlugs(): Promise<string[]> {
   } catch {}
   try {
     const entries = await fs.readdir(CONTENT_DIR)
-    return entries.filter(f => f.toLowerCase().endsWith('.md')).map(slugFromFilename)
+    return entries.filter(f => f.toLowerCase().endsWith('.mdx')).map(slugFromFilename)
   } catch (e) {
     console.error('Error reading billet slugs from FS:', e)
     return []
