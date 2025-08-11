@@ -41,12 +41,12 @@ async function migrateBilletsToDatabase() {
   const billetsDir = path.join(process.cwd(), 'content/billets')
   
   try {
-    // Lire tous les fichiers .md
-    const files = fs.readdirSync(billetsDir).filter(file => file.endsWith('.md'))
+    // Lire tous les fichiers .mdx
+    const files = fs.readdirSync(billetsDir).filter(file => file.endsWith('.mdx'))
     console.log(`📁 Trouvé ${files.length} fichiers de billets`)
     
     for (const fileName of files) {
-      const slug = fileName.replace('.md', '')
+      const slug = fileName.replace('.mdx', '')
       const filePath = path.join(billetsDir, fileName)
       
       console.log(`📝 Migration du billet: ${slug}`)
@@ -122,13 +122,13 @@ async function migrateBilletsToDatabase() {
     // Synchronisation inverse : supprimer de la DB les billets dont le fichier .md n'existe plus
     console.log('🔄 Vérification des billets à supprimer...')
     const allDbBillets = await prisma.billet.findMany({ select: { slug: true } })
-    const fileBasedSlugs = files.map(fileName => fileName.replace('.md', ''))
+    const fileBasedSlugs = files.map(fileName => fileName.replace('.mdx', ''))
     
     let deletedCount = 0
     for (const dbBillet of allDbBillets) {
       if (!fileBasedSlugs.includes(dbBillet.slug)) {
         await prisma.billet.delete({ where: { slug: dbBillet.slug } })
-        console.log(`🗑️ Billet "${dbBillet.slug}" supprimé de la DB (fichier .md absent)`)
+        console.log(`🗑️ Billet "${dbBillet.slug}" supprimé de la DB (fichier .mdx absent)`)
         deletedCount++
       }
     }
@@ -138,7 +138,7 @@ async function migrateBilletsToDatabase() {
     // Afficher un résumé
     const totalBillets = await prisma.billet.count()
     console.log(`📊 Total des billets en base: ${totalBillets}`)
-    console.log(`📁 Fichiers .md trouvés: ${files.length}`)
+    console.log(`📁 Fichiers .mdx trouvés: ${files.length}`)
     console.log(`🗑️ Billets supprimés: ${deletedCount}`)
     
   } catch (error) {

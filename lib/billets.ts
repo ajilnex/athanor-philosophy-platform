@@ -19,11 +19,24 @@ function slugFromFilename(file: string) {
 }
 
 function dateFrom(front: any, slug: string): string {
-  const d =
-    (front?.date ? new Date(front.date) : null)
-    || (/^\d{4}-\d{2}-\d{2}/.test(slug) ? new Date(slug.slice(0,10)) : null)
-    || new Date()
-  return d.toISOString().split('T')[0]
+  // Essayez le frontmatter en premier
+  if (front?.date) {
+    const frontDate = new Date(front.date)
+    if (!isNaN(frontDate.getTime())) {
+      return frontDate.toISOString().split('T')[0]
+    }
+  }
+  
+  // Ensuite le slug (format YYYY-MM-DD)
+  if (/^\d{4}-\d{2}-\d{2}/.test(slug)) {
+    const slugDate = new Date(slug.slice(0,10))
+    if (!isNaN(slugDate.getTime())) {
+      return slugDate.toISOString().split('T')[0]
+    }
+  }
+  
+  // Fallback : aujourd'hui
+  return new Date().toISOString().split('T')[0]
 }
 
 async function fsAll(): Promise<Billet[]> {
