@@ -24,11 +24,14 @@ function isMdxFile(filename: string): boolean {
 }
 
 function dateFrom(front: any, slug: string): string {
-  // Essayez le frontmatter en premier
-  if (front?.date) {
-    const frontDate = new Date(front.date)
-    if (!isNaN(frontDate.getTime())) {
-      return frontDate.toISOString().split('T')[0]
+  // Essayez le frontmatter en premier (date, created)
+  const dateFields = ['date', 'created']
+  for (const field of dateFields) {
+    if (front?.[field]) {
+      const frontDate = new Date(front[field])
+      if (!isNaN(frontDate.getTime())) {
+        return frontDate.toISOString().split('T')[0]
+      }
     }
   }
   

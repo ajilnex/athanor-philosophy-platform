@@ -24,8 +24,8 @@ export function ImageUpload({ onImageUploaded, className = "" }: ImageUploadProp
       return
     }
 
-    if (file.size > 5 * 1024 * 1024) { // 5MB max
-      setError('Image trop volumineuse (max 5MB)')
+    if (file.size > 20 * 1024 * 1024) { // 20MB max (Cloudinary s'occupe de l'optimisation)
+      setError('Image trop volumineuse (max 20MB)')
       return
     }
 
@@ -121,7 +121,7 @@ export function ImageUpload({ onImageUploaded, className = "" }: ImageUploadProp
           </button>
         </div>
         <p className="text-xs text-gray-500">
-          JPG, PNG, GIF jusqu'à 5MB
+          JPG, PNG, GIF jusqu'à 20MB (optimisation Cloudinary)
         </p>
       </div>
     </div>

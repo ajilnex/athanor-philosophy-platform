@@ -45,6 +45,10 @@ export async function POST(request: NextRequest) {
           folder: 'athanor/billets',
           use_filename: true,
           unique_filename: true,
+          transformation: [
+            { quality: 'auto:good', fetch_format: 'auto' }, // Optimisation auto
+            { width: 2048, height: 2048, crop: 'limit' }, // Max 2048px
+          ]
         },
         (error, result) => {
           if (error) reject(error)
