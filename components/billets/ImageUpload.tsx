@@ -1,16 +1,18 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Upload, Image as ImageIcon, X, Check } from 'lucide-react'
+import { Upload, Image as ImageIcon, X, Check, Copy } from 'lucide-react'
 
 interface ImageUploadProps {
-  onImageUploaded?: (url: string) => void
+  onImageUploaded?: (url: string, markdownSyntax: string) => void
   className?: string
+  autoInsert?: boolean // Si true, insère automatiquement la syntaxe
 }
 
-export function ImageUpload({ onImageUploaded, className = "" }: ImageUploadProps) {
+export function ImageUpload({ onImageUploaded, className = "", autoInsert = false }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null)
+  const [markdownSyntax, setMarkdownSyntax] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -47,7 +49,24 @@ export function ImageUpload({ onImageUploaded, className = "" }: ImageUploadProp
 
       const result = await response.json()
       setUploadedUrl(result.url)
-      onImageUploaded?.(result.url)
+      
+      // Créer la syntaxe markdown pour l'image
+      const filename = file.name.split('.')[0] || 'image'
+      const syntax = `![${filename}](${result.url})`
+      setMarkdownSyntax(syntax)
+      
+      // Callback avec URL et syntaxe markdown
+      onImageUploaded?.(result.url, syntax)
+      
+      // Si autoInsert est activé, copier dans le presse-papier
+      if (autoInsert) {
+        try {
+          await navigator.clipboard.writeText(syntax)
+          console.log('✅ Syntaxe markdown copiée dans le presse-papier')
+        } catch (err) {
+          console.log('⚠️ Impossible de copier dans le presse-papier:', err)
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue')
     } finally {
@@ -57,9 +76,21 @@ export function ImageUpload({ onImageUploaded, className = "" }: ImageUploadProp
 
   const resetUpload = () => {
     setUploadedUrl(null)
+    setMarkdownSyntax(null)
     setError(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
+    }
+  }
+  
+  const copyToClipboard = async () => {
+    if (markdownSyntax) {
+      try {
+        await navigator.clipboard.writeText(markdownSyntax)
+        console.log('📋 Syntaxe copiée!')
+      } catch (err) {
+        console.error('Erreur copie:', err)
+      }
     }
   }
 
@@ -78,15 +109,34 @@ export function ImageUpload({ onImageUploaded, className = "" }: ImageUploadProp
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="mb-2">
+        <div className="mb-3">
           <img 
             src={uploadedUrl} 
             alt="Image uploadée"
             className="max-w-full h-auto max-h-48 rounded border"
           />
         </div>
-        <div className="text-xs text-gray-600 bg-white p-2 rounded border font-mono">
-          {uploadedUrl}
+        
+        {markdownSyntax && (
+          <div className="mb-3">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-medium text-green-700">Syntaxe Markdown:</span>
+              <button
+                onClick={copyToClipboard}
+                className="text-green-600 hover:text-green-800 text-xs flex items-center space-x-1"
+              >
+                <Copy className="h-3 w-3" />
+                <span>Copier</span>
+              </button>
+            </div>
+            <div className="text-xs text-gray-600 bg-white p-2 rounded border font-mono break-all">
+              {markdownSyntax}
+            </div>
+          </div>
+        )}
+        
+        <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded border">
+          <strong>URL:</strong> {uploadedUrl}
         </div>
       </div>
     )
