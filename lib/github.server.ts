@@ -3,15 +3,19 @@ import { Octokit } from '@octokit/rest'
 // Configuration GitHub
 const REPO_OWNER = process.env.GITHUB_OWNER || 'ajilnex'
 const REPO_NAME = process.env.GITHUB_REPO || 'athanor-philosophy-platform'
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN
 
-if (!GITHUB_TOKEN) {
-  throw new Error('GITHUB_TOKEN manquant dans les variables d\'environnement')
+// Lazy loading du client GitHub
+function getOctokit() {
+  const GITHUB_TOKEN = process.env.GITHUB_TOKEN
+  
+  if (!GITHUB_TOKEN) {
+    throw new Error('GITHUB_TOKEN manquant dans les variables d\'environnement')
+  }
+
+  return new Octokit({
+    auth: GITHUB_TOKEN,
+  })
 }
-
-const octokit = new Octokit({
-  auth: GITHUB_TOKEN,
-})
 
 interface GitHubFileUpdate {
   path: string
@@ -25,6 +29,7 @@ interface GitHubFileUpdate {
  */
 export async function getFileFromGitHub(path: string): Promise<{ content: string; sha: string } | null> {
   try {
+    const octokit = getOctokit()
     const response = await octokit.repos.getContent({
       owner: REPO_OWNER,
       repo: REPO_NAME,
@@ -50,6 +55,7 @@ export async function getFileFromGitHub(path: string): Promise<{ content: string
  * Crée ou met à jour un fichier sur GitHub
  */
 export async function updateFileOnGitHub(fileUpdate: GitHubFileUpdate): Promise<{ sha: string }> {
+  const octokit = getOctokit()
   const content = Buffer.from(fileUpdate.content, 'utf-8').toString('base64')
   
   const params: any = {
@@ -75,6 +81,7 @@ export async function updateFileOnGitHub(fileUpdate: GitHubFileUpdate): Promise<
  * Supprime un fichier sur GitHub
  */
 export async function deleteFileOnGitHub(path: string, message: string): Promise<void> {
+  const octokit = getOctokit()
   // D'abord récupérer le SHA du fichier
   const file = await getFileFromGitHub(path)
   if (!file) {
