@@ -15,7 +15,7 @@ export interface Billet {
 }
 
 function slugFromFilename(file: string) {
-  return file.replace(/\.(mdx|md)$/i, '')
+  return file.replace(/\.mdx$/i, '')
 }
 
 function isMdxFile(filename: string): boolean {
@@ -49,7 +49,7 @@ function dateFrom(front: any, slug: string): string {
 async function fsAll(): Promise<Billet[]> {
   try {
     const entries = await fs.readdir(CONTENT_DIR)
-    const files = entries.filter(f => f.toLowerCase().endsWith('.mdx') || f.toLowerCase().endsWith('.md'))
+    const files = entries.filter(f => f.toLowerCase().endsWith('.mdx'))
     const items: Billet[] = []
     for (const file of files) {
       const slug = slugFromFilename(file)
@@ -99,40 +99,32 @@ export async function getAllBillets(): Promise<Billet[]> {
 }
 
 export async function getBilletBySlug(slug: string) {
-  // Billets = 100% statiques, toujours depuis le filesystem
-  // Essaye .mdx en premier, puis .md en fallback
-  const extensions = ['.mdx', '.md']
-  
-  for (const ext of extensions) {
-    try {
-      const filePath = path.join(CONTENT_DIR, `${slug}${ext}`)
-      const raw = await fs.readFile(filePath, 'utf8')
-      const { data, content } = matter(raw)
-      const contentWithBacklinks = await transformBacklinks(content)
-      return {
-        slug,
-        title: (data?.title as string) || slug,
-        date: dateFrom(data, slug),
-        tags: Array.isArray(data?.tags) ? data.tags as string[] : [],
-        content: contentWithBacklinks,
-        excerpt: (data?.excerpt as string) || undefined,
-        isMdx: ext === '.mdx',
-      }
-    } catch (e) {
-      // Continue vers l'extension suivante
-      continue
+  // Billets = 100% statiques, toujours depuis le filesystem (uniquement .mdx)
+  try {
+    const filePath = path.join(CONTENT_DIR, `${slug}.mdx`)
+    const raw = await fs.readFile(filePath, 'utf8')
+    const { data, content } = matter(raw)
+    const contentWithBacklinks = await transformBacklinks(content)
+    return {
+      slug,
+      title: (data?.title as string) || slug,
+      date: dateFrom(data, slug),
+      tags: Array.isArray(data?.tags) ? data.tags as string[] : [],
+      content: contentWithBacklinks,
+      excerpt: (data?.excerpt as string) || undefined,
+      isMdx: true,
     }
+  } catch (e) {
+    console.error(`Error: No billet found for slug ${slug}.mdx`)
+    return null
   }
-  
-  console.error(`Error: No billet found for slug ${slug} (.mdx or .md)`)
-  return null
 }
 
 export async function getBilletSlugs(): Promise<string[]> {
   // Billets = 100% statiques, toujours depuis le filesystem
   try {
     const entries = await fs.readdir(CONTENT_DIR)
-    return entries.filter(f => f.toLowerCase().endsWith('.mdx') || f.toLowerCase().endsWith('.md')).map(slugFromFilename)
+    return entries.filter(f => f.toLowerCase().endsWith('.mdx')).map(slugFromFilename)
   } catch (e) {
     console.error('Error reading billet slugs from FS:', e)
     return []
