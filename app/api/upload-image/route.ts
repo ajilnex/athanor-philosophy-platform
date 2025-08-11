@@ -3,6 +3,15 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import cloudinary from '@/lib/cloudinary'
 
+// Configuration pour accepter des fichiers plus gros
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '12mb', // Un peu plus que la limite client
+    },
+  },
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Vérification authentification admin
@@ -46,8 +55,9 @@ export async function POST(request: NextRequest) {
           use_filename: true,
           unique_filename: true,
           transformation: [
-            { quality: 'auto:good', fetch_format: 'auto' }, // Optimisation auto
-            { width: 2048, height: 2048, crop: 'limit' }, // Max 2048px
+            { width: 1600, crop: 'limit' }, // Redimensionne si plus large que 1600px
+            { quality: 'auto:good' },       // Compresse intelligemment
+            { fetch_format: 'auto' }        // Choisit le meilleur format (webp/avif)
           ]
         },
         (error, result) => {
@@ -67,9 +77,9 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erreur upload image:', error)
+    console.error('Erreur d\'upload sur l\'API:', error)
     return NextResponse.json(
-      { error: 'Erreur interne du serveur' },
+      { error: 'Une erreur est survenue lors de l\'upload.', details: (error as Error).message },
       { status: 500 }
     )
   }

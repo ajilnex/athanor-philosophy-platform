@@ -26,8 +26,12 @@ export function ImageUpload({ onImageUploaded, className = "", autoInsert = fals
       return
     }
 
-    if (file.size > 20 * 1024 * 1024) { // 20MB max (Cloudinary s'occupe de l'optimisation)
-      setError('Image trop volumineuse (max 20MB)')
+    // Limite de taille configurée
+    const MAX_SIZE_MB = 10;
+    const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+    
+    if (file.size > MAX_SIZE_BYTES) {
+      setError(`L'image est trop volumineuse. La taille maximale est de ${MAX_SIZE_MB} Mo.`)
       return
     }
 
@@ -44,7 +48,9 @@ export function ImageUpload({ onImageUploaded, className = "", autoInsert = fals
       })
 
       if (!response.ok) {
-        throw new Error('Erreur lors de l\'upload')
+        const errorData = await response.json().catch(() => ({}))
+        // Affiche l'erreur renvoyée par l'API
+        throw new Error(errorData.error || 'Échec de l\'upload sur le serveur.')
       }
 
       const result = await response.json()
@@ -171,7 +177,7 @@ export function ImageUpload({ onImageUploaded, className = "", autoInsert = fals
           </button>
         </div>
         <p className="text-xs text-gray-500">
-          JPG, PNG, GIF jusqu'à 20MB (optimisation Cloudinary)
+          JPG, PNG, GIF jusqu'à 10MB (optimisation Cloudinary)
         </p>
       </div>
     </div>
