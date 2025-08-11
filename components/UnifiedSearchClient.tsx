@@ -237,7 +237,7 @@ export function UnifiedSearchClient() {
                     </div>
                     {'score' in doc && (
                       <div className="text-xs opacity-60">
-                        Score: {Math.round((1 - doc.score) * 100)}%
+                        Score: {Math.round((1 - (doc.score as number)) * 100)}%
                       </div>
                     )}
                   </div>

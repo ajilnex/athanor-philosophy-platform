@@ -87,8 +87,16 @@ async function buildSearchIndex() {
       for (const publication of publications) {
         try {
           console.log(`   Processing PDF: ${publication.title}`)
-          // Construire l'URL du PDF (probablement dans /uploads)
-          const pdfUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/uploads/${path.basename(publication.filePath)}`
+          // Utiliser directement le filePath de la base de données
+          let pdfUrl = publication.filePath
+          
+          // Si c'est un chemin relatif, construire l'URL complète
+          if (!pdfUrl.startsWith('http')) {
+            const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+            pdfUrl = pdfUrl.startsWith('/') ? `${baseUrl}${pdfUrl}` : `${baseUrl}/${pdfUrl}`
+          }
+          
+          console.log(`   PDF URL: ${pdfUrl}`)
           const cleanText = extractPdfTextViaScript(pdfUrl)
           
           if (cleanText) {
