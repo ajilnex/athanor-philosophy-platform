@@ -15,20 +15,17 @@ export default async function HomePage() {
          Philosopher - Ecrire - Editer
         </p>
 
-        {/* Barre de recherche (plus courte, centrée) */}
-        <form action="/recherche" method="get" className="mt-6 mb-8">
-          <label htmlFor="home-search" className="sr-only">Rechercher sur le site</label>
-          <input
-            id="home-search"
-            name="q"
-            placeholder="Rechercher sur le site…"
-            className="w-full bg-transparent p-3 pl-4 text-lg border rounded-full
-                       border-l-foreground/30 border-t-foreground/30 border-b-foreground/30 border-r-transparent
-                       focus:border-r-foreground/30 focus:outline-none focus:ring-2 focus:ring-accent/50
-                       transition-all duration-300"
-            autoComplete="off"
-          />
-        </form>
+        {/* Barre de recherche (compacte et centrée) */}
+        <div className="w-full max-w-lg mx-auto mt-6 mb-8">
+          <form action="/recherche" method="GET" className="relative">
+            <input
+              type="search"
+              name="q"
+              placeholder="Rechercher..."
+              className="search-input w-full p-3 pl-4 pr-10 text-base"
+            />
+          </form>
+        </div>
 
         {/* Navigation mobile */}
         <nav className="flex flex-col space-y-4 sm:hidden text-foreground font-light">

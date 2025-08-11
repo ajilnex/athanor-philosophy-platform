@@ -52,6 +52,20 @@
     @apply w-full px-3 py-2 border border-subtle focus:outline-none focus:border-foreground transition-colors duration-200;
   }
 
+  .search-input {
+    @apply bg-background/50 text-foreground rounded-full outline-none
+           transition-all duration-300 backdrop-blur-sm shadow-sm;
+    border: 1px solid;
+    border-image-source: linear-gradient(to right, hsl(var(--subtle) / 0.5), hsl(var(--subtle) / 0.1));
+    border-image-slice: 1;
+    border-right-color: transparent; /* Force la bordure droite à disparaître */
+  }
+  .search-input:focus {
+    @apply ring-2 ring-accent/50;
+    border-image-source: linear-gradient(to right, hsl(var(--accent) / 0.8), hsl(var(--accent) / 0.3));
+    border-right-color: hsl(var(--accent) / 0.3);
+  }
+
   /* Styles pour les backlinks [[mot]] */
   .backlink {
     @apply text-foreground hover:opacity-70 font-normal underline transition-opacity duration-200;

@@ -4,35 +4,33 @@ import { ArrowRight } from 'lucide-react'
 
 export function LatestActivityCard({ billet }: { billet: Billet }) {
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      <h2 className="font-serif text-xl text-subtle mb-4 text-center">Dernière activité</h2>
+    <div className="w-full max-w-lg mx-auto">
+      <h2 className="font-serif text-lg text-subtle mb-3 text-center">Dernière activité</h2>
       <Link 
         href={`/billets/${billet.slug}`} 
-        className="block p-6 rounded-xl border border-subtle/20 bg-background/50 shadow-sm backdrop-blur-sm group transition-all duration-300 hover:border-subtle/50 hover:shadow-lg"
+        className="block p-4 rounded-lg border border-subtle/20 bg-background/50 shadow-sm backdrop-blur-sm group transition-all duration-300 hover:border-subtle/50 hover:shadow-md"
       >
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <h3 className="font-serif text-2xl font-medium text-foreground group-hover:text-accent transition-colors">
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="font-serif text-xl font-medium text-foreground group-hover:text-accent transition-colors">
               {billet.title}
             </h3>
-            <p className="mt-1 text-sm text-subtle">
-              {new Date(billet.date).toLocaleDateString('fr-FR', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}
+            <p className="mt-1 text-xs text-subtle">
+              {new Date(billet.date).toLocaleDateString('fr-FR', { month: 'long', day: 'numeric' })}
             </p>
           </div>
-          <ArrowRight className="h-5 w-5 text-subtle/50 transition-all duration-300 transform -translate-x-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 flex-shrink-0 ml-4" />
+          <ArrowRight className="h-4 w-4 text-subtle/50 transition-transform duration-300 transform group-hover:translate-x-1" />
         </div>
         
-        <div className="relative mt-4 h-20 overflow-hidden">
-          <p className="text-foreground/80 font-light leading-relaxed">
-            {billet.excerpt || billet.content.substring(0, 280)}...
-          </p>
-          {/* Le masque en dégradé pour l'effet "fade-out" */}
-          <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none" />
-        </div>
+        {/* L'extrait est maintenant optionnel et plus court */}
+        {billet.excerpt && (
+          <div className="relative mt-3 max-h-12 overflow-hidden">
+            <p className="text-sm text-foreground/70 font-light">
+              {billet.excerpt}
+            </p>
+            <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-background/80 to-transparent pointer-events-none" />
+          </div>
+        )}
       </Link>
     </div>
   )
