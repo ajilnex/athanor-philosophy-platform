@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
 import * as path from 'path'
-import * as matter from 'gray-matter'
+import matter from 'gray-matter'
 
 export const dynamic = 'force-dynamic'
 
