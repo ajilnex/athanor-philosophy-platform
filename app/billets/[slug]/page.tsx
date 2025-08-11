@@ -34,7 +34,14 @@ export default async function BilletPage({ params }: { params: { slug: string } 
             <h1 className="text-2xl sm:text-3xl font-light text-foreground">
               {billet.title}
             </h1>
-            <EditBilletButton slug={params.slug} className="ml-4 flex-shrink-0" />
+            <EditBilletButton 
+              slug={params.slug}
+              title={billet.title}
+              content={billet.content}
+              tags={billet.tags}
+              excerpt={billet.excerpt}
+              className="ml-4 flex-shrink-0" 
+            />
           </div>
           
           <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-subtle mb-4">
