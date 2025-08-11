@@ -28,6 +28,13 @@ interface SearchIndex {
   }
 }
 
+interface SnippetData {
+  snippet: string
+  hasMatch: boolean
+  title: string
+  type: 'billet' | 'publication'
+}
+
 export function UnifiedSearchClient() {
   const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState('')
@@ -35,6 +42,8 @@ export function UnifiedSearchClient() {
   const [lunrIndex, setLunrIndex] = useState<lunr.Index | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [snippets, setSnippets] = useState<Record<string, SnippetData>>({})
+  const [loadingSnippets, setLoadingSnippets] = useState(false)
 
   // Load search index on component mount
   useEffect(() => {
@@ -88,6 +97,37 @@ export function UnifiedSearchClient() {
       return []
     }
   }, [searchQuery, lunrIndex, searchIndex])
+
+  // Fetch snippets when search results change
+  useEffect(() => {
+    async function fetchSnippets() {
+      if (!searchQuery.trim() || searchResults.length === 0) {
+        setSnippets({})
+        return
+      }
+
+      setLoadingSnippets(true)
+      try {
+        const resultIds = searchResults.map(result => result.id).slice(0, 10) // Limit to first 10 results
+        const response = await fetch(`/api/snippets?q=${encodeURIComponent(searchQuery)}&ids=${resultIds.join(',')}`)
+        
+        if (response.ok) {
+          const snippetsData = await response.json()
+          setSnippets(snippetsData)
+        } else {
+          console.error('Failed to fetch snippets:', response.statusText)
+          setSnippets({})
+        }
+      } catch (error) {
+        console.error('Error fetching snippets:', error)
+        setSnippets({})
+      } finally {
+        setLoadingSnippets(false)
+      }
+    }
+
+    fetchSnippets()
+  }, [searchQuery, searchResults])
 
   if (loading) {
     return (
@@ -218,11 +258,26 @@ export function UnifiedSearchClient() {
                     </Link>
                   </h2>
                   
-                  {doc.excerpt && (
-                    <p className="text-foreground/70 mb-4 line-clamp-3">
+                  {/* Contextual snippet or fallback to excerpt */}
+                  {snippets[doc.id]?.snippet ? (
+                    <div className="mb-4">
+                      {loadingSnippets ? (
+                        <div className="flex items-center space-x-2 text-subtle">
+                          <div className="animate-spin h-3 w-3 border border-subtle border-t-transparent rounded-full"></div>
+                          <span className="text-sm">Recherche contextuelle...</span>
+                        </div>
+                      ) : (
+                        <div 
+                          className="text-foreground/80 text-sm leading-relaxed"
+                          dangerouslySetInnerHTML={{ __html: snippets[doc.id].snippet }}
+                        />
+                      )}
+                    </div>
+                  ) : doc.excerpt ? (
+                    <p className="text-foreground/70 mb-4 line-clamp-3 text-sm">
                       {doc.excerpt}
                     </p>
-                  )}
+                  ) : null}
                   
                   <div className="flex flex-wrap items-center gap-4 text-sm text-subtle mb-4">
                     <div className="flex items-center space-x-1">

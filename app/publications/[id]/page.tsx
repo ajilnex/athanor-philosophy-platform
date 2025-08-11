@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, User, Calendar, FileText, Tag, Download } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
+import { PdfClientViewer } from '@/components/publications/PdfClientViewer'
 
 async function getPublication(id: string) {
   try {
@@ -104,6 +105,14 @@ export default async function PublicationPage({ params }: { params: { id: string
             </div>
           </div>
         </div>
+      </div>
+
+      {/* PDF Viewer */}
+      <div className="mt-8">
+        <PdfClientViewer 
+          pdfUrl={publication.filePath} 
+          title={publication.title}
+        />
       </div>
 
       {/* Publication Summary */}
