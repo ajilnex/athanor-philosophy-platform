@@ -3,14 +3,9 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import cloudinary from '@/lib/cloudinary'
 
-// Configuration pour accepter des fichiers plus gros
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '12mb', // Un peu plus que la limite client
-    },
-  },
-}
+// Configuration App Router pour upload de gros fichiers
+export const dynamic = 'force-dynamic' // S'assure que la route est toujours exécutée dynamiquement
+export const maxDuration = 60 // Augmente le timeout à 60s pour les gros uploads
 
 export async function POST(request: NextRequest) {
   try {
