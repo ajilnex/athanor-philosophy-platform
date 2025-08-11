@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { getAllBillets } from '@/lib/billets'
-import { LatestBilletCard } from '@/components/home/LatestBilletCard'
+import { LatestActivityCard } from '@/components/home/LatestActivityCard'
 
 export default async function HomePage() {
   const allBillets = await getAllBillets()
@@ -22,9 +22,10 @@ export default async function HomePage() {
             id="home-search"
             name="q"
             placeholder="Rechercher sur le site…"
-            className="block mx-auto w-full max-w-sm rounded-full border-l-foreground/50 border-t-foreground/50 border-b-foreground/50 border-r-transparent bg-transparent px-4 py-3
-                       text-lg outline-none shadow-sm focus:border-accent focus:ring-2
-                       focus:ring-accent/20 transition-all duration-300"
+            className="w-full bg-transparent p-3 pl-4 text-lg border rounded-full
+                       border-l-foreground/30 border-t-foreground/30 border-b-foreground/30 border-r-transparent
+                       focus:border-r-foreground/30 focus:outline-none focus:ring-2 focus:ring-accent/50
+                       transition-all duration-300"
             autoComplete="off"
           />
         </form>
@@ -47,9 +48,8 @@ export default async function HomePage() {
 
         {/* Dernière activité */}
         {latestBillet && (
-          <div className="mt-16 w-full max-w-2xl">
-            <h2 className="font-serif text-xl text-subtle mb-6 text-left">Dernière activité</h2>
-            <LatestBilletCard billet={latestBillet} />
+          <div className="mt-16">
+            <LatestActivityCard billet={latestBillet} />
           </div>
         )}
       </main>
