@@ -18,7 +18,7 @@ function NavItem({ href, children }: { href: string; children: React.ReactNode }
 
 export function Navbar() {
   return (
-    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur border-b border-subtle">
+    <header className="sticky top-0 z-50 w-full border-b border-subtle/30 bg-background/80 backdrop-blur-lg">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 h-14 flex items-center justify-between">
         {/* Brand -> Home */}
         <Link href="/" className="font-serif text-lg tracking-tight hover:opacity-80">

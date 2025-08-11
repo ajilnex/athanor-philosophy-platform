@@ -57,7 +57,7 @@ export function EditBilletButton({
       <div className={`inline-flex ${className}`}>
         <button
           onClick={() => setShowEditor(true)}
-          className="inline-flex items-center space-x-2 px-3 py-1.5 text-sm text-subtle hover:text-foreground border border-subtle hover:border-foreground transition-all duration-200 rounded-md bg-white hover:bg-gray-50"
+          className="btn btn-secondary text-xs"
         >
           <Edit3 className="h-4 w-4" />
           <span>Éditer</span>

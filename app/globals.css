@@ -4,8 +4,27 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: 220 10% 98%; /* Gris très clair, presque blanc */
+    --foreground: 220 15% 20%; /* Noir doux, presque anthracite */
+    --subtle: 220 10% 60%;     /* Gris moyen pour les métadonnées */
+    --accent: 220 90% 55%;     /* Un bleu encre profond et académique */
+  }
+
+  /* Optionnel: pour un futur thème sombre */
+  /* .dark { ... } */
+
   body {
-    @apply bg-background text-foreground font-serif;
+    @apply bg-background text-foreground font-sans;
+    /* Ajout d'un dégradé radial très subtil pour donner vie au fond */
+    background-image: radial-gradient(circle at top left, hsl(220 10% 95%), transparent),
+                      radial-gradient(circle at bottom right, hsl(220 90% 98%), transparent);
+    background-size: 100vw 100vh;
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
   }
   
   a {
@@ -14,16 +33,19 @@
 }
 
 @layer components {
-  .btn-primary {
-    @apply bg-foreground hover:bg-opacity-80 text-white px-4 py-2 font-light transition-opacity duration-200;
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all duration-200;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
-  
+  .btn-primary {
+    @apply btn bg-foreground text-background shadow-sm hover:bg-foreground/90;
+  }
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 text-foreground border border-subtle px-4 py-2 font-light transition-colors duration-200;
+    @apply btn bg-background border border-subtle/50 text-foreground shadow-sm hover:bg-gray-100;
   }
   
   .card {
-    @apply bg-white border border-gray-200 p-6;
+    @apply bg-background/80 border border-transparent rounded-lg shadow-sm transition-all duration-300 hover:border-subtle/50 hover:shadow-md backdrop-blur-sm p-6;
   }
   
   .input-field {

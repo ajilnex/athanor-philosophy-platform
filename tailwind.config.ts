@@ -9,9 +9,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: '#f8f8f7',
-        foreground: '#1c1c1c',
-        subtle: '#6b7280',
+        background: 'hsl(var(--background))', // Fond principal
+        foreground: 'hsl(var(--foreground))', // Texte principal
+        subtle: 'hsl(var(--subtle))',         // Texte secondaire, bordures
+        accent: 'hsl(var(--accent))',         // Couleur d'accentuation (liens, focus)
         transparent: 'transparent',
         white: '#ffffff',
         black: '#000000',
