@@ -2,6 +2,7 @@
 
 import { MDXProvider } from '@mdx-js/react'
 import { ReactNode } from 'react'
+import { ImageUpload } from './billets/ImageUpload'
 
 // Composants personnalisés pour MDX
 const components = {
@@ -41,6 +42,9 @@ const components = {
   
   // Blockquotes
   blockquote: (props: any) => <blockquote className="border-l-4 border-gray-200 pl-4 my-4 italic text-subtle" {...props} />,
+  
+  // Composants personnalisés Athanor
+  ImageUpload: (props: any) => <ImageUpload className="my-6" {...props} />,
 }
 
 interface MDXContentProps {

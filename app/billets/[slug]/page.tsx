@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ArrowLeft, Calendar, Tag } from 'lucide-react'
 import { getBilletBySlug, getBilletSlugs } from '@/lib/billets'
 import { compileMDX } from '@/lib/mdx'
+import { EditBilletButton } from '@/components/billets/EditBilletButton'
 
 export async function generateStaticParams() {
   const slugs = await getBilletSlugs()
@@ -29,9 +30,12 @@ export default async function BilletPage({ params }: { params: { slug: string } 
         </Link>
         
         <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-light text-foreground mb-4">
-            {billet.title}
-          </h1>
+          <div className="flex items-start justify-between mb-4">
+            <h1 className="text-2xl sm:text-3xl font-light text-foreground">
+              {billet.title}
+            </h1>
+            <EditBilletButton slug={params.slug} className="ml-4 flex-shrink-0" />
+          </div>
           
           <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-subtle mb-4">
             <div className="flex items-center space-x-2">
@@ -66,7 +70,7 @@ export default async function BilletPage({ params }: { params: { slug: string } 
 
       {/* Content */}
       <article className="max-w-none">
-        {await compileMDX(billet.content)}
+        {await compileMDX(billet.content, billet.isMdx)}
       </article>
 
       {/* Navigation */}
