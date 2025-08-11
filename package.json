@@ -3,10 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "tinacms dev -c \"next dev\"",
-    "dev:next": "next dev",
+    "dev": "next dev",
     "build": "node scripts/build.cjs",
-    "build:tina": "tinacms build",
     "start": "next start",
     "lint": "next lint",
     "db:push": "prisma db push",
@@ -21,7 +19,6 @@
     "@octokit/rest": "^22.0.0",
     "@prisma/client": "5.22.0",
     "@tailwindcss/typography": "^0.5.10",
-    "@tinacms/cli": "^1.10.2",
     "cloudinary": "^2.0.1",
     "clsx": "^2.0.0",
     "fuse.js": "^7.0.0",
@@ -36,8 +33,7 @@
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
     "remark-parse": "^11.0.0",
-    "tailwind-merge": "^2.2.0",
-    "tinacms": "^2.8.2"
+    "tailwind-merge": "^2.2.0"
   },
   "devDependencies": {
     "@types/node": "^20",

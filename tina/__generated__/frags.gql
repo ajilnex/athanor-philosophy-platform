@@ -1,8 +1,0 @@
-fragment BilletParts on Billet {
-  __typename
-  title
-  date
-  tags
-  excerpt
-  body
-}

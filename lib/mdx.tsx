@@ -1,7 +1,6 @@
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import { remark } from 'remark'
 import html from 'remark-html'
-import { ImageUpload } from '@/components/billets/ImageUpload'
 
 // Composants disponibles dans MDX
 const mdxComponents = {
@@ -42,8 +41,7 @@ const mdxComponents = {
   // Blockquotes
   blockquote: (props: any) => <blockquote className="border-l-4 border-gray-200 pl-4 my-4 italic text-subtle" {...props} />,
   
-  // Composants personnalisés Athanor  
-  ImageUpload: (props: any) => <ImageUpload className="my-6" autoInsert={false} {...props} />,
+  // Composants personnalisés Athanor - Aucun composant interactif dans le contenu
 }
 
 // Compilateur mixte MDX/MD côté serveur
