@@ -44,7 +44,7 @@ export default function AProposPage() {
         <ul className="list-disc pl-5 space-y-2">
           <li>
             <strong>Lire &amp; chercher</strong> : la page{" "}
-            <Link href="/recherche" className="underline">
+            <Link href="/search" className="underline">
               recherche
             </Link>{" "}
             interroge les billets (titre, tags, contenu).

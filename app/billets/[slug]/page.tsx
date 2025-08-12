@@ -1,9 +1,12 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Calendar, Tag } from 'lucide-react'
+import { ArrowLeft, Calendar, Tag, Lock } from 'lucide-react'
 import { getBilletBySlug, getBilletSlugs } from '@/lib/billets'
 import { compileMDX } from '@/lib/mdx'
 import { EditBilletButton } from '@/components/billets/EditBilletButton'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 
 export async function generateStaticParams() {
   const slugs = await getBilletSlugs()
@@ -11,10 +14,51 @@ export async function generateStaticParams() {
 }
 
 export default async function BilletPage({ params }: { params: { slug: string } }) {
+  const session = await getServerSession(authOptions)
   const billet = await getBilletBySlug(params.slug)
 
   if (!billet) {
     notFound()
+  }
+
+  // Vérifier si le billet est scellé
+  const billetRecord = await prisma.billet.findUnique({
+    where: { slug: params.slug }
+  })
+
+  const isSealed = billetRecord?.isSealed || false
+  const isAdmin = (session?.user as any)?.role === 'ADMIN'
+  const isVisitor = !session // Mode visiteur simple
+
+  // Si le billet est scellé et l'utilisateur n'est pas admin, interdire l'accès
+  if (isSealed && !isAdmin) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <Link
+          href="/billets"
+          className="inline-flex items-center text-subtle hover:text-foreground mb-6 font-light"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Retour aux billets
+        </Link>
+        
+        <div className="text-center py-12">
+          <Lock className="h-12 w-12 mx-auto mb-4 text-subtle" />
+          <h1 className="text-2xl font-light text-foreground mb-2">Contenu scellé</h1>
+          <p className="text-subtle mb-6">
+            Ce billet est réservé aux administrateurs.
+          </p>
+          {!session && (
+            <Link
+              href="/auth/signin"
+              className="inline-flex items-center px-4 py-2 border border-foreground hover:bg-foreground hover:text-background transition-colors"
+            >
+              Se connecter
+            </Link>
+          )}
+        </div>
+      </div>
+    )
   }
 
   return (

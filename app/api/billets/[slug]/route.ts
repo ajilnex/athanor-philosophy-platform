@@ -3,12 +3,24 @@ import { revalidatePath } from 'next/cache'
 import { getBilletBySlug } from '@/lib/billets'
 import { unlink } from 'fs/promises'
 import { join } from 'path'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { slug: string } }
 ) {
   try {
+    // Vérification authentification admin OBLIGATOIRE
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: 'Authentification admin requise' },
+        { status: 401 }
+      )
+    }
+
     const { slug } = params
     
     if (!slug) {

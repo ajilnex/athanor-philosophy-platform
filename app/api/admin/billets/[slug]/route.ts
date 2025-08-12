@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { generateBilletContent, updateFileOnGitHub, deleteFileOnGitHub, getFileFromGitHub } from '@/lib/github.server'
+import { generateBilletContent, updateFileWithContribution, deleteFileOnGitHub, getFileFromGitHub } from '@/lib/github.server'
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: { slug: string } }
 ) {
   try {
-    // Vérification authentification admin
+    // Vérification authentification (ADMIN ou USER connecté)
     const session = await getServerSession(authOptions)
     
-    if (!session?.user || session.user.role !== 'admin') {
+    if (!session?.user) {
       return NextResponse.json(
-        { error: 'Authentification admin requise' },
+        { error: 'Authentification requise' },
         { status: 401 }
       )
     }
@@ -63,8 +63,8 @@ export async function PUT(
       content
     )
 
-    // Mise à jour du fichier sur GitHub
-    const result = await updateFileOnGitHub({
+    // Mise à jour du fichier sur GitHub avec gestion des contributions
+    const result = await updateFileWithContribution({
       path: filePath,
       content: mdxContent,
       message: `feat: Mise à jour billet "${title}"
@@ -75,19 +75,38 @@ Modifié via l'interface d'admin d'Athanor
 
 Co-Authored-By: Claude <noreply@anthropic.com>`,
       sha: existingFile.sha,
+      author: {
+        name: session.user.name || 'Utilisateur',
+        email: session.user.email!,
+        role: (session.user as any).role
+      }
     })
 
     console.log(`✏️ Billet mis à jour: ${slug}`)
 
-    return NextResponse.json(
-      {
-        success: true,
-        message: `Billet "${title}" mis à jour avec succès`,
-        slug,
-        sha: result.sha,
-      },
-      { status: 200 }
-    )
+    // Réponse différente selon le type de contribution
+    if (result.pullRequest) {
+      return NextResponse.json(
+        {
+          success: true,
+          type: 'pull_request',
+          message: `Votre modification a été soumise pour révision`,
+          pullRequest: result.pullRequest,
+        },
+        { status: 200 }
+      )
+    } else {
+      return NextResponse.json(
+        {
+          success: true,
+          type: 'direct_commit',
+          message: `Billet "${title}" mis à jour avec succès`,
+          slug,
+          sha: result.sha,
+        },
+        { status: 200 }
+      )
+    }
 
   } catch (error) {
     console.error('Erreur mise à jour billet:', error)
@@ -106,7 +125,7 @@ export async function DELETE(
     // Vérification authentification admin
     const session = await getServerSession(authOptions)
     
-    if (!session?.user || session.user.role !== 'admin') {
+    if (!session?.user || (session.user as any).role !== 'ADMIN') {
       return NextResponse.json(
         { error: 'Authentification admin requise' },
         { status: 401 }

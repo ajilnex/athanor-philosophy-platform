@@ -3,9 +3,22 @@
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import cloudinary from '@/lib/cloudinary'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+
+// Helper function pour vérifier les permissions admin
+async function requireAdmin() {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    throw new Error('Authentification admin requise')
+  }
+  return session
+}
 
 export async function toggleArticlePublished(articleId: string) {
   try {
+    await requireAdmin() // Vérification admin obligatoire
+    
     const article = await prisma.article.findUnique({
       where: { id: articleId },
     })
@@ -29,6 +42,8 @@ export async function toggleArticlePublished(articleId: string) {
 
 export async function deleteArticle(articleId: string) {
   try {
+    await requireAdmin() // Vérification admin obligatoire
+    
     await prisma.article.delete({
       where: { id: articleId },
     })
@@ -43,6 +58,8 @@ export async function deleteArticle(articleId: string) {
 
 export async function uploadArticle(formData: FormData) {
   try {
+    await requireAdmin() // Vérification admin obligatoire
+    
     const file = formData.get('file') as File
     const title = formData.get('title') as string
     const description = formData.get('description') as string

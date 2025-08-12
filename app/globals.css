@@ -9,6 +9,9 @@
     --foreground: 220 15% 20%; /* Noir doux, presque anthracite */
     --subtle: 220 10% 60%;     /* Gris moyen pour les métadonnées */
     --accent: 220 90% 55%;     /* Un bleu encre profond et académique */
+    --destructive: 0 84% 60%;  /* Rouge pour erreurs et danger */
+    --success: 142 76% 36%;    /* Vert pour succès */
+    --muted: 220 10% 95%;      /* Arrière-plans neutres très clairs */
   }
 
   /* Optionnel: pour un futur thème sombre */
@@ -41,7 +44,7 @@
     @apply btn bg-foreground text-background shadow-sm hover:bg-foreground/90;
   }
   .btn-secondary {
-    @apply btn bg-background border border-subtle/50 text-foreground shadow-sm hover:bg-gray-100;
+    @apply btn bg-background border border-subtle/50 text-foreground shadow-sm hover:bg-muted;
   }
   
   .card {

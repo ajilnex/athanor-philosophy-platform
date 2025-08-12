@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { Edit3 } from 'lucide-react'
 import { BilletEditor } from './BilletEditor'
+import toast from 'react-hot-toast'
 
 interface EditBilletButtonProps {
   slug: string
@@ -25,9 +26,12 @@ export function EditBilletButton({
   const { data: session, status } = useSession()
   const [showEditor, setShowEditor] = useState(false)
 
-  // Seuls les admins peuvent éditer
+  // Seuls les utilisateurs avec rôle USER ou ADMIN peuvent contribuer
   if (status === 'loading') return null
-  if (!session?.user || session.user.role !== 'admin') return null
+  if (!session?.user) return null
+  
+  const userRole = (session.user as any)?.role
+  if (userRole === 'VISITOR') return null
 
   const handleUpdateBillet = async (data: any) => {
     try {
@@ -44,8 +48,17 @@ export function EditBilletButton({
         throw new Error(error.error || 'Erreur lors de la mise à jour')
       }
 
-      // Rafraîchir la page pour voir les changements
-      window.location.reload()
+      const result = await response.json()
+      
+      if (result.type === 'pull_request') {
+        // Pour les contributions, afficher un message différent
+        toast.success(`${result.message}\nVotre Pull Request: ${result.pullRequest.html_url}`, {
+          duration: 8000,
+        })
+      } else {
+        // Pour les admins, recharger la page
+        window.location.reload()
+      }
     } catch (error) {
       console.error('Erreur mise à jour:', error)
       throw error
@@ -60,7 +73,9 @@ export function EditBilletButton({
           className="btn btn-secondary text-xs"
         >
           <Edit3 className="h-4 w-4" />
-          <span>Éditer</span>
+          <span>
+            {(session.user as any).role === 'ADMIN' ? 'Éditer' : 'Proposer modification'}
+          </span>
         </button>
       </div>
 
@@ -68,6 +83,7 @@ export function EditBilletButton({
         isOpen={showEditor}
         onClose={() => setShowEditor(false)}
         mode="edit"
+        userRole={(session.user as any).role}
         initialData={{
           slug,
           title,

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 function NavItem({ href, children }: { href: string; children: React.ReactNode }) {
   const pathname = usePathname();
@@ -17,6 +18,8 @@ function NavItem({ href, children }: { href: string; children: React.ReactNode }
 }
 
 export function Navbar() {
+  const { data: session } = useSession();
+  
   return (
     <header className="sticky top-0 z-50 w-full border-b border-subtle/30 bg-background/80 backdrop-blur-lg">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 h-14 flex items-center justify-between">
@@ -31,7 +34,10 @@ export function Navbar() {
           <NavItem href="/publications">Publications</NavItem>
           <NavItem href="/a-propos">À propos</NavItem>
           <NavItem href="/search">Recherche</NavItem>
-          <NavItem href="/admin">Admin</NavItem>
+          {session?.user?.role === 'ADMIN' && (
+            <NavItem href="/admin">Admin</NavItem>
+          )}
+          <NavItem href="/auth/signin">Connexion</NavItem>
         </nav>
 
         {/* Mobile: simple lien recherche (optionnel) */}

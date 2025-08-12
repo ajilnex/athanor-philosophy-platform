@@ -13,6 +13,9 @@ const config: Config = {
         foreground: 'hsl(var(--foreground))', // Texte principal
         subtle: 'hsl(var(--subtle))',         // Texte secondaire, bordures
         accent: 'hsl(var(--accent))',         // Couleur d'accentuation (liens, focus)
+        destructive: 'hsl(var(--destructive))', // Couleur d'erreur/danger
+        success: 'hsl(var(--success))',       // Couleur de succès
+        muted: 'hsl(var(--muted))',          // Arrière-plans neutres
         transparent: 'transparent',
         white: '#ffffff',
         black: '#000000',

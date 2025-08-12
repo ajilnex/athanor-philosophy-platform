@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Plus, FileText, Settings, Upload, Lock, ShieldAlert, LogOut, Edit3 } from 'lucide-react'
+import { Plus, FileText, Settings, Upload, Lock, ShieldAlert, LogOut, Edit3, Users } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
@@ -54,7 +54,7 @@ async function AdminNormalPage() {
   }
 
   // 2) Connecté mais pas admin -> 403 propre
-  if (session.user?.role !== 'admin') {
+  if ((session.user as any)?.role !== 'ADMIN') {
     return (
       <div className="max-w-xl mx-auto px-6 py-16 text-center">
         <ShieldAlert className="h-10 w-10 mx-auto mb-4 text-subtle" />
@@ -117,7 +117,7 @@ async function AdminNormalPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Link href="/admin/upload" className="card border-subtle hover:border-foreground transition-colors group">
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 flex items-center justify-center">
@@ -137,7 +137,19 @@ async function AdminNormalPage() {
             </div>
             <div>
               <h3 className="font-light text-foreground">Gérer les Publications</h3>
-              <p className="text-sm text-subtle font-light">Voir et supprimer</p>
+              <p className="text-sm text-subtle font-light">Sceller et supprimer</p>
+            </div>
+          </div>
+        </Link>
+
+        <Link href="/admin/billets" className="card border-subtle hover:border-foreground transition-colors group">
+          <div className="flex items-center space-x-4">
+            <div className="w-10 h-10 flex items-center justify-center">
+              <Edit3 className="h-5 w-5 text-foreground" />
+            </div>
+            <div>
+              <h3 className="font-light text-foreground">Gérer les Billets</h3>
+              <p className="text-sm text-subtle font-light">Sceller et organiser</p>
             </div>
           </div>
         </Link>
@@ -150,6 +162,18 @@ async function AdminNormalPage() {
             <div>
               <h3 className="font-light text-foreground">Éditer les Billets</h3>
               <p className="text-sm text-subtle font-light">Interface d'écriture TinaCMS</p>
+            </div>
+          </div>
+        </Link>
+
+        <Link href="/admin/users" className="card border-subtle hover:border-foreground transition-colors group">
+          <div className="flex items-center space-x-4">
+            <div className="w-10 h-10 flex items-center justify-center">
+              <Users className="h-5 w-5 text-foreground" />
+            </div>
+            <div>
+              <h3 className="font-light text-foreground">Gestion des Utilisateurs</h3>
+              <p className="text-sm text-subtle font-light">Rôles et permissions</p>
             </div>
           </div>
         </Link>

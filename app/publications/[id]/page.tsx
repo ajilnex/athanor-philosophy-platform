@@ -1,8 +1,10 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, User, Calendar, FileText, Tag, Download } from 'lucide-react'
+import { ArrowLeft, User, Calendar, FileText, Tag, Download, Lock } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { PdfClientViewer } from '@/components/publications/PdfClientViewer'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
 
 async function getPublication(id: string) {
   try {
@@ -29,11 +31,46 @@ export default async function PublicationPage({
   params: { id: string }
   searchParams: { page?: string; q?: string }
 }) {
+  const session = await getServerSession(authOptions)
   const publication = await getPublication(params.id)
   let initialPage = searchParams.page ? parseInt(searchParams.page, 10) : 1
 
   if (!publication) {
     notFound()
+  }
+
+  const isSealed = publication.isSealed || false
+  const isAdmin = (session?.user as any)?.role === 'ADMIN'
+
+  // Si la publication est scellée et l'utilisateur n'est pas admin, interdire l'accès
+  if (isSealed && !isAdmin) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <Link
+          href="/publications"
+          className="inline-flex items-center text-subtle hover:text-foreground mb-6 font-light"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Retour aux publications
+        </Link>
+        
+        <div className="text-center py-12">
+          <Lock className="h-12 w-12 mx-auto mb-4 text-subtle" />
+          <h1 className="text-2xl font-light text-foreground mb-2">Publication scellée</h1>
+          <p className="text-subtle mb-6">
+            Cette publication est réservée aux administrateurs.
+          </p>
+          {!session && (
+            <Link
+              href="/auth/signin"
+              className="inline-flex items-center px-4 py-2 border border-foreground hover:bg-foreground hover:text-background transition-colors"
+            >
+              Se connecter
+            </Link>
+          )}
+        </div>
+      </div>
+    )
   }
 
   // Si un terme de recherche est fourni, essayer de trouver la page correspondante

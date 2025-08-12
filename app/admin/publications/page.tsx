@@ -27,8 +27,8 @@ function formatFileSize(bytes: number): string {
 export default async function AdminPublicationsPage() {
   const session = await getServerSession(authOptions)
 
-  if (!session || session.user?.role !== 'admin') {
-    redirect('/')
+  if (!session || (session.user as any)?.role !== 'ADMIN') {
+    redirect('/admin')
   }
 
   const publications = await getAllPublications()

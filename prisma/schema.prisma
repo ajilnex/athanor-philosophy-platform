@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  VISITOR
+  USER
+  ADMIN
+}
+
 model Article {
   id          String   @id @default(cuid())
   title       String
@@ -15,25 +21,40 @@ model Article {
   fileName    String   @unique
   filePath    String
   fileSize    Int
-  tags        String[] // PostgreSQL array of strings
+  tags        String[]
   category    String?
   publishedAt DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   isPublished Boolean  @default(true)
+  isSealed    Boolean  @default(false)
+}
+
+model Billet {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  content     String
+  excerpt     String?
+  tags        String[]
+  date        DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isSealed    Boolean  @default(false)
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  role          String    @default("user") // "admin" or "user"
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
+  id             String    @id @default(cuid())
+  name           String?
+  email          String    @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String?
+  role           Role      @default(USER)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  accounts       Account[]
+  sessions       Session[]
 }
 
 model Account {

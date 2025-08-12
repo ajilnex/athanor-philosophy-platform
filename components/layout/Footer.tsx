@@ -8,6 +8,11 @@ export function Footer() {
               aub.robert@gmail.com
             </a>
           </p>
+          <div className="mt-4">
+            <a href="/admin" className="text-subtle text-xs hover:text-foreground transition-colors">
+              Admin
+            </a>
+          </div>
         </div>
       </div>
     </footer>

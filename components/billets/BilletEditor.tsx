@@ -9,6 +9,7 @@ interface BilletEditorProps {
   isOpen: boolean
   onClose: () => void
   mode: 'create' | 'edit'
+  userRole?: 'ADMIN' | 'USER'
   initialData?: {
     slug?: string
     title?: string
@@ -27,7 +28,7 @@ interface BilletData {
   excerpt: string
 }
 
-export function BilletEditor({ isOpen, onClose, mode, initialData, onSave }: BilletEditorProps) {
+export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onSave }: BilletEditorProps) {
   const [title, setTitle] = useState(initialData?.title || '')
   const [slug, setSlug] = useState(initialData?.slug || '')
   const [content, setContent] = useState(initialData?.content || '')
@@ -162,7 +163,12 @@ export function BilletEditor({ isOpen, onClose, mode, initialData, onSave }: Bil
               className="disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save className="h-4 w-4" />
-              <span>{isSaving ? 'Sauvegarde...' : 'Sauvegarder'}</span>
+              <span>
+                {isSaving 
+                  ? (userRole === 'ADMIN' ? 'Sauvegarde...' : 'Envoi de la proposition...') 
+                  : (userRole === 'ADMIN' ? 'Sauvegarder et Publier' : 'Proposer la modification')
+                }
+              </span>
             </ShimmerButton>
           </div>
         </div>
@@ -180,7 +186,7 @@ export function BilletEditor({ isOpen, onClose, mode, initialData, onSave }: Bil
                   type="text"
                   value={title}
                   onChange={(e) => handleTitleChange(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="input-field"
                   placeholder="Titre de votre billet"
                 />
               </div>
@@ -194,7 +200,7 @@ export function BilletEditor({ isOpen, onClose, mode, initialData, onSave }: Bil
                     type="text"
                     value={slug}
                     onChange={(e) => setSlug(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                    className="input-field font-mono text-sm"
                     placeholder="2025-08-11-mon-billet"
                   />
                 </div>
@@ -210,7 +216,7 @@ export function BilletEditor({ isOpen, onClose, mode, initialData, onSave }: Bil
                   type="text"
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="input-field"
                   placeholder="philosophie, collaboration, images"
                 />
               </div>
@@ -223,7 +229,7 @@ export function BilletEditor({ isOpen, onClose, mode, initialData, onSave }: Bil
                   type="text"
                   value={excerpt}
                   onChange={(e) => setExcerpt(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="input-field"
                   placeholder="Résumé du billet..."
                 />
               </div>
@@ -247,7 +253,7 @@ export function BilletEditor({ isOpen, onClose, mode, initialData, onSave }: Bil
                   ref={textareaRef}
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  className="w-full min-h-[400px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                  className="w-full min-h-[400px] input-field font-mono text-sm"
                   placeholder="# Votre billet en Markdown
 
 Écrivez votre contenu ici...
@@ -262,7 +268,7 @@ Vous pouvez utiliser la **syntaxe Markdown** et insérer des images avec le bout
         {/* Error */}
         {error && (
           <div className="p-4 bg-red-50 border-t border-red-200">
-            <p className="text-red-600 text-sm">{error}</p>
+            <p className="text-destructive text-sm">{error}</p>
           </div>
         )}
 
