@@ -16,4 +16,4 @@ console.log('📝 Billets: Mode statique (pas de sync DB)');
 console.log('🔍 Génération de l\'index de recherche...');
 execSync('node scripts/build-search-index.js', { stdio:'inherit' });
 
-execSync('npx next build', { stdio:'inherit' });
+execSync('npx prisma db push --accept-data-loss', { stdio:'inherit' });
