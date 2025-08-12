@@ -22,11 +22,38 @@ function formatFileSize(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
 }
 
-export default async function PublicationPage({ params }: { params: { id: string } }) {
+export default async function PublicationPage({ 
+  params, 
+  searchParams 
+}: { 
+  params: { id: string }
+  searchParams: { page?: string; q?: string }
+}) {
   const publication = await getPublication(params.id)
+  let initialPage = searchParams.page ? parseInt(searchParams.page, 10) : 1
 
   if (!publication) {
     notFound()
+  }
+
+  // Si un terme de recherche est fourni, essayer de trouver la page correspondante
+  if (searchParams.q && !searchParams.page) {
+    try {
+      const searchResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/find-in-pdf?url=${encodeURIComponent(publication.filePath)}&q=${encodeURIComponent(searchParams.q)}`,
+        { cache: 'no-store' } // Important pour les recherches dynamiques
+      )
+      
+      if (searchResponse.ok) {
+        const searchResult = await searchResponse.json()
+        if (searchResult.found && searchResult.pageNumber) {
+          initialPage = searchResult.pageNumber
+        }
+      }
+    } catch (error) {
+      console.error('Error searching in PDF:', error)
+      // Continue avec la page par défaut en cas d'erreur
+    }
   }
 
   return (
@@ -112,6 +139,7 @@ export default async function PublicationPage({ params }: { params: { id: string
         <PdfClientViewer 
           pdfUrl={publication.filePath} 
           title={publication.title}
+          initialPage={initialPage}
         />
       </div>
 

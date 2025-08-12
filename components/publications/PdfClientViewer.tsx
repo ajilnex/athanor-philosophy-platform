@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf'
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, Maximize2 } from 'lucide-react'
 
@@ -13,15 +13,21 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 interface PdfClientViewerProps {
   pdfUrl: string
   title: string
+  initialPage?: number
 }
 
-export function PdfClientViewer({ pdfUrl, title }: PdfClientViewerProps) {
+export function PdfClientViewer({ pdfUrl, title, initialPage = 1 }: PdfClientViewerProps) {
   const [numPages, setNumPages] = useState<number>(0)
-  const [pageNumber, setPageNumber] = useState<number>(1)
+  const [pageNumber, setPageNumber] = useState<number>(initialPage)
   const [scale, setScale] = useState<number>(1.2)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false)
+
+  // Synchronize with initialPage changes
+  useEffect(() => {
+    setPageNumber(initialPage)
+  }, [initialPage])
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages)

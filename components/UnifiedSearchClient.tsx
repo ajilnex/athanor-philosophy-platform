@@ -274,7 +274,11 @@ export function UnifiedSearchClient() {
                 
                 <div className="lg:w-48 flex flex-col space-y-3">
                   <Link
-                    href={doc.url}
+                    href={
+                      doc.type === 'publication' && searchQuery.trim()
+                        ? `${doc.url}?q=${encodeURIComponent(searchQuery.trim())}`
+                        : doc.url
+                    }
                     className="px-4 py-2 bg-accent text-background rounded-lg hover:bg-accent/90 transition-colors text-center inline-flex items-center justify-center space-x-2"
                   >
                     {doc.type === 'billet' ? (
