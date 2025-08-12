@@ -42,6 +42,40 @@ function getNodeTier(degree, tiers) {
 }
 
 /**
+ * Get node visual size based on degree
+ */
+function getNodeSize(degree, tiers) {
+  const tier = getNodeTier(degree, tiers)
+  return tier === 1 ? 8 : tier === 2 ? 6 : 4
+}
+
+/**
+ * Calculate robust text metrics approximation for collision detection
+ */
+function addTextMetrics(nodes, tiers) {
+  return nodes.map(node => {
+    const tier = getNodeTier(node.degree || 0, tiers)
+    const fontSize = tier === 1 ? 12 : tier === 2 ? 10 : 8
+    const labelText = node.label.length > 25 ? node.label.substring(0, 25) + '…' : node.label
+    
+    // Approximation robuste basée sur les caractéristiques d'IBM Plex Serif
+    // Facteur d'ajustement pour serif fonts (plus larges que sans-serif)
+    const serifFactor = 0.65
+    const labelWidth = labelText.length * fontSize * serifFactor
+    const labelHeight = fontSize * 1.2 // Height avec descenders
+    
+    return {
+      ...node,
+      labelWidth,
+      labelHeight,
+      labelText,
+      fontSize,
+      nodeSize: getNodeSize(node.degree || 0, tiers)
+    }
+  })
+}
+
+/**
  * Elliptical layout for elegant horizontal composition
  */
 function applyEllipticalLayout(nodes) {
@@ -174,6 +208,85 @@ function applyForceLayout(nodes, edges, iterations = 200) {
       node.x = Math.max(MARGIN, Math.min(SVG_WIDTH - MARGIN, node.x))
       node.y = Math.max(MARGIN, Math.min(SVG_HEIGHT - MARGIN, node.y))
     })
+  }
+  
+  return nodes
+}
+
+/**
+ * Apply collision resolution to prevent label overlap
+ * This is the "choreography" layer that ensures perfect readability
+ */
+function applyCollisionResolution(nodes, iterations = 50, padding = 20) {
+  console.log('   🎭 Résolution des collisions de labels...')
+  
+  for (let iter = 0; iter < iterations; iter++) {
+    let hasCollisions = false
+    
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const nodeA = nodes[i]
+        const nodeB = nodes[j]
+        
+        // Calculer les bounding boxes des labels
+        const boxA = {
+          x: nodeA.x - nodeA.labelWidth / 2,
+          y: nodeA.y + nodeA.nodeSize + 4, // Position du label sous le nœud
+          width: nodeA.labelWidth,
+          height: nodeA.labelHeight
+        }
+        
+        const boxB = {
+          x: nodeB.x - nodeB.labelWidth / 2,
+          y: nodeB.y + nodeB.nodeSize + 4,
+          width: nodeB.labelWidth,
+          height: nodeB.labelHeight
+        }
+        
+        // Vérifier collision
+        const overlapX = Math.max(0, Math.min(boxA.x + boxA.width, boxB.x + boxB.width) - Math.max(boxA.x, boxB.x))
+        const overlapY = Math.max(0, Math.min(boxA.y + boxA.height, boxB.y + boxB.height) - Math.max(boxA.y, boxB.y))
+        
+        if (overlapX > 0 && overlapY > 0) {
+          hasCollisions = true
+          
+          // Calculer direction de séparation
+          const centerAx = boxA.x + boxA.width / 2
+          const centerAy = boxA.y + boxA.height / 2
+          const centerBx = boxB.x + boxB.width / 2
+          const centerBy = boxB.y + boxB.height / 2
+          
+          const dx = centerBx - centerAx
+          const dy = centerBy - centerAy
+          const distance = Math.sqrt(dx * dx + dy * dy) || 1
+          
+          // Force de séparation proportionnelle au chevauchement
+          const separation = Math.max(overlapX, overlapY) + padding
+          const force = separation * 0.5 // Force de poussée
+          
+          const fx = (dx / distance) * force
+          const fy = (dy / distance) * force
+          
+          // Pousser les nœuds dans des directions opposées
+          nodeA.x -= fx * 0.5
+          nodeA.y -= fy * 0.5
+          nodeB.x += fx * 0.5
+          nodeB.y += fy * 0.5
+          
+          // Garder dans les limites
+          nodeA.x = Math.max(MARGIN, Math.min(SVG_WIDTH - MARGIN, nodeA.x))
+          nodeA.y = Math.max(MARGIN, Math.min(SVG_HEIGHT - MARGIN, nodeA.y))
+          nodeB.x = Math.max(MARGIN, Math.min(SVG_WIDTH - MARGIN, nodeB.x))
+          nodeB.y = Math.max(MARGIN, Math.min(SVG_HEIGHT - MARGIN, nodeB.y))
+        }
+      }
+    }
+    
+    // Arrêt anticipé si plus de collisions
+    if (!hasCollisions) {
+      console.log(`   ✅ Collisions résolues en ${iter + 1} itérations`)
+      break
+    }
   }
   
   return nodes
@@ -481,10 +594,13 @@ async function main() {
     const tiers = calculateTiers(graphData.nodes)
     console.log(`   🎯 Tiers: T1≥${tiers.tier1}, T2≥${tiers.tier2}, T3≥${tiers.tier3}`)
     
-    // Filter nodes (keep top nodes and some connected ones)
+    // Filter nodes (keep top nodes and some connected ones) and add text metrics
     let filteredNodes = graphData.nodes
       .filter(node => (node.degree || 0) >= 1) // Only keep connected nodes
       .slice(0, 30) // Limit to 30 nodes for readability
+    
+    // Add precise text metrics for collision detection
+    filteredNodes = addTextMetrics(filteredNodes, tiers)
     
     // Filter edges to only include those between filtered nodes
     const nodeIds = new Set(filteredNodes.map(n => n.id))
@@ -494,9 +610,10 @@ async function main() {
     
     console.log(`   🎯 Filtré: ${filteredNodes.length} nœuds, ${filteredEdges.length} arêtes`)
     
-    // Apply controlled elliptical layout with strong forces
+    // Apply controlled elliptical layout with collision resolution
     filteredNodes = applyEllipticalLayout(filteredNodes)
     filteredNodes = applyForceLayout(filteredNodes, filteredEdges, 200)
+    filteredNodes = applyCollisionResolution(filteredNodes) // NOUVELLE COUCHE : chorégraphie
     filteredNodes = centerAndPadGraph(filteredNodes) // Centrage pondéré final
     
     // Generate SVG
