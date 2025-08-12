@@ -4,12 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/build.cjs",
+    "build": "npm run graph:build && npm run graph:svg && node scripts/build.cjs",
     "start": "next start",
     "lint": "next lint",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "graph:build": "node scripts/build-graph-billets.cjs",
+    "graph:svg": "node scripts/render-graph-svg.cjs"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.0",

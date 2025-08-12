@@ -1,0 +1,304 @@
+{
+  "nodes": [
+    {
+      "id": "billet:2025-08-04-20-19-31",
+      "label": "2025-08-04-20-19-31",
+      "url": "/billets/2025-08-04-20-19-31",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-04-21-56-25",
+      "label": "2025-08-04-21-56-25",
+      "url": "/billets/2025-08-04-21-56-25",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-04-22-11-00",
+      "label": "2025-08-04-22-11-00",
+      "url": "/billets/2025-08-04-22-11-00",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-04-note-de-push",
+      "label": "« note de push »",
+      "url": "/billets/2025-08-04-note-de-push",
+      "degree": 1
+    },
+    {
+      "id": "billet:dialectique-du-pomodoro",
+      "label": "dialectique-du-pomodoro",
+      "url": "/billets/dialectique-du-pomodoro",
+      "degree": 2
+    },
+    {
+      "id": "billet:2025-08-04-premier-billet",
+      "label": "Premier billet - Test du système",
+      "url": "/billets/2025-08-04-premier-billet",
+      "degree": 3
+    },
+    {
+      "id": "billet:dialectique",
+      "label": "dialectique",
+      "url": "/billets/dialectique",
+      "degree": 1
+    },
+    {
+      "id": "billet:philosophie-mobile",
+      "label": "philosophie-mobile",
+      "url": "/billets/philosophie-mobile",
+      "degree": 2
+    },
+    {
+      "id": "billet:2025-08-05-dialectique-du-pomodoro",
+      "label": "Dialectique du Pomodoro",
+      "url": "/billets/2025-08-05-dialectique-du-pomodoro",
+      "degree": 3
+    },
+    {
+      "id": "billet:technique-pomodoro",
+      "label": "technique-pomodoro",
+      "url": "/billets/technique-pomodoro",
+      "degree": 1
+    },
+    {
+      "id": "billet:2025-08-06-12-21-30",
+      "label": "2025-08-06-12-21-30",
+      "url": "/billets/2025-08-06-12-21-30",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-06-16-48-11",
+      "label": "2025-08-06-16-48-11",
+      "url": "/billets/2025-08-06-16-48-11",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-06-16-49-31",
+      "label": "2025-08-06-16-49-31",
+      "url": "/billets/2025-08-06-16-49-31",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-06-peirce-sellars",
+      "label": "BNF, rayon philosophie — Peirce & les Sellars (étagère, fragments)",
+      "url": "/billets/2025-08-06-peirce-sellars",
+      "degree": 2
+    },
+    {
+      "id": "billet:2025-08-06-resume-la-procedure-de-publication-dun-billet",
+      "label": "Résume la procédure de publication d'un billet",
+      "url": "/billets/2025-08-06-resume-la-procedure-de-publication-dun-billet",
+      "degree": 2
+    },
+    {
+      "id": "billet:2025-08-07-20-32-23",
+      "label": "2025-08-07-20-32-23",
+      "url": "/billets/2025-08-07-20-32-23",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-07-21-51-24",
+      "label": "2025-08-07-21-51-24",
+      "url": "/billets/2025-08-07-21-51-24",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-07-nouveau-billet",
+      "label": "Petit essai de billet",
+      "url": "/billets/2025-08-07-nouveau-billet",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-07-test-suppression",
+      "label": "Test suppression physique",
+      "url": "/billets/2025-08-07-test-suppression",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-08-00-35-33",
+      "label": "2025-08-08-00-35-33",
+      "url": "/billets/2025-08-08-00-35-33",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-08-09-30-35",
+      "label": "2025-08-08-09-30-35",
+      "url": "/billets/2025-08-08-09-30-35",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-08-15-26-22",
+      "label": "2025-08-08-15-26-22",
+      "url": "/billets/2025-08-08-15-26-22",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani",
+      "label": "Notes sur *Intelligence and Spirit* (Reza Negarestani) — continuité, apprentissage, esprit collectif",
+      "url": "/billets/2025-08-10-18-56-32-intelligence-and-spirit-negarestani",
+      "degree": 3
+    },
+    {
+      "id": "billet:2025-08-10-iri-berkleid-sublime-bacteriologique",
+      "label": "2025-08-10-iri-berkleid-sublime-bacteriologique",
+      "url": "/billets/2025-08-10-iri-berkleid-sublime-bacteriologique",
+      "degree": 5
+    },
+    {
+      "id": "billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide",
+      "label": "Publier un billet avec termd → Termux → GitHub → Vercel (procédure compacte)",
+      "url": "/billets/2025-08-10-19-13-04-termd-a-termux-github-vercel-guide",
+      "degree": 3
+    },
+    {
+      "id": "billet:2025-08-11-check",
+      "label": "check",
+      "url": "/billets/2025-08-11-check",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-11-la-coupure-signifiante-du-continuum-reel-a-l-eclosion-du-signe",
+      "label": "La coupure signifiante : du continuum réel à l’éclosion du signe",
+      "url": "/billets/2025-08-11-la-coupure-signifiante-du-continuum-reel-a-l-eclosion-du-signe",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-11-note-programmatique-de-la-coupure-de-dedekind-a-l-ex-sistence-du-reel-ecriture-des-mathemes-n-uds-et-sinthome-quelques-convergences-operatoires-avec-peirce",
+      "label": "Note programmatique : de la coupure de Dedekind à l’ex-sistence du Réel, écriture des mathèmes, nœuds et sinthome ; quelques convergences opératoires avec Peirce",
+      "url": "/billets/2025-08-11-note-programmatique-de-la-coupure-de-dedekind-a-l-ex-sistence-du-reel-ecriture-des-mathemes-n-uds-et-sinthome-quelques-convergences-operatoires-avec-peirce",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-11-p-np",
+      "label": "P = NP ?",
+      "url": "/billets/2025-08-11-p-np",
+      "degree": 0
+    },
+    {
+      "id": "billet:2025-08-11-test",
+      "label": "test",
+      "url": "/billets/2025-08-11-test",
+      "degree": 0
+    },
+    {
+      "id": "billet:alpha",
+      "label": "Alpha",
+      "url": "/billets/alpha",
+      "degree": 4
+    },
+    {
+      "id": "billet:beta",
+      "label": "beta",
+      "url": "/billets/beta",
+      "degree": 3
+    },
+    {
+      "id": "billet:gamma",
+      "label": "gamma",
+      "url": "/billets/gamma",
+      "degree": 3
+    }
+  ],
+  "edges": [
+    {
+      "id": "billet:2025-08-04-note-de-push→billet:dialectique-du-pomodoro",
+      "source": "billet:2025-08-04-note-de-push",
+      "target": "billet:dialectique-du-pomodoro"
+    },
+    {
+      "id": "billet:2025-08-04-premier-billet→billet:dialectique",
+      "source": "billet:2025-08-04-premier-billet",
+      "target": "billet:dialectique"
+    },
+    {
+      "id": "billet:2025-08-04-premier-billet→billet:dialectique-du-pomodoro",
+      "source": "billet:2025-08-04-premier-billet",
+      "target": "billet:dialectique-du-pomodoro"
+    },
+    {
+      "id": "billet:2025-08-04-premier-billet→billet:philosophie-mobile",
+      "source": "billet:2025-08-04-premier-billet",
+      "target": "billet:philosophie-mobile"
+    },
+    {
+      "id": "billet:2025-08-05-dialectique-du-pomodoro→billet:technique-pomodoro",
+      "source": "billet:2025-08-05-dialectique-du-pomodoro",
+      "target": "billet:technique-pomodoro"
+    },
+    {
+      "id": "billet:2025-08-05-dialectique-du-pomodoro→billet:philosophie-mobile",
+      "source": "billet:2025-08-05-dialectique-du-pomodoro",
+      "target": "billet:philosophie-mobile"
+    },
+    {
+      "id": "billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani→billet:2025-08-06-peirce-sellars",
+      "source": "billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani",
+      "target": "billet:2025-08-06-peirce-sellars"
+    },
+    {
+      "id": "billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani→billet:2025-08-10-iri-berkleid-sublime-bacteriologique",
+      "source": "billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani",
+      "target": "billet:2025-08-10-iri-berkleid-sublime-bacteriologique"
+    },
+    {
+      "id": "billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide→billet:2025-08-06-resume-la-procedure-de-publication-dun-billet",
+      "source": "billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide",
+      "target": "billet:2025-08-06-resume-la-procedure-de-publication-dun-billet"
+    },
+    {
+      "id": "billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide→billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani",
+      "source": "billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide",
+      "target": "billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani"
+    },
+    {
+      "id": "billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide→billet:2025-08-10-iri-berkleid-sublime-bacteriologique",
+      "source": "billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide",
+      "target": "billet:2025-08-10-iri-berkleid-sublime-bacteriologique"
+    },
+    {
+      "id": "billet:2025-08-10-iri-berkleid-sublime-bacteriologique→billet:2025-08-06-resume-la-procedure-de-publication-dun-billet",
+      "source": "billet:2025-08-10-iri-berkleid-sublime-bacteriologique",
+      "target": "billet:2025-08-06-resume-la-procedure-de-publication-dun-billet"
+    },
+    {
+      "id": "billet:2025-08-10-iri-berkleid-sublime-bacteriologique→billet:2025-08-06-peirce-sellars",
+      "source": "billet:2025-08-10-iri-berkleid-sublime-bacteriologique",
+      "target": "billet:2025-08-06-peirce-sellars"
+    },
+    {
+      "id": "billet:2025-08-10-iri-berkleid-sublime-bacteriologique→billet:2025-08-05-dialectique-du-pomodoro",
+      "source": "billet:2025-08-10-iri-berkleid-sublime-bacteriologique",
+      "target": "billet:2025-08-05-dialectique-du-pomodoro"
+    },
+    {
+      "id": "billet:alpha→billet:beta",
+      "source": "billet:alpha",
+      "target": "billet:beta"
+    },
+    {
+      "id": "billet:alpha→billet:gamma",
+      "source": "billet:alpha",
+      "target": "billet:gamma"
+    },
+    {
+      "id": "billet:beta→billet:alpha",
+      "source": "billet:beta",
+      "target": "billet:alpha"
+    },
+    {
+      "id": "billet:beta→billet:gamma",
+      "source": "billet:beta",
+      "target": "billet:gamma"
+    },
+    {
+      "id": "billet:gamma→billet:alpha",
+      "source": "billet:gamma",
+      "target": "billet:alpha"
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2025-08-12T01:07:47.147Z",
+    "billetsCount": 29,
+    "nodesCount": 33
+  }
+}
