@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { Search, FileText, Calendar, Tag, BookOpen } from 'lucide-react'
 import * as lunr from 'lunr'
 import { makeSnippet } from '@/lib/search-utils'
+import { MiniGraph } from '@/components/graph/MiniGraph'
 
 interface SearchDocument {
   id: string
@@ -134,18 +135,32 @@ export function UnifiedSearchClient() {
         </p>
       </div>
 
-      {/* Search Bar */}
-      <div className="mb-8">
-        <div className="relative max-w-2xl">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-subtle" />
+      {/* Search Bar with Mini Graph */}
+      <div className="mb-8 flex flex-col lg:flex-row gap-6">
+        <div className="flex-1">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-subtle" />
+            </div>
+            <input
+              type="text"
+              placeholder="Rechercher dans billets et publications..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="block w-full pl-10 pr-3 py-3 border border-subtle/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent bg-background text-foreground text-lg transition-all duration-200"
+            />
           </div>
-          <input
-            type="text"
-            placeholder="Rechercher dans billets et publications..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full pl-10 pr-3 py-3 border border-subtle/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent bg-background text-foreground text-lg transition-all duration-200"
+        </div>
+        
+        {/* Mini Graph - shows context for top search result */}
+        <div className="lg:w-80">
+          <MiniGraph 
+            centerNodeId={searchResults.length > 0 && searchResults[0].type === 'billet' 
+              ? searchResults[0].id 
+              : undefined
+            }
+            maxNodes={5}
+            className="h-full"
           />
         </div>
       </div>
