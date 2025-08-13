@@ -100,6 +100,65 @@ function applyEllipticalLayout(nodes) {
 }
 
 /**
+ * Apply persistent positions from JSON with proper scaling and centering for SVG viewport
+ */
+function applyPersistentPositions(nodes) {
+  if (nodes.length === 0) return nodes
+  
+  // Find bounds of existing positions
+  const positions = nodes.filter(n => n.x !== undefined && n.y !== undefined)
+  if (positions.length === 0) {
+    // Fallback to elliptical layout if no positions
+    return applyEllipticalLayout(nodes)
+  }
+  
+  const minX = Math.min(...positions.map(n => n.x))
+  const maxX = Math.max(...positions.map(n => n.x))
+  const minY = Math.min(...positions.map(n => n.y))
+  const maxY = Math.max(...positions.map(n => n.y))
+  
+  const sourceWidth = maxX - minX
+  const sourceHeight = maxY - minY
+  
+  // SVG working area with margins
+  const margin = 60
+  const targetWidth = SVG_WIDTH - 2 * margin
+  const targetHeight = SVG_HEIGHT - 2 * margin
+  const targetCenterX = SVG_WIDTH / 2
+  const targetCenterY = SVG_HEIGHT / 2
+  
+  // Calculate scaling to fit within viewport while preserving aspect ratio
+  const scaleX = sourceWidth > 0 ? targetWidth / sourceWidth : 1
+  const scaleY = sourceHeight > 0 ? targetHeight / sourceHeight : 1
+  const scale = Math.min(scaleX, scaleY, 1.2) // Limit maximum scale
+  
+  // Center of source coordinates
+  const sourceCenterX = (minX + maxX) / 2
+  const sourceCenterY = (minY + maxY) / 2
+  
+  return nodes.map(node => {
+    if (node.x === undefined || node.y === undefined) {
+      // Fallback position for nodes without coordinates
+      return {
+        ...node,
+        x: targetCenterX + (Math.random() - 0.5) * 100,
+        y: targetCenterY + (Math.random() - 0.5) * 50
+      }
+    }
+    
+    // Transform persistent positions to SVG coordinates
+    const transformedX = targetCenterX + (node.x - sourceCenterX) * scale
+    const transformedY = targetCenterY + (node.y - sourceCenterY) * scale
+    
+    return {
+      ...node,
+      x: transformedX,
+      y: transformedY
+    }
+  })
+}
+
+/**
  * Center the graph on the most central node and apply padding
  */
 function centerAndPadGraph(nodes) {
@@ -397,10 +456,16 @@ function generateSVG(nodes, edges, tiers) {
     .map(edge => {
       const source = nodes.find(n => n.id === edge.source)
       const target = nodes.find(n => n.id === edge.target)
+      const sourceTier = getNodeTier(source.degree || 0, tiers)
+      const targetTier = getNodeTier(target.degree || 0, tiers)
+      
       const strokeWidth = edge.bidirectional ? 1.5 : 1
       
+      // Higher opacity if at least one endpoint is T1, lower otherwise
+      const opacity = (sourceTier === 1 || targetTier === 1) ? 0.8 : 0.4
+      
       return `<line x1="${source.x}" y1="${source.y}" x2="${target.x}" y2="${target.y}" 
-                    stroke="${COLOR_SUBTLE}" stroke-width="${strokeWidth}" opacity="0.6"/>`
+                    stroke="${COLOR_SUBTLE}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`
     }).join('\n')
   
   // Generate nodes with sophisticated group structure
@@ -610,10 +675,10 @@ async function main() {
     
     console.log(`   🎯 Filtré: ${filteredNodes.length} nœuds, ${filteredEdges.length} arêtes`)
     
-    // Apply controlled elliptical layout with collision resolution
+    // Apply controlled elliptical layout with collision resolution (forme élégante horizontale)
     filteredNodes = applyEllipticalLayout(filteredNodes)
     filteredNodes = applyForceLayout(filteredNodes, filteredEdges, 200)
-    filteredNodes = applyCollisionResolution(filteredNodes) // NOUVELLE COUCHE : chorégraphie
+    filteredNodes = applyCollisionResolution(filteredNodes) // Chorégraphie
     filteredNodes = centerAndPadGraph(filteredNodes) // Centrage pondéré final
     
     // Generate SVG

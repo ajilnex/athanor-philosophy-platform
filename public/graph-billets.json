@@ -4,199 +4,265 @@
       "id": "billet:2025-08-04-20-19-31",
       "label": "2025-08-04-20-19-31",
       "url": "/billets/2025-08-04-20-19-31",
-      "degree": 0
+      "degree": 0,
+      "x": -201.3522460652209,
+      "y": -164.49095113254936
     },
     {
       "id": "billet:2025-08-04-21-56-25",
       "label": "2025-08-04-21-56-25",
       "url": "/billets/2025-08-04-21-56-25",
-      "degree": 0
+      "degree": 0,
+      "x": 62.889381325884244,
+      "y": -77.74912035803055
     },
     {
       "id": "billet:2025-08-04-22-11-00",
       "label": "2025-08-04-22-11-00",
       "url": "/billets/2025-08-04-22-11-00",
-      "degree": 0
+      "degree": 0,
+      "x": -83.62902222275224,
+      "y": 54.82870272098741
     },
     {
       "id": "billet:2025-08-04-note-de-push",
       "label": "« note de push »",
       "url": "/billets/2025-08-04-note-de-push",
-      "degree": 1
+      "degree": 1,
+      "x": 94.1155022839682,
+      "y": -153.43491203059486
     },
     {
       "id": "billet:dialectique-du-pomodoro",
       "label": "dialectique-du-pomodoro",
       "url": "/billets/dialectique-du-pomodoro",
-      "degree": 2
+      "degree": 2,
+      "x": 173.5211659481196,
+      "y": 47.858175560766384
     },
     {
       "id": "billet:2025-08-04-premier-billet",
       "label": "Premier billet - Test du système",
       "url": "/billets/2025-08-04-premier-billet",
-      "degree": 3
+      "degree": 3,
+      "x": 91.67344690097265,
+      "y": 243.30223824144025
     },
     {
       "id": "billet:dialectique",
       "label": "dialectique",
       "url": "/billets/dialectique",
-      "degree": 1
+      "degree": 1,
+      "x": -179.65327635624337,
+      "y": -11.16692860491413
     },
     {
       "id": "billet:philosophie-mobile",
       "label": "philosophie-mobile",
       "url": "/billets/philosophie-mobile",
-      "degree": 2
+      "degree": 2,
+      "x": -259.08648767162845,
+      "y": 21.77594787785674
     },
     {
       "id": "billet:2025-08-05-dialectique-du-pomodoro",
       "label": "Dialectique du Pomodoro",
       "url": "/billets/2025-08-05-dialectique-du-pomodoro",
-      "degree": 3
+      "degree": 3,
+      "x": -15.294424677058906,
+      "y": 179.34904676021495
     },
     {
       "id": "billet:technique-pomodoro",
       "label": "technique-pomodoro",
       "url": "/billets/technique-pomodoro",
-      "degree": 1
+      "degree": 1,
+      "x": 162.08208443401836,
+      "y": 78.29047135842104
     },
     {
       "id": "billet:2025-08-06-12-21-30",
       "label": "2025-08-06-12-21-30",
       "url": "/billets/2025-08-06-12-21-30",
-      "degree": 0
+      "degree": 0,
+      "x": 31.332873773126142,
+      "y": 94.96447241530564
     },
     {
       "id": "billet:2025-08-06-16-48-11",
       "label": "2025-08-06-16-48-11",
       "url": "/billets/2025-08-06-16-48-11",
-      "degree": 0
+      "degree": 0,
+      "x": 152.62393467152077,
+      "y": 95.42502064649169
     },
     {
       "id": "billet:2025-08-06-16-49-31",
       "label": "2025-08-06-16-49-31",
       "url": "/billets/2025-08-06-16-49-31",
-      "degree": 0
+      "degree": 0,
+      "x": -68.28138240694159,
+      "y": 73.05924182878583
     },
     {
       "id": "billet:2025-08-06-peirce-sellars",
       "label": "BNF, rayon philosophie — Peirce & les Sellars (étagère, fragments)",
       "url": "/billets/2025-08-06-peirce-sellars",
-      "degree": 2
+      "degree": 2,
+      "x": 93.2686333379926,
+      "y": -36.068851316102325
     },
     {
       "id": "billet:2025-08-06-resume-la-procedure-de-publication-dun-billet",
       "label": "Résume la procédure de publication d'un billet",
       "url": "/billets/2025-08-06-resume-la-procedure-de-publication-dun-billet",
-      "degree": 2
+      "degree": 2,
+      "x": 41.28207379987496,
+      "y": -91.0812295853634
     },
     {
       "id": "billet:2025-08-07-20-32-23",
       "label": "2025-08-07-20-32-23",
       "url": "/billets/2025-08-07-20-32-23",
-      "degree": 0
+      "degree": 0,
+      "x": 252.598095008915,
+      "y": 61.597097316895876
     },
     {
       "id": "billet:2025-08-07-21-51-24",
       "label": "2025-08-07-21-51-24",
       "url": "/billets/2025-08-07-21-51-24",
-      "degree": 0
+      "degree": 0,
+      "x": 60.271872871680046,
+      "y": -79.79537167367565
     },
     {
       "id": "billet:2025-08-07-nouveau-billet",
       "label": "Petit essai de billet",
       "url": "/billets/2025-08-07-nouveau-billet",
-      "degree": 0
+      "degree": 0,
+      "x": -80.19278209694313,
+      "y": 59.74209319694279
     },
     {
       "id": "billet:2025-08-07-test-suppression",
       "label": "Test suppression physique",
       "url": "/billets/2025-08-07-test-suppression",
-      "degree": 0
+      "degree": 0,
+      "x": 8.228771743850277,
+      "y": -99.66086150333847
     },
     {
       "id": "billet:2025-08-08-00-35-33",
       "label": "2025-08-08-00-35-33",
       "url": "/billets/2025-08-08-00-35-33",
-      "degree": 0
+      "degree": 0,
+      "x": -142.21684313841888,
+      "y": -110.33752547407595
     },
     {
       "id": "billet:2025-08-08-09-30-35",
       "label": "2025-08-08-09-30-35",
       "url": "/billets/2025-08-08-09-30-35",
-      "degree": 0
+      "degree": 0,
+      "x": 39.75681237794002,
+      "y": 175.55453816277515
     },
     {
       "id": "billet:2025-08-08-15-26-22",
       "label": "2025-08-08-15-26-22",
       "url": "/billets/2025-08-08-15-26-22",
-      "degree": 0
+      "degree": 0,
+      "x": 17.01282802326848,
+      "y": 98.54219239823463
     },
     {
       "id": "billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani",
       "label": "Notes sur *Intelligence and Spirit* (Reza Negarestani) — continuité, apprentissage, esprit collectif",
       "url": "/billets/2025-08-10-18-56-32-intelligence-and-spirit-negarestani",
-      "degree": 3
+      "degree": 3,
+      "x": 68.83102773141232,
+      "y": -250.72353224505582
     },
     {
       "id": "billet:2025-08-10-iri-berkleid-sublime-bacteriologique",
       "label": "2025-08-10-iri-berkleid-sublime-bacteriologique",
       "url": "/billets/2025-08-10-iri-berkleid-sublime-bacteriologique",
-      "degree": 5
+      "degree": 5,
+      "x": 55.0964121578499,
+      "y": 83.45289310342889
     },
     {
       "id": "billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide",
       "label": "Publier un billet avec termd → Termux → GitHub → Vercel (procédure compacte)",
       "url": "/billets/2025-08-10-19-13-04-termd-a-termux-github-vercel-guide",
-      "degree": 3
+      "degree": 3,
+      "x": -91.94292250936019,
+      "y": -39.32555149565975
     },
     {
       "id": "billet:2025-08-11-check",
       "label": "check",
       "url": "/billets/2025-08-11-check",
-      "degree": 0
+      "degree": 0,
+      "x": 180.40334699428178,
+      "y": 187.22882361768114
     },
     {
       "id": "billet:2025-08-11-la-coupure-signifiante-du-continuum-reel-a-l-eclosion-du-signe",
       "label": "La coupure signifiante : du continuum réel à l’éclosion du signe",
       "url": "/billets/2025-08-11-la-coupure-signifiante-du-continuum-reel-a-l-eclosion-du-signe",
-      "degree": 0
+      "degree": 0,
+      "x": -19.31427001188256,
+      "y": 178.96077495895042
     },
     {
       "id": "billet:2025-08-11-note-programmatique-de-la-coupure-de-dedekind-a-l-ex-sistence-du-reel-ecriture-des-mathemes-n-uds-et-sinthome-quelques-convergences-operatoires-avec-peirce",
       "label": "Note programmatique : de la coupure de Dedekind à l’ex-sistence du Réel, écriture des mathèmes, nœuds et sinthome ; quelques convergences opératoires avec Peirce",
       "url": "/billets/2025-08-11-note-programmatique-de-la-coupure-de-dedekind-a-l-ex-sistence-du-reel-ecriture-des-mathemes-n-uds-et-sinthome-quelques-convergences-operatoires-avec-peirce",
-      "degree": 0
+      "degree": 0,
+      "x": 99.47800546460095,
+      "y": -10.204235825617902
     },
     {
       "id": "billet:2025-08-11-p-np",
       "label": "P = NP ?",
       "url": "/billets/2025-08-11-p-np",
-      "degree": 0
+      "degree": 0,
+      "x": -90.60834486235602,
+      "y": -155.53175830454808
     },
     {
       "id": "billet:2025-08-11-test",
       "label": "test",
       "url": "/billets/2025-08-11-test",
-      "degree": 0
+      "degree": 0,
+      "x": -255.96378729601923,
+      "y": 45.63485064156798
     },
     {
       "id": "billet:alpha",
       "label": "Alpha",
       "url": "/billets/alpha",
-      "degree": 4
+      "degree": 4,
+      "x": 99.32044820329828,
+      "y": -150.11811539150077
     },
     {
       "id": "billet:beta",
       "label": "beta",
       "url": "/billets/beta",
-      "degree": 3
+      "degree": 3,
+      "x": 212.03981610860504,
+      "y": 150.46300669808826
     },
     {
       "id": "billet:gamma",
       "label": "gamma",
       "url": "/billets/gamma",
-      "degree": 3
+      "degree": 3,
+      "x": 179.94614051025437,
+      "y": -4.4030120898979455
     }
   ],
   "edges": [
@@ -297,8 +363,13 @@
     }
   ],
   "metadata": {
-    "generatedAt": "2025-08-12T23:23:02.317Z",
+    "generatedAt": "2025-08-13T07:53:45.400Z",
     "billetsCount": 29,
-    "nodesCount": 33
+    "nodesCount": 33,
+    "stability": {
+      "pivotsLocked": 12,
+      "newNodes": 0,
+      "avgMovement": 0
+    }
   }
 }

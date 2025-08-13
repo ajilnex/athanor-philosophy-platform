@@ -1,0 +1,23 @@
+{
+  "description": "Nœuds pivots du graphe des billets - positions fixes entre builds",
+  "version": "1.0",
+  "pivots": [
+    "billet:2025-08-10-iri-berkleid-sublime-bacteriologique",
+    "billet:alpha",
+    "billet:2025-08-04-premier-billet",
+    "billet:2025-08-05-dialectique-du-pomodoro",
+    "billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani",
+    "billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide",
+    "billet:beta",
+    "billet:gamma",
+    "billet:dialectique-du-pomodoro",
+    "billet:philosophie-mobile",
+    "billet:2025-08-06-peirce-sellars",
+    "billet:2025-08-06-resume-la-procedure-de-publication-dun-billet"
+  ],
+  "stats": {
+    "totalPivots": 12,
+    "minDegreeForPivot": 2,
+    "createdAt": "2025-08-13T09:40:00Z"
+  }
+}

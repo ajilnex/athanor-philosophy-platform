@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 
 function NavItem({ href, children }: { href: string; children: React.ReactNode }) {
   const pathname = usePathname();
@@ -19,6 +19,10 @@ function NavItem({ href, children }: { href: string; children: React.ReactNode }
 
 export function Navbar() {
   const { data: session } = useSession();
+  
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: '/' })
+  }
   
   return (
     <header className="sticky top-0 z-50 w-full border-b border-subtle/30 bg-background/80 backdrop-blur-lg">
@@ -37,7 +41,16 @@ export function Navbar() {
           {session?.user?.role === 'ADMIN' && (
             <NavItem href="/admin">Admin</NavItem>
           )}
-          <NavItem href="/auth/signin">Connexion</NavItem>
+          {session ? (
+            <button 
+              onClick={handleSignOut}
+              className="px-3 py-2 text-sm font-light hover:text-subtle transition-colors"
+            >
+              Se déconnecter
+            </button>
+          ) : (
+            <NavItem href="/auth/signin">Connexion</NavItem>
+          )}
         </nav>
 
         {/* Mobile: simple lien recherche (optionnel) */}

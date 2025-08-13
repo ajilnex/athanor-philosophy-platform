@@ -1,18 +1,117 @@
 #!/usr/bin/env node
 
-/* Build un graphe billets-only en JSON (noeuds = billets, edges = liens) */
+/* Build un graphe billets-only en JSON (noeuds = billets, edges = liens) avec positions persistantes */
 const fs = require('fs/promises')
 const path = require('path')
 const matter = require('gray-matter')
+const crypto = require('crypto')
 
 const BILLETS_DIR = path.join(process.cwd(), 'content', 'billets')
 const OUT_PATH = path.join(process.cwd(), 'public', 'graph-billets.json')
+const PIVOTS_PATH = path.join(process.cwd(), 'data', 'graph-pivots.json')
+const POSITIONS_PATH = path.join(process.cwd(), 'public', 'graph-positions.json')
 
-/** @typedef {{ id:string, label:string, url:string, degree?:number }} Node */
+/** @typedef {{ id:string, label:string, url:string, degree?:number, x?:number, y?:number }} Node */
 /** @typedef {{ id:string, source:string, target:string }} Edge */
+
+// Utilitaires pour la stabilité du graphe
+async function loadPivots() {
+  try {
+    const data = await fs.readFile(PIVOTS_PATH, 'utf8')
+    const pivots = JSON.parse(data)
+    return new Set(pivots.pivots || [])
+  } catch (e) {
+    console.log('   ⚠️  Pivots non trouvés, tous les nœuds seront mobiles')
+    return new Set()
+  }
+}
+
+async function loadPositions() {
+  try {
+    const data = await fs.readFile(POSITIONS_PATH, 'utf8')
+    return JSON.parse(data)
+  } catch (e) {
+    console.log('   📍 Aucune position persistante trouvée, génération initiale')
+    return {}
+  }
+}
+
+function generateDeterministicPosition(nodeId, existingPositions) {
+  // Seed déterministe basé sur le hash du nodeId
+  const hash = crypto.createHash('md5').update(nodeId).digest('hex')
+  const seed = parseInt(hash.substr(0, 8), 16)
+  
+  // Générateur pseudo-aléatoire simple et déterministe
+  let rng = seed
+  const random = () => {
+    rng = (rng * 1664525 + 1013904223) % (2**32)
+    return rng / (2**32)
+  }
+  
+  // Placement en anneaux concentriques pour éviter le clustering
+  const angle = random() * 2 * Math.PI
+  const ring = Math.floor(random() * 3) // 3 anneaux
+  const radius = 100 + ring * 80 // Rayons 100, 180, 260
+  
+  return {
+    x: Math.cos(angle) * radius,
+    y: Math.sin(angle) * radius
+  }
+}
+
+function applyStabilizedLayout(nodes, pivots, existingPositions) {
+  const positions = { ...existingPositions }
+  let pivotLocked = 0
+  let newNodes = 0
+  let totalMovement = 0
+  
+  // 1. Verrouiller les positions des pivots existants
+  for (const node of nodes) {
+    if (pivots.has(node.id) && positions[node.id]) {
+      node.x = positions[node.id].x
+      node.y = positions[node.id].y
+      pivotLocked++
+    } else if (positions[node.id]) {
+      // Nœud existant non-pivot : position actuelle + légère relaxation
+      node.x = positions[node.id].x
+      node.y = positions[node.id].y
+    } else {
+      // Nouveau nœud : position déterministe
+      const pos = generateDeterministicPosition(node.id, positions)
+      node.x = pos.x
+      node.y = pos.y
+      newNodes++
+    }
+    
+    // Sauvegarder la nouvelle position
+    if (!positions[node.id]) {
+      positions[node.id] = { x: node.x, y: node.y }
+    } else {
+      const oldPos = positions[node.id]
+      const movement = Math.sqrt((node.x - oldPos.x)**2 + (node.y - oldPos.y)**2)
+      if (!pivots.has(node.id)) {
+        totalMovement += movement
+      }
+      positions[node.id] = { x: node.x, y: node.y }
+    }
+  }
+  
+  return {
+    positions,
+    stats: {
+      pivotLocked,
+      newNodes,
+      avgMovement: totalMovement / Math.max(1, nodes.length - pivotLocked - newNodes)
+    }
+  }
+}
 
 async function main() {
   console.log('🔗 Construction du graphe des billets...')
+  
+  // Charger les données de stabilité
+  const pivots = await loadPivots()
+  const existingPositions = await loadPositions()
   
   const nodes = new Map() /** @type {Map<string, Node>} */
   const edges = new Set() /** @type {Set<string>} */
@@ -103,26 +202,44 @@ async function main() {
     nodes.set(id, { ...n, degree: degree.get(id) ?? 0 })
   }
 
-  // 3) Sauvegarde
+  // 3) Appliquer le layout stabilisé
+  const nodesList = [...nodes.values()]
+  const layoutResult = applyStabilizedLayout(nodesList, pivots, existingPositions)
+  
+  // 4) Sauvegarde du graphe avec positions
   const graph = { 
-    nodes: [...nodes.values()], 
+    nodes: nodesList, 
     edges: edgeList,
     metadata: {
       generatedAt: new Date().toISOString(),
       billetsCount: files.length,
       nodesCount: nodes.size,
-      edgesCount: edges.length
+      edgesCount: edges.length,
+      stability: {
+        pivotsLocked: layoutResult.stats.pivotLocked,
+        newNodes: layoutResult.stats.newNodes,
+        avgMovement: Math.round(layoutResult.stats.avgMovement * 100) / 100
+      }
     }
   }
   
+  // 5) Sauvegarder les positions pour le prochain build
   await fs.mkdir(path.dirname(OUT_PATH), { recursive: true })
   await fs.writeFile(OUT_PATH, JSON.stringify(graph, null, 2))
+  await fs.writeFile(POSITIONS_PATH, JSON.stringify(layoutResult.positions, null, 2))
   
   console.log(`✅ graph-billets.json généré →`)
   console.log(`   📄 ${files.length} billets analysés`)
   console.log(`   🔗 ${graph.nodes.length} nœuds, ${graph.edges.length} arêtes`)
   
-  // Statistiques intéressantes
+  // Statistiques de stabilité
+  const { stats } = layoutResult
+  console.log(`   📍 Stabilité: ${stats.pivotLocked} pivots verrouillés, ${stats.newNodes} nouveaux nœuds`)
+  if (stats.avgMovement > 0) {
+    console.log(`   🔄 Mouvement moyen: ${stats.avgMovement.toFixed(1)}px`)
+  }
+  
+  // Statistiques des degrés
   const degrees = [...nodes.values()].map(n => n.degree).sort((a, b) => b - a)
   if (degrees.length > 0) {
     console.log(`   📊 Degré max: ${degrees[0]}, médian: ${degrees[Math.floor(degrees.length/2)]}`)
