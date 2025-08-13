@@ -52,21 +52,19 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
   const miniGraphData = React.useMemo(() => {
     if (!graphData || !centerNodeId) return null
 
-    // Handle billet: prefix in centerNodeId
-    const cleanCenterNodeId = centerNodeId.startsWith('billet:') ? centerNodeId : `billet:${centerNodeId}`
-    const centerNode = graphData.nodes.find(n => n.id === cleanCenterNodeId)
+    const centerNode = graphData.nodes.find(n => n.id === centerNodeId)
     if (!centerNode) return null
 
     // Find connected nodes
-    const connectedNodeIds = new Set<string>([cleanCenterNodeId])
+    const connectedNodeIds = new Set<string>([centerNodeId])
     const relevantEdges: GraphEdge[] = []
 
     // Add direct connections
     graphData.edges.forEach(edge => {
-      if (edge.from === cleanCenterNodeId) {
+      if (edge.from === centerNodeId) {
         connectedNodeIds.add(edge.to)
         relevantEdges.push(edge)
-      } else if (edge.to === cleanCenterNodeId) {
+      } else if (edge.to === centerNodeId) {
         connectedNodeIds.add(edge.from)
         relevantEdges.push(edge)
       }
@@ -147,8 +145,7 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
 
         {/* Render nodes */}
         {miniGraphData.nodes.map((node) => {
-          const cleanCenterNodeId = centerNodeId?.startsWith('billet:') ? centerNodeId : `billet:${centerNodeId}`
-          const isCenter = node.id === cleanCenterNodeId
+          const isCenter = node.id === centerNodeId
           const nodeRadius = isCenter ? 6 : 4
           
           return (

@@ -55,7 +55,7 @@ async function buildSearchIndex() {
       const { data, content } = matter(raw)
       
       searchDocuments.push({
-        id: `billet-${slug}`,
+        id: `billet:${slug}`,
         type: 'billet',
         title: data.title || slug,
         content: content.substring(0, 2000), // Limite pour performances
@@ -101,7 +101,7 @@ async function buildSearchIndex() {
           
           if (cleanText) {
             searchDocuments.push({
-              id: `publication-${publication.id}`,
+              id: `publication:${publication.id}`,
               type: 'publication',
               title: publication.title,
               content: cleanText.substring(0, 5000), // Plus de contenu pour les PDF

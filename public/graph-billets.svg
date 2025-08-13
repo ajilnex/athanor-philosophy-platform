@@ -100,39 +100,39 @@
   
   <!-- Edges -->
   <g class="edges">
-    <line x1="988.9644828624279" y1="173.09235482221217" x2="923.182128912358" y2="191.12537957678404" 
+    <line x1="993.349324433424" y1="175.11710722716327" x2="910.6056990678464" y2="194.03278294486162" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.4"/>
-<line x1="771.584710463287" y1="203.5821147619092" x2="747.1746808561918" y2="232.2842456578499" 
+<line x1="765.8753554880329" y1="204.89986130780414" x2="736.9773600621596" y2="228.4946817466515" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.8"/>
-<line x1="771.584710463287" y1="203.5821147619092" x2="923.182128912358" y2="191.12537957678404" 
+<line x1="765.8753554880329" y1="204.89986130780414" x2="910.6056990678464" y2="194.03278294486162" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.8"/>
-<line x1="771.584710463287" y1="203.5821147619092" x2="604.9542299880259" y2="205.52401610144014" 
+<line x1="765.8753554880329" y1="204.89986130780414" x2="578.655941688366" y2="206.69377793812572" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.8"/>
-<line x1="454.00782708536974" y1="195.54357317244165" x2="339.56028351633773" y2="217.43512178035925" 
+<line x1="399.63960330821624" y1="193.79443265561275" x2="321.6476152285511" y2="219.503777336251" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.8"/>
-<line x1="454.00782708536974" y1="195.54357317244165" x2="604.9542299880259" y2="205.52401610144014" 
+<line x1="399.63960330821624" y1="193.79443265561275" x2="578.655941688366" y2="206.69377793812572" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.8"/>
-<line x1="214.37149873207588" y1="75.85266625177749" x2="211.03551713757216" y2="122.65185590005552" 
+<line x1="242.08193319102338" y1="80.0715001996806" x2="206.65067556657584" y2="134.8344804824675" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.8"/>
-<line x1="214.37149873207588" y1="75.85266625177749" x2="259.9784242209547" y2="180.08030042125006" 
+<line x1="242.08193319102338" y1="80.0715001996806" x2="343.48710233798795" y2="145.78628639577312" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.8"/>
-<line x1="408.0203326034123" y1="111.0379887900248" x2="406.64652996739824" y2="92.162662849751" 
+<line x1="416.7624369630684" y1="114.1558140419578" x2="223.5769918694631" y2="121.27227797008337" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.8"/>
-<line x1="408.0203326034123" y1="111.0379887900248" x2="214.37149873207588" y2="75.85266625177749" 
+<line x1="416.7624369630684" y1="114.1558140419578" x2="242.08193319102338" y2="80.0715001996806" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.8"/>
-<line x1="408.0203326034123" y1="111.0379887900248" x2="259.9784242209547" y2="180.08030042125006" 
+<line x1="416.7624369630684" y1="114.1558140419578" x2="343.48710233798795" y2="145.78628639577312" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.8"/>
-<line x1="259.9784242209547" y1="180.08030042125006" x2="406.64652996739824" y2="92.162662849751" 
+<line x1="343.48710233798795" y1="145.78628639577312" x2="223.5769918694631" y2="121.27227797008337" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.8"/>
-<line x1="259.9784242209547" y1="180.08030042125006" x2="211.03551713757216" y2="122.65185590005552" 
+<line x1="343.48710233798795" y1="145.78628639577312" x2="206.65067556657584" y2="134.8344804824675" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.8"/>
-<line x1="259.9784242209547" y1="180.08030042125006" x2="454.00782708536974" y2="195.54357317244165" 
+<line x1="343.48710233798795" y1="145.78628639577312" x2="399.63960330821624" y2="193.79443265561275" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.8"/>
-<line x1="849.6287244114014" y1="94.47632149321757" x2="874.353088821137" y2="67.71575434215008" 
+<line x1="841.536365552551" y1="98.54351199434485" x2="865.9377650839488" y2="71.50531825334848" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.5" opacity="0.8"/>
-<line x1="849.6287244114014" y1="94.47632149321757" x2="897.2970020280939" y2="104.85321761733185" 
+<line x1="841.536365552551" y1="98.54351199434485" x2="889.5527576732951" y2="108.36484399377558" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.5" opacity="0.8"/>
-<line x1="874.353088821137" y1="67.71575434215008" x2="897.2970020280939" y2="104.85321761733185" 
+<line x1="865.9377650839488" y1="71.50531825334848" x2="889.5527576732951" y2="108.36484399377558" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.8"/>
   </g>
   
@@ -140,7 +140,7 @@
   <g class="nodes">
     <g class="node-group-static tier-3">
                 <title>« note de push »</title>
-                <circle cx="988.9644828624279" cy="173.09235482221217" r="4" 
+                <circle cx="993.349324433424" cy="175.11710722716327" r="4" 
                            fill="hsl(220, 10%, 60%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
@@ -151,21 +151,21 @@
 <a href="/billets/dialectique-du-pomodoro" class="graph-link">
                 <g class="node-group tier-2" data-degree="2">
                   <title>dialectique-du-pomodoro (2 connexions)</title>
-                  <circle cx="923.182128912358" cy="191.12537957678404" r="18" 
+                  <circle cx="910.6056990678464" cy="194.03278294486162" r="18" 
                             fill="transparent" 
                             class="tap-area"/>
-                  <circle cx="923.182128912358" cy="191.12537957678404" r="12" 
+                  <circle cx="910.6056990678464" cy="194.03278294486162" r="12" 
                           fill="hsl(220, 15%, 20%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="923.182128912358" cy="191.12537957678404" r="6" 
+                  <circle cx="910.6056990678464" cy="194.03278294486162" r="6" 
                            fill="hsl(220, 15%, 20%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="923.182128912358" y="213.12537957678404" 
+                  <text x="910.6056990678464" y="216.03278294486162" 
                     text-anchor="middle" 
                     font-size="10" 
                     font-family="IBM Plex Serif, serif" 
@@ -182,21 +182,21 @@
 <a href="/billets/2025-08-04-premier-billet" class="graph-link">
                 <g class="node-group tier-1" data-degree="3">
                   <title>Premier billet - Test du système (3 connexions)</title>
-                  <circle cx="771.584710463287" cy="203.5821147619092" r="20" 
+                  <circle cx="765.8753554880329" cy="204.89986130780414" r="20" 
                             fill="transparent" 
                             class="tap-area"/>
-                  <circle cx="771.584710463287" cy="203.5821147619092" r="14" 
+                  <circle cx="765.8753554880329" cy="204.89986130780414" r="14" 
                           fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="771.584710463287" cy="203.5821147619092" r="8" 
+                  <circle cx="765.8753554880329" cy="204.89986130780414" r="8" 
                            fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="771.584710463287" y="229.5821147619092" 
+                  <text x="765.8753554880329" y="230.89986130780414" 
                     text-anchor="middle" 
                     font-size="12" 
                     font-family="IBM Plex Serif, serif" 
@@ -211,7 +211,7 @@
               </a>
 <g class="node-group-static tier-3">
                 <title>dialectique</title>
-                <circle cx="747.1746808561918" cy="232.2842456578499" r="4" 
+                <circle cx="736.9773600621596" cy="228.4946817466515" r="4" 
                            fill="hsl(220, 10%, 60%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
@@ -222,30 +222,29 @@
 <a href="/billets/philosophie-mobile" class="graph-link">
                 <g class="node-group tier-2" data-degree="2">
                   <title>philosophie-mobile (2 connexions)</title>
-                  <circle cx="604.9542299880259" cy="205.52401610144014" r="18" 
+                  <circle cx="578.655941688366" cy="206.69377793812572" r="18" 
                             fill="transparent" 
                             class="tap-area"/>
-                  <circle cx="604.9542299880259" cy="205.52401610144014" r="12" 
+                  <circle cx="578.655941688366" cy="206.69377793812572" r="12" 
                           fill="hsl(220, 15%, 20%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="604.9542299880259" cy="205.52401610144014" r="6" 
+                  <circle cx="578.655941688366" cy="206.69377793812572" r="6" 
                            fill="hsl(220, 15%, 20%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="604.9542299880259" y="227.52401610144014" 
+                  <text x="578.655941688366" y="228.69377793812572" 
                     text-anchor="middle" 
                     font-size="10" 
                     font-family="IBM Plex Serif, serif" 
                     fill="hsl(220, 15%, 20%)"
-                    class="node-label node-label-hover"
+                    class="node-label node-label-visible"
                     paint-order="stroke" 
                     stroke="hsl(220, 10%, 98%)" 
-                    stroke-width="3px"
-                    opacity="0">
+                    stroke-width="3px">
                     philosophie-mobile
                   </text>
                 </g>
@@ -253,21 +252,21 @@
 <a href="/billets/2025-08-05-dialectique-du-pomodoro" class="graph-link">
                 <g class="node-group tier-1" data-degree="3">
                   <title>Dialectique du Pomodoro (3 connexions)</title>
-                  <circle cx="454.00782708536974" cy="195.54357317244165" r="20" 
+                  <circle cx="399.63960330821624" cy="193.79443265561275" r="20" 
                             fill="transparent" 
                             class="tap-area"/>
-                  <circle cx="454.00782708536974" cy="195.54357317244165" r="14" 
+                  <circle cx="399.63960330821624" cy="193.79443265561275" r="14" 
                           fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="454.00782708536974" cy="195.54357317244165" r="8" 
+                  <circle cx="399.63960330821624" cy="193.79443265561275" r="8" 
                            fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="454.00782708536974" y="221.54357317244165" 
+                  <text x="399.63960330821624" y="219.79443265561275" 
                     text-anchor="middle" 
                     font-size="12" 
                     font-family="IBM Plex Serif, serif" 
@@ -282,7 +281,7 @@
               </a>
 <g class="node-group-static tier-3">
                 <title>technique-pomodoro</title>
-                <circle cx="339.56028351633773" cy="217.43512178035925" r="4" 
+                <circle cx="321.6476152285511" cy="219.503777336251" r="4" 
                            fill="hsl(220, 10%, 60%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
@@ -293,21 +292,21 @@
 <a href="/billets/2025-08-06-peirce-sellars" class="graph-link">
                 <g class="node-group tier-2" data-degree="2">
                   <title>BNF, rayon philosophie — Peirce &amp; les Sellars (étagère, fragments) (2 connexions)</title>
-                  <circle cx="211.03551713757216" cy="122.65185590005552" r="18" 
+                  <circle cx="206.65067556657584" cy="134.8344804824675" r="18" 
                             fill="transparent" 
                             class="tap-area"/>
-                  <circle cx="211.03551713757216" cy="122.65185590005552" r="12" 
+                  <circle cx="206.65067556657584" cy="134.8344804824675" r="12" 
                           fill="hsl(220, 15%, 20%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="211.03551713757216" cy="122.65185590005552" r="6" 
+                  <circle cx="206.65067556657584" cy="134.8344804824675" r="6" 
                            fill="hsl(220, 15%, 20%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="211.03551713757216" y="144.65185590005552" 
+                  <text x="206.65067556657584" y="156.8344804824675" 
                     text-anchor="middle" 
                     font-size="10" 
                     font-family="IBM Plex Serif, serif" 
@@ -324,21 +323,21 @@
 <a href="/billets/2025-08-06-resume-la-procedure-de-publication-dun-billet" class="graph-link">
                 <g class="node-group tier-2" data-degree="2">
                   <title>Résume la procédure de publication d&#39;un billet (2 connexions)</title>
-                  <circle cx="406.64652996739824" cy="92.162662849751" r="18" 
+                  <circle cx="223.5769918694631" cy="121.27227797008337" r="18" 
                             fill="transparent" 
                             class="tap-area"/>
-                  <circle cx="406.64652996739824" cy="92.162662849751" r="12" 
+                  <circle cx="223.5769918694631" cy="121.27227797008337" r="12" 
                           fill="hsl(220, 15%, 20%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="406.64652996739824" cy="92.162662849751" r="6" 
+                  <circle cx="223.5769918694631" cy="121.27227797008337" r="6" 
                            fill="hsl(220, 15%, 20%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="406.64652996739824" y="114.162662849751" 
+                  <text x="223.5769918694631" y="143.27227797008337" 
                     text-anchor="middle" 
                     font-size="10" 
                     font-family="IBM Plex Serif, serif" 
@@ -355,21 +354,21 @@
 <a href="/billets/2025-08-10-18-56-32-intelligence-and-spirit-negarestani" class="graph-link">
                 <g class="node-group tier-1" data-degree="3">
                   <title>Notes sur *Intelligence and Spirit* (Reza Negarestani) — continuité, apprentissage, esprit collectif (3 connexions)</title>
-                  <circle cx="214.37149873207588" cy="75.85266625177749" r="20" 
+                  <circle cx="242.08193319102338" cy="80.0715001996806" r="20" 
                             fill="transparent" 
                             class="tap-area"/>
-                  <circle cx="214.37149873207588" cy="75.85266625177749" r="14" 
+                  <circle cx="242.08193319102338" cy="80.0715001996806" r="14" 
                           fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="214.37149873207588" cy="75.85266625177749" r="8" 
+                  <circle cx="242.08193319102338" cy="80.0715001996806" r="8" 
                            fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="214.37149873207588" y="101.85266625177749" 
+                  <text x="242.08193319102338" y="106.0715001996806" 
                     text-anchor="middle" 
                     font-size="12" 
                     font-family="IBM Plex Serif, serif" 
@@ -385,21 +384,21 @@
 <a href="/billets/2025-08-10-iri-berkleid-sublime-bacteriologique" class="graph-link">
                 <g class="node-group tier-1" data-degree="5">
                   <title>2025-08-10-iri-berkleid-sublime-bacteriologique (5 connexions)</title>
-                  <circle cx="259.9784242209547" cy="180.08030042125006" r="20" 
+                  <circle cx="343.48710233798795" cy="145.78628639577312" r="20" 
                             fill="transparent" 
                             class="tap-area"/>
-                  <circle cx="259.9784242209547" cy="180.08030042125006" r="14" 
+                  <circle cx="343.48710233798795" cy="145.78628639577312" r="14" 
                           fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="259.9784242209547" cy="180.08030042125006" r="8" 
+                  <circle cx="343.48710233798795" cy="145.78628639577312" r="8" 
                            fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="259.9784242209547" y="206.08030042125006" 
+                  <text x="343.48710233798795" y="171.78628639577312" 
                     text-anchor="middle" 
                     font-size="12" 
                     font-family="IBM Plex Serif, serif" 
@@ -415,21 +414,21 @@
 <a href="/billets/2025-08-10-19-13-04-termd-a-termux-github-vercel-guide" class="graph-link">
                 <g class="node-group tier-1" data-degree="3">
                   <title>Publier un billet avec termd → Termux → GitHub → Vercel (procédure compacte) (3 connexions)</title>
-                  <circle cx="408.0203326034123" cy="111.0379887900248" r="20" 
+                  <circle cx="416.7624369630684" cy="114.1558140419578" r="20" 
                             fill="transparent" 
                             class="tap-area"/>
-                  <circle cx="408.0203326034123" cy="111.0379887900248" r="14" 
+                  <circle cx="416.7624369630684" cy="114.1558140419578" r="14" 
                           fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="408.0203326034123" cy="111.0379887900248" r="8" 
+                  <circle cx="416.7624369630684" cy="114.1558140419578" r="8" 
                            fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="408.0203326034123" y="137.0379887900248" 
+                  <text x="416.7624369630684" y="140.1558140419578" 
                     text-anchor="middle" 
                     font-size="12" 
                     font-family="IBM Plex Serif, serif" 
@@ -445,21 +444,21 @@
 <a href="/billets/alpha" class="graph-link">
                 <g class="node-group tier-1" data-degree="4">
                   <title>Alpha (4 connexions)</title>
-                  <circle cx="849.6287244114014" cy="94.47632149321757" r="20" 
+                  <circle cx="841.536365552551" cy="98.54351199434485" r="20" 
                             fill="transparent" 
                             class="tap-area"/>
-                  <circle cx="849.6287244114014" cy="94.47632149321757" r="14" 
+                  <circle cx="841.536365552551" cy="98.54351199434485" r="14" 
                           fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="849.6287244114014" cy="94.47632149321757" r="8" 
+                  <circle cx="841.536365552551" cy="98.54351199434485" r="8" 
                            fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="849.6287244114014" y="120.47632149321757" 
+                  <text x="841.536365552551" y="124.54351199434485" 
                     text-anchor="middle" 
                     font-size="12" 
                     font-family="IBM Plex Serif, serif" 
@@ -475,21 +474,21 @@
 <a href="/billets/beta" class="graph-link">
                 <g class="node-group tier-1" data-degree="3">
                   <title>beta (3 connexions)</title>
-                  <circle cx="874.353088821137" cy="67.71575434215008" r="20" 
+                  <circle cx="865.9377650839488" cy="71.50531825334848" r="20" 
                             fill="transparent" 
                             class="tap-area"/>
-                  <circle cx="874.353088821137" cy="67.71575434215008" r="14" 
+                  <circle cx="865.9377650839488" cy="71.50531825334848" r="14" 
                           fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="874.353088821137" cy="67.71575434215008" r="8" 
+                  <circle cx="865.9377650839488" cy="71.50531825334848" r="8" 
                            fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="874.353088821137" y="93.71575434215008" 
+                  <text x="865.9377650839488" y="97.50531825334848" 
                     text-anchor="middle" 
                     font-size="12" 
                     font-family="IBM Plex Serif, serif" 
@@ -505,21 +504,21 @@
 <a href="/billets/gamma" class="graph-link">
                 <g class="node-group tier-1" data-degree="3">
                   <title>gamma (3 connexions)</title>
-                  <circle cx="897.2970020280939" cy="104.85321761733185" r="20" 
+                  <circle cx="889.5527576732951" cy="108.36484399377558" r="20" 
                             fill="transparent" 
                             class="tap-area"/>
-                  <circle cx="897.2970020280939" cy="104.85321761733185" r="14" 
+                  <circle cx="889.5527576732951" cy="108.36484399377558" r="14" 
                           fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="897.2970020280939" cy="104.85321761733185" r="8" 
+                  <circle cx="889.5527576732951" cy="108.36484399377558" r="8" 
                            fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="897.2970020280939" y="130.85321761733184" 
+                  <text x="889.5527576732951" y="134.3648439937756" 
                     text-anchor="middle" 
                     font-size="12" 
                     font-family="IBM Plex Serif, serif" 
