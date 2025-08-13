@@ -12,8 +12,8 @@ interface GraphNode {
 }
 
 interface GraphEdge {
-  from: string
-  to: string
+  source: string
+  target: string
   weight?: number
 }
 
@@ -61,11 +61,11 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
 
     // Add direct connections
     graphData.edges.forEach(edge => {
-      if (edge.from === centerNodeId) {
-        connectedNodeIds.add(edge.to)
+      if (edge.source === centerNodeId) {
+        connectedNodeIds.add(edge.target)
         relevantEdges.push(edge)
-      } else if (edge.to === centerNodeId) {
-        connectedNodeIds.add(edge.from)
+      } else if (edge.target === centerNodeId) {
+        connectedNodeIds.add(edge.source)
         relevantEdges.push(edge)
       }
     })
@@ -79,7 +79,7 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
     const connectedArray = Array.from(connectedNodeIds)
     const limitedNodeIds = connectedArray.slice(0, maxNodes)
     const filteredEdges = relevantEdges.filter(
-      edge => limitedNodeIds.includes(edge.from) && limitedNodeIds.includes(edge.to)
+      edge => limitedNodeIds.includes(edge.source) && limitedNodeIds.includes(edge.target)
     )
 
     // Get corresponding nodes
@@ -125,8 +125,8 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
       >
         {/* Render edges */}
         {miniGraphData.edges.map((edge, index) => {
-          const fromNode = miniGraphData.nodes.find(n => n.id === edge.from)
-          const toNode = miniGraphData.nodes.find(n => n.id === edge.to)
+          const fromNode = miniGraphData.nodes.find(n => n.id === edge.source)
+          const toNode = miniGraphData.nodes.find(n => n.id === edge.target)
           if (!fromNode || !toNode) return null
 
           return (
@@ -146,7 +146,7 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
         {/* Render nodes */}
         {miniGraphData.nodes.map((node) => {
           const isCenter = node.id === centerNodeId
-          const nodeRadius = isCenter ? 6 : 4
+          const nodeRadius = isCenter ? 5 : 3.5
           
           return (
             <g key={node.id}>
@@ -163,9 +163,9 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
                   x={node.x}
                   y={node.y - 10}
                   textAnchor="middle"
-                  fontSize="8"
+                  fontSize="10"
                   fill="currentColor"
-                  className="text-subtle text-xs"
+                  className="text-subtle"
                 >
                   {node.label.length > 15 
                     ? node.label.substring(0, 12) + '...' 
