@@ -15,3 +15,7 @@ console.log('📝 Billets: Mode statique (pas de sync DB)');
 // Génération de l'index de recherche unifié
 console.log('🔍 Génération de l\'index de recherche...');
 execSync('node scripts/build-search-index.js', { stdio:'inherit' });
+
+// IMPORTANT: Lancer le build Next.js après la préparation des données
+console.log('🏗️ Lancement du build Next.js...');
+execSync('npx next build', { stdio:'inherit' });
