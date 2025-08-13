@@ -7,7 +7,7 @@ export default async function DebugAuthPage() {
   
   // Debug info côté serveur
   let dbUser = null
-  let accounts = []
+  let accounts: any[] = []
   
   if (session?.user?.email) {
     try {
