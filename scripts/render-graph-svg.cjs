@@ -56,7 +56,11 @@ function addTextMetrics(nodes, tiers) {
   return nodes.map(node => {
     const tier = getNodeTier(node.degree || 0, tiers)
     const fontSize = tier === 1 ? 12 : tier === 2 ? 10 : 8
-    const labelText = node.label.length > 25 ? node.label.substring(0, 25) + '…' : node.label
+    const MAX_LABEL_LENGTH = 25
+    let labelText = node.label
+    if (labelText.length > MAX_LABEL_LENGTH) {
+      labelText = labelText.substring(0, MAX_LABEL_LENGTH - 1) + '…'
+    }
     
     // Approximation robuste basée sur les caractéristiques d'IBM Plex Serif
     // Facteur d'ajustement pour serif fonts (plus larges que sans-serif)
@@ -279,6 +283,7 @@ function applyForceLayout(nodes, edges, iterations = 200) {
 function applyCollisionResolution(nodes, iterations = 50, padding = 20) {
   console.log('   🎭 Résolution des collisions de labels...')
   
+  // Phase 1: Try to resolve collisions by moving nodes
   for (let iter = 0; iter < iterations; iter++) {
     let hasCollisions = false
     
@@ -348,7 +353,44 @@ function applyCollisionResolution(nodes, iterations = 50, padding = 20) {
     }
   }
   
-  return nodes
+  // Phase 2: Intelligent pruning - hide labels that still collide
+  const visibleLabels = new Set(nodes.map(n => n.id))
+  
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const nodeA = nodes[i]
+      const nodeB = nodes[j]
+      
+      // Check if labels still overlap after movement
+      const boxA = {
+        x: nodeA.x - nodeA.labelWidth / 2,
+        y: nodeA.y + nodeA.nodeSize + 4,
+        width: nodeA.labelWidth,
+        height: nodeA.labelHeight
+      }
+      
+      const boxB = {
+        x: nodeB.x - nodeB.labelWidth / 2,
+        y: nodeB.y + nodeB.nodeSize + 4,
+        width: nodeB.labelWidth,
+        height: nodeB.labelHeight
+      }
+      
+      const overlapX = Math.max(0, Math.min(boxA.x + boxA.width, boxB.x + boxB.width) - Math.max(boxA.x, boxB.x))
+      const overlapY = Math.max(0, Math.min(boxA.y + boxA.height, boxB.y + boxB.height) - Math.max(boxA.y, boxB.y))
+      
+      if (overlapX > 0 && overlapY > 0) {
+        // Hide label of less important node (lower degree)
+        if ((nodeA.degree || 0) < (nodeB.degree || 0)) {
+          visibleLabels.delete(nodeA.id)
+        } else {
+          visibleLabels.delete(nodeB.id)
+        }
+      }
+    }
+  }
+  
+  return { finalNodes: nodes, visibleLabels }
 }
 
 /**
@@ -406,9 +448,9 @@ function filterLabelsAntiCollision(nodes, tiers) {
 /**
  * Generate SVG content
  */
-function generateSVG(nodes, edges, tiers) {
-  // Anti-collision: determine which nodes get visible labels
-  const nodesWithVisibleLabels = filterLabelsAntiCollision(nodes, tiers)
+function generateSVG(nodes, edges, tiers, visibleLabels = null) {
+  // Use provided visibleLabels or fallback to anti-collision filter
+  const nodesWithVisibleLabels = visibleLabels || filterLabelsAntiCollision(nodes, tiers)
   
   const defs = `
     <defs>
@@ -477,7 +519,11 @@ function generateSVG(nodes, edges, tiers) {
     const textSize = tier === 1 ? 12 : tier === 2 ? 10 : 8
     
     const isClickable = tier <= 2
-    const labelText = node.label.length > 25 ? node.label.substring(0, 25) + '…' : node.label
+    const MAX_LABEL_LENGTH = 25
+    let labelText = node.label
+    if (labelText.length > MAX_LABEL_LENGTH) {
+      labelText = labelText.substring(0, MAX_LABEL_LENGTH - 1) + '…'
+    }
     const hasVisibleLabel = nodesWithVisibleLabels.has(node.id)
     const isT2HoverLabel = tier === 2 && !hasVisibleLabel
     
@@ -678,11 +724,11 @@ async function main() {
     // Apply controlled elliptical layout with collision resolution (forme élégante horizontale)
     filteredNodes = applyEllipticalLayout(filteredNodes)
     filteredNodes = applyForceLayout(filteredNodes, filteredEdges, 200)
-    filteredNodes = applyCollisionResolution(filteredNodes) // Chorégraphie
-    filteredNodes = centerAndPadGraph(filteredNodes) // Centrage pondéré final
+    const { finalNodes, visibleLabels } = applyCollisionResolution(filteredNodes) // Chorégraphie
+    filteredNodes = centerAndPadGraph(finalNodes) // Centrage pondéré final
     
     // Generate SVG
-    const svgContent = generateSVG(filteredNodes, filteredEdges, tiers)
+    const svgContent = generateSVG(filteredNodes, filteredEdges, tiers, visibleLabels)
     
     // Write to file
     fs.writeFileSync(OUTPUT_SVG_PATH, svgContent, 'utf8')

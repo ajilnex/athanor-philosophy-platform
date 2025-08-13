@@ -48,44 +48,45 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
     loadGraphData()
   }, [])
 
-  // Generate mini graph focused on center node
+  // Generate linear horizontal graph layout
   const miniGraphData = React.useMemo(() => {
     if (!graphData || !centerNodeId) return null
-
+    
     const centerNode = graphData.nodes.find(n => n.id === centerNodeId)
     if (!centerNode) return null
 
-    // Find connected nodes
-    const connectedNodeIds = new Set<string>([centerNodeId])
-    const relevantEdges: GraphEdge[] = []
+    // Find direct neighbors
+    const neighbors = graphData.edges
+      .filter(e => e.source === centerNodeId || e.target === centerNodeId)
+      .map(e => (e.source === centerNodeId ? e.target : e.source))
+      .map(neighborId => graphData.nodes.find(n => n.id === neighborId))
+      .filter((node): node is GraphNode => node !== undefined)
+      .slice(0, maxNodes - 1)
 
-    // Add direct connections
-    graphData.edges.forEach(edge => {
-      if (edge.source === centerNodeId) {
-        connectedNodeIds.add(edge.target)
-        relevantEdges.push(edge)
-      } else if (edge.target === centerNodeId) {
-        connectedNodeIds.add(edge.source)
-        relevantEdges.push(edge)
-      }
+    if (neighbors.length === 0) return null // Don't show anything if no connections
+
+    // Linear horizontal layout
+    const nodes = [centerNode, ...neighbors]
+    const spacing = 200 // Generous spacing for readability
+    
+    // Center node at origin
+    centerNode.x = 0
+    centerNode.y = 0
+
+    // Place neighbors alternating left and right
+    neighbors.forEach((node, i) => {
+      const side = i % 2 === 0 ? 1 : -1 // Alternate right and left
+      const step = Math.ceil((i + 1) / 2)
+      node.x = side * step * spacing
+      node.y = 0 // All on the same horizontal line
     })
 
-    // If no connections, show just the center node
-    if (connectedNodeIds.size === 1) {
-      return { nodes: [centerNode], edges: [] }
+    return { 
+      nodes, 
+      edges: graphData.edges.filter(e => 
+        nodes.some(n => n.id === e.source) && nodes.some(n => n.id === e.target)
+      )
     }
-
-    // Limit to maxNodes (center + connections)
-    const connectedArray = Array.from(connectedNodeIds)
-    const limitedNodeIds = connectedArray.slice(0, maxNodes)
-    const filteredEdges = relevantEdges.filter(
-      edge => limitedNodeIds.includes(edge.source) && limitedNodeIds.includes(edge.target)
-    )
-
-    // Get corresponding nodes
-    const nodes = graphData.nodes.filter(n => limitedNodeIds.includes(n.id))
-
-    return { nodes, edges: filteredEdges }
   }, [graphData, centerNodeId, maxNodes])
 
   if (loading) {
@@ -107,21 +108,11 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
     )
   }
 
-  // Calculate SVG viewBox based on node positions
-  const padding = 20
-  const xs = miniGraphData.nodes.map(n => n.x)
-  const ys = miniGraphData.nodes.map(n => n.y)
-  const minX = Math.min(...xs) - padding
-  const maxX = Math.max(...xs) + padding
-  const minY = Math.min(...ys) - padding
-  const maxY = Math.max(...ys) + padding
-
   return (
-    <div className={`bg-background/50 rounded-lg border border-subtle/20 p-4 ${className}`}>
-      <h3 className="text-sm font-medium text-foreground mb-2">Graphe contextuel</h3>
+    <div className={`w-full ${className}`}>
       <svg
-        viewBox={`${minX} ${minY} ${maxX - minX} ${maxY - minY}`}
-        className="w-full h-32 border border-subtle/10 rounded"
+        viewBox="-500 -60 1000 120"
+        className="w-full h-full"
       >
         {/* Render edges */}
         {miniGraphData.edges.map((edge, index) => {
@@ -136,9 +127,9 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
               y1={fromNode.y}
               x2={toNode.x}
               y2={toNode.y}
-              stroke="currentColor"
-              strokeWidth="1"
-              className="text-subtle/40"
+              stroke="hsl(var(--foreground))"
+              strokeWidth="2.5"
+              opacity="0.5"
             />
           )
         })}
@@ -146,41 +137,68 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
         {/* Render nodes */}
         {miniGraphData.nodes.map((node) => {
           const isCenter = node.id === centerNodeId
-          const nodeRadius = isCenter ? 5 : 3.5
+          const nodeRadius = isCenter ? 8 : 6
+          const labelText = node.label.length > 25 
+            ? node.label.substring(0, 22) + '…' 
+            : node.label
           
           return (
             <g key={node.id}>
+              {/* Node halo for center node */}
+              {isCenter && (
+                <circle
+                  cx={node.x}
+                  cy={node.y}
+                  r={nodeRadius + 4}
+                  fill="hsl(var(--accent) / 0.15)"
+                  stroke="none"
+                />
+              )}
+              
+              {/* Main node */}
               <circle
                 cx={node.x}
                 cy={node.y}
                 r={nodeRadius}
-                fill="currentColor"
-                className={isCenter ? 'text-accent' : 'text-foreground/60'}
+                fill={isCenter ? 'hsl(var(--accent))' : 'hsl(var(--foreground))'}
+                stroke="hsl(var(--background))"
+                strokeWidth="2"
               />
-              {/* Node labels for small graphs */}
-              {miniGraphData.nodes.length <= 3 && (
-                <text
-                  x={node.x}
-                  y={node.y - 10}
-                  textAnchor="middle"
-                  fontSize="10"
-                  fill="currentColor"
-                  className="text-subtle"
-                >
-                  {node.label.length > 15 
-                    ? node.label.substring(0, 12) + '...' 
-                    : node.label
-                  }
-                </text>
-              )}
+              
+              {/* Node labels with maximum visibility */}
+              <text
+                x={node.x}
+                y={node.y - nodeRadius - 18}
+                textAnchor="middle"
+                fontSize="16"
+                fontWeight="500"
+                fontFamily="var(--font-serif)"
+                fill="hsl(var(--foreground))"
+                style={{ 
+                  userSelect: 'none',
+                  paintOrder: 'stroke',
+                  stroke: 'hsl(var(--background))',
+                  strokeWidth: '4px',
+                  strokeLinejoin: 'round'
+                }}
+              >
+                {labelText}
+              </text>
+
+              {/* Clickable area for navigation */}
+              <a href={node.url}>
+                <circle
+                  cx={node.x}
+                  cy={node.y}
+                  r={Math.max(nodeRadius + 12, 25)}
+                  fill="transparent"
+                  className="cursor-pointer hover:fill-black/5 transition-all"
+                />
+              </a>
             </g>
           )
         })}
       </svg>
-      
-      <div className="mt-2 text-xs text-subtle">
-        {miniGraphData.nodes.length} nœud{miniGraphData.nodes.length > 1 ? 's' : ''}, {miniGraphData.edges.length} lien{miniGraphData.edges.length > 1 ? 's' : ''}
-      </div>
     </div>
   )
 }

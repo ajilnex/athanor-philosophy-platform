@@ -31,8 +31,8 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-center px-4 sm:px-6">
       <main className="max-w-4xl w-full -mt-16">
-        {/* Graphe collé au header */}
-        <section className="w-full mb-1">
+        {/* Graphe avec espacement harmonieux */}
+        <section className="w-full max-w-4xl mx-auto mt-8 mb-12">
           <GraphSVG />
         </section>
 

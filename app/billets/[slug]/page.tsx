@@ -7,6 +7,7 @@ import { EditBilletButton } from '@/components/billets/EditBilletButton'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { MiniGraph } from '@/components/graph/MiniGraph'
 
 export async function generateStaticParams() {
   const slugs = await getBilletSlugs()
@@ -123,6 +124,16 @@ export default async function BilletPage({ params }: { params: { slug: string } 
       <article className="max-w-none">
         {await compileMDX(billet.content, billet.isMdx)}
       </article>
+
+      {/* Ligne de pensée */}
+      <section className="mt-16 pt-8 border-t border-subtle/20">
+        <div className="w-full max-w-4xl mx-auto h-40">
+          <MiniGraph 
+            centerNodeId={`billet:${params.slug}`} 
+            maxNodes={5}
+          />
+        </div>
+      </section>
 
       {/* Navigation */}
       <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-subtle">
