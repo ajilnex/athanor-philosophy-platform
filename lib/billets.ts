@@ -108,18 +108,9 @@ async function transformBacklinks(content: string): Promise<string> {
 
 export async function getAllBillets(): Promise<Billet[]> {
   // Billets = 100% statiques, toujours depuis le filesystem
-  const allBillets = await fsAll()
-  
-  // Filtrer les billets supprimés (dans le trash GitHub)
-  const activeBillets = []
-  for (const billet of allBillets) {
-    const isDeleted = await isFileInTrash(`content/billets/${billet.slug}.mdx`)
-    if (!isDeleted) {
-      activeBillets.push(billet)
-    }
-  }
-  
-  return activeBillets
+  // Note: La vérification du trash se fait uniquement au niveau des pages individuelles
+  // pour éviter trop d'appels API GitHub lors du listage
+  return fsAll()
 }
 
 export async function getBilletBySlug(slug: string) {
@@ -146,20 +137,10 @@ export async function getBilletBySlug(slug: string) {
 
 export async function getBilletSlugs(): Promise<string[]> {
   // Billets = 100% statiques, toujours depuis le filesystem
+  // Note: La vérification du trash se fait uniquement au niveau des pages individuelles
   try {
     const entries = await fs.readdir(CONTENT_DIR)
-    const allSlugs = entries.filter(f => f.toLowerCase().endsWith('.mdx')).map(slugFromFilename)
-    
-    // Filtrer les billets supprimés (dans le trash GitHub)
-    const activeSlugs = []
-    for (const slug of allSlugs) {
-      const isDeleted = await isFileInTrash(`content/billets/${slug}.mdx`)
-      if (!isDeleted) {
-        activeSlugs.push(slug)
-      }
-    }
-    
-    return activeSlugs
+    return entries.filter(f => f.toLowerCase().endsWith('.mdx')).map(slugFromFilename)
   } catch (e) {
     console.error('Error reading billet slugs from FS:', e)
     return []

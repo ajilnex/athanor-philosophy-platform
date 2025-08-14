@@ -3,6 +3,9 @@ import * as runtime from 'react/jsx-runtime'
 import { remark } from 'remark'
 import html from 'remark-html'
 import { BibliographyProvider } from '@/components/bibliography/BibliographyProvider'
+import { Cite } from '@/components/bibliography/Cite'
+import { Bibliography } from '@/components/bibliography/Bibliography'
+import { BibliographyIndex } from '@/components/bibliography/BibliographyIndex'
 
 // Composants MDX simplifiés directement dans ce fichier (pas de hook)
 const mdxComponents = {
@@ -42,6 +45,11 @@ const mdxComponents = {
   
   // Blockquotes
   blockquote: (props: any) => <blockquote className="border-l-4 border-gray-200 pl-4 my-4 italic text-subtle" {...props} />,
+  
+  // Composants personnalisés Athanor
+  Cite,
+  Bibliography,
+  BibliographyIndex,
 }
 
 // Compilateur mixte MDX/MD côté serveur avec support Next.js 15 natif
