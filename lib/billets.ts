@@ -101,7 +101,7 @@ async function transformBacklinks(content: string): Promise<string> {
     )
     const href = `/billets/${found ?? targetSlug}`
     const missing = !found
-    return `<a href="${href}" class="backlink" data-backlink="${linkText}" ${missing ? 'data-missing="true"' : ''}>${linkText}</a>`
+    return `<a href="${href}" className="backlink" data-backlink="${linkText}" ${missing ? 'data-missing="true"' : ''}>${linkText}</a>`
   })
 }
 
