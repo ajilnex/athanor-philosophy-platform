@@ -139,11 +139,11 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
       if (!originalNode || !originalLink) return
       
       const href = originalLink.getAttribute('href')
-      const originalCircle = originalNode.querySelector('circle')
+      const originalCircle = originalNode.querySelector('circle.node-main')
       const originalText = originalNode.querySelector('text')
       if (!originalCircle) return
       
-      // Copier exactement les attributs du nœud original
+      // Copier exactement les attributs du nœud principal
       const cx = originalCircle.getAttribute('cx')
       const cy = originalCircle.getAttribute('cy')
       const r = originalCircle.getAttribute('r')
@@ -164,7 +164,7 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
           <circle cx="${cx}" cy="${cy}" r="${parseFloat(r || '0') + 4}" 
                   fill="hsl(220, 90%, 55%)" opacity="0.3" filter="url(#clone-glow)"/>
           <circle cx="${cx}" cy="${cy}" r="${r}" 
-                  fill="hsl(220, 90%, 55%)" stroke="hsl(220, 10%, 98%)" stroke-width="2" opacity="1"/>
+                  fill="hsl(220, 90%, 55%)" stroke="${stroke || 'hsl(220, 10%, 98%)'}" stroke-width="${strokeWidth || '1'}" opacity="1"/>
           ${originalText ? `
           <text x="${textX}" y="${textY}" 
                 text-anchor="middle" font-size="${fontSize}" 
@@ -180,11 +180,13 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
       cloneElements.set(nodeId, cloneGroup)
       
       // Créer des clones des arêtes connectées
+      const edgesGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g')
       const neighbors = adjacencyMap.get(nodeId) || new Set()
+      
       neighbors.forEach(neighborId => {
         const neighborNode = svgElement.querySelector(`[data-id="${neighborId}"]`)
         if (neighborNode) {
-          const neighborCircle = neighborNode.querySelector('circle')
+          const neighborCircle = neighborNode.querySelector('circle.node-main')
           if (neighborCircle) {
             const neighborCx = parseFloat(neighborCircle.getAttribute('cx') || '0')
             const neighborCy = parseFloat(neighborCircle.getAttribute('cy') || '0')
@@ -196,21 +198,18 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
             edgeClone.setAttribute('x2', neighborCx.toString())
             edgeClone.setAttribute('y2', neighborCy.toString())
             edgeClone.setAttribute('stroke', 'hsl(220, 90%, 55%)')
-            edgeClone.setAttribute('stroke-width', '2')
-            edgeClone.setAttribute('opacity', '0.8')
-            edgeClone.setAttribute('stroke-dasharray', '5 5')
-            edgeClone.style.animation = 'dash 1.8s ease-in-out infinite'
+            edgeClone.setAttribute('stroke-width', '1')
+            edgeClone.setAttribute('opacity', '0.4')
             
-            overlayElement.appendChild(edgeClone)
-            
-            // Stocker pour suppression
-            if (!cloneElements.has(`${nodeId}-edges`)) {
-              cloneElements.set(`${nodeId}-edges`, document.createElementNS('http://www.w3.org/2000/svg', 'g'))
-            }
-            cloneElements.get(`${nodeId}-edges`)?.appendChild(edgeClone)
+            edgesGroup.appendChild(edgeClone)
           }
         }
       })
+      
+      if (edgesGroup.children.length > 0) {
+        overlayElement.appendChild(edgesGroup)
+        cloneElements.set(`${nodeId}-edges`, edgesGroup)
+      }
     }
 
     function removeClone(nodeId: string) {
@@ -222,13 +221,8 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
       
       // Supprimer les clones d'arêtes
       const edgesGroup = cloneElements.get(`${nodeId}-edges`)
-      if (edgesGroup) {
-        const edges = edgesGroup.childNodes
-        edges.forEach(edge => {
-          if (edge.parentNode === overlayElement) {
-            overlayElement.removeChild(edge)
-          }
-        })
+      if (edgesGroup && edgesGroup.parentNode) {
+        overlayElement.removeChild(edgesGroup)
         cloneElements.delete(`${nodeId}-edges`)
       }
       

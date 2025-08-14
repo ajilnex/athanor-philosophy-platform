@@ -40,14 +40,14 @@ export function Navbar() {
           {session ? (
             <button 
               onClick={handleSignOut}
-              className="px-3 py-1.5 text-sm font-light bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+              className="px-3 py-1.5 text-sm font-light bg-slate-900/90 hover:bg-slate-800/95 text-slate-50 rounded-md transition-all duration-200 border border-slate-700/30 backdrop-blur-sm"
             >
               Se déconnecter
             </button>
           ) : (
             <Link
               href="/auth/signin"
-              className="px-3 py-1.5 text-sm font-light bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+              className="px-3 py-1.5 text-sm font-light bg-slate-900/90 hover:bg-slate-800/95 text-slate-50 rounded-md transition-all duration-200 border border-slate-700/30 backdrop-blur-sm"
             >
               Connexion
             </Link>

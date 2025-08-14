@@ -57,7 +57,7 @@ export default async function HomePage() {
 
           {/* Maison d'édition */}
           <div className="my-12 text-center">
-            <Link href="/edition" className="inline-flex items-center px-6 py-3 glass hover:bg-background/45 rounded-lg text-foreground transition-all duration-200 font-light">
+            <Link href="/edition" className="inline-flex items-center px-6 py-3 bg-slate-900/90 hover:bg-slate-800/95 rounded-lg text-slate-50 transition-all duration-200 font-light border border-slate-700/30 backdrop-blur-sm">
               Maison d'édition
             </Link>
           </div>

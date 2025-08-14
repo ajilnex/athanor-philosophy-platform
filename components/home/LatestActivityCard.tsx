@@ -8,7 +8,7 @@ export function LatestActivityCard({ billet }: { billet: Billet }) {
       <h2 className="font-serif text-lg text-subtle mb-3 text-center">Activité récente</h2>
       <Link 
         href={`/billets/${billet.slug}`} 
-        className="block p-4 group transition-all duration-300"
+        className="block p-4 group transition-all duration-300 bg-background/95 backdrop-blur-sm rounded-lg border border-subtle/10"
       >
         <div className="flex justify-between items-center">
           <div>
@@ -28,7 +28,7 @@ export function LatestActivityCard({ billet }: { billet: Billet }) {
             <p className="text-sm text-foreground/70 font-light">
               {billet.excerpt}
             </p>
-            <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-background/80 to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
           </div>
         )}
       </Link>
