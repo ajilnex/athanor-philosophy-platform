@@ -1,0 +1,60 @@
+---
+created: 2025-08-08T09:30:35+02:00
+modified: 2025-08-08T09:30:39+02:00
+---
+
+---
+title: "Collaborer sur Athanor au format .mdx : feuille de route pour une implementation future"
+tags: [mdx, tina-cms, collaboration, architecture, philosophie, cloudinary]
+---
+
+*Athanor* s’est d’abord présenté comme un site de publication philosophique fondé sur des fichiers Markdown, stockés localement, versionnés par Git, déployés automatiquement via Vercel. Le choix du Markdown (.md) garantissait la simplicité, la pérennité, l’indexabilité, et l’édition hors-ligne. Mais le site évolue désormais vers une ambition plus vaste : offrir un véritable environnement d’édition collaborative et réflexive en ligne.
+
+**Objectif :**  
+Transformer *Athanor* en plateforme d’écriture partagée, où chacun peut contribuer à des textes philosophiques — ajout, édition, insertion d’images — dans une logique d’hospitalité intellectuelle, sans sacrifier la rigueur technique.
+
+## Feuille de route technique
+
+1. **Adoption du format .mdx**  
+   Le format `.mdx` permet de mêler Markdown et composants React. Cela autorise, par exemple :
+   - l’ajout d’éléments interactifs (note flottante, citation dynamique) ;
+   - l’insertion directe de composants de mise en forme ou de logique ;
+   - une plus grande expressivité sémantique et visuelle.
+
+2. **Édition en ligne avec TinaCMS**  
+   TinaCMS permet une édition *in situ* (dans le site), directement depuis l’interface. L’idée :
+   - les fichiers `.mdx` restent dans Git ;
+   - l’édition déclenche un commit ;
+   - pas de base de données pour les billets eux-mêmes : le texte reste versionné ;
+   - on conserve la logique de build static + API ISR.
+
+3. **Images hébergées sur Cloudinary**  
+   Déjà utilisé pour les PDF, Cloudinary servira aussi à :
+   - héberger les images insérées dans les billets ;
+   - générer les liens automatiquement au moment de l’upload ;
+   - afficher des images optimisées (responsive, lazy-loaded, etc.).
+
+4. **Interface graphique d’upload**  
+   Pour garantir l’accessibilité à tous :
+   - un bouton “Ajouter une image” dans l’éditeur ;
+   - drag’n’drop, recadrage, preview ;
+   - format d’insertion `![légende](url)` généré automatiquement.
+
+## Modifications requises dans l’architecture actuelle
+
+- Remplacer `gray-matter` par un parser `.mdx` (par exemple `next-mdx-remote` ou `@next/mdx`).
+- Adapter la page `[slug]` pour rendre du MDX dynamique (avec `useMDXComponent`).
+- Ajouter un bouton “Éditer ce billet” menant à TinaCMS (avec authentification basique).
+- Séparer le front public et l’interface de rédaction (deux layouts).
+- Permettre à TinaCMS d’écrire dans le dossier `content/billets/` (via GitHub ou Git local si self-hosté).
+- Maintenir le script de migration Prisma (si besoin de persistance secondaire, indexation, moteur de recherche…).
+
+## Vision
+
+Athanor devient un espace de dialogue philosophique incarné :  
+les billets ne sont plus figés mais *exposés à l’altération*, comme dans un palimpseste numérique. La combinaison de `.mdx`, de TinaCMS et d’une architecture Git-first garantit à la fois traçabilité, ouverture et sobriété technique.
+
+Ce dispositif vise une communauté de pensée plus qu’un réseau social :  
+il s’adresse aux lecteurs qui deviennent écrivains, aux écrivains qui acceptent d’être corrigés, à ceux qui voient dans le Markdown non un appauvrissement, mais un médium de clarté conceptuelle.
+
+Le chantier est ouvert. La matière est là.
