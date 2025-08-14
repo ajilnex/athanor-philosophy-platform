@@ -1,20 +1,13 @@
 'use client'
 
-import { useState, useRef, useMemo } from 'react'
-import { X, Save, Image as ImageIcon, GraduationCap } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { X, Save, Image as ImageIcon, GraduationCap, Bold, Italic, Heading, Quote, List, ListOrdered, Link, Minus } from 'lucide-react'
 import { ImageUpload } from './ImageUpload'
 import { ShimmerButton } from '@/components/ui/ShimmerButton'
 import { CitationPicker } from '@/components/editor/CitationPicker'
-import dynamic from 'next/dynamic'
-
-// Import dynamique pour éviter les problèmes SSR
-const SimpleMdeEditor = dynamic(() => import('react-simplemde-editor'), {
-  ssr: false,
-  loading: () => <div className="w-full min-h-[400px] bg-gray-100 animate-pulse rounded-md" />
-})
-
-// Import des styles CSS
-import 'easymde/dist/easymde.min.css'
+import CodeMirror from '@uiw/react-codemirror'
+import { markdown } from '@codemirror/lang-markdown'
+import { EditorView } from '@codemirror/view'
 
 interface BilletEditorProps {
   isOpen: boolean
@@ -94,33 +87,37 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
     setShowCitationPicker(false)
   }
 
-  // Configuration de l'éditeur SimpleMDE
-  const editorOptions = useMemo(() => {
-    return {
-      spellChecker: false,
-      status: false,
-      toolbar: [
-        'bold', 'italic', 'heading', '|',
-        'quote', 'unordered-list', 'ordered-list', '|',
-        'link', 'horizontal-rule', '|',
-        {
-          name: 'insertImage',
-          action: () => setShowImageUpload(true),
-          className: 'fa fa-picture-o',
-          title: 'Insérer une image via Cloudinary',
-        } as any,
-        {
-          name: 'insertCitation',
-          action: () => setShowCitationPicker(true),
-          className: 'fa fa-graduation-cap',
-          title: 'Insérer une citation Zotero',
-        } as any,
-        '|',
-        'preview', 'side-by-side', 'fullscreen'
-      ] as any,
-      placeholder: '# Votre billet en Markdown\n\nÉcrivez votre contenu ici...\n\nVous pouvez utiliser la **syntaxe Markdown** et insérer des images et citations avec la barre d\'outils.',
-    }
-  }, [])
+  // Configuration CodeMirror
+  const extensions = [
+    markdown(),
+    EditorView.lineWrapping,
+    EditorView.theme({
+      '&': { fontSize: '14px' },
+      '.cm-content': { padding: '16px', minHeight: '400px' },
+      '.cm-focused': { outline: 'none' },
+      '.cm-editor': { borderRadius: '8px' }
+    })
+  ]
+
+  // Actions toolbar
+  const insertMarkdown = (before: string, after: string = '') => {
+    const selection = window.getSelection()?.toString() || ''
+    const newText = before + selection + after
+    const cursorPos = content.length
+    const newContent = content.substring(0, cursorPos) + newText + content.substring(cursorPos)
+    setContent(newContent)
+  }
+
+  const toolbarActions = [
+    { icon: Bold, action: () => insertMarkdown('**', '**'), title: 'Gras' },
+    { icon: Italic, action: () => insertMarkdown('*', '*'), title: 'Italique' },
+    { icon: Heading, action: () => insertMarkdown('## '), title: 'Titre' },
+    { icon: Quote, action: () => insertMarkdown('> '), title: 'Citation' },
+    { icon: List, action: () => insertMarkdown('- '), title: 'Liste' },
+    { icon: ListOrdered, action: () => insertMarkdown('1. '), title: 'Liste numérotée' },
+    { icon: Link, action: () => insertMarkdown('[', '](url)'), title: 'Lien' },
+    { icon: Minus, action: () => insertMarkdown('\n---\n'), title: 'Ligne horizontale' },
+  ]
 
   const handleSave = async () => {
     if (!title.trim() || !content.trim()) {
@@ -260,12 +257,49 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
               </label>
               
               <div className="border border-gray-300 rounded-md overflow-hidden">
-                <SimpleMdeEditor
+                {/* Toolbar personnalisée */}
+                <div className="flex items-center gap-1 p-2 bg-gray-50 border-b border-gray-200">
+                  {toolbarActions.map((action, index) => (
+                    <button
+                      key={index}
+                      onClick={action.action}
+                      title={action.title}
+                      className="p-2 rounded hover:bg-gray-200 transition-colors"
+                      type="button"
+                    >
+                      <action.icon className="h-4 w-4" />
+                    </button>
+                  ))}
+                  <div className="w-px h-6 bg-gray-300 mx-1" />
+                  <button
+                    onClick={() => setShowImageUpload(true)}
+                    title="Insérer une image"
+                    className="p-2 rounded hover:bg-gray-200 transition-colors"
+                    type="button"
+                  >
+                    <ImageIcon className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setShowCitationPicker(true)}
+                    title="Insérer une citation"
+                    className="p-2 rounded hover:bg-gray-200 transition-colors"
+                    type="button"
+                  >
+                    <GraduationCap className="h-4 w-4" />
+                  </button>
+                </div>
+
+                {/* Éditeur CodeMirror */}
+                <CodeMirror
                   ref={editorRef}
                   value={content}
-                  onChange={setContent}
-                  options={editorOptions}
-                  className="[&_.editor-toolbar]:bg-gray-100 [&_.CodeMirror]:min-h-[400px] [&_.CodeMirror]:font-mono [&_.CodeMirror]:text-sm"
+                  onChange={(value) => setContent(value)}
+                  extensions={extensions}
+                  placeholder="# Votre billet en Markdown
+
+Écrivez votre contenu ici...
+
+Vous pouvez utiliser la **syntaxe Markdown** et insérer des images et citations avec la barre d'outils."
                 />
               </div>
             </div>

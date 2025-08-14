@@ -6,7 +6,14 @@ const { execSync } = require('node:child_process');
 const isProd = (process.env.VERCEL_ENV === 'production') || (process.env.NODE_ENV === 'production');
 
 execSync('npx prisma generate', { stdio:'inherit' });
-execSync('npx prisma db push --accept-data-loss', { stdio:'inherit' });
+
+// SÉCURITÉ: Ne jamais exécuter db push en production (risque de perte de données)
+if (!isProd) {
+  execSync('npx prisma db push --accept-data-loss', { stdio:'inherit' });
+  console.log('🗄️ Base de données synchronisée (dev/staging)');
+} else {
+  console.log('🛡️ Production détectée: prisma db push ignoré pour la sécurité');
+}
 
 // NOTE: Billets sont maintenant 100% statiques (filesystem uniquement)
 // La synchronisation DB a été désactivée pour éviter les conflits

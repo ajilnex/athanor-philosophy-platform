@@ -36,6 +36,110 @@
 }
 
 @layer components {
+  /* UI Verre - Utilitaire glass */
+  .glass {
+    @apply bg-background/35 backdrop-blur-md border border-white/10;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  }
+  
+  .glass-light {
+    @apply bg-background/25 backdrop-blur-sm border border-white/10;
+  }
+  
+  /* Constellation intégrée v2 - Budget opacité global */
+  .interactive-graph-background {
+    opacity: 0.8;
+    transition: opacity 0.6s ease;
+  }
+  
+  .interactive-graph-background .node-main {
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+  }
+  
+  .interactive-graph-background .node-label {
+    opacity: 0.35;
+  }
+  
+  .interactive-graph-background .edge {
+    opacity: 0.25;
+  }
+  
+  /* Overlay clones */
+  .interactive-graph-overlay {
+    z-index: 1;
+  }
+  
+  /* Supprimer les soulignements sur les liens SVG */
+  .interactive-graph-overlay a,
+  .interactive-graph-background a {
+    text-decoration: none !important;
+  }
+  
+  .interactive-graph-overlay a:hover,
+  .interactive-graph-background a:hover {
+    text-decoration: none !important;
+  }
+  
+  /* Constellation intégrée - Animations et états */
+  @keyframes dash {
+    from { stroke-dashoffset: 10; }
+    to { stroke-dashoffset: 0; }
+  }
+  
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.02; }
+    50% { opacity: 0.08; }
+  }
+  
+  /* Zone de frappe invisible sur fond */
+  .interactive-graph-background .node-hit {
+    opacity: 0;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  
+  .interactive-graph-background .node-hit:focus {
+    opacity: 0.05;
+    outline: 2px solid hsl(var(--accent));
+    outline-offset: 2px;
+  }
+  
+  /* États voisinage sur fond */
+  .interactive-graph-background [data-id].neighbor .node-main {
+    opacity: 0.45;
+    transform: scale(1.05);
+  }
+  
+  /* Arêtes actives sur fond */
+  .interactive-graph-background .edge.neighbor-active {
+    opacity: 0.25;
+    stroke-width: 2;
+    stroke-dasharray: 5 5;
+    animation: dash 1.8s ease-in-out infinite;
+  }
+  
+  /* Twinkles subtils pour signaler la présence */
+  @media (prefers-reduced-motion: no-preference) {
+    .interactive-graph .node-main:nth-child(3n) {
+      animation: twinkle 8s ease-in-out infinite;
+      animation-delay: 0s;
+    }
+    
+    .interactive-graph .node-main:nth-child(5n) {
+      animation: twinkle 12s ease-in-out infinite;
+      animation-delay: 4s;
+    }
+  }
+  
+  /* Désactivation pour préférence mouvement réduit */
+  @media (prefers-reduced-motion: reduce) {
+    .interactive-graph * {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
   .btn {
     @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all duration-200;
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background;
@@ -59,17 +163,12 @@
   }
 
   .search-input {
-    @apply bg-background/50 text-foreground rounded-full outline-none
-           transition-all duration-300 backdrop-blur-sm shadow-sm;
-    border: 1px solid;
-    border-image-source: linear-gradient(to right, hsl(var(--subtle) / 0.5), hsl(var(--subtle) / 0.1));
-    border-image-slice: 1;
-    border-right-color: transparent; /* Force la bordure droite à disparaître */
+    @apply glass text-foreground rounded-full outline-none
+           transition-all duration-300;
   }
   .search-input:focus {
     @apply ring-2 ring-accent/50;
-    border-image-source: linear-gradient(to right, hsl(var(--accent) / 0.8), hsl(var(--accent) / 0.3));
-    border-right-color: hsl(var(--accent) / 0.3);
+    border-color: hsl(var(--accent) / 0.4);
   }
 
   /* Styles pour les backlinks [[mot]] */

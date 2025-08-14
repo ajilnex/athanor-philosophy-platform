@@ -7,6 +7,7 @@ const matter = require('gray-matter')
 const crypto = require('crypto')
 
 const BILLETS_DIR = path.join(process.cwd(), 'content', 'billets')
+const TRASH_DIR = path.join(process.cwd(), 'content', 'trash')
 const OUT_PATH = path.join(process.cwd(), 'public', 'graph-billets.json')
 const PIVOTS_PATH = path.join(process.cwd(), 'data', 'graph-pivots.json')
 const POSITIONS_PATH = path.join(process.cwd(), 'public', 'graph-positions.json')
@@ -110,7 +111,22 @@ function applyStabilizedLayout(nodes, pivots, existingPositions) {
 async function loadTrashedSlugs() {
   try {
     const trashFiles = (await fs.readdir(TRASH_DIR)).filter(f => f.endsWith('.mdx'))
-    return new Set(trashFiles.map(f => f.replace(/\.mdx$/, '')))
+    const trashedSlugs = new Set()
+    
+    // Pour chaque fichier trash, extraire tous les slugs possibles
+    for (const file of trashFiles) {
+      const fullSlug = file.replace(/\.mdx$/, '')
+      trashedSlugs.add(fullSlug)
+      
+      // Extraire aussi le titre/slug sans date si c'est un format daté
+      const withoutDate = fullSlug.replace(/^\d{4}-\d{2}-\d{2}-/, '')
+      if (withoutDate !== fullSlug) {
+        trashedSlugs.add(withoutDate)
+      }
+    }
+    
+    console.log(`   🗑️  Billets trash détectés: ${Array.from(trashedSlugs).join(', ')}`)
+    return trashedSlugs
   } catch (e) {
     console.log('   📄 Aucun billet supprimé trouvé dans trash')
     return new Set()
@@ -124,10 +140,6 @@ async function main() {
   const pivots = await loadPivots()
   const existingPositions = await loadPositions()
   const trashedSlugs = await loadTrashedSlugs()
-  
-  if (trashedSlugs.size > 0) {
-    console.log(`   🗑️  ${trashedSlugs.size} billets dans trash à exclure`)
-  }
   
   const nodes = new Map() /** @type {Map<string, Node>} */
   const edges = new Set() /** @type {Set<string>} */
@@ -147,6 +159,12 @@ async function main() {
     const slug = file.replace(/\.mdx$/, '')
     const raw = await fs.readFile(path.join(BILLETS_DIR, file), 'utf8')
     const { content, data } = matter(raw)
+
+    // Skip si sealed: true
+    if (data.sealed === true) {
+      console.log(`   🔒 Billet scellé ignoré: ${file}`)
+      continue
+    }
 
     const me = `billet:${slug}`
     if (!nodes.has(me)) {

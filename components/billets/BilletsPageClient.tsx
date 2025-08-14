@@ -16,7 +16,7 @@ export function BilletsPageClient({ initialBillets }: BilletsPageClientProps) {
   const [showEditor, setShowEditor] = useState(false)
   const [billets, setBillets] = useState(initialBillets)
   
-  const isAdmin = session?.user?.role === 'admin'
+  const isAdmin = (session?.user as any)?.role === 'ADMIN'
 
   const handleCreateBillet = async (data: any) => {
     try {
@@ -74,6 +74,7 @@ export function BilletsPageClient({ initialBillets }: BilletsPageClientProps) {
         isOpen={showEditor}
         onClose={() => setShowEditor(false)}
         mode="create"
+        userRole={isAdmin ? 'ADMIN' : 'USER'}
         onSave={handleCreateBillet}
       />
     </>

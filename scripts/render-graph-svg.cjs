@@ -7,10 +7,10 @@ const path = require('path')
 const GRAPH_JSON_PATH = path.join(process.cwd(), 'public', 'graph-billets.json')
 const OUTPUT_SVG_PATH = path.join(process.cwd(), 'public', 'graph-billets.svg')
 
-// SVG dimensions - Format rectangulaire ultra-compact
-const SVG_WIDTH = 1200
-const SVG_HEIGHT = 300  // Format ultra-compact pour coller au header
-const MARGIN = 40       // Marge minimale pour plus de compacité
+// SVG dimensions - Plein écran dynamique
+const SVG_WIDTH = 1440   // Ratio desktop standard
+const SVG_HEIGHT = 820   // Format plein écran pour constellation
+const VIEWPORT_MARGIN = 0.08  // 8% de marge pour bbox scaling
 
 // Palette cohérente avec le site (valeurs HSL de globals.css)
 const COLOR_FOREGROUND = 'hsl(220, 15%, 20%)'  // Texte principal
@@ -42,11 +42,11 @@ function getNodeTier(degree, tiers) {
 }
 
 /**
- * Get node visual size based on degree
+ * Get node visual size based on degree (v2 scaling)
  */
 function getNodeSize(degree, tiers) {
   const tier = getNodeTier(degree, tiers)
-  return tier === 1 ? 8 : tier === 2 ? 6 : 4
+  return tier === 1 ? 11 : tier === 2 ? 7 : 4
 }
 
 /**
@@ -55,7 +55,7 @@ function getNodeSize(degree, tiers) {
 function addTextMetrics(nodes, tiers) {
   return nodes.map(node => {
     const tier = getNodeTier(node.degree || 0, tiers)
-    const fontSize = tier === 1 ? 12 : tier === 2 ? 10 : 8
+    const fontSize = tier === 1 ? 14 : tier === 2 ? 11 : 8
     const MAX_LABEL_LENGTH = 25
     let labelText = node.label
     if (labelText.length > MAX_LABEL_LENGTH) {
@@ -80,25 +80,26 @@ function addTextMetrics(nodes, tiers) {
 }
 
 /**
- * Elliptical layout for elegant horizontal composition
+ * Golden angle pivots for stable constellation
  */
-function applyEllipticalLayout(nodes) {
+function applyGoldenAnglePivots(nodes) {
   const centerX = SVG_WIDTH / 2
   const centerY = SVG_HEIGHT / 2
-  const radiusX = (SVG_WIDTH - 2 * MARGIN) / 2.5  // Ellipse horizontale large
-  const radiusY = (SVG_HEIGHT - 2 * MARGIN) / 3   // Plus compacte verticalement
+  const goldenAngle = Math.PI * (3 - Math.sqrt(5)) // ~137.5°
+  
+  // Amplitude augmentée +35% pour plein écran
+  const radiusX = (SVG_WIDTH * 0.35)  // 35% du viewport width
+  const radiusY = (SVG_HEIGHT * 0.32) // 32% du viewport height
   
   return nodes.map((node, i) => {
-    const angle = (i / nodes.length) * 2 * Math.PI
-    // Ajout de variation aléatoire légère pour naturel
-    const variation = 0.15
-    const radiusVariationX = radiusX * (1 + (Math.random() - 0.5) * variation)
-    const radiusVariationY = radiusY * (1 + (Math.random() - 0.5) * variation)
+    // Pivots déterministes avec golden angle
+    const angle = i * goldenAngle
+    const radius = Math.sqrt(i / nodes.length) // Distribution radiale uniforme
     
     return {
       ...node,
-      x: centerX + Math.cos(angle) * radiusVariationX,
-      y: centerY + Math.sin(angle) * radiusVariationY
+      x: centerX + Math.cos(angle) * radiusX * radius,
+      y: centerY + Math.sin(angle) * radiusY * radius
     }
   })
 }
@@ -163,42 +164,38 @@ function applyPersistentPositions(nodes) {
 }
 
 /**
- * Center the graph on the most central node and apply padding
+ * Bbox scaling to fill 90-92% of viewport
  */
-function centerAndPadGraph(nodes) {
+function applyBboxScaling(nodes) {
   if (nodes.length === 0) return nodes
   
-  // Find the most central node (highest degree)
-  const centralNode = nodes.reduce((max, node) => 
-    (node.degree || 0) > (max.degree || 0) ? node : max
-  )
-  
-  // Calculate bounds
+  // Calculate current bounding box
   const minX = Math.min(...nodes.map(n => n.x))
   const maxX = Math.max(...nodes.map(n => n.x))
   const minY = Math.min(...nodes.map(n => n.y))
   const maxY = Math.max(...nodes.map(n => n.y))
   
+  const currentWidth = maxX - minX
+  const currentHeight = maxY - minY
   const currentCenterX = (minX + maxX) / 2
   const currentCenterY = (minY + maxY) / 2
   
-  // Desired center (bias toward central node but not too extreme)
+  // Target dimensions: 90-92% of viewport with margin
+  const targetMargin = SVG_WIDTH * VIEWPORT_MARGIN
+  const targetWidth = SVG_WIDTH - 2 * targetMargin
+  const targetHeight = SVG_HEIGHT - 2 * targetMargin
   const targetCenterX = SVG_WIDTH / 2
   const targetCenterY = SVG_HEIGHT / 2
   
-  // Offset to center the graph better
-  const offsetX = targetCenterX - currentCenterX
-  const offsetY = targetCenterY - currentCenterY
-  
-  // Apply centering and padding (6% margin)
-  const padding = Math.min(SVG_WIDTH, SVG_HEIGHT) * 0.06
-  const workingWidth = SVG_WIDTH - 2 * padding
-  const workingHeight = SVG_HEIGHT - 2 * padding
+  // Calculate scaling factors
+  const scaleX = currentWidth > 0 ? targetWidth / currentWidth : 1
+  const scaleY = currentHeight > 0 ? targetHeight / currentHeight : 1
+  const scale = Math.min(scaleX, scaleY) * 0.91 // 91% fill factor
   
   return nodes.map(node => ({
     ...node,
-    x: padding + ((node.x + offsetX - padding) * workingWidth) / (SVG_WIDTH - 2 * padding),
-    y: padding + ((node.y + offsetY - padding) * workingHeight) / (SVG_HEIGHT - 2 * padding)
+    x: targetCenterX + (node.x - currentCenterX) * scale,
+    y: targetCenterY + (node.y - currentCenterY) * scale
   }))
 }
 
@@ -222,8 +219,8 @@ function applyForceLayout(nodes, edges, iterations = 200) {
         const dy = nodeB.y - nodeA.y
         const dist = Math.sqrt(dx * dx + dy * dy) || 1
         
-        // Répulsion ultra-forte pour maximum d'espacement
-        const repulsion = (2500 / (dist * dist)) * cooling // Répulsion massivement augmentée
+        // Répulsion contrôlée pour constellation plein écran
+        const repulsion = (1800 / (dist * dist)) * cooling // Répulsion ajustée plein écran
         const fx = (dx / dist) * repulsion
         const fy = (dy / dist) * repulsion * 0.8 // Moins de force verticale
         
@@ -266,10 +263,11 @@ function applyForceLayout(nodes, edges, iterations = 200) {
       node.y += (dy / dist) * gravity * 1.0  // Gravité verticale modérée
     })
     
-    // Keep nodes in bounds with padding
+    // Keep nodes in bounds with viewport margin
+    const margin = SVG_WIDTH * VIEWPORT_MARGIN
     nodes.forEach(node => {
-      node.x = Math.max(MARGIN, Math.min(SVG_WIDTH - MARGIN, node.x))
-      node.y = Math.max(MARGIN, Math.min(SVG_HEIGHT - MARGIN, node.y))
+      node.x = Math.max(margin, Math.min(SVG_WIDTH - margin, node.x))
+      node.y = Math.max(margin, Math.min(SVG_HEIGHT - margin, node.y))
     })
   }
   
@@ -337,11 +335,12 @@ function applyCollisionResolution(nodes, iterations = 50, padding = 20) {
           nodeB.x += fx * 0.5
           nodeB.y += fy * 0.5
           
-          // Garder dans les limites
-          nodeA.x = Math.max(MARGIN, Math.min(SVG_WIDTH - MARGIN, nodeA.x))
-          nodeA.y = Math.max(MARGIN, Math.min(SVG_HEIGHT - MARGIN, nodeA.y))
-          nodeB.x = Math.max(MARGIN, Math.min(SVG_WIDTH - MARGIN, nodeB.x))
-          nodeB.y = Math.max(MARGIN, Math.min(SVG_HEIGHT - MARGIN, nodeB.y))
+          // Garder dans les limites du viewport
+          const margin = SVG_WIDTH * VIEWPORT_MARGIN
+          nodeA.x = Math.max(margin, Math.min(SVG_WIDTH - margin, nodeA.x))
+          nodeA.y = Math.max(margin, Math.min(SVG_HEIGHT - margin, nodeA.y))
+          nodeB.x = Math.max(margin, Math.min(SVG_WIDTH - margin, nodeB.x))
+          nodeB.y = Math.max(margin, Math.min(SVG_HEIGHT - margin, nodeB.y))
         }
       }
     }
@@ -488,7 +487,7 @@ function generateSVG(nodes, edges, tiers, visibleLabels = null) {
       const target = nodes.find(n => n.id === edge.target)
       if (!source || !target) return false
       
-      // Filter T3↔T3 connections to reduce noise
+      // Filter T3↔T3 connections to reduce visual noise
       const sourceTier = getNodeTier(source.degree || 0, tiers)
       const targetTier = getNodeTier(target.degree || 0, tiers)
       if (sourceTier === 3 && targetTier === 3) return false
@@ -501,13 +500,14 @@ function generateSVG(nodes, edges, tiers, visibleLabels = null) {
       const sourceTier = getNodeTier(source.degree || 0, tiers)
       const targetTier = getNodeTier(target.degree || 0, tiers)
       
-      const strokeWidth = edge.bidirectional ? 1.5 : 1
+      const strokeWidth = edge.bidirectional ? 1.8 : (sourceTier === 1 || targetTier === 1) ? 1.6 : 1.0
       
-      // Higher opacity if at least one endpoint is T1, lower otherwise
-      const opacity = (sourceTier === 1 || targetTier === 1) ? 0.8 : 0.4
+      // Budget opacité global: fond très discret
+      const opacity = (sourceTier === 1 || targetTier === 1) ? 0.15 : 0.1
       
       return `<line x1="${source.x}" y1="${source.y}" x2="${target.x}" y2="${target.y}" 
-                    stroke="${COLOR_SUBTLE}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`
+                    stroke="${COLOR_SUBTLE}" stroke-width="${strokeWidth}" opacity="${opacity}"
+                    class="edge" data-source="${edge.source}" data-target="${edge.target}"/>`
     }).join('\n')
   
   // Generate nodes with sophisticated group structure
@@ -547,27 +547,29 @@ function generateSVG(nodes, edges, tiers, visibleLabels = null) {
                             fill="transparent" 
                             class="tap-area"/>`
     
-    // Labels avec gestion intelligente
+    // Règles d'apparition: T1 visible, T2 survol, T3 jamais
     let text = ''
-    if (hasVisibleLabel) {
-      text = `<text x="${node.x}" y="${node.y + radius + textSize + 6}" 
+    if (tier === 1) {
+      // T1: toujours visible avec halo renforcé
+      text = `<text x="${node.x}" y="${node.y + radius + textSize + 8}" 
                     text-anchor="middle" 
                     font-size="${textSize}" 
                     font-family="IBM Plex Serif, serif" 
                     fill="${COLOR_FOREGROUND}"
-                    class="node-label node-label-visible"
+                    class="node-label node-label-t1"
                     paint-order="stroke" 
                     stroke="${COLOR_BACKGROUND}" 
-                    stroke-width="3px">
+                    stroke-width="4px">
                     ${escapeXML(labelText)}
                   </text>`
-    } else if (isT2HoverLabel) {
+    } else if (tier === 2) {
+      // T2: au survol seulement
       text = `<text x="${node.x}" y="${node.y + radius + textSize + 6}" 
                     text-anchor="middle" 
                     font-size="${textSize}" 
                     font-family="IBM Plex Serif, serif" 
                     fill="${COLOR_FOREGROUND}"
-                    class="node-label node-label-hover"
+                    class="node-label node-label-t2"
                     paint-order="stroke" 
                     stroke="${COLOR_BACKGROUND}" 
                     stroke-width="3px"
@@ -575,22 +577,28 @@ function generateSVG(nodes, edges, tiers, visibleLabels = null) {
                     ${escapeXML(labelText)}
                   </text>`
     }
+    // T3: pas de label (text reste vide)
     
-    if (isClickable) {
-      return `<a href="${node.url}" class="graph-link">
-                <g class="node-group tier-${tier}" data-degree="${node.degree || 0}">
+    // Seuls T1 et T2 sont cliquables, T3 reste statique
+    if (tier <= 2) {
+      return `<a href="${node.url}" class="graph-link" data-node-id="${node.id}">
+                <g class="node-group tier-${tier}" data-degree="${node.degree || 0}" data-id="${node.id}">
                   <title>${escapeXML(node.label)} (${node.degree || 0} connexions)</title>
-                  ${tapArea}
+                  <!-- Zone de hit pour deux-calques système -->
+                  <circle cx="${node.x}" cy="${node.y}" r="${radius + 15}" 
+                          fill="transparent" class="node-hit" 
+                          data-id="${node.id}" tabindex="0"
+                          aria-label="${escapeXML(node.label)}"/>
                   ${halo}
                   ${circle}
                   ${text}
                 </g>
               </a>`
     } else {
-      return `<g class="node-group-static tier-${tier}">
+      return `<g class="node-group-static tier-${tier}" data-id="${node.id}">
                 <title>${escapeXML(node.label)}</title>
                 ${circle}
-                ${text}
+                <!-- T3: pas de label -->
               </g>`
     }
   }).join('\n')
@@ -708,7 +716,7 @@ async function main() {
     // Filter nodes (keep connected and interesting nodes) and add text metrics
     let filteredNodes = graphData.nodes
       .filter(node => (node.degree || 0) >= 1) // Only keep connected nodes
-      .slice(0, 20) // Limit to 20 nodes for better readability and spacing
+      .slice(0, 18) // Limit to 18 nodes for cleaner constellation
     
     // Add precise text metrics for collision detection
     filteredNodes = addTextMetrics(filteredNodes, tiers)
@@ -721,11 +729,11 @@ async function main() {
     
     console.log(`   🎯 Filtré: ${filteredNodes.length} nœuds, ${filteredEdges.length} arêtes`)
     
-    // Apply controlled elliptical layout with collision resolution (forme élégante horizontale)
-    filteredNodes = applyEllipticalLayout(filteredNodes)
-    filteredNodes = applyForceLayout(filteredNodes, filteredEdges, 300) // Plus d'itérations pour plus d'espacement
-    const { finalNodes, visibleLabels } = applyCollisionResolution(filteredNodes, 75, 30) // Plus de padding pour éviter collisions
-    filteredNodes = centerAndPadGraph(finalNodes) // Centrage pondéré final
+    // Apply golden angle constellation with bbox scaling
+    filteredNodes = applyGoldenAnglePivots(filteredNodes)
+    filteredNodes = applyForceLayout(filteredNodes, filteredEdges, 180) // Force layout léger pour décoller amas
+    const { finalNodes, visibleLabels } = applyCollisionResolution(filteredNodes, 60, 25)
+    filteredNodes = applyBboxScaling(finalNodes) // Bbox scaling 90-92% viewport
     
     // Generate SVG
     const svgContent = generateSVG(filteredNodes, filteredEdges, tiers, visibleLabels)

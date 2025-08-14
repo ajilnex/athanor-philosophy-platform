@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run graph:build && npm run graph:svg && node scripts/build.cjs",
+    "build": "npx prisma generate && node scripts/build-bibliography.js && node scripts/validate-citations.js && node scripts/build-citation-map.js && node scripts/build-graph-billets.cjs && node scripts/render-graph-svg.cjs && node scripts/build-search-index.js && next build",
     "start": "next start",
     "lint": "next lint",
     "db:push": "prisma db push",
@@ -12,6 +12,7 @@
     "postinstall": "prisma generate",
     "graph:build": "node scripts/build-graph-billets.cjs",
     "graph:svg": "node scripts/render-graph-svg.cjs",
+    "test:build": "npm run build && node scripts/check-build.js",
     "db:dev:start": "docker-compose up -d",
     "db:dev:stop": "docker-compose down",
     "db:dev:reset": "npm run db:dev:stop && npm run db:dev:start && sleep 2 && npx prisma migrate dev --name init"
@@ -32,7 +33,6 @@
     "cloudinary": "^2.0.1",
     "clsx": "^2.0.0",
     "dotenv": "^17.2.1",
-    "easymde": "^2.20.0",
     "font-measure": "^1.2.2",
     "fuse.js": "^7.0.0",
     "gray-matter": "^4.0.3",
@@ -45,7 +45,6 @@
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
     "react-pdf": "^10.0.1",
-    "react-simplemde-editor": "^5.2.0",
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
     "remark-parse": "^11.0.0",

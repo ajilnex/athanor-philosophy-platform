@@ -5,10 +5,10 @@ import { ArrowRight } from 'lucide-react'
 export function LatestActivityCard({ billet }: { billet: Billet }) {
   return (
     <div className="w-full max-w-lg mx-auto">
-      <h2 className="font-serif text-lg text-subtle mb-3 text-center">Dernière activité</h2>
+      <h2 className="font-serif text-lg text-subtle mb-3 text-center">Activité récente</h2>
       <Link 
         href={`/billets/${billet.slug}`} 
-        className="block p-4 rounded-lg border border-subtle/20 bg-background/50 shadow-sm backdrop-blur-sm group transition-all duration-300 hover:border-subtle/50 hover:shadow-md"
+        className="block p-4 group transition-all duration-300"
       >
         <div className="flex justify-between items-center">
           <div>

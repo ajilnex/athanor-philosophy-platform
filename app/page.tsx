@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { getAllBillets } from '@/lib/billets'
 import { LatestActivityCard } from '@/components/home/LatestActivityCard'
-import { GraphSVG } from '@/components/GraphSVG'
+import { InteractiveGraph } from '@/components/graph/InteractiveGraph'
 
 export default async function HomePage() {
   const allBillets = await getAllBillets()
@@ -29,60 +29,47 @@ export default async function HomePage() {
     console.warn('Could not read graph stats:', error)
   }
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-center px-4 sm:px-6">
-      <main className="max-w-4xl w-full -mt-16">
-        {/* Graphe avec espacement harmonieux */}
-        <section className="w-full max-w-4xl mx-auto mt-8 mb-12">
-          <GraphSVG />
-        </section>
+    <>
+      {/* Couche 1: Le Graphe en Arrière-Plan - Constellation intégrée */}
+      <div className="fixed inset-0 z-0">
+        <InteractiveGraph className="w-full h-full" />
+      </div>
 
-        <h1 className="text-3xl sm:text-4xl font-light tracking-tight text-foreground mb-4">
-          L'athanor
-        </h1>
+      {/* Couche 2: Le Contenu au Premier Plan */}
+      <main className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 sm:px-6">
+        <div className="max-w-4xl w-full">
+          <h1 className="text-3xl sm:text-4xl font-light tracking-tight text-foreground mb-8 py-4 px-6">
+            L'athanor
+          </h1>
 
-        <p className="text-base sm:text-lg text-subtle font-light">
-         Philosopher - Ecrire - Editer
-        </p>
-
-        {/* Barre de recherche (compacte et centrée) */}
-        <div className="w-full max-w-lg mx-auto mt-6 mb-8">
-          <form action="/search" method="GET" className="relative">
-            <input
-              type="search"
-              name="q"
-              placeholder="Rechercher..."
-              className="search-input w-full p-3 pl-4 pr-10 text-base"
-            />
-          </form>
-        </div>
-
-        {/* Navigation mobile */}
-        <nav className="flex flex-col space-y-4 sm:hidden text-foreground font-light">
-          <Link href="/billets" className="hover:text-subtle transition-colors py-2">Billets</Link>
-          <Link href="/publications" className="hover:text-subtle transition-colors py-2">Publications</Link>
-        </nav>
-
-        {/* Navigation desktop */}
-        <nav className="hidden sm:flex space-x-6 lg:space-x-8 text-foreground font-light justify-center">
-          <Link href="/billets" className="hover:text-subtle transition-colors">Billets</Link>
-          <Link href="/publications" className="hover:text-subtle transition-colors">Publications</Link>
-        </nav>
-
-        {/* Maison d'édition */}
-        <div className="my-12 text-center">
-          <Link href="/edition" className="inline-flex items-center px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-foreground transition-all duration-200 font-light">
-            Maison d'édition
-          </Link>
-        </div>
-
-
-        {/* Dernière activité */}
-        {latestBillet && (
-          <div className="mt-16">
-            <LatestActivityCard billet={latestBillet} />
+          {/* Barre de recherche (compacte et centrée) */}
+          <div className="w-full max-w-lg mx-auto mt-6 mb-8">
+            <form action="/search" method="GET" className="relative">
+              <input
+                type="search"
+                name="q"
+                placeholder="Rechercher..."
+                className="search-input w-full p-3 pl-4 pr-10 text-base bg-background/70 backdrop-blur-md"
+              />
+            </form>
           </div>
-        )}
+
+
+          {/* Maison d'édition */}
+          <div className="my-12 text-center">
+            <Link href="/edition" className="inline-flex items-center px-6 py-3 glass hover:bg-background/45 rounded-lg text-foreground transition-all duration-200 font-light">
+              Maison d'édition
+            </Link>
+          </div>
+
+          {/* Activité récente */}
+          {latestBillet && (
+            <div className="mt-16">
+              <LatestActivityCard billet={latestBillet} />
+            </div>
+          )}
+        </div>
       </main>
-    </div>
+    </>
   )
 }
