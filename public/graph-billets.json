@@ -273,22 +273,6 @@
       "y": -121.13976912093825
     },
     {
-      "id": "billet:test-citation-2",
-      "label": "Deuxième test de citation",
-      "url": "/billets/test-citation-2",
-      "degree": 0,
-      "x": 240.99439841028666,
-      "y": 97.57919826922141
-    },
-    {
-      "id": "billet:test-citation",
-      "label": "Test du système de citations",
-      "url": "/billets/test-citation",
-      "degree": 0,
-      "x": -99.65004714177095,
-      "y": -149.8995266991955
-    },
-    {
       "id": "billet:test-deletion",
       "label": "Test de suppression",
       "url": "/billets/test-deletion",
@@ -395,9 +379,9 @@
     }
   ],
   "metadata": {
-    "generatedAt": "2025-08-14T02:29:25.164Z",
-    "billetsCount": 33,
-    "nodesCount": 37,
+    "generatedAt": "2025-08-14T02:33:57.216Z",
+    "billetsCount": 31,
+    "nodesCount": 35,
     "stability": {
       "pivotsLocked": 12,
       "newNodes": 0,
