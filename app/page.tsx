@@ -60,19 +60,17 @@ export default async function HomePage() {
         <nav className="flex flex-col space-y-4 sm:hidden text-foreground font-light">
           <Link href="/billets" className="hover:text-subtle transition-colors py-2">Billets</Link>
           <Link href="/publications" className="hover:text-subtle transition-colors py-2">Publications</Link>
-          <Link href="/a-propos" className="hover:text-subtle transition-colors py-2">À propos</Link>
         </nav>
 
         {/* Navigation desktop */}
         <nav className="hidden sm:flex space-x-6 lg:space-x-8 text-foreground font-light justify-center">
           <Link href="/billets" className="hover:text-subtle transition-colors">Billets</Link>
           <Link href="/publications" className="hover:text-subtle transition-colors">Publications</Link>
-          <Link href="/a-propos" className="hover:text-subtle transition-colors">À propos</Link>
         </nav>
 
         {/* Maison d'édition */}
         <div className="my-12 text-center">
-          <Link href="/edition" className="inline-flex items-center px-6 py-3 border border-subtle/30 rounded-lg hover:border-subtle/50 text-foreground hover:text-accent transition-all duration-200 font-light">
+          <Link href="/edition" className="inline-flex items-center px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-foreground transition-all duration-200 font-light">
             Maison d'édition
           </Link>
         </div>

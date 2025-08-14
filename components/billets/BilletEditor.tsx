@@ -1,9 +1,20 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { X, Save, Eye, EyeOff, Image as ImageIcon } from 'lucide-react'
+import { useState, useRef, useMemo } from 'react'
+import { X, Save, Image as ImageIcon, GraduationCap } from 'lucide-react'
 import { ImageUpload } from './ImageUpload'
 import { ShimmerButton } from '@/components/ui/ShimmerButton'
+import { CitationPicker } from '@/components/editor/CitationPicker'
+import dynamic from 'next/dynamic'
+
+// Import dynamique pour éviter les problèmes SSR
+const SimpleMdeEditor = dynamic(() => import('react-simplemde-editor'), {
+  ssr: false,
+  loading: () => <div className="w-full min-h-[400px] bg-gray-100 animate-pulse rounded-md" />
+})
+
+// Import des styles CSS
+import 'easymde/dist/easymde.min.css'
 
 interface BilletEditorProps {
   isOpen: boolean
@@ -34,12 +45,12 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
   const [content, setContent] = useState(initialData?.content || '')
   const [tags, setTags] = useState(initialData?.tags?.join(', ') || '')
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || '')
-  const [showPreview, setShowPreview] = useState(false)
   const [showImageUpload, setShowImageUpload] = useState(false)
+  const [showCitationPicker, setShowCitationPicker] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const editorRef = useRef<any>(null)
 
   // Génération automatique du slug depuis le titre
   const generateSlug = (titleText: string) => {
@@ -61,28 +72,55 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
   }
 
   const insertTextAtCursor = (text: string) => {
-    const textarea = textareaRef.current
-    if (!textarea) return
-
-    const start = textarea.selectionStart
-    const end = textarea.selectionEnd
-    const before = content.substring(0, start)
-    const after = content.substring(end)
-    
-    const newContent = before + text + after
-    setContent(newContent)
-    
-    // Repositionner le curseur après le texte inséré
-    setTimeout(() => {
-      textarea.focus()
-      textarea.setSelectionRange(start + text.length, start + text.length)
-    }, 0)
+    if (editorRef.current && editorRef.current.editor) {
+      const editor = editorRef.current.editor
+      const doc = editor.codemirror.getDoc()
+      const cursor = doc.getCursor()
+      doc.replaceRange(text, cursor)
+      editor.codemirror.focus()
+    } else {
+      // Fallback : ajouter à la fin
+      setContent(prev => prev + text)
+    }
   }
 
   const handleImageUploaded = (url: string, markdownSyntax: string) => {
     insertTextAtCursor(markdownSyntax)
     setShowImageUpload(false)
   }
+
+  const handleCitationSelected = (citationKey: string) => {
+    insertTextAtCursor(`<Cite item="${citationKey}" />`)
+    setShowCitationPicker(false)
+  }
+
+  // Configuration de l'éditeur SimpleMDE
+  const editorOptions = useMemo(() => {
+    return {
+      spellChecker: false,
+      status: false,
+      toolbar: [
+        'bold', 'italic', 'heading', '|',
+        'quote', 'unordered-list', 'ordered-list', '|',
+        'link', 'horizontal-rule', '|',
+        {
+          name: 'insertImage',
+          action: () => setShowImageUpload(true),
+          className: 'fa fa-picture-o',
+          title: 'Insérer une image via Cloudinary',
+        },
+        {
+          name: 'insertCitation',
+          action: () => setShowCitationPicker(true),
+          className: 'fa fa-graduation-cap',
+          title: 'Insérer une citation Zotero',
+        },
+        '|',
+        'preview', 'side-by-side', 'fullscreen'
+      ],
+      placeholder: '# Votre billet en Markdown\n\nÉcrivez votre contenu ici...\n\nVous pouvez utiliser la **syntaxe Markdown** et insérer des images et citations avec la barre d\'outils.',
+    }
+  }, [])
 
   const handleSave = async () => {
     if (!title.trim() || !content.trim()) {
@@ -136,41 +174,21 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
         </div>
 
         {/* Toolbar */}
-        <div className="flex items-center justify-between p-4 border-b bg-gray-50">
-          <div className="flex items-center space-x-2">
-            <ShimmerButton
-              onClick={() => setShowImageUpload(true)}
-              variant="secondary"
-            >
-              <ImageIcon className="h-4 w-4" />
-              <span>Image</span>
-            </ShimmerButton>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setShowPreview(!showPreview)}
-              className="flex items-center space-x-2 px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
-            >
-              {showPreview ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              <span>{showPreview ? 'Éditer' : 'Preview'}</span>
-            </button>
-            
-            <ShimmerButton
-              onClick={handleSave}
-              disabled={isSaving}
-              variant="primary"
-              className="disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Save className="h-4 w-4" />
-              <span>
-                {isSaving 
-                  ? (userRole === 'ADMIN' ? 'Sauvegarde...' : 'Envoi de la proposition...') 
-                  : (userRole === 'ADMIN' ? 'Sauvegarder et Publier' : 'Proposer la modification')
-                }
-              </span>
-            </ShimmerButton>
-          </div>
+        <div className="flex items-center justify-end p-4 border-b bg-gray-50">
+          <ShimmerButton
+            onClick={handleSave}
+            disabled={isSaving}
+            variant="primary"
+            className="disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Save className="h-4 w-4" />
+            <span>
+              {isSaving 
+                ? (userRole === 'ADMIN' ? 'Sauvegarde...' : 'Envoi de la proposition...') 
+                : (userRole === 'ADMIN' ? 'Sauvegarder et Publier' : 'Proposer la modification')
+              }
+            </span>
+          </ShimmerButton>
         </div>
 
         {/* Content */}
@@ -235,32 +253,21 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
               </div>
             </div>
 
-            {/* Editor/Preview */}
+            {/* Éditeur Markdown avec preview intégré */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Contenu * {showPreview && '(Preview)'}
+                Contenu *
               </label>
               
-              {showPreview ? (
-                <div className="w-full min-h-[400px] p-4 border border-gray-300 rounded-md prose prose-sm max-w-none bg-gray-50">
-                  {/* Preview du markdown */}
-                  <div dangerouslySetInnerHTML={{ 
-                    __html: content.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>')
-                  }} />
-                </div>
-              ) : (
-                <textarea
-                  ref={textareaRef}
+              <div className="border border-gray-300 rounded-md overflow-hidden">
+                <SimpleMdeEditor
+                  ref={editorRef}
                   value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  className="w-full min-h-[400px] input-field font-mono text-sm"
-                  placeholder="# Votre billet en Markdown
-
-Écrivez votre contenu ici...
-
-Vous pouvez utiliser la **syntaxe Markdown** et insérer des images avec le bouton Image de la toolbar."
+                  onChange={setContent}
+                  options={editorOptions}
+                  className="[&_.editor-toolbar]:bg-gray-100 [&_.CodeMirror]:min-h-[400px] [&_.CodeMirror]:font-mono [&_.CodeMirror]:text-sm"
                 />
-              )}
+              </div>
             </div>
           </div>
         </div>
@@ -293,6 +300,13 @@ Vous pouvez utiliser la **syntaxe Markdown** et insérer des images avec le bout
             </div>
           </div>
         )}
+
+        {/* Citation Picker Modal */}
+        <CitationPicker
+          isOpen={showCitationPicker}
+          onClose={() => setShowCitationPicker(false)}
+          onCitationSelect={handleCitationSelected}
+        />
       </div>
     </div>
   )

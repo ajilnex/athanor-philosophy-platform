@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Calendar, Tag, FileText } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import type { Billet } from '@/lib/billets'
-import { EditBilletButton } from './EditBilletButton'
+// import { EditBilletButton } from './EditBilletButton' // Supprimé : bouton éditer déplacé sur page individuelle
 
 interface BilletsListProps {
   initialBillets: Billet[]
@@ -93,25 +93,13 @@ export function BilletsList({ initialBillets }: BilletsListProps) {
               )}
             </div>
             
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-start">
               <Link
                 href={`/billets/${billet.slug}`}
                 className="text-foreground hover:text-subtle transition-colors font-light underline text-sm sm:text-base"
               >
                 Lire →
               </Link>
-              
-              {isAdmin && (
-                <EditBilletButton
-                  slug={billet.slug}
-                  title={billet.title}
-                  content={billet.content}
-                  tags={billet.tags}
-                  excerpt={billet.excerpt}
-                  onDelete={handleDeleteBillet}
-                  className="ml-4"
-                />
-              )}
             </div>
           </div>
         </article>

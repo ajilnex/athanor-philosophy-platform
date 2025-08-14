@@ -36,20 +36,21 @@ export function Navbar() {
         <nav className="hidden sm:flex items-center gap-2">
           <NavItem href="/billets">Billets</NavItem>
           <NavItem href="/publications">Publications</NavItem>
-          <NavItem href="/a-propos">À propos</NavItem>
           <NavItem href="/search">Recherche</NavItem>
-          {session?.user?.role === 'ADMIN' && (
-            <NavItem href="/admin">Admin</NavItem>
-          )}
           {session ? (
             <button 
               onClick={handleSignOut}
-              className="px-3 py-2 text-sm font-light hover:text-subtle transition-colors"
+              className="px-3 py-1.5 text-sm font-light bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
             >
               Se déconnecter
             </button>
           ) : (
-            <NavItem href="/auth/signin">Connexion</NavItem>
+            <Link
+              href="/auth/signin"
+              className="px-3 py-1.5 text-sm font-light bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+            >
+              Connexion
+            </Link>
           )}
         </nav>
 

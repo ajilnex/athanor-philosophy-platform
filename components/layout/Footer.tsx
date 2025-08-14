@@ -1,4 +1,11 @@
+'use client';
+
+import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+
 export function Footer() {
+  const { data: session } = useSession();
+  
   return (
     <footer className="bg-background border-t border-subtle mt-16">
       <div className="max-w-4xl mx-auto px-6 py-8">
@@ -8,10 +15,15 @@ export function Footer() {
               aub.robert@gmail.com
             </a>
           </p>
-          <div className="mt-4">
-            <a href="/admin" className="text-subtle text-xs hover:text-foreground transition-colors">
-              Admin
-            </a>
+          <div className="mt-4 flex justify-center gap-4">
+            <Link href="/a-propos" className="text-subtle text-xs hover:text-foreground transition-colors">
+              À propos
+            </Link>
+            {session?.user?.role === 'ADMIN' && (
+              <Link href="/admin" className="text-subtle text-xs hover:text-foreground transition-colors">
+                Admin
+              </Link>
+            )}
           </div>
         </div>
       </div>
