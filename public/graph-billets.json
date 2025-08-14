@@ -2,7 +2,7 @@
   "nodes": [
     {
       "id": "billet:2025-08-04-21-56-25",
-      "label": "2025-08-04-21-56-25",
+      "label": "blabla yvan",
       "url": "/billets/2025-08-04-21-56-25",
       "degree": 0,
       "x": 62.889381325884244,
@@ -82,7 +82,7 @@
     },
     {
       "id": "billet:2025-08-07-20-32-23",
-      "label": "2025-08-07-20-32-23",
+      "label": "Petit texte charmant pour le parisien qui cherche une plage où se tremper",
       "url": "/billets/2025-08-07-20-32-23",
       "degree": 0,
       "x": 252.598095008915,
@@ -105,24 +105,8 @@
       "y": 59.74209319694279
     },
     {
-      "id": "billet:2025-08-07-test-suppression",
-      "label": "Test suppression physique",
-      "url": "/billets/2025-08-07-test-suppression",
-      "degree": 0,
-      "x": 8.228771743850277,
-      "y": -99.66086150333847
-    },
-    {
-      "id": "billet:2025-08-08-00-35-33",
-      "label": "2025-08-08-00-35-33",
-      "url": "/billets/2025-08-08-00-35-33",
-      "degree": 0,
-      "x": -142.21684313841888,
-      "y": -110.33752547407595
-    },
-    {
       "id": "billet:2025-08-08-15-26-22",
-      "label": "2025-08-08-15-26-22",
+      "label": "Coupure de Dedekind et argument a priori de Peirce",
       "url": "/billets/2025-08-08-15-26-22",
       "degree": 0,
       "x": 17.01282802326848,
@@ -193,14 +177,6 @@
       "y": -155.53175830454808
     },
     {
-      "id": "billet:2025-08-11-test",
-      "label": "test",
-      "url": "/billets/2025-08-11-test",
-      "degree": 0,
-      "x": -255.96378729601923,
-      "y": 45.63485064156798
-    },
-    {
       "id": "billet:alpha",
       "label": "Alpha",
       "url": "/billets/alpha",
@@ -231,14 +207,6 @@
       "degree": 0,
       "x": 133.1358566928,
       "y": -121.13976912093825
-    },
-    {
-      "id": "billet:test-deletion",
-      "label": "Test de suppression",
-      "url": "/billets/test-deletion",
-      "degree": 0,
-      "x": 81.46778325485599,
-      "y": -57.991381183239696
     }
   ],
   "edges": [
@@ -329,9 +297,9 @@
     }
   ],
   "metadata": {
-    "generatedAt": "2025-08-14T11:45:09.574Z",
-    "billetsCount": 26,
-    "nodesCount": 30,
+    "generatedAt": "2025-08-14T15:05:58.914Z",
+    "billetsCount": 22,
+    "nodesCount": 26,
     "stability": {
       "pivotsLocked": 12,
       "newNodes": 0,

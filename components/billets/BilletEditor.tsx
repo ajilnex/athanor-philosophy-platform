@@ -108,16 +108,16 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
           action: () => setShowImageUpload(true),
           className: 'fa fa-picture-o',
           title: 'Insérer une image via Cloudinary',
-        },
+        } as any,
         {
           name: 'insertCitation',
           action: () => setShowCitationPicker(true),
           className: 'fa fa-graduation-cap',
           title: 'Insérer une citation Zotero',
-        },
+        } as any,
         '|',
         'preview', 'side-by-side', 'fullscreen'
-      ],
+      ] as any,
       placeholder: '# Votre billet en Markdown\n\nÉcrivez votre contenu ici...\n\nVous pouvez utiliser la **syntaxe Markdown** et insérer des images et citations avec la barre d\'outils.',
     }
   }, [])
