@@ -1,6 +1,7 @@
 import path from 'path'
 import fs from 'fs/promises'
 import matter from 'gray-matter'
+import { isFileInTrash } from '@/lib/github.server'
 
 const CONTENT_DIR = path.join(process.cwd(), 'content', 'billets')
 
@@ -107,7 +108,18 @@ async function transformBacklinks(content: string): Promise<string> {
 
 export async function getAllBillets(): Promise<Billet[]> {
   // Billets = 100% statiques, toujours depuis le filesystem
-  return fsAll()
+  const allBillets = await fsAll()
+  
+  // Filtrer les billets supprimés (dans le trash GitHub)
+  const activeBillets = []
+  for (const billet of allBillets) {
+    const isDeleted = await isFileInTrash(`content/billets/${billet.slug}.mdx`)
+    if (!isDeleted) {
+      activeBillets.push(billet)
+    }
+  }
+  
+  return activeBillets
 }
 
 export async function getBilletBySlug(slug: string) {
@@ -136,7 +148,18 @@ export async function getBilletSlugs(): Promise<string[]> {
   // Billets = 100% statiques, toujours depuis le filesystem
   try {
     const entries = await fs.readdir(CONTENT_DIR)
-    return entries.filter(f => f.toLowerCase().endsWith('.mdx')).map(slugFromFilename)
+    const allSlugs = entries.filter(f => f.toLowerCase().endsWith('.mdx')).map(slugFromFilename)
+    
+    // Filtrer les billets supprimés (dans le trash GitHub)
+    const activeSlugs = []
+    for (const slug of allSlugs) {
+      const isDeleted = await isFileInTrash(`content/billets/${slug}.mdx`)
+      if (!isDeleted) {
+        activeSlugs.push(slug)
+      }
+    }
+    
+    return activeSlugs
   } catch (e) {
     console.error('Error reading billet slugs from FS:', e)
     return []

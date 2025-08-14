@@ -30,6 +30,26 @@ interface GitHubFileUpdate {
 }
 
 /**
+ * Vérifie si un fichier est dans le trash (supprimé)
+ */
+export async function isFileInTrash(originalPath: string): Promise<boolean> {
+  try {
+    const octokit = getOctokit()
+    // Convertir le chemin vers le trash
+    const trashPath = originalPath.replace('content/', 'trash/')
+    
+    await octokit.repos.getContent({
+      owner: REPO_OWNER,
+      repo: REPO_NAME,
+      path: trashPath,
+    })
+    return true // Fichier trouvé dans trash = supprimé
+  } catch (error) {
+    return false // Fichier pas trouvé dans trash = pas supprimé
+  }
+}
+
+/**
  * Récupère le contenu d'un fichier depuis GitHub
  */
 export async function getFileFromGitHub(path: string): Promise<{ content: string; sha: string } | null> {

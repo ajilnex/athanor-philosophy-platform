@@ -8,6 +8,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { MiniGraph } from '@/components/graph/MiniGraph'
+import { isFileInTrash } from '@/lib/github.server'
 
 export async function generateStaticParams() {
   const slugs = await getBilletSlugs()
@@ -16,7 +17,15 @@ export async function generateStaticParams() {
 
 export default async function BilletPage({ params }: { params: Promise<{ slug: string }> }) {
   const session = await getServerSession(authOptions)
-  const billet = await getBilletBySlug((await params).slug)
+  const { slug } = await params
+  
+  // Vérifier d'abord si le billet est supprimé (dans le trash GitHub)
+  const isDeleted = await isFileInTrash(`content/billets/${slug}.mdx`)
+  if (isDeleted) {
+    notFound()
+  }
+  
+  const billet = await getBilletBySlug(slug)
 
   if (!billet) {
     notFound()
@@ -24,7 +33,7 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
 
   // Vérifier si le billet est scellé
   const billetRecord = await prisma.billet.findUnique({
-    where: { slug: (await params).slug }
+    where: { slug }
   })
 
   const isSealed = billetRecord?.isSealed || false
@@ -80,7 +89,7 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
               {billet.title}
             </h1>
             <EditBilletButton 
-              slug={(await params).slug}
+              slug={slug}
               title={billet.title}
               content={billet.content}
               tags={billet.tags}
@@ -129,7 +138,7 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
       <section className="mt-16 pt-8 border-t border-subtle/20">
         <div className="w-full max-w-4xl mx-auto h-40">
           <MiniGraph 
-            centerNodeId={`billet:${(await params).slug}`} 
+            centerNodeId={`billet:${slug}`} 
             maxNodes={5}
           />
         </div>
