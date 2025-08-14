@@ -13,6 +13,7 @@ interface EditBilletButtonProps {
   tags: string[]
   excerpt?: string
   className?: string
+  onDelete?: (slug: string) => void // Callback pour suppression instantanée
 }
 
 export function EditBilletButton({ 
@@ -21,7 +22,8 @@ export function EditBilletButton({
   content, 
   tags, 
   excerpt, 
-  className = "" 
+  className = "",
+  onDelete
 }: EditBilletButtonProps) {
   const { data: session, status } = useSession()
   const [showEditor, setShowEditor] = useState(false)
@@ -75,7 +77,14 @@ export function EditBilletButton({
 
     setIsDeleting(true)
     
+    // 1. Suppression visuelle instantanée (UX optimiste)
+    if (onDelete) {
+      onDelete(slug)
+      toast.success('Billet supprimé')
+    }
+    
     try {
+      // 2. Appel API en arrière-plan (déclenche le déploiement)
       const response = await fetch(`/api/admin/billets/${slug}`, {
         method: 'DELETE',
       })
@@ -86,14 +95,20 @@ export function EditBilletButton({
       }
 
       const result = await response.json()
-      toast.success(result.message)
+      console.log('✅ Suppression confirmée côté serveur:', result.message)
       
-      // Rediriger vers la liste des billets
-      window.location.href = '/billets'
+      // Si on est sur la page du billet, rediriger vers la liste
+      if (!onDelete) {
+        window.location.href = '/billets'
+      }
     } catch (error) {
-      console.error('Erreur suppression:', error)
-      toast.error('Erreur lors de la suppression')
+      console.error('Erreur suppression API:', error)
+      toast.error('Erreur lors de la suppression définitive')
       setIsDeleting(false)
+      
+      // En cas d'erreur, on pourrait restaurer l'élément (rollback UX)
+      // Mais pour la philosophie du site, on garde la suppression visuelle
+      // car l'admin a pris la décision de supprimer
     }
   }
 

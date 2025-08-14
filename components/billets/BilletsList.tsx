@@ -3,14 +3,24 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Calendar, Tag, FileText } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import type { Billet } from '@/lib/billets'
+import { EditBilletButton } from './EditBilletButton'
 
 interface BilletsListProps {
   initialBillets: Billet[]
 }
 
 export function BilletsList({ initialBillets }: BilletsListProps) {
+  const { data: session } = useSession()
   const [billets, setBillets] = useState<Billet[]>(initialBillets)
+  
+  const isAdmin = (session?.user as any)?.role === 'ADMIN'
+  
+  // Fonction de suppression instantanée (UX optimiste)
+  const handleDeleteBillet = (slug: string) => {
+    setBillets(prevBillets => prevBillets.filter(billet => billet.slug !== slug))
+  }
 
 
   if (billets.length === 0) {
@@ -83,13 +93,25 @@ export function BilletsList({ initialBillets }: BilletsListProps) {
               )}
             </div>
             
-            <div>
+            <div className="flex items-center justify-between">
               <Link
                 href={`/billets/${billet.slug}`}
                 className="text-foreground hover:text-subtle transition-colors font-light underline text-sm sm:text-base"
               >
                 Lire →
               </Link>
+              
+              {isAdmin && (
+                <EditBilletButton
+                  slug={billet.slug}
+                  title={billet.title}
+                  content={billet.content}
+                  tags={billet.tags}
+                  excerpt={billet.excerpt}
+                  onDelete={handleDeleteBillet}
+                  className="ml-4"
+                />
+              )}
             </div>
           </div>
         </article>
