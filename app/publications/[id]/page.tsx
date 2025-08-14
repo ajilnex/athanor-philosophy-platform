@@ -28,12 +28,14 @@ export default async function PublicationPage({
   params, 
   searchParams 
 }: { 
-  params: { id: string }
-  searchParams: { page?: string; q?: string }
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ page?: string; q?: string }>
 }) {
   const session = await getServerSession(authOptions)
-  const publication = await getPublication(params.id)
-  let initialPage = searchParams.page ? parseInt(searchParams.page, 10) : 1
+  const { id } = await params
+  const searchParamsResolved = await searchParams
+  const publication = await getPublication(id)
+  let initialPage = searchParamsResolved.page ? parseInt(searchParamsResolved.page, 10) : 1
 
   if (!publication) {
     notFound()
@@ -74,10 +76,10 @@ export default async function PublicationPage({
   }
 
   // Si un terme de recherche est fourni, essayer de trouver la page correspondante
-  if (searchParams.q && !searchParams.page) {
+  if (searchParamsResolved.q && !searchParamsResolved.page) {
     try {
       const searchResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/find-in-pdf?url=${encodeURIComponent(publication.filePath)}&q=${encodeURIComponent(searchParams.q)}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/find-in-pdf?url=${encodeURIComponent(publication.filePath)}&q=${encodeURIComponent(searchParamsResolved.q)}`,
         { cache: 'no-store' } // Important pour les recherches dynamiques
       )
       

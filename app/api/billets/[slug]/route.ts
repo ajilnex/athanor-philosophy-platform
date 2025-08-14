@@ -8,7 +8,7 @@ import { authOptions } from '@/lib/auth'
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     // Vérification authentification admin OBLIGATOIRE
@@ -21,7 +21,7 @@ export async function DELETE(
       )
     }
 
-    const { slug } = params
+    const { slug } = await params
     
     if (!slug) {
       return NextResponse.json(

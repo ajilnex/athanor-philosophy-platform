@@ -139,17 +139,42 @@ async function buildBibliography() {
     // Normalisation
     const bibliography = zoteroItems.map(normalizeZoteroItem);
     
-    // Validation des clés uniques
-    const keys = bibliography.map(item => item.key);
-    const duplicateKeys = keys.filter((key, index) => keys.indexOf(key) !== index);
+    // Gestion robuste des clés dupliquées
+    const keyMap = new Map();
+    const uniqueBibliography = [];
+    const duplicateKeys = [];
+    
+    for (const item of bibliography) {
+      const originalKey = item.key;
+      let finalKey = originalKey;
+      let counter = 1;
+      
+      // Si la clé existe déjà, ajouter un suffixe numérique
+      while (keyMap.has(finalKey)) {
+        finalKey = `${originalKey}-${counter}`;
+        counter++;
+        if (!duplicateKeys.includes(originalKey)) {
+          duplicateKeys.push(originalKey);
+        }
+      }
+      
+      // Mettre à jour la clé si nécessaire
+      if (finalKey !== originalKey) {
+        console.warn(`⚠️  Clé dupliquée résolue: ${originalKey} → ${finalKey}`);
+        item.key = finalKey;
+      }
+      
+      keyMap.set(finalKey, item);
+      uniqueBibliography.push(item);
+    }
     
     if (duplicateKeys.length > 0) {
-      console.error('❌ Clés dupliquées détectées:', duplicateKeys);
-      throw new Error('Clés de citation en doublon - vérifiez vos citekeys Better BibTeX');
+      console.warn(`⚠️  ${duplicateKeys.length} clés dupliquées détectées et résolues:`, duplicateKeys);
+      console.warn('   💡 Conseil: vérifiez vos citekeys Better BibTeX dans Zotero pour éviter les doublons');
     }
     
     // Tri alphabétique par auteur principal puis année
-    bibliography.sort((a, b) => {
+    uniqueBibliography.sort((a, b) => {
       const authorA = a.authors[0]?.family || '';
       const authorB = b.authors[0]?.family || '';
       if (authorA !== authorB) return authorA.localeCompare(authorB);
@@ -157,10 +182,10 @@ async function buildBibliography() {
     });
     
     // Statistiques
-    const withDOI = bibliography.filter(item => item.DOI).length;
-    const withoutDOI = bibliography.length - withDOI;
+    const withDOI = uniqueBibliography.filter(item => item.DOI).length;
+    const withoutDOI = uniqueBibliography.length - withDOI;
     
-    console.log(`   📊 ${bibliography.length} entrées normalisées`);
+    console.log(`   📊 ${uniqueBibliography.length} entrées normalisées`);
     console.log(`   🔗 ${withDOI} avec DOI, ${withoutDOI} sans DOI`);
     
     if (withoutDOI > 0) {
@@ -168,10 +193,10 @@ async function buildBibliography() {
     }
     
     // Écriture du fichier
-    fs.writeFileSync(OUTPUT_PATH, JSON.stringify(bibliography, null, 2), 'utf8');
+    fs.writeFileSync(OUTPUT_PATH, JSON.stringify(uniqueBibliography, null, 2), 'utf8');
     console.log(`✅ Bibliographie générée: ${OUTPUT_PATH}`);
     
-    return bibliography;
+    return uniqueBibliography;
     
   } catch (error) {
     console.error('❌ Échec de la construction de la bibliographie:', error.message);

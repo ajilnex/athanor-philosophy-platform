@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -18,7 +18,7 @@ export async function PATCH(
     }
 
     const { sealed } = await request.json()
-    const { slug } = params
+    const { slug } = await params
 
     if (typeof sealed !== 'boolean') {
       return NextResponse.json(

@@ -3,17 +3,18 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const resolvedParams = await params
   try {
-    console.log('📥 Download request for article:', params.id)
+    console.log('📥 Download request for article:', resolvedParams.id)
     
     // Connect to database first
     await prisma.$connect()
     
     const article = await prisma.article.findFirst({
       where: { 
-        id: params.id,
+        id: resolvedParams.id,
         isPublished: true 
       },
     })

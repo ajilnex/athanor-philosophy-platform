@@ -1,4 +1,4 @@
-export default function AuthorPage({ params }: { params: { slug: string } }) {
+export default async function AuthorPage({ params }: { params: Promise<{ slug: string }> }) {
   // Pour l'instant, nous affichons le même message pour tout le monde.
   // À l'avenir, on pourrait récupérer le nom de l'auteur à partir du slug.
   const getAuthorName = (slug: string) => {
@@ -10,7 +10,8 @@ export default function AuthorPage({ params }: { params: { slug: string } }) {
     }
   }
 
-  const authorName = getAuthorName(params.slug)
+  const { slug } = await params
+  const authorName = getAuthorName(slug)
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-16 text-center">

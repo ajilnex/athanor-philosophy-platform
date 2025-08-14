@@ -8,8 +8,9 @@ import { authOptions } from '@/lib/auth'
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const resolvedParams = await params
   // 🛡️ PROTECTION: Vérifier l'autorisation admin
   const session = await getServerSession(authOptions)
   
@@ -21,7 +22,7 @@ export async function PATCH(
     const { isPublished } = await request.json()
 
     const article = await prisma.article.update({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       data: { isPublished },
     })
 
@@ -37,8 +38,9 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const resolvedParams = await params
   // 🛡️ PROTECTION: Vérifier l'autorisation admin
   const session = await getServerSession(authOptions)
   
@@ -49,7 +51,7 @@ export async function DELETE(
   try {
     // Get article info first
     const article = await prisma.article.findUnique({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
     })
 
     if (!article) {
@@ -61,7 +63,7 @@ export async function DELETE(
 
     // Delete from database
     await prisma.article.delete({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
     })
 
     // Delete file from filesystem

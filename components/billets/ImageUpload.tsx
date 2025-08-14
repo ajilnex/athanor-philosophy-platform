@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { Upload, Image as ImageIcon, X, Check, Copy } from 'lucide-react'
+import Image from 'next/image'
 
 interface ImageUploadProps {
   onImageUploaded?: (url: string, markdownSyntax: string) => void
@@ -116,10 +117,13 @@ export function ImageUpload({ onImageUploaded, className = "", autoInsert = fals
           </button>
         </div>
         <div className="mb-3">
-          <img 
+          <Image 
             src={uploadedUrl} 
             alt="Image uploadée"
-            className="max-w-full h-auto max-h-48 rounded border"
+            width={400}
+            height={192}
+            className="max-w-full h-auto max-h-48 rounded border object-contain"
+            style={{ width: 'auto', height: 'auto', maxHeight: '12rem' }}
           />
         </div>
         

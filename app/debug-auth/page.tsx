@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import Link from 'next/link'
 
 export default async function DebugAuthPage() {
   const session = await getServerSession(authOptions)
@@ -76,18 +77,18 @@ export default async function DebugAuthPage() {
         <div className="p-6 border rounded-lg bg-gray-50">
           <h2 className="text-xl font-semibold mb-4">🔧 Actions</h2>
           <div className="space-x-4">
-            <a 
+            <Link 
               href="/api/auth/signin?callbackUrl=/debug-auth" 
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Se connecter
-            </a>
-            <a 
+            </Link>
+            <Link 
               href="/api/auth/signout?callbackUrl=/debug-auth" 
               className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
             >
               Se déconnecter
-            </a>
+            </Link>
             <a 
               href="/admin" 
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"

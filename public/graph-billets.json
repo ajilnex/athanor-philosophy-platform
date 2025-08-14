@@ -263,6 +263,38 @@
       "degree": 3,
       "x": 179.94614051025437,
       "y": -4.4030120898979455
+    },
+    {
+      "id": "billet:bibliographie-collective",
+      "label": "Bibliographie collective d'Athanor",
+      "url": "/billets/bibliographie-collective",
+      "degree": 0,
+      "x": 133.1358566928,
+      "y": -121.13976912093825
+    },
+    {
+      "id": "billet:test-citation-2",
+      "label": "Deuxième test de citation",
+      "url": "/billets/test-citation-2",
+      "degree": 0,
+      "x": 240.99439841028666,
+      "y": 97.57919826922141
+    },
+    {
+      "id": "billet:test-citation",
+      "label": "Test du système de citations",
+      "url": "/billets/test-citation",
+      "degree": 0,
+      "x": -99.65004714177095,
+      "y": -149.8995266991955
+    },
+    {
+      "id": "billet:test-deletion",
+      "label": "Test de suppression",
+      "url": "/billets/test-deletion",
+      "degree": 0,
+      "x": 81.46778325485599,
+      "y": -57.991381183239696
     }
   ],
   "edges": [
@@ -363,9 +395,9 @@
     }
   ],
   "metadata": {
-    "generatedAt": "2025-08-13T21:16:29.094Z",
-    "billetsCount": 29,
-    "nodesCount": 33,
+    "generatedAt": "2025-08-14T02:29:25.164Z",
+    "billetsCount": 33,
+    "nodesCount": 37,
     "stability": {
       "pivotsLocked": 12,
       "newNodes": 0,

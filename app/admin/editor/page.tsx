@@ -77,7 +77,7 @@ async function getBilletContent(slug: string) {
 export default async function AdminEditorPage({ 
   searchParams 
 }: { 
-  searchParams: { edit?: string } 
+  searchParams: Promise<{ edit?: string }> 
 }) {
   // Vérification authentification admin
   const session = await getServerSession(authOptions)
@@ -86,7 +86,8 @@ export default async function AdminEditorPage({
     redirect('/auth/signin')
   }
 
-  const editSlug = searchParams.edit
+  const resolvedSearchParams = await searchParams
+  const editSlug = resolvedSearchParams.edit
   const billets = await getBilletsList()
 
   // Si un billet spécifique est demandé en édition

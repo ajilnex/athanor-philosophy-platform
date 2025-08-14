@@ -56,14 +56,15 @@ export async function generateStaticParams() {
   }
 }
 
-export async function generateMetadata({ params }: { params: { key: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ key: string }> }) {
   try {
     const bibliographyPath = path.join(process.cwd(), 'public', 'bibliography.json')
     const bibliography: BibliographyEntry[] = JSON.parse(
       fs.readFileSync(bibliographyPath, 'utf8')
     )
     
-    const entry = bibliography.find(item => item.key === params.key)
+    const { key } = await params
+    const entry = bibliography.find(item => item.key === key)
     if (!entry) {
       return {
         title: 'Référence introuvable - Athanor'
@@ -132,7 +133,8 @@ function formatFullCitation(entry: BibliographyEntry): string {
   return citation
 }
 
-export default async function RefPage({ params }: { params: { key: string } }) {
+export default async function RefPage({ params }: { params: Promise<{ key: string }> }) {
+  const { key } = await params
   let entry: BibliographyEntry | null = null
   let citedIn: CitationContext[] = []
   
@@ -143,7 +145,7 @@ export default async function RefPage({ params }: { params: { key: string } }) {
       fs.readFileSync(bibliographyPath, 'utf8')
     )
     
-    entry = bibliography.find(item => item.key === params.key) || null
+    entry = bibliography.find(item => item.key === key) || null
     
     // Charger la carte des citations
     const citationsMapPath = path.join(process.cwd(), 'public', 'citations-map.json')
@@ -151,7 +153,7 @@ export default async function RefPage({ params }: { params: { key: string } }) {
       const citationsMap: CitationsMap = JSON.parse(
         fs.readFileSync(citationsMapPath, 'utf8')
       )
-      citedIn = citationsMap[params.key] || []
+      citedIn = citationsMap[key] || []
     }
   } catch (error) {
     console.error('Erreur lors du chargement des données:', error)

@@ -14,9 +14,7 @@ const nextConfig = {
     config.resolve.alias.encoding = false;
     return config;
   },
-  experimental: {
-    serverComponentsExternalPackages: ['@prisma/client'],
-  },
+  serverExternalPackages: ['@prisma/client'],
 }
 
 module.exports = withMDX(nextConfig)

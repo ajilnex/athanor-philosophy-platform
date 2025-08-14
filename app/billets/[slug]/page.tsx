@@ -14,9 +14,9 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }))
 }
 
-export default async function BilletPage({ params }: { params: { slug: string } }) {
+export default async function BilletPage({ params }: { params: Promise<{ slug: string }> }) {
   const session = await getServerSession(authOptions)
-  const billet = await getBilletBySlug(params.slug)
+  const billet = await getBilletBySlug((await params).slug)
 
   if (!billet) {
     notFound()
@@ -24,7 +24,7 @@ export default async function BilletPage({ params }: { params: { slug: string } 
 
   // Vérifier si le billet est scellé
   const billetRecord = await prisma.billet.findUnique({
-    where: { slug: params.slug }
+    where: { slug: (await params).slug }
   })
 
   const isSealed = billetRecord?.isSealed || false
@@ -80,7 +80,7 @@ export default async function BilletPage({ params }: { params: { slug: string } 
               {billet.title}
             </h1>
             <EditBilletButton 
-              slug={params.slug}
+              slug={(await params).slug}
               title={billet.title}
               content={billet.content}
               tags={billet.tags}
@@ -129,7 +129,7 @@ export default async function BilletPage({ params }: { params: { slug: string } 
       <section className="mt-16 pt-8 border-t border-subtle/20">
         <div className="w-full max-w-4xl mx-auto h-40">
           <MiniGraph 
-            centerNodeId={`billet:${params.slug}`} 
+            centerNodeId={`billet:${(await params).slug}`} 
             maxNodes={5}
           />
         </div>

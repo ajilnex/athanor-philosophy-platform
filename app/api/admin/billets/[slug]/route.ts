@@ -5,7 +5,7 @@ import { generateBilletContent, updateFileWithContribution, moveFileToTrash, get
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     // Vérification authentification (ADMIN ou USER connecté)
@@ -18,7 +18,7 @@ export async function PUT(
       )
     }
 
-    const { slug } = params
+    const { slug } = await params
     const body = await request.json()
     const { title, content, tags = [], excerpt = '' } = body
 
@@ -119,7 +119,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>`,
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     // Vérification authentification admin
@@ -132,7 +132,7 @@ export async function DELETE(
       )
     }
 
-    const { slug } = params
+    const { slug } = await params
 
     // Vérifier si le fichier existe sur GitHub (essayer .mdx puis .md)
     const extensions = ['mdx', 'md']

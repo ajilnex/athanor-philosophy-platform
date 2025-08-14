@@ -42,12 +42,12 @@ async function AdminNormalPage() {
         <Lock className="h-10 w-10 mx-auto mb-4 text-subtle" />
         <h1 className="text-2xl font-light text-foreground mb-2">Espace administration</h1>
         <p className="text-subtle mb-6 font-light">Connecte-toi pour continuer.</p>
-        <a
+        <Link
           href="/api/auth/signin?callbackUrl=/admin"
           className="inline-flex items-center px-4 py-2 border border-foreground hover:bg-foreground hover:text-background transition-colors"
         >
           Se connecter avec GitHub
-        </a>
+        </Link>
         <p className="text-xs text-subtle mt-4 font-light">Après connexion, tu reviendras ici automatiquement.</p>
       </div>
     )
@@ -66,9 +66,9 @@ async function AdminNormalPage() {
           <p className="mb-2">Pour te promouvoir admin (à exécuter côté base) :</p>
           <code>UPDATE "User" SET role = 'admin' WHERE email = 'ton-email@github';</code>
         </div>
-        <a href="/api/auth/signout?callbackUrl=/" className="inline-flex items-center gap-2 underline text-sm">
+        <Link href="/api/auth/signout?callbackUrl=/" className="inline-flex items-center gap-2 underline text-sm">
           <LogOut className="h-4 w-4" /> Se déconnecter
-        </a>
+        </Link>
       </div>
     )
   }
