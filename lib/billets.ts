@@ -24,8 +24,8 @@ function isMdxFile(filename: string): boolean {
 }
 
 function dateFrom(front: any, slug: string): string {
-  // Essayez le frontmatter en premier (date, created)
-  const dateFields = ['date', 'created']
+  // Priorité : date de première publication (published, created, puis date)
+  const dateFields = ['published', 'created', 'date']
   for (const field of dateFields) {
     if (front?.[field]) {
       const frontDate = new Date(front[field])

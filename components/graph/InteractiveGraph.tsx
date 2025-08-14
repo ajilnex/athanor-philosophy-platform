@@ -112,11 +112,11 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
       const cy = parseFloat(circle.getAttribute('cy') || '0')
       const r = parseFloat(circle.getAttribute('r') || '0')
       
-      // Hit area invisible mais cliquable
+      // Hit area invisible mais cliquable (réduite)
       const hitArea = document.createElementNS('http://www.w3.org/2000/svg', 'g')
       hitArea.innerHTML = `
         <a href="${href}" style="pointer-events: auto;">
-          <circle cx="${cx}" cy="${cy}" r="${r + 15}" 
+          <circle cx="${cx}" cy="${cy}" r="${r + 5}" 
                   fill="transparent" 
                   stroke="none" 
                   data-id="${nodeId}"
@@ -132,6 +132,32 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
     let activeNode: string | null = null
     let timeoutId: number | null = null
     const cloneElements = new Map<string, SVGGElement>()
+
+    // Helper pour vérifier si on est au-dessus d'une zone shield
+    function isOverShield(clientX: number, clientY: number): boolean {
+      // Désactive l'overlay ET le SVG de fond pour jeter un coup d'œil en dessous
+      const prevOverlay = overlayElement.style.pointerEvents
+      const prevBackground = container.style.pointerEvents
+      const backgroundSvg = container.querySelector('svg')
+      const prevBackgroundSvg = backgroundSvg?.style.pointerEvents
+      
+      overlayElement.style.pointerEvents = 'none'
+      container.style.pointerEvents = 'none'
+      if (backgroundSvg) backgroundSvg.style.pointerEvents = 'none'
+      
+      const below = document.elementFromPoint(clientX, clientY)
+      
+      overlayElement.style.pointerEvents = prevOverlay
+      container.style.pointerEvents = prevBackground
+      if (backgroundSvg && prevBackgroundSvg !== undefined) {
+        backgroundSvg.style.pointerEvents = prevBackgroundSvg
+      }
+      
+      const hasShield = !!below && !!(below as HTMLElement).closest('[data-graph-shield]')
+      console.log('Shield check:', { clientX, clientY, below: below?.tagName, className: (below as HTMLElement)?.className, hasShield })
+      
+      return hasShield
+    }
 
     function createClone(nodeId: string) {
       if (!svgElement) return
@@ -233,11 +259,20 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
 
     // Délégation d'événements sur l'overlay
     function handleMouseOver(e: Event) {
+      const me = e as MouseEvent
+      console.log('MouseOver triggered:', { target: (e.target as Element)?.tagName })
+      
+      if (isOverShield(me.clientX, me.clientY)) {
+        console.log('Shield detected - blocking interaction')
+        return // ➜ ne pas activer le clone
+      }
+
       const target = e.target as Element
       const hitArea = target.closest('.hit-area')
       if (hitArea) {
         const nodeId = hitArea.getAttribute('data-id')
         if (nodeId) {
+          console.log('Activating node:', nodeId)
           if (timeoutId) clearTimeout(timeoutId)
           if (activeNode !== nodeId) {
             if (activeNode) removeClone(activeNode)
@@ -284,6 +319,10 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
     let armedNode: string | null = null
 
     function handleTouch(e: Event) {
+      const te = e as TouchEvent
+      const touch = te.changedTouches[0]
+      if (isOverShield(touch.clientX, touch.clientY)) return // idem sur mobile
+
       const target = e.target as Element
       const hitArea = target.closest('.hit-area')
       if (!hitArea) return
