@@ -1,7 +1,9 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { X, Save, Image as ImageIcon, GraduationCap, Bold, Italic, Heading, Quote, List, ListOrdered, Link, Minus } from 'lucide-react'
+import { useState, useRef, useMemo } from 'react'
+import { X, Save, Image as ImageIcon, GraduationCap, Bold, Italic, Heading, Quote, ListOrdered, Link, Eye, EyeOff } from 'lucide-react'
+import { remark } from 'remark'
+import html from 'remark-html'
 import { ImageUpload } from './ImageUpload'
 import { ShimmerButton } from '@/components/ui/ShimmerButton'
 import { CitationPicker } from '@/components/editor/CitationPicker'
@@ -35,15 +37,27 @@ interface BilletData {
 export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onSave }: BilletEditorProps) {
   const [title, setTitle] = useState(initialData?.title || '')
   const [slug, setSlug] = useState(initialData?.slug || '')
+  const [tags] = useState<string[]>([]) // Champs supprimés mais nécessaires pour la compatibilité
+  const [excerpt] = useState<string>('') // Champs supprimés mais nécessaires pour la compatibilité
   const [content, setContent] = useState(initialData?.content || '')
-  const [tags, setTags] = useState(initialData?.tags?.join(', ') || '')
-  const [excerpt, setExcerpt] = useState(initialData?.excerpt || '')
   const [showImageUpload, setShowImageUpload] = useState(false)
+  const [showPreview, setShowPreview] = useState(false)
   const [showCitationPicker, setShowCitationPicker] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   
   const editorRef = useRef<any>(null)
+
+  // Rendu markdown pour l'aperçu
+  const previewHtml = useMemo(() => {
+    if (!showPreview || !content.trim()) return ''
+    try {
+      return remark().use(html).processSync(content).toString()
+    } catch (error) {
+      console.error('Erreur de rendu markdown:', error)
+      return '<p>Erreur de rendu markdown</p>'
+    }
+  }, [content, showPreview])
 
   // Génération automatique du slug depuis le titre
   const generateSlug = (titleText: string) => {
@@ -113,10 +127,8 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
     { icon: Italic, action: () => insertMarkdown('*', '*'), title: 'Italique' },
     { icon: Heading, action: () => insertMarkdown('## '), title: 'Titre' },
     { icon: Quote, action: () => insertMarkdown('> '), title: 'Citation' },
-    { icon: List, action: () => insertMarkdown('- '), title: 'Liste' },
     { icon: ListOrdered, action: () => insertMarkdown('1. '), title: 'Liste numérotée' },
     { icon: Link, action: () => insertMarkdown('[', '](url)'), title: 'Lien' },
-    { icon: Minus, action: () => insertMarkdown('\n---\n'), title: 'Ligne horizontale' },
   ]
 
   const handleSave = async () => {
@@ -134,14 +146,12 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
     setError(null)
 
     try {
-      const tagsArray = tags.split(',').map(t => t.trim()).filter(t => t.length > 0)
-      
       await onSave({
         slug: mode === 'create' ? slug : initialData?.slug,
         title: title.trim(),
         content: content.trim(),
-        tags: tagsArray,
-        excerpt: excerpt.trim(),
+        tags: tags,
+        excerpt: excerpt,
       })
       
       onClose()
@@ -171,7 +181,16 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
         </div>
 
         {/* Toolbar */}
-        <div className="flex items-center justify-end p-4 border-b bg-gray-50">
+        <div className="flex items-center justify-between p-4 border-b bg-gray-50">
+          <button
+            onClick={() => setShowPreview(!showPreview)}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+            type="button"
+          >
+            {showPreview ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {showPreview ? 'Éditer' : 'Aperçu'}
+          </button>
+          <div>
           <ShimmerButton
             onClick={handleSave}
             disabled={isSaving}
@@ -186,68 +205,24 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
               }
             </span>
           </ShimmerButton>
+          </div>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-hidden flex">
           <div className="flex-1 p-6 overflow-y-auto">
-            {/* Meta Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Titre *
-                </label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => handleTitleChange(e.target.value)}
-                  className="input-field"
-                  placeholder="Titre de votre billet"
-                />
-              </div>
-              
-              {mode === 'create' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Slug *
-                  </label>
-                  <input
-                    type="text"
-                    value={slug}
-                    onChange={(e) => setSlug(e.target.value)}
-                    className="input-field font-mono text-sm"
-                    placeholder="2025-08-11-mon-billet"
-                  />
-                </div>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tags (séparés par des virgules)
-                </label>
-                <input
-                  type="text"
-                  value={tags}
-                  onChange={(e) => setTags(e.target.value)}
-                  className="input-field"
-                  placeholder="philosophie, collaboration, images"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Résumé
-                </label>
-                <input
-                  type="text"
-                  value={excerpt}
-                  onChange={(e) => setExcerpt(e.target.value)}
-                  className="input-field"
-                  placeholder="Résumé du billet..."
-                />
-              </div>
+            {/* Meta Fields - Simplifié */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Titre *
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => handleTitleChange(e.target.value)}
+                className="input-field w-full"
+                placeholder="Titre de votre billet"
+              />
             </div>
 
             {/* Éditeur Markdown avec preview intégré */}
@@ -257,50 +232,66 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
               </label>
               
               <div className="border border-gray-300 rounded-md overflow-hidden">
-                {/* Toolbar personnalisée */}
-                <div className="flex items-center gap-1 p-2 bg-gray-50 border-b border-gray-200">
-                  {toolbarActions.map((action, index) => (
-                    <button
-                      key={index}
-                      onClick={action.action}
-                      title={action.title}
-                      className="p-2 rounded hover:bg-gray-200 transition-colors"
-                      type="button"
-                    >
-                      <action.icon className="h-4 w-4" />
-                    </button>
-                  ))}
-                  <div className="w-px h-6 bg-gray-300 mx-1" />
-                  <button
-                    onClick={() => setShowImageUpload(true)}
-                    title="Insérer une image"
-                    className="p-2 rounded hover:bg-gray-200 transition-colors"
-                    type="button"
-                  >
-                    <ImageIcon className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setShowCitationPicker(true)}
-                    title="Insérer une citation"
-                    className="p-2 rounded hover:bg-gray-200 transition-colors"
-                    type="button"
-                  >
-                    <GraduationCap className="h-4 w-4" />
-                  </button>
-                </div>
+                {!showPreview && (
+                  <>
+                    {/* Toolbar personnalisée */}
+                    <div className="flex items-center gap-1 p-2 bg-gray-50 border-b border-gray-200">
+                      {toolbarActions.map((action, index) => (
+                        <button
+                          key={index}
+                          onClick={action.action}
+                          title={action.title}
+                          className="p-2 rounded hover:bg-gray-200 transition-colors"
+                          type="button"
+                        >
+                          <action.icon className="h-4 w-4" />
+                        </button>
+                      ))}
+                      <div className="w-px h-6 bg-gray-300 mx-1" />
+                      <button
+                        onClick={() => setShowImageUpload(true)}
+                        title="Insérer une image"
+                        className="p-2 rounded hover:bg-gray-200 transition-colors"
+                        type="button"
+                      >
+                        <ImageIcon className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => setShowCitationPicker(true)}
+                        title="Insérer une citation"
+                        className="p-2 rounded hover:bg-gray-200 transition-colors"
+                        type="button"
+                      >
+                        <GraduationCap className="h-4 w-4" />
+                      </button>
+                    </div>
 
-                {/* Éditeur CodeMirror */}
-                <CodeMirror
-                  ref={editorRef}
-                  value={content}
-                  onChange={(value) => setContent(value)}
-                  extensions={extensions}
-                  placeholder="# Votre billet en Markdown
+                    {/* Éditeur CodeMirror */}
+                    <CodeMirror
+                      ref={editorRef}
+                      value={content}
+                      onChange={(value) => setContent(value)}
+                      extensions={extensions}
+                      placeholder="# Votre billet en Markdown
 
 Écrivez votre contenu ici...
 
 Vous pouvez utiliser la **syntaxe Markdown** et insérer des images et citations avec la barre d'outils."
-                />
+                    />
+                  </>
+                )}
+
+                {showPreview && (
+                  <div className="p-4 prose prose-sm max-w-none min-h-[400px] bg-white">
+                    {content.trim() ? (
+                      <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+                    ) : (
+                      <div className="text-gray-500 italic">
+                        Saisissez du contenu pour voir l'aperçu...
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
