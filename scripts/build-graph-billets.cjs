@@ -106,12 +106,28 @@ function applyStabilizedLayout(nodes, pivots, existingPositions) {
   }
 }
 
+// Charger la liste des billets supprimés (dans trash)
+async function loadTrashedSlugs() {
+  try {
+    const trashFiles = (await fs.readdir(TRASH_DIR)).filter(f => f.endsWith('.mdx'))
+    return new Set(trashFiles.map(f => f.replace(/\.mdx$/, '')))
+  } catch (e) {
+    console.log('   📄 Aucun billet supprimé trouvé dans trash')
+    return new Set()
+  }
+}
+
 async function main() {
   console.log('🔗 Construction du graphe des billets...')
   
   // Charger les données de stabilité
   const pivots = await loadPivots()
   const existingPositions = await loadPositions()
+  const trashedSlugs = await loadTrashedSlugs()
+  
+  if (trashedSlugs.size > 0) {
+    console.log(`   🗑️  ${trashedSlugs.size} billets dans trash à exclure`)
+  }
   
   const nodes = new Map() /** @type {Map<string, Node>} */
   const edges = new Set() /** @type {Set<string>} */
@@ -141,11 +157,11 @@ async function main() {
       })
     }
 
-    // a) Wikilinks [[slug]]
+    // a) Wikilinks [[slug]] - Exclure les billets supprimés
     const wikiMatches = [...content.matchAll(/\[\[([^\]]+)\]\]/g)]
     for (const m of wikiMatches) {
       const targetSlug = m[1].trim()
-      if (!targetSlug) continue
+      if (!targetSlug || trashedSlugs.has(targetSlug)) continue
       const to = `billet:${targetSlug}`
       if (!nodes.has(to)) {
         nodes.set(to, { 
@@ -165,11 +181,11 @@ async function main() {
       }
     }
 
-    // b) Liens markdown internes → /billets/target
+    // b) Liens markdown internes → /billets/target - Exclure les billets supprimés
     const mdMatches = [...content.matchAll(/\]\(\/billets\/([^)#?\s/]+)\)/g)]
     for (const m of mdMatches) {
       const targetSlug = m[1].trim()
-      if (!targetSlug) continue
+      if (!targetSlug || trashedSlugs.has(targetSlug)) continue
       const to = `billet:${targetSlug}`
       if (!nodes.has(to)) {
         nodes.set(to, { 

@@ -147,7 +147,11 @@ export function UnifiedSearchClient() {
               placeholder="Rechercher dans billets et publications..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="block w-full pl-10 pr-3 py-3 border border-subtle/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent bg-background text-foreground text-lg transition-all duration-200"
+              className="block w-full pl-10 pr-3 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-transparent text-foreground text-lg transition-all duration-300 bg-background/20 backdrop-blur-md border border-white/10 shadow-lg hover:shadow-xl hover:bg-background/30"
+              style={{
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(0, 0, 0, 0.1)'
+              }}
             />
           </div>
         </div>

@@ -222,10 +222,10 @@ function applyForceLayout(nodes, edges, iterations = 200) {
         const dy = nodeB.y - nodeA.y
         const dist = Math.sqrt(dx * dx + dy * dy) || 1
         
-        // Répulsion très forte pour aérer davantage
-        const repulsion = (1000 / (dist * dist)) * cooling // Forte augmentation de la répulsion
+        // Répulsion ultra-forte pour maximum d'espacement
+        const repulsion = (2500 / (dist * dist)) * cooling // Répulsion massivement augmentée
         const fx = (dx / dist) * repulsion
-        const fy = (dy / dist) * repulsion * 0.7 // Moins de force verticale
+        const fy = (dy / dist) * repulsion * 0.8 // Moins de force verticale
         
         nodeA.x -= fx
         nodeA.y -= fy
@@ -705,10 +705,10 @@ async function main() {
     const tiers = calculateTiers(graphData.nodes)
     console.log(`   🎯 Tiers: T1≥${tiers.tier1}, T2≥${tiers.tier2}, T3≥${tiers.tier3}`)
     
-    // Filter nodes (keep top nodes and some connected ones) and add text metrics
+    // Filter nodes (keep connected and interesting nodes) and add text metrics
     let filteredNodes = graphData.nodes
       .filter(node => (node.degree || 0) >= 1) // Only keep connected nodes
-      .slice(0, 30) // Limit to 30 nodes for readability
+      .slice(0, 20) // Limit to 20 nodes for better readability and spacing
     
     // Add precise text metrics for collision detection
     filteredNodes = addTextMetrics(filteredNodes, tiers)
@@ -723,8 +723,8 @@ async function main() {
     
     // Apply controlled elliptical layout with collision resolution (forme élégante horizontale)
     filteredNodes = applyEllipticalLayout(filteredNodes)
-    filteredNodes = applyForceLayout(filteredNodes, filteredEdges, 200)
-    const { finalNodes, visibleLabels } = applyCollisionResolution(filteredNodes) // Chorégraphie
+    filteredNodes = applyForceLayout(filteredNodes, filteredEdges, 300) // Plus d'itérations pour plus d'espacement
+    const { finalNodes, visibleLabels } = applyCollisionResolution(filteredNodes, 75, 30) // Plus de padding pour éviter collisions
     filteredNodes = centerAndPadGraph(finalNodes) // Centrage pondéré final
     
     // Generate SVG
