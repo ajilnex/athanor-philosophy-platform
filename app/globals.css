@@ -46,6 +46,9 @@
   .btn-secondary {
     @apply btn bg-background border border-subtle/50 text-foreground shadow-sm hover:bg-muted;
   }
+  .btn-danger {
+    @apply btn bg-destructive text-white shadow-sm hover:bg-destructive/90;
+  }
   
   .card {
     @apply bg-background/80 border border-transparent rounded-lg shadow-sm transition-all duration-300 hover:border-subtle/50 hover:shadow-md backdrop-blur-sm p-6;

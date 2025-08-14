@@ -73,6 +73,18 @@ async function fsAll(): Promise<Billet[]> {
   }
 }
 
+// Fonction utilitaire pour vérifier si un billet est dans trash
+export async function isBilletInTrash(slug: string): Promise<boolean> {
+  try {
+    const trashDir = path.join(process.cwd(), 'content', 'trash')
+    const trashPath = path.join(trashDir, `${slug}.mdx`)
+    await fs.access(trashPath)
+    return true
+  } catch {
+    return false
+  }
+}
+
 // Ne traite QUE les backlinks [[...]] en sécurité
 async function transformBacklinks(content: string): Promise<string> {
   const allSlugs = await getBilletSlugs()

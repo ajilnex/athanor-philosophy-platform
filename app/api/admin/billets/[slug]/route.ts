@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { generateBilletContent, updateFileWithContribution, deleteFileOnGitHub, getFileFromGitHub } from '@/lib/github.server'
+import { generateBilletContent, updateFileWithContribution, moveFileToTrash, getFileFromGitHub } from '@/lib/github.server'
 
 export async function PUT(
   request: NextRequest,
@@ -154,24 +154,22 @@ export async function DELETE(
       )
     }
 
-    // Suppression du fichier sur GitHub
-    await deleteFileOnGitHub(
+    // Déplacement du fichier vers trash (suppression douce)
+    await moveFileToTrash(
       filePath,
-      `feat: Suppression billet "${slug}"
-
-Supprimé via l'interface d'admin d'Athanor
+      `Billet "${slug}" supprimé via l'interface d'admin d'Athanor
 
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>`
     )
 
-    console.log(`🗑️ Billet supprimé: ${slug}`)
+    console.log(`🗑️ Billet déplacé vers trash: ${slug}`)
 
     return NextResponse.json(
       {
         success: true,
-        message: `Billet "${slug}" supprimé avec succès`,
+        message: `Billet "${slug}" déplacé vers trash avec succès`,
       },
       { status: 200 }
     )

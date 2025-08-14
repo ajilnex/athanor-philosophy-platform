@@ -1,6 +1,10 @@
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import { remark } from 'remark'
 import html from 'remark-html'
+import { BibliographyProvider } from '@/components/bibliography/BibliographyProvider'
+import { Cite } from '@/components/bibliography/Cite'
+import { Bibliography } from '@/components/bibliography/Bibliography'
+import { BibliographyIndex } from '@/components/bibliography/BibliographyIndex'
 
 // Composants disponibles dans MDX
 const mdxComponents = {
@@ -41,17 +45,22 @@ const mdxComponents = {
   // Blockquotes
   blockquote: (props: any) => <blockquote className="border-l-4 border-gray-200 pl-4 my-4 italic text-subtle" {...props} />,
   
-  // Composants personnalisés Athanor - Aucun composant interactif dans le contenu
+  // Composants personnalisés Athanor
+  Cite,
+  Bibliography,
+  BibliographyIndex,
 }
 
 // Compilateur mixte MDX/MD côté serveur
 export async function compileMDX(content: string, isMdx: boolean = true) {
   if (isMdx) {
-    // Contenu MDX - compilation complète avec composants React
+    // Contenu MDX - compilation complète avec composants React et provider bibliographie
     return (
-      <div className="prose prose-sm sm:prose max-w-none">
-        <MDXRemote source={content} components={mdxComponents} />
-      </div>
+      <BibliographyProvider>
+        <div className="prose prose-sm sm:prose max-w-none">
+          <MDXRemote source={content} components={mdxComponents} />
+        </div>
+      </BibliographyProvider>
     )
   } else {
     // Contenu MD simple - traitement via remark

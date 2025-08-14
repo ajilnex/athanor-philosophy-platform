@@ -1,0 +1,31 @@
+{
+  "example-key-2024": [
+    {
+      "slug": "bibliographie-collective",
+      "title": "Bibliographie collective d'Athanor",
+      "excerpt": "...un système de citation par composants : - Citation dans le texte : ` ` génère une note numérotée - Bibliographie finale : ` ` affiche automatiquement la liste des..."
+    },
+    {
+      "slug": "test-citation-2",
+      "title": "Deuxième test de citation",
+      "excerpt": "...permet de tester que la même référence peut être citée dans plusieurs billets. La recherche philosophique contemporaine s'appuie sur des fondements méthodologiques rigoureux. Les développements récents confirment cette tendance."
+    },
+    {
+      "slug": "test-citation",
+      "title": "Test du système de citations",
+      "excerpt": "...tester l'implémentation du système de citations académiques d'Athanor. Exemple de citation simple Selon certains auteurs , la philosophie moderne nécessite une approche rigoureuse des sources. Exemple avec plusieurs citations Les..."
+    }
+  ],
+  "another-example-2023": [
+    {
+      "slug": "test-citation-2",
+      "title": "Deuxième test de citation",
+      "excerpt": "...philosophique contemporaine s'appuie sur des fondements méthodologiques rigoureux. Les développements récents confirment cette tendance."
+    },
+    {
+      "slug": "test-citation",
+      "title": "Test du système de citations",
+      "excerpt": "...plusieurs citations Les travaux récents montrent une convergence entre les approches analytiques et continentales . Répétition d'une citation Comme nous l'avons déjà mentionné , cette approche reste pertinente. Bibliographie automatique..."
+    }
+  ]
+}

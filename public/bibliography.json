@@ -1,0 +1,45 @@
+[
+  {
+    "key": "example-key-2024",
+    "type": "book",
+    "title": "Foundations of Modern Philosophy",
+    "authors": [
+      {
+        "family": "Smith",
+        "given": "John"
+      }
+    ],
+    "year": "2024",
+    "container": "",
+    "DOI": "10.1000/123456",
+    "URL": "",
+    "ISBN": "978-0-123456-78-9",
+    "tags": ["philosophy", "methodology"],
+    "publisher": "Academic Press",
+    "place": "Oxford"
+  },
+  {
+    "key": "another-example-2023",
+    "type": "article",
+    "title": "Contemporary Approaches to Analytical Philosophy",
+    "authors": [
+      {
+        "family": "Johnson",
+        "given": "Mary"
+      },
+      {
+        "family": "Williams",
+        "given": "Robert"
+      }
+    ],
+    "year": "2023",
+    "container": "Journal of Philosophy",
+    "DOI": "10.1234/phil.2023.456",
+    "URL": "",
+    "ISBN": "",
+    "tags": ["analytical philosophy", "contemporary"],
+    "volume": "120",
+    "issue": "3",
+    "pages": "45-72"
+  }
+]

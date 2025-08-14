@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { Edit3 } from 'lucide-react'
+import { Edit3, Trash2 } from 'lucide-react'
 import { BilletEditor } from './BilletEditor'
 import toast from 'react-hot-toast'
 
@@ -25,6 +25,7 @@ export function EditBilletButton({
 }: EditBilletButtonProps) {
   const { data: session, status } = useSession()
   const [showEditor, setShowEditor] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   // Seuls les utilisateurs avec rôle USER ou ADMIN peuvent contribuer
   if (status === 'loading') return null
@@ -32,6 +33,8 @@ export function EditBilletButton({
   
   const userRole = (session.user as any)?.role
   if (userRole === 'VISITOR') return null
+
+  const isAdmin = userRole === 'ADMIN'
 
   const handleUpdateBillet = async (data: any) => {
     try {
@@ -65,18 +68,60 @@ export function EditBilletButton({
     }
   }
 
+  const handleDeleteBillet = async () => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer le billet "${title}" ?\n\nIl sera déplacé vers le dossier trash et ne sera plus visible nulle part.`)) {
+      return
+    }
+
+    setIsDeleting(true)
+    
+    try {
+      const response = await fetch(`/api/admin/billets/${slug}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Erreur lors de la suppression')
+      }
+
+      const result = await response.json()
+      toast.success(result.message)
+      
+      // Rediriger vers la liste des billets
+      window.location.href = '/billets'
+    } catch (error) {
+      console.error('Erreur suppression:', error)
+      toast.error('Erreur lors de la suppression')
+      setIsDeleting(false)
+    }
+  }
+
   return (
     <>
-      <div className={`inline-flex ${className}`}>
+      <div className={`inline-flex gap-2 ${className}`}>
         <button
           onClick={() => setShowEditor(true)}
           className="btn btn-secondary text-xs"
         >
           <Edit3 className="h-4 w-4" />
           <span>
-            {(session.user as any).role === 'ADMIN' ? 'Éditer' : 'Proposer modification'}
+            {isAdmin ? 'Éditer' : 'Proposer modification'}
           </span>
         </button>
+        
+        {isAdmin && (
+          <button
+            onClick={handleDeleteBillet}
+            disabled={isDeleting}
+            className="btn btn-danger text-xs"
+          >
+            <Trash2 className="h-4 w-4" />
+            <span>
+              {isDeleting ? 'Suppression...' : 'Supprimer'}
+            </span>
+          </button>
+        )}
       </div>
 
       <BilletEditor

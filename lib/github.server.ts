@@ -103,6 +103,39 @@ export async function deleteFileOnGitHub(path: string, message: string): Promise
 }
 
 /**
+ * Déplace un fichier vers le dossier trash (suppression douce)
+ */
+export async function moveFileToTrash(sourcePath: string, message: string): Promise<void> {
+  const octokit = getOctokit()
+  
+  // Récupérer le contenu du fichier source
+  const sourceFile = await getFileFromGitHub(sourcePath)
+  if (!sourceFile) {
+    throw new Error(`Fichier non trouvé : ${sourcePath}`)
+  }
+
+  // Extraire le nom du fichier
+  const fileName = sourcePath.split('/').pop()
+  const trashPath = `content/trash/${fileName}`
+
+  // Créer le fichier dans trash
+  await updateFileOnGitHub({
+    path: trashPath,
+    content: sourceFile.content,
+    message: `trash: Déplacement de ${sourcePath} vers trash\n\n${message}`
+  })
+
+  // Supprimer le fichier original
+  await octokit.repos.deleteFile({
+    owner: REPO_OWNER,
+    repo: REPO_NAME,
+    path: sourcePath,
+    message: `trash: Suppression de ${sourcePath} (déplacé vers trash)\n\n${message}`,
+    sha: sourceFile.sha,
+  })
+}
+
+/**
  * Génère le contenu MDX d'un billet
  */
 export function generateBilletContent(
