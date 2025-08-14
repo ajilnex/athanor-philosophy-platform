@@ -134,6 +134,7 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
     const cloneElements = new Map<string, SVGGElement>()
 
     function createClone(nodeId: string) {
+      if (!svgElement) return
       const originalNode = svgElement.querySelector(`[data-id="${nodeId}"]`)
       const originalLink = originalNode?.closest('a')
       if (!originalNode || !originalLink) return
@@ -184,6 +185,7 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
       const neighbors = adjacencyMap.get(nodeId) || new Set()
       
       neighbors.forEach(neighborId => {
+        if (!svgElement) return
         const neighborNode = svgElement.querySelector(`[data-id="${neighborId}"]`)
         if (neighborNode) {
           const neighborCircle = neighborNode.querySelector('circle.node-main')
