@@ -87,18 +87,31 @@ export function CommentSection({ targetType, targetId, title, className = '' }: 
   }, [targetType, targetId])
 
   // Ajouter un nouveau commentaire
-  const handleCommentAdded = (newComment: Comment) => {
-    setComments(prev => [newComment, ...prev])
+  const handleCommentAdded = (newComment: any) => {
+    // Normaliser la structure du commentaire pour correspondre à l'interface Comment
+    const normalizedComment: Comment = {
+      ...newComment,
+      replies: [], // Nouveau commentaire n'a pas de réponses
+      _count: { replies: 0 } // Initialiser le compteur
+    }
+    setComments(prev => [normalizedComment, ...prev])
     setPagination(prev => ({ ...prev, total: prev.total + 1 }))
   }
 
   // Ajouter une réponse à un commentaire existant
-  const handleReplyAdded = (parentId: string, reply: Comment) => {
+  const handleReplyAdded = (parentId: string, reply: any) => {
+    // Normaliser la réponse
+    const normalizedReply: Comment = {
+      ...reply,
+      replies: [], // Les réponses n'ont pas de sous-réponses (max 2 niveaux)
+      _count: { replies: 0 }
+    }
+    
     setComments(prev => prev.map(comment => {
       if (comment.id === parentId) {
         return {
           ...comment,
-          replies: [...comment.replies, reply],
+          replies: [...comment.replies, normalizedReply],
           _count: { replies: comment._count.replies + 1 }
         }
       }
