@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-// Charge les variables d'environnement
-require('dotenv').config({ path: '.env.local' })
+// Variables d'environnement chargées automatiquement par Next.js
 
 /**
  * Script de build pour créer un index de recherche unifié

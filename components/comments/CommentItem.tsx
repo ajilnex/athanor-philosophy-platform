@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 import { Reply, Edit3, Trash2, Eye, EyeOff, Clock, User } from 'lucide-react'
 import { CommentForm } from './CommentForm'
 
@@ -204,10 +205,13 @@ export function CommentItem({
             {/* Avatar */}
             <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center overflow-hidden">
               {comment.author.image ? (
-                <img 
+                <Image 
                   src={comment.author.image} 
                   alt={comment.author.name || 'Avatar'}
+                  width={32}
+                  height={32}
                   className="w-full h-full object-cover"
+                  priority={false}
                 />
               ) : (
                 <User className="h-4 w-4 text-subtle" />

@@ -21,8 +21,8 @@ const config: Config = {
         black: '#000000',
       },
       fontFamily: {
-        serif: ['IBM Plex Serif', 'Georgia', 'serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-serif)', 'Georgia', 'serif'],
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
       },
       backgroundImage: {
         'aurore-gradient': 'radial-gradient(120% 120% at 50% 0%, hsl(var(--background)) 50%, hsl(var(--accent) / 0.1))',

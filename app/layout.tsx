@@ -1,9 +1,26 @@
 import type { Metadata } from 'next'
+import { IBM_Plex_Serif, Inter } from 'next/font/google'
 import './globals.css'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import AppSessionProvider from '@/components/SessionProvider'
 import { Toaster } from 'react-hot-toast'
+
+// Optimisation des polices avec next/font
+const ibmPlexSerif = IBM_Plex_Serif({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  style: ['normal', 'italic'],
+  variable: '--font-serif',
+  display: 'swap',
+})
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-sans',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: "L'athanor — Plateforme philosophique",
@@ -17,7 +34,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body className="min-h-screen bg-background text-foreground">
+      <body className={`min-h-screen bg-background text-foreground ${inter.variable} ${ibmPlexSerif.variable}`}>
         <AppSessionProvider>
           <div className="flex flex-col min-h-screen">
             <Navbar />

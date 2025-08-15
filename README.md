@@ -13,12 +13,13 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
 
 ## Technologies
 
-- **Next.js 14** - Framework React avec App Router
+- **Next.js 15.x** - Framework React avec App Router
+- **React 19** - Bibliothèque d'interface utilisateur
 - **TypeScript** - Typage statique
 - **Tailwind CSS** - Framework CSS utilitaire
 - **Prisma** - ORM et gestion de base de données
-- **SQLite** - Base de données locale
-- **React PDF** - Visualisation PDF
+- **PostgreSQL** - Base de données via Prisma
+- **MDX support** - Support des contenus MDX via @next/mdx
 - **Fuse.js** - Recherche floue
 
 ## Installation
@@ -36,20 +37,32 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
 
 3. **Configurez l'environnement**
    ```bash
-   cp .env.example .env
+   cp .env.example .env.local
+   ```
+   
+   Modifiez `.env.local` avec vos variables d'environnement :
+   ```bash
+   DATABASE_URL="postgresql://user:password@localhost:5432/athanor_dev"
+   DIRECT_DATABASE_URL="postgresql://user:password@localhost:5432/athanor_dev"
    ```
 
-4. **Initialisez la base de données**
+4. **Lancez PostgreSQL avec Docker**
+   ```bash
+   docker run --name postgres-athanor -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e POSTGRES_DB=athanor_dev -p 5432:5432 -d postgres:15
+   ```
+
+5. **Initialisez la base de données**
    ```bash
    npx prisma db push
+   npx prisma db seed
    ```
 
-5. **Lancez le serveur de développement**
+6. **Lancez le serveur de développement**
    ```bash
    npm run dev
    ```
 
-6. **Ouvrez votre navigateur**
+7. **Ouvrez votre navigateur**
    ```
    http://localhost:3000
    ```
@@ -57,18 +70,27 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
 ## Structure du projet
 
 ```
-athanor/
+philosophy-platform/
 ├── app/                    # App Router de Next.js
 │   ├── admin/             # Interface d'administration
+│   ├── billets/           # Pages des billets (MDX)
+│   ├── edition/           # Maison d'édition et auteurs
+│   ├── graphe/            # Visualisation graphique
 │   ├── publications/      # Pages des publications
-│   ├── search/            # Page de recherche
+│   ├── recherche/         # Page de recherche
 │   └── api/              # Routes API
 ├── components/            # Composants React réutilisables
+│   ├── graph/            # Composants de visualisation
 │   ├── layout/           # Composants de mise en page
-│   └── admin/            # Composants d'administration
+│   ├── publications/     # Composants PDF et publications
+│   └── ui/               # Composants d'interface
+├── content/              # Contenu MDX
+│   └── billets/          # Billets au format MDX
 ├── lib/                  # Utilitaires et configuration
 ├── prisma/               # Schéma et migrations de base de données
+├── scripts/              # Scripts de build et utilitaires
 └── public/               # Fichiers statiques
+    ├── images/           # Images et assets
     └── uploads/          # Fichiers PDF uploadés
 ```
 

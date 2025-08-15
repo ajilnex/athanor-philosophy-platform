@@ -48,8 +48,8 @@ function formatFileSize(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
 }
 
-// Force dynamic rendering to avoid build-time API calls
-export const dynamic = 'force-dynamic'
+// ISR: Page statique régénérée toutes les 5 minutes
+export const revalidate = 300
 
 export default async function PublicationsPage() {
   const publications = await getPublications()

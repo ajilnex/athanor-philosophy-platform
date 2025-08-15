@@ -1,5 +1,4 @@
-// Charge les variables d'environnement
-require('dotenv').config({ path: '.env.local' });
+// Variables d'environnement chargées automatiquement par Next.js
 
 const { execSync } = require('node:child_process');
 
