@@ -8,6 +8,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { MiniGraph } from '@/components/graph/MiniGraph'
+import { CommentSection } from '@/components/comments/CommentSection'
 import { isFileInTrash } from '@/lib/github.server'
 
 export async function generateStaticParams() {
@@ -133,6 +134,13 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
       <article className="max-w-none">
         {await compileMDX(billet.content, billet.isMdx)}
       </article>
+
+      {/* Section commentaires */}
+      <CommentSection
+        targetType="billet"
+        targetId={slug}
+        title={billet.title}
+      />
 
       {/* Ligne de pensée */}
       <section className="mt-16 pt-8 border-t border-subtle/20">

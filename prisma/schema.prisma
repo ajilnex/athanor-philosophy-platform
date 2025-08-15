@@ -55,6 +55,7 @@ model User {
   updatedAt      DateTime  @updatedAt
   accounts       Account[]
   sessions       Session[]
+  comments       Comment[]
 }
 
 model Account {
@@ -90,4 +91,32 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  content    String
+  authorId   String
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Polymorphe: soit billet soit publication
+  targetType String   // 'billet' | 'publication'
+  targetId   String   // slug pour billets, id pour publications
+  
+  // Hiérarchie (max 2 niveaux)
+  parentId   String?
+  parent     Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies    Comment[] @relation("CommentReplies")
+  
+  // Modération
+  isApproved Boolean  @default(false)
+  isVisible  Boolean  @default(true)
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  @@index([targetType, targetId, createdAt])
+  @@index([parentId, createdAt])
+  @@index([isApproved, isVisible])
+  @@index([authorId])
 }

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ArrowLeft, User, Calendar, FileText, Tag, Download, Lock } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { PdfClientViewer } from '@/components/publications/PdfClientViewer'
+import { CommentSection } from '@/components/comments/CommentSection'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 
@@ -181,6 +182,13 @@ export default async function PublicationPage({
           initialPage={initialPage}
         />
       </div>
+
+      {/* Section commentaires */}
+      <CommentSection
+        targetType="publication"
+        targetId={publication.id}
+        title={publication.title}
+      />
 
       {/* Publication Summary */}
       <div className="card border-subtle mt-6 sm:mt-8">
