@@ -11,7 +11,9 @@ import { BacklinkPicker } from '@/components/editor/BacklinkPicker'
 import CodeMirror from '@uiw/react-codemirror'
 import { markdown } from '@codemirror/lang-markdown'
 import { EditorView } from '@codemirror/view'
-import { backlinkTriggerExtension, cleanupBacklinkTrigger } from '@/lib/codemirror-backlink-trigger'
+// Déclencheur [[ retiré
+import { closeBrackets } from '@codemirror/autocomplete'
+import { Prec } from '@codemirror/state'
 
 interface BilletEditorProps {
   isOpen: boolean
@@ -46,7 +48,8 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
   const [showPreview, setShowPreview] = useState(false)
   const [showCitationPicker, setShowCitationPicker] = useState(false)
   const [showBacklinkPicker, setShowBacklinkPicker] = useState(false)
-  const [backlinkTriggerPosition, setBacklinkTriggerPosition] = useState<number | null>(null)
+  // Déclencheur [[ retiré
+  const [selectedTextForBacklink, setSelectedTextForBacklink] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   
@@ -115,29 +118,7 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
   }
 
   const insertBacklink = (backlinkText: string) => {
-    if (backlinkTriggerPosition !== null && editorRef.current?.view) {
-      // Mode déclencheur : remplacer les [[ par le backlink complet
-      const view = editorRef.current.view
-      const backlinkStart = backlinkTriggerPosition - 2 // Position des [[
-      
-      view.dispatch({
-        changes: {
-          from: backlinkStart, // Position des [[
-          to: backlinkTriggerPosition, // Position actuelle (après [[)
-          insert: backlinkText // Remplacer tout par le backlink complet
-        },
-        selection: { anchor: backlinkStart + backlinkText.length }
-      })
-      
-      const newContent = view.state.doc.toString()
-      setContent(newContent)
-      view.focus()
-      
-      setBacklinkTriggerPosition(null)
-    } else {
-      // Mode bouton : insérer au curseur
-      insertTextAtCursor(backlinkText)
-    }
+    insertTextAtCursor(backlinkText)
   }
 
   const handleBacklinkSelected = (slug: string, alias?: string) => {
@@ -189,25 +170,19 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
     setShowBacklinkPicker(false)
   }
 
-  const handleBacklinkTrigger = useCallback((position: number) => {
-    console.log('🎯 handleBacklinkTrigger appelé avec position:', position)
-    // Ignorer les déclencheurs quand le picker est déjà ouvert (mode bouton)
-    if (showBacklinkPicker) {
-      console.log('🎯 Picker déjà ouvert, trigger ignoré')
-      return
+  const openBacklinkPickerFromToolbar = () => {
+    if (editorRef.current?.view) {
+      const view = editorRef.current.view
+      const sel = view.state.selection.main
+      const txt = sel.empty ? '' : view.state.sliceDoc(sel.from, sel.to)
+      setSelectedTextForBacklink(txt)
+    } else {
+      setSelectedTextForBacklink('')
     }
-    
-    console.log('🎯 Ouverture picker, position:', position)
-    setBacklinkTriggerPosition(position)
     setShowBacklinkPicker(true)
-  }, [showBacklinkPicker])
+  }
 
   const handleBacklinkPickerClose = () => {
-    // Nettoyer les [[ orphelins si on ferme sans sélection
-    if (backlinkTriggerPosition !== null && editorRef.current?.view) {
-      cleanupBacklinkTrigger(editorRef.current.view, backlinkTriggerPosition)
-      setBacklinkTriggerPosition(null)
-    }
     setShowBacklinkPicker(false)
   }
 
@@ -221,8 +196,9 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
       '.cm-focused': { outline: 'none' },
       '.cm-editor': { borderRadius: '8px' }
     }),
-    backlinkTriggerExtension(handleBacklinkTrigger)
-  ], [handleBacklinkTrigger])
+    // Désactiver l'auto‑complétion des crochets [] pour éviter les ]] ajoutés automatiquement
+    Prec.highest(closeBrackets({ brackets: '(){}""\'\'' })),
+  ], [])
 
   // Actions toolbar
   const insertMarkdown = (before: string, after: string = '') => {
@@ -376,7 +352,7 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
                         <GraduationCap className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => setShowBacklinkPicker(true)}
+                        onClick={openBacklinkPickerFromToolbar}
                         title="Insérer un backlink"
                         className="p-2 rounded hover:bg-gray-200 transition-colors"
                         type="button"
@@ -390,6 +366,7 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
                       ref={editorRef}
                       value={content}
                       onChange={(value) => setContent(value)}
+                      basicSetup={{ closeBrackets: false }}
                       extensions={extensions}
                       placeholder="# Votre billet en Markdown
 
@@ -458,6 +435,7 @@ Vous pouvez utiliser la **syntaxe Markdown** et insérer des images et citations
           onClose={handleBacklinkPickerClose}
           onSelect={handleBacklinkSelected}
           onCreateNew={handleCreateNewBillet}
+          selectedText={selectedTextForBacklink}
         />
       </div>
     </div>

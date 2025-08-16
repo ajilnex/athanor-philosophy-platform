@@ -8,6 +8,8 @@ import { EditorView } from '@codemirror/view'
 import { InsertReferenceDialog } from './InsertReferenceDialog'
 import { BacklinkPicker } from '@/components/editor/BacklinkPicker'
 import { backlinkTriggerExtension, cleanupBacklinkTrigger } from '@/lib/codemirror-backlink-trigger'
+import { closeBrackets } from '@codemirror/autocomplete'
+import { Prec } from '@codemirror/state'
 import toast from 'react-hot-toast'
 
 interface EditorClientProps {
@@ -22,6 +24,7 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
   const [showReferenceDialog, setShowReferenceDialog] = useState(false)
   const [showBacklinkPicker, setShowBacklinkPicker] = useState(false)
   const [backlinkTriggerPosition, setBacklinkTriggerPosition] = useState<number | null>(null)
+  const [selectedTextForBacklink, setSelectedTextForBacklink] = useState('')
   const editorRef = useRef<any>(null)
 
   const handleSave = async () => {
@@ -122,17 +125,18 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
     const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
     
     if (backlinkTriggerPosition !== null && editorRef.current?.view) {
-      // Mode déclencheur : remplacer les [[ par le backlink complet
+      // Mode déclencheur : remplacer le pattern complet [[...]] si présent, sinon jusqu'au curseur
       const view = editorRef.current.view
+      const docText = view.state.doc.toString()
+      const start = Math.max(0, backlinkTriggerPosition - 2)
+      const head = view.state.selection.main.head
+      const closeIdx = docText.indexOf(']]', start)
+      const end = closeIdx !== -1 && closeIdx >= start && closeIdx <= start + 100 ? closeIdx + 2 : head
       view.dispatch({
-        changes: {
-          from: backlinkTriggerPosition - 2, // Position des [[
-          to: backlinkTriggerPosition, // Position actuelle
-          insert: backlinkText
-        },
-        selection: { anchor: backlinkTriggerPosition - 2 + backlinkText.length }
+        changes: { from: start, to: end, insert: backlinkText },
+        selection: { anchor: start + backlinkText.length }
       })
-      
+
       const newContent = view.state.doc.toString()
       setContent(newContent)
       view.focus()
@@ -226,7 +230,18 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
           </button>
           
           <button
-            onClick={() => setShowBacklinkPicker(true)}
+            onClick={() => {
+              if (editorRef.current?.view) {
+                const view = editorRef.current.view
+                const sel = view.state.selection.main
+                const txt = sel.empty ? '' : view.state.sliceDoc(sel.from, sel.to)
+                setSelectedTextForBacklink(txt)
+              } else {
+                setSelectedTextForBacklink('')
+              }
+              setBacklinkTriggerPosition(null)
+              setShowBacklinkPicker(true)
+            }}
             className="inline-flex items-center px-3 py-2 text-sm bg-background border border-subtle/50 text-foreground rounded-md hover:bg-muted transition-colors"
           >
             <Link2 className="h-4 w-4 mr-2" />
@@ -259,6 +274,7 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
           ref={editorRef}
           value={content}
           height="100%"
+          basicSetup={{ closeBrackets: false }}
           extensions={[
             markdown(),
             EditorView.theme({
@@ -282,6 +298,8 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
                 height: '100%',
               }
             }),
+            // Désactiver l'auto‑complétion des crochets [] pour éviter les ]] ajoutés automatiquement
+            Prec.highest(closeBrackets({ brackets: '(){}""\'\'' })),
             backlinkTriggerExtension(handleBacklinkTrigger)
           ]}
           onChange={(value) => setContent(value)}
@@ -321,6 +339,7 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
         onClose={handleBacklinkPickerClose}
         onSelect={handleBacklinkSelected}
         onCreateNew={handleCreateNewBillet}
+        selectedText={selectedTextForBacklink}
       />
     </div>
   )
