@@ -190,11 +190,14 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
   }
 
   const handleBacklinkTrigger = (position: number) => {
+    console.log('🎯 handleBacklinkTrigger appelé avec position:', position)
     // Ignorer les déclencheurs quand le picker est déjà ouvert (mode bouton)
     if (showBacklinkPicker) {
+      console.log('🎯 Picker déjà ouvert, trigger ignoré')
       return
     }
     
+    console.log('🎯 Ouverture picker, position:', position)
     setBacklinkTriggerPosition(position)
     setShowBacklinkPicker(true)
   }

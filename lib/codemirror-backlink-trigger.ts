@@ -18,12 +18,15 @@ export function backlinkTriggerExtension(onTrigger: (position: number) => void):
       // Vérifier si l'insertion contient `[[`
       const bracketIndex = insertedText.indexOf('[[')
       if (bracketIndex !== -1) {
+        console.log('🔥 Déclencheur [[ détecté:', { insertedText, bracketIndex })
         // Position dans le document où `[[` a été inséré
         const absolutePosition = fromB + bracketIndex + 2 // +2 pour être après les `[[`
+        console.log('🔥 Position trigger:', absolutePosition)
         
         // Déclencher l'ouverture de la palette
         // Utiliser setTimeout pour éviter les conflits avec la transaction en cours
         setTimeout(() => {
+          console.log('🔥 Appel onTrigger')
           onTrigger(absolutePosition)
         }, 0)
       }
