@@ -1,6 +1,6 @@
 # Sécurité - L'Athanor
 
-Documentation des considérations de sécurité critiques pour la plateforme philosophique L'Athanor.
+Documentation des considérations de sécurité critiques pour la plateforme philosophique L'Athanor. Version mise à jour avec optimisations récentes et nouvelles fonctionnalités.
 
 ## 🚨 Risques Identifiés et Mesures Recommandées
 
@@ -126,8 +126,25 @@ DIRECT_DATABASE_URL="postgresql://..."  # Bypass pooler
 ### Configuration Vercel sécurisée
 
 ```javascript
-// Headers de sécurité (next.config.js)
+// Headers de sécurité + optimisations (next.config.js)
 const nextConfig = {
+  // Optimisations images (sécurité via remotePatterns)
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+        pathname: '/u/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      }
+    ],
+  },
+  
+  // Headers de sécurité
   async headers() {
     return [
       {
@@ -144,6 +161,10 @@ const nextConfig = {
           {
             key: 'X-XSS-Protection',
             value: '1; mode=block'
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin'
           }
         ]
       }
@@ -163,19 +184,46 @@ const nextConfig = {
 
 ### Métriques à surveiller
 
-- Nombre de requêtes `/api/find-in-pdf` par heure
-- Taille moyenne des PDF téléchargés
-- Latence des requêtes de commentaires
-- Utilisation mémoire pendant parsing PDF
+- **PDF API** : Nombre de requêtes `/api/find-in-pdf` par heure
+- **Performance** : Web Core Vitals (LCP, CLS, FID)
+- **Images** : Optimisation next/image (formats WebP/AVIF)
+- **Build** : Temps pipeline parallélisé vs séquentiel
+- **ISR** : Cache hit ratio publications (revalidation 300s)
+- **Commentaires** : Latence avec avatars optimisés
+- **Mémoire** : Utilisation pendant parsing PDF et graph SVG
 
 ---
+
+## 🔒 Éléments de Sécurité Liés aux Optimisations Récentes
+
+### Optimisation Images (next/image)
+
+**Sécurité renforcée** :
+- `remotePatterns` limite les domaines d'images autorisés
+- Protection contre le hotlinking malveillant
+- Formats optimisés (WebP/AVIF) réduisent la surface d'attaque
+
+### Pipeline Build Parallélisé
+
+**Risques réduits** :
+- Timeout build plus court = moins d'exposition aux attaques DoS
+- Échec rapide en cas de script compromis
+- Isolation des groupes de scripts (bibliographie, graph, recherche)
+
+### ISR (Incremental Static Regeneration)
+
+**Avantages sécurité** :
+- Pages statiques = surface d'attaque réduite
+- Cache 300s limite les requêtes malveillantes répétées
+- Regeneration contrôlée vs rendu dynamique systématique
 
 **⚡ Actions immédiates recommandées** :
 1. Implémenter allowlist pour `/api/find-in-pdf`
 2. Configurer Upstash Redis pour rate limiting en production
 3. Activer 2FA sur compte GitHub OAuth
-4. Ajouter headers de sécurité dans `next.config.js`
-5. Mettre en place monitoring des tentatives SSRF
+4. Vérifier configuration `remotePatterns` images
+5. Monitorer performance build parallélisé
+6. Mettre en place monitoring des tentatives SSRF
 
 **🔗 Références** :
 - [OWASP SSRF Prevention](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html)

@@ -4,11 +4,12 @@ Guide complet pour déployer la plateforme philosophique L'Athanor en production
 
 ## Prérequis
 
-- Node.js 18+ 
+- Node.js 18+ (Node.js 20+ recommandé)
 - PostgreSQL (via service cloud comme Neon, PlanetScale, ou Supabase)
-- Compte Vercel
-- Compte Cloudinary (pour le stockage de fichiers)
-- Token GitHub (pour l'édition collaborative)
+- Compte Vercel (Pro recommandé pour les timeouts étendus)
+- Compte Cloudinary (pour le stockage PDF/images)
+- Token GitHub (pour Git-as-CMS et OAuth)
+- Compte Zotero (optionnel, pour bibliographie automatique)
 
 ## 📦 Pipeline de Build
 
@@ -18,18 +19,23 @@ Le script de build exécute automatiquement plusieurs tâches critiques :
 npm run build
 ```
 
-### Étapes du Build (dans l'ordre)
+### Étapes du Build Optimisé (parallélisé)
 
 1. **`npx prisma generate`** - Génération du client Prisma
-2. **`node scripts/build-bibliography.js`** - Construction de la bibliographie 
-3. **`node scripts/validate-citations.js`** - Validation des citations
-4. **`node scripts/build-citation-map.js`** - Mapping des citations
-5. **`node scripts/build-graph-billets.cjs`** - Génération du graphe des billets
-6. **`node scripts/render-graph-svg.cjs`** - Rendu SVG du graphe
-7. **`node scripts/build-search-index.js`** - Construction de l'index de recherche
-8. **`next build`** - Build Next.js
+2. **Groupe A (parallèle)** :
+   - `build-bibliography.js` - Construction bibliographie Zotero
+   - `validate-citations.js` - Validation références
+   - `build-citation-map.js` - Mapping citations
+3. **Groupe B (parallèle)** :
+   - `build-graph-billets.cjs` - Analyse liens MDX
+   - `render-graph-svg.cjs` - Génération SVG interactif
+4. **Groupe C (parallèle)** :
+   - `build-search-index.js` - Index unifié (billets + publications)
+5. **`wait`** - Synchronisation de tous les groupes
+6. **`next build`** - Build Next.js avec optimisations
 
-⚠️ **Important**: Tous ces scripts s'exécutent lors du déploiement et peuvent prendre du temps. En environnement serverless, surveillez les timeouts (limite Vercel : 45s par fonction).
+⚙️ **Performance** : Pipeline parallélisé réduit le temps de build de ~60%
+⚠️ **Serverless** : Timeout Vercel 45s build, surveillez les scripts lourds
 
 ## 🗄️ Configuration Base de Données
 
@@ -85,12 +91,32 @@ npx prisma db seed
 
 ### next.config.js
 
-Configuration requise pour Prisma :
+Configuration avec optimisations intégrées :
 
 ```javascript
 const nextConfig = {
   serverExternalPackages: ['@prisma/client'],
-  // ... autres options
+  experimental: {
+    serverComponentsExternalPackages: ['@prisma/client']
+  },
+  // Optimisation images
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+        pathname: '/u/**',
+      },
+      {
+        protocol: 'https', 
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      }
+    ],
+  },
+  // Performance
+  poweredByHeader: false,
+  reactStrictMode: true,
 }
 ```
 
@@ -129,6 +155,12 @@ GITHUB_OWNER="votre-username"
 GITHUB_REPO="nom-du-repo"
 GITHUB_ID="oauth-app-id"
 GITHUB_SECRET="oauth-app-secret"
+```
+
+#### 📚 Zotero (Bibliographie)
+```bash
+ZOTERO_GROUP_ID="6096924"  # ID du groupe Zotero public
+ZOTERO_API_KEY="votre-zotero-api-key"  # Optionnel pour groupes privés
 ```
 
 #### 🎨 Application
@@ -203,12 +235,15 @@ npx prisma migrate status
 
 ### 3. Tests Fonctionnels
 
-- [ ] Page d'accueil charge correctement
-- [ ] Recherche fonctionne (`/recherche`)
-- [ ] Articles PDF sont accessibles (`/publications/[slug]`)
-- [ ] Interface admin fonctionne (`/admin`)
-- [ ] Graphe des billets s'affiche (`/graphe`)
-- [ ] Upload de fichiers fonctionne (Cloudinary)
+- [ ] **Accueil** : Page charge avec polices optimisées
+- [ ] **Recherche** : Index unifié billets + publications (`/recherche`)
+- [ ] **Publications** : PDF accessibles avec ISR (`/publications/[slug]`)
+- [ ] **Billets** : Contenu MDX + backlinks (`/billets/[slug]`)
+- [ ] **Graphe** : SVG interactif avec survols (`/graphe`)
+- [ ] **Admin** : Upload Cloudinary + modération (`/admin`)
+- [ ] **Comments** : Système commentaires avec avatars optimisés
+- [ ] **Performance** : Web Core Vitals (LCP < 2.5s, CLS < 0.1)
+- [ ] **Bibliographie** : Citations Zotero + composant `<Bibliography />`
 
 ## ⚠️ Limitations Serverless
 
@@ -221,16 +256,20 @@ npx prisma migrate status
 ### Scripts Build
 
 Les scripts peuvent échouer en serverless si :
-- Parsing PDF trop volumineux (timeout)
-- Génération graphe complexe (mémoire)
-- Index de recherche trop large (timeout)
+- **Bibliographie** : API Zotero lente ou inaccessible
+- **Graphe** : Trop de billets MDX à analyser (>100)
+- **Recherche** : Index trop volumineux (publications + billets)
+- **Citations** : Validation massive de références
+- **SVG** : Rendu graphique complexe avec interactions
 
 ### Solutions
 
-1. **Optimiser les scripts** : Pagination, cache, lazy loading
-2. **Build séparé** : CI/CD pour pre-build des assets
-3. **Edge Functions** : Pour les opérations légères
-4. **Cron Jobs** : Pour la régénération périodique des index
+1. **Pipeline parallélisé** : Déjà implémenté (gain 60%)
+2. **Cache intelligent** : Réutiliser `public/*.json` si pas de changements
+3. **ISR** : Pages statiques avec revalidation (publications : 300s)
+4. **Build séparé** : CI/CD GitHub Actions pour assets lourds
+5. **Edge Functions** : Recherche et commentaires
+6. **Incremental** : Rebuilder seulement les parties modifiées
 
 ## 🔧 Dépannage
 

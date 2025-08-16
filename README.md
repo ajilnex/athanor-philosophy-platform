@@ -1,26 +1,41 @@
 # Athanor - Plateforme Philosophique
 
-Une plateforme moderne pour publier et consulter des articles de philosophie avec visualiseur PDF intégré.
+Une plateforme moderne pour publier et consulter des articles de philosophie avec recherche avancée, graphe des billets et optimisations performance.
 
 ## Fonctionnalités
 
-- ✨ **Interface moderne** - Design académique et épuré
-- 📚 **Visualiseur PDF intégré** - Lecture directe dans le navigateur
-- 🔍 **Recherche avancée** - Recherche par titre, auteur, description et mots-clés
-- 🛡️ **Interface d'administration** - Gestion complète des articles
+- ✨ **Interface moderne** - Design académique optimisé avec next/font
+- 📚 **Publications PDF** - Gestion intégrée avec Cloudinary
+- 📝 **Billets MDX** - Système Git-as-CMS avec backlinks automatiques
+- 🕰️ **Graphe interactif** - Visualisation des connexions entre billets
+- 🔍 **Recherche unifiée** - Index statique avec snippets contextuels
+- 🚀 **Performance** - ISR, optimisation images, pipeline parallélisé
+- 💬 **Système de commentaires** - Modération et hiérarchie
+- 📚 **Bibliographie Zotero** - Intégration citations automatiques
 - 📱 **Responsive** - Optimisé pour tous les appareils
-- 🎨 **Design académique** - Typographie et couleurs pensées pour la lecture
 
 ## Technologies
 
-- **Next.js 15.x** - Framework React avec App Router
-- **React 19** - Bibliothèque d'interface utilisateur
-- **TypeScript** - Typage statique
+### Stack Principal
+- **Next.js 15.4.6** - Framework React avec App Router et optimisations
+- **React 19.0.0** - Bibliothèque d'interface utilisateur (version finale)
+- **TypeScript** - Typage statique strict
 - **Tailwind CSS** - Framework CSS utilitaire
-- **Prisma** - ORM et gestion de base de données
-- **PostgreSQL** - Base de données via Prisma
-- **MDX support** - Support des contenus MDX via @next/mdx
-- **Fuse.js** - Recherche floue
+- **PostgreSQL** - Base de données (Docker local / Neon production)
+- **Prisma 6.14.0** - ORM moderne avec génération type-safe
+
+### Contenu & Performance
+- **MDX natif** - Support MDX via @mdx-js/mdx 3.1.0
+- **next/font** - Optimisation polices (IBM Plex Serif + Inter)
+- **next/image** - Optimisation images automatique
+- **ISR** - Incremental Static Regeneration pour performance
+- **Fuse.js 7.0.0** - Recherche floue avancée
+
+### Services & Intégrations
+- **NextAuth.js 4.24.5** - Authentification (GitHub OAuth + Credentials)
+- **Cloudinary** - Stockage et optimisation PDF/images
+- **Zotero API** - Bibliographie et citations automatiques
+- **Vercel** - Déploiement avec auto-build sur push
 
 ## Installation
 
@@ -42,19 +57,42 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
    
    Modifiez `.env.local` avec vos variables d'environnement :
    ```bash
+   # Base de données (Docker local)
    DATABASE_URL="postgresql://user:password@localhost:5432/athanor_dev"
    DIRECT_DATABASE_URL="postgresql://user:password@localhost:5432/athanor_dev"
+   
+   # Authentification
+   NEXTAUTH_URL="http://localhost:3000"
+   NEXTAUTH_SECRET="your-secret-key-here"
+   
+   # GitHub (pour Git-as-CMS)
+   GITHUB_TOKEN="ghp_your_github_token"
+   GITHUB_OWNER="your-username"
+   GITHUB_REPO="philosophy-platform"
+   
+   # Cloudinary (pour uploads)
+   CLOUDINARY_CLOUD_NAME="your-cloud-name"
+   CLOUDINARY_API_KEY="your-api-key"
+   CLOUDINARY_API_SECRET="your-api-secret"
+   
+   # Zotero (pour bibliographie)
+   ZOTERO_GROUP_ID="your-group-id"
+   ZOTERO_API_KEY="your-zotero-key"
    ```
 
 4. **Lancez PostgreSQL avec Docker**
    ```bash
+   # Option 1: Docker command direct
    docker run --name postgres-athanor -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e POSTGRES_DB=athanor_dev -p 5432:5432 -d postgres:15
+   
+   # Option 2: Script npm (recommandé)
+   npm run db:dev:start
    ```
 
 5. **Initialisez la base de données**
    ```bash
-   npx prisma db push
-   npx prisma db seed
+   npm run db:push    # Synchronise le schéma
+   npm run db:seed    # Ajoute des données de test (optionnel)
    ```
 
 6. **Lancez le serveur de développement**
@@ -122,12 +160,25 @@ La section "Billets" fonctionne sur un principe de "Git-as-a-CMS". Toute gestion
 
 ### Scripts disponibles
 
+#### Développement
 - `npm run dev` - Serveur de développement
-- `npm run build` - Build de production
+- `npm run lint` - Vérification ESLint
+- `npm run typecheck` - Vérification TypeScript
+
+#### Build & Production
+- `npm run build` - Build optimisé avec pipeline parallélisé
 - `npm run start` - Serveur de production
-- `npm run lint` - Vérification du code
-- `npm run db:push` - Synchronisation du schéma de base de données
-- `npm run db:studio` - Interface graphique Prisma Studio
+
+#### Base de données
+- `npm run db:dev:start` - Lance PostgreSQL Docker
+- `npm run db:push` - Synchronise le schéma
+- `npm run db:studio` - Interface Prisma Studio
+- `npm run db:seed` - Ajoute des données de test
+
+#### Contenu & Assets
+- `npm run graph:build` - Génère le graphe des billets
+- `npm run graph:svg` - Rend le SVG interactif
+- `npm run search:build` - Reconstruit l'index de recherche
 
 ### Ajout d'articles
 
@@ -169,9 +220,16 @@ colors: {
 
 ### Typographie
 
-Les polices sont configurées dans `globals.css` :
-- **Crimson Text** pour les titres (serif)
-- **Inter** pour le corps de texte (sans-serif)
+Les polices sont optimisées via next/font dans `app/layout.tsx` :
+- **IBM Plex Serif** pour les titres et contenu (serif) avec variables CSS
+- **Inter** pour l'interface utilisateur (sans-serif) avec variables CSS
+- **Optimisations** : `display: 'swap'`, preload automatique, subsetting
+
+```typescript
+// Variables CSS disponibles
+--font-serif: IBM Plex Serif (poids 300, 400, 500, 600 + italiques)
+--font-sans: Inter (poids 300, 400, 500, 600, 700)
+```
 
 ## Support
 
