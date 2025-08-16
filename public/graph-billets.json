@@ -164,7 +164,7 @@
       "id": "billet:alpha",
       "label": "alpha",
       "url": "/billets/alpha",
-      "degree": 4,
+      "degree": 5,
       "x": 99.32044820329828,
       "y": -150.11811539150077
     },
@@ -185,6 +185,14 @@
       "y": -179.50423361795816
     },
     {
+      "id": "billet:2025-08-16-je-suis-au-cafe",
+      "label": "je suis au café",
+      "url": "/billets/2025-08-16-je-suis-au-cafe",
+      "degree": 1,
+      "x": -66.36940244000536,
+      "y": -74.80041724319865
+    },
+    {
       "id": "billet:2025-08-16-nouveau",
       "label": "nouveau",
       "url": "/billets/2025-08-16-nouveau",
@@ -193,20 +201,28 @@
       "y": 189.01210239019585
     },
     {
+      "id": "billet:2025-08-16-test-wikilink",
+      "label": "test wikilink",
+      "url": "/billets/2025-08-16-test-wikilink",
+      "degree": 1,
+      "x": -255.86034950715677,
+      "y": 46.211270812168586
+    },
+    {
+      "id": "billet:bibliographie-collective",
+      "label": "bibliographie-collective",
+      "url": "/billets/bibliographie-collective",
+      "degree": 1,
+      "x": 133.1358566928,
+      "y": -121.13976912093825
+    },
+    {
       "id": "billet:gamma",
       "label": "gamma",
       "url": "/billets/gamma",
       "degree": 2,
       "x": 179.94614051025437,
       "y": -4.4030120898979455
-    },
-    {
-      "id": "billet:bibliographie-collective",
-      "label": "Bibliographie collective d'Athanor",
-      "url": "/billets/bibliographie-collective",
-      "degree": 0,
-      "x": 133.1358566928,
-      "y": -121.13976912093825
     }
   ],
   "edges": [
@@ -256,6 +272,16 @@
       "target": "billet:beta"
     },
     {
+      "id": "billet:2025-08-16-je-suis-au-cafe→billet:alpha",
+      "source": "billet:2025-08-16-je-suis-au-cafe",
+      "target": "billet:alpha"
+    },
+    {
+      "id": "billet:2025-08-16-test-wikilink→billet:bibliographie-collective",
+      "source": "billet:2025-08-16-test-wikilink",
+      "target": "billet:bibliographie-collective"
+    },
+    {
       "id": "billet:alpha→billet:beta",
       "source": "billet:alpha",
       "target": "billet:beta"
@@ -277,9 +303,9 @@
     }
   ],
   "metadata": {
-    "generatedAt": "2025-08-16T15:02:37.334Z",
-    "billetsCount": 26,
-    "nodesCount": 26,
+    "generatedAt": "2025-08-16T19:59:29.946Z",
+    "billetsCount": 28,
+    "nodesCount": 28,
     "stability": {
       "pivotsLocked": 8,
       "newNodes": 0,

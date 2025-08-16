@@ -3,7 +3,7 @@ import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Edit3, FileText } from 'lucide-react'
-import { EditorClient } from '@/components/admin/EditorClient'
+import { EditorClientDynamic as EditorClient } from '@/components/admin/EditorClientDynamic'
 import fs from 'fs'
 import path from 'path'
 

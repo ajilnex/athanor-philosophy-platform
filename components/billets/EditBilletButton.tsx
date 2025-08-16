@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { Edit3, Trash2 } from 'lucide-react'
-import { BilletEditor } from './BilletEditor'
+import { BilletEditorDynamic as BilletEditor } from './BilletEditorDynamic'
 import toast from 'react-hot-toast'
 
 interface EditBilletButtonProps {

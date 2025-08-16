@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import { Plus } from 'lucide-react'
 import { Billet } from '@/lib/billets'
 import { BilletsList } from './BilletsList'
-import { BilletEditor } from './BilletEditor'
+import { BilletEditorDynamic as BilletEditor } from './BilletEditorDynamic'
 
 interface BilletsPageClientProps {
   initialBillets: Billet[]
