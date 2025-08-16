@@ -19,7 +19,7 @@ interface BacklinkPickerProps {
   selectedText?: string
 }
 
-// Fetcher function pour SWR
+// Fonction fetcher simple
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export function BacklinkPicker({

@@ -44,7 +44,7 @@ interface ApiResponse {
   }
 }
 
-// Fetcher function pour SWR
+// Fonction fetcher simple
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export function CommentSection({
@@ -55,15 +55,15 @@ export function CommentSection({
 }: CommentSectionProps) {
   const { data: session } = useSession()
   const [page, setPage] = useState(1)
-  const [comments, setComments] = useState<Comment[]>([])
 
-  // Utilisation de SWR pour le data fetching avec pagination
+  // SWR simple - un seul point de vérité
   const { data, error, isLoading, mutate } = useSWR<ApiResponse>(
     `/api/comments?targetType=${targetType}&targetId=${encodeURIComponent(targetId)}&page=${page}&limit=20`,
     fetcher
   )
 
-  // Extraire les données de la réponse SWR
+  // Extraire directement les données de SWR
+  const comments = data?.comments ?? []
   const pagination = data?.pagination ?? {
     page: 1,
     limit: 20,
@@ -73,79 +73,37 @@ export function CommentSection({
 
   const isAdmin = (session?.user as any)?.role === 'ADMIN'
 
-  // Synchroniser les commentaires avec les données SWR
-  // Cela permet de maintenir l'état local pour les mutations optimistes
-  React.useEffect(() => {
-    if (data?.comments) {
-      setComments(data.comments)
-    }
-  }, [data?.comments])
-
-  // Ajouter un nouveau commentaire avec mutation optimiste
+  // Ajouter un nouveau commentaire - simple revalidation
   const handleCommentAdded = useCallback(
     (newComment: any) => {
-      // Normaliser la structure du commentaire pour correspondre à l'interface Comment
-      const normalizedComment: Comment = {
-        ...newComment,
-        replies: [], // Nouveau commentaire n'a pas de réponses
-        _count: { replies: 0 }, // Initialiser le compteur
-      }
-      setComments(prev => [normalizedComment, ...prev])
-
-      // Revalider les données SWR pour synchroniser avec le serveur
+      // Simplement revalider les données SWR
       mutate()
     },
     [mutate]
   )
 
-  // Ajouter une réponse à un commentaire existant avec mutation optimiste
+  // Ajouter une réponse - simple revalidation
   const handleReplyAdded = useCallback(
     (parentId: string, reply: any) => {
-      // Normaliser la réponse
-      const normalizedReply: Comment = {
-        ...reply,
-        replies: [], // Les réponses n'ont pas de sous-réponses (max 2 niveaux)
-        _count: { replies: 0 },
-      }
-
-      setComments(prev =>
-        prev.map(comment => {
-          if (comment.id === parentId) {
-            return {
-              ...comment,
-              replies: [...comment.replies, normalizedReply],
-              _count: { replies: comment._count.replies + 1 },
-            }
-          }
-          return comment
-        })
-      )
-
-      // Revalider les données SWR
+      // Simplement revalider les données SWR
       mutate()
     },
     [mutate]
   )
 
-  // Mettre à jour un commentaire avec mutation optimiste
+  // Mettre à jour un commentaire - simple revalidation
   const handleCommentUpdated = useCallback(
     (updatedComment: Comment) => {
-      setComments(prev =>
-        prev.map(comment => (comment.id === updatedComment.id ? updatedComment : comment))
-      )
-
-      // Revalider les données SWR
+      // Simplement revalider les données SWR
       mutate()
     },
     [mutate]
   )
 
-  // Supprimer/masquer un commentaire avec mutation optimiste
+  // Supprimer un commentaire - simple revalidation
   const handleCommentDeleted = useCallback(
     (commentId: string) => {
-      setComments(prev => prev.filter(comment => comment.id !== commentId))
-
-      // Revalider les données SWR
+      // Simplement revalider les données SWR
       mutate()
     },
     [mutate]
