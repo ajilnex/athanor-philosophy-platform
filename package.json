@@ -7,6 +7,8 @@
     "build": "npx prisma generate && npx dotenv-cli -e .env.local -- bash -c '(node scripts/build-bibliography.js && node scripts/validate-citations.js && node scripts/build-citation-map.js) & (node scripts/build-graph-billets.cjs && node scripts/render-graph-svg.cjs) & (node scripts/build-search-index.js); wait' && next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "npx tsc --noEmit",
+    "typecheck:scripts": "npx tsc --noEmit --project tsconfig.scripts.json",
     "db:migrate:dev": "npx dotenv-cli -e .env.local -- npx prisma migrate dev",
     "db:migrate:deploy": "npx prisma migrate deploy",
     "db:migrate:status": "npx dotenv-cli -e .env.local -- npx prisma migrate status",
