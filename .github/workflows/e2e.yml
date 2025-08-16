@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      NODE_ENV: production
       NEXTAUTH_SECRET: test-secret
       # BASE_URL used by Playwright config; points to webServer
       BASE_URL: http://localhost:3000
@@ -25,7 +24,7 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install dependencies (include dev)
         run: npm ci
 
       - name: Generate Prisma client
@@ -55,4 +54,3 @@ jobs:
           name: test-results
           path: test-results
           retention-days: 7
-
