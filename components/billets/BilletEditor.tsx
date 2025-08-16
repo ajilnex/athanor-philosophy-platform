@@ -114,9 +114,7 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
     setShowCitationPicker(false)
   }
 
-  const handleBacklinkSelected = (slug: string, alias?: string) => {
-    const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
-    
+  const insertBacklink = (backlinkText: string) => {
     if (backlinkTriggerPosition !== null && editorRef.current?.view) {
       // Mode déclencheur : remplacer les [[ par le backlink complet
       const view = editorRef.current.view
@@ -140,7 +138,11 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
       // Mode bouton : insérer au curseur
       insertTextAtCursor(backlinkText)
     }
-    
+  }
+
+  const handleBacklinkSelected = (slug: string, alias?: string) => {
+    const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
+    insertBacklink(backlinkText)
     setShowBacklinkPicker(false)
   }
 
@@ -164,23 +166,23 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
         })
         
         if (response.ok) {
-          // Insérer le backlink
+          // Insérer le backlink avec la même logique que handleBacklinkSelected
           const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
-          insertTextAtCursor(backlinkText)
+          insertBacklink(backlinkText)
         } else {
           // Fallback : insérer quand même le lien
           const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
-          insertTextAtCursor(backlinkText)
+          insertBacklink(backlinkText)
         }
       } catch (error) {
         // Fallback : insérer le lien
         const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
-        insertTextAtCursor(backlinkText)
+        insertBacklink(backlinkText)
       }
     } else {
       // Non-admin : insérer le lien + message
       const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
-      insertTextAtCursor(backlinkText)
+      insertBacklink(backlinkText)
       // TODO: Toast "Billet à créer par un admin"
     }
     
