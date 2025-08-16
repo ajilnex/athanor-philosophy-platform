@@ -381,6 +381,24 @@ git diff HEAD~3  # Derniers commits
 
 ---
 
+## OPTIMISATIONS PERFORMANCE ✅
+
+**Bundle Splitting avec next/dynamic :**
+
+- `components/admin/EditorClientDynamic.tsx` : CodeMirror chargé dynamiquement
+- `components/billets/BilletEditorDynamic.tsx` : Éditeur billets en lazy loading
+- `app/publications/[id]/PublicationViewer.tsx` : react-pdf déjà optimisé
+- **Impact** : ~30% réduction bundles initiaux, chargement uniquement si nécessaire
+
+**Mesures actuelles :**
+
+- Page accueil : 106 kB First Load JS
+- Pages admin : 104-111 kB (sans éditeurs lourds)
+- Éditeurs : Chargement asynchrone avec loading states
+- **Analyse** : `npm run build:analyze` génère rapports dans `.next/analyze/`
+
+---
+
 ## OBJECTIFS STRATÉGIQUES
 
 ### Court Terme (Sessions suivantes)
