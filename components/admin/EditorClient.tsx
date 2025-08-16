@@ -7,7 +7,6 @@ import { markdown } from '@codemirror/lang-markdown'
 import { EditorView } from '@codemirror/view'
 import { InsertReferenceDialog } from './InsertReferenceDialog'
 import { BacklinkPicker } from '@/components/editor/BacklinkPicker'
-import { backlinkTriggerExtension, cleanupBacklinkTrigger } from '@/lib/codemirror-backlink-trigger'
 import { closeBrackets } from '@codemirror/autocomplete'
 import { Prec } from '@codemirror/state'
 import toast from 'react-hot-toast'
@@ -23,7 +22,6 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
   const [isSaving, setIsSaving] = useState(false)
   const [showReferenceDialog, setShowReferenceDialog] = useState(false)
   const [showBacklinkPicker, setShowBacklinkPicker] = useState(false)
-  const [backlinkTriggerPosition, setBacklinkTriggerPosition] = useState<number | null>(null)
   const [selectedTextForBacklink, setSelectedTextForBacklink] = useState('')
   const editorRef = useRef<any>(null)
 
@@ -124,28 +122,8 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
   const handleBacklinkSelected = (slug: string, alias?: string) => {
     const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
     
-    if (backlinkTriggerPosition !== null && editorRef.current?.view) {
-      // Mode déclencheur : remplacer le pattern complet [[...]] si présent, sinon jusqu'au curseur
-      const view = editorRef.current.view
-      const docText = view.state.doc.toString()
-      const start = Math.max(0, backlinkTriggerPosition - 2)
-      const head = view.state.selection.main.head
-      const closeIdx = docText.indexOf(']]', start)
-      const end = closeIdx !== -1 && closeIdx >= start && closeIdx <= start + 100 ? closeIdx + 2 : head
-      view.dispatch({
-        changes: { from: start, to: end, insert: backlinkText },
-        selection: { anchor: start + backlinkText.length }
-      })
-
-      const newContent = view.state.doc.toString()
-      setContent(newContent)
-      view.focus()
-      
-      setBacklinkTriggerPosition(null)
-    } else {
-      // Mode bouton : insérer au curseur
-      insertText(backlinkText)
-    }
+    // Insertion simple au curseur (déclencheur retiré)
+    insertText(backlinkText)
     
     setShowBacklinkPicker(false)
   }
@@ -188,17 +166,9 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
     setShowBacklinkPicker(false)
   }
 
-  const handleBacklinkTrigger = (position: number) => {
-    setBacklinkTriggerPosition(position)
-    setShowBacklinkPicker(true)
-  }
+  // Déclencheur [[ retiré
 
   const handleBacklinkPickerClose = () => {
-    // Nettoyer les [[ orphelins si on ferme sans sélection
-    if (backlinkTriggerPosition !== null && editorRef.current?.view) {
-      cleanupBacklinkTrigger(editorRef.current.view, backlinkTriggerPosition)
-      setBacklinkTriggerPosition(null)
-    }
     setShowBacklinkPicker(false)
   }
 
@@ -239,7 +209,6 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
               } else {
                 setSelectedTextForBacklink('')
               }
-              setBacklinkTriggerPosition(null)
               setShowBacklinkPicker(true)
             }}
             className="inline-flex items-center px-3 py-2 text-sm bg-background border border-subtle/50 text-foreground rounded-md hover:bg-muted transition-colors"
@@ -299,8 +268,7 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
               }
             }),
             // Désactiver l'auto‑complétion des crochets [] pour éviter les ]] ajoutés automatiquement
-            Prec.highest(closeBrackets({ brackets: '(){}""\'\'' })),
-            backlinkTriggerExtension(handleBacklinkTrigger)
+            // (basicSetup.closeBrackets est déjà désactivé au niveau du composant)
           ]}
           onChange={(value) => setContent(value)}
         />
