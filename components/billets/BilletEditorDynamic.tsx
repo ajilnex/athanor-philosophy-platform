@@ -19,7 +19,7 @@ const BilletEditor = dynamic(
 
 interface BilletData {
   slug?: string
-  title: string
+  title?: string
   content: string
   tags: string[]
   excerpt: string

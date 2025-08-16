@@ -45,7 +45,7 @@ interface BilletEditorProps {
 
 interface BilletData {
   slug?: string
-  title: string
+  title?: string
   content: string
   tags: string[]
   excerpt: string
@@ -241,13 +241,22 @@ export function BilletEditor({
   ]
 
   const handleSave = async () => {
-    if (!title.trim() || !content.trim()) {
-      setError('Le titre et le contenu sont obligatoires')
+    const hasFrontmatter = /^---[\s\S]*?---/m.test(content)
+    const hasH1 = /^#\s+.+/m.test(content)
+
+    if (!content.trim()) {
+      setError('Le contenu est obligatoire')
       return
     }
 
-    if (mode === 'create' && !slug.trim()) {
-      setError('Le slug est obligatoire')
+    // Autoriser titre vide si on peut l'inférer depuis le contenu (frontmatter ou H1)
+    if (!title.trim() && !(hasFrontmatter || hasH1)) {
+      setError('Ajoutez un Titre, un frontmatter (--- title: ... ---) ou un H1 (# Titre)')
+      return
+    }
+
+    if (mode === 'create' && title.trim() && !slug.trim()) {
+      setError('Le slug est obligatoire si un titre est saisi')
       return
     }
 
@@ -256,8 +265,8 @@ export function BilletEditor({
 
     try {
       await onSave({
-        slug: mode === 'create' ? slug : initialData?.slug,
-        title: title.trim(),
+        slug: mode === 'create' ? (title.trim() ? slug : undefined) : initialData?.slug,
+        title: title.trim() || undefined,
         content: content.trim(),
         tags: tags,
         excerpt: excerpt,
@@ -333,6 +342,11 @@ export function BilletEditor({
                 className="input-field w-full"
                 placeholder="Titre de votre billet"
               />
+              <p className="mt-1 text-xs text-gray-500">
+                Astuce: laissez vide si votre contenu commence par un frontmatter
+                <code> --- title: ... --- </code> ou par un <code># Titre</code>. Le système déduira
+                automatiquement le titre et le slug.
+              </p>
             </div>
 
             {/* Éditeur Markdown avec preview intégré */}
