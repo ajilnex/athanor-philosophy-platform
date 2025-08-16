@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { MessageSquare, AlertCircle } from 'lucide-react'
+import useSWR from 'swr'
 import { CommentForm } from './CommentForm'
 import { CommentItem } from './CommentItem'
 import { CommentPagination } from './CommentPagination'
@@ -43,6 +44,9 @@ interface ApiResponse {
   }
 }
 
+// Fetcher function pour SWR
+const fetcher = (url: string) => fetch(url).then(res => res.json())
+
 export function CommentSection({
   targetType,
   targetId,
@@ -50,102 +54,107 @@ export function CommentSection({
   className = '',
 }: CommentSectionProps) {
   const { data: session } = useSession()
+  const [page, setPage] = useState(1)
   const [comments, setComments] = useState<Comment[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [pagination, setPagination] = useState({
+
+  // Utilisation de SWR pour le data fetching avec pagination
+  const { data, error, isLoading, mutate } = useSWR<ApiResponse>(
+    `/api/comments?targetType=${targetType}&targetId=${encodeURIComponent(targetId)}&page=${page}&limit=20`,
+    fetcher
+  )
+
+  // Extraire les données de la réponse SWR
+  const pagination = data?.pagination ?? {
     page: 1,
     limit: 20,
     total: 0,
     pages: 0,
-  })
+  }
 
   const isAdmin = (session?.user as any)?.role === 'ADMIN'
 
-  // Charger les commentaires
-  const fetchComments = useCallback(
-    async (page = 1) => {
-      try {
-        setLoading(true)
-        const response = await fetch(
-          `/api/comments?targetType=${targetType}&targetId=${encodeURIComponent(targetId)}&page=${page}&limit=20`
-        )
+  // Synchroniser les commentaires avec les données SWR
+  // Cela permet de maintenir l'état local pour les mutations optimistes
+  React.useEffect(() => {
+    if (data?.comments) {
+      setComments(data.comments)
+    }
+  }, [data?.comments])
 
-        if (!response.ok) {
-          throw new Error('Erreur lors du chargement des commentaires')
-        }
-
-        const data: ApiResponse = await response.json()
-        setComments(data.comments)
-        setPagination(data.pagination)
-        setError(null)
-      } catch (err) {
-        console.error('Erreur chargement commentaires:', err)
-        setError(err instanceof Error ? err.message : 'Erreur inconnue')
-      } finally {
-        setLoading(false)
+  // Ajouter un nouveau commentaire avec mutation optimiste
+  const handleCommentAdded = useCallback(
+    (newComment: any) => {
+      // Normaliser la structure du commentaire pour correspondre à l'interface Comment
+      const normalizedComment: Comment = {
+        ...newComment,
+        replies: [], // Nouveau commentaire n'a pas de réponses
+        _count: { replies: 0 }, // Initialiser le compteur
       }
+      setComments(prev => [normalizedComment, ...prev])
+
+      // Revalider les données SWR pour synchroniser avec le serveur
+      mutate()
     },
-    [targetType, targetId]
+    [mutate]
   )
 
-  // Charger les commentaires au montage
-  useEffect(() => {
-    fetchComments()
-  }, [fetchComments])
+  // Ajouter une réponse à un commentaire existant avec mutation optimiste
+  const handleReplyAdded = useCallback(
+    (parentId: string, reply: any) => {
+      // Normaliser la réponse
+      const normalizedReply: Comment = {
+        ...reply,
+        replies: [], // Les réponses n'ont pas de sous-réponses (max 2 niveaux)
+        _count: { replies: 0 },
+      }
 
-  // Ajouter un nouveau commentaire
-  const handleCommentAdded = (newComment: any) => {
-    // Normaliser la structure du commentaire pour correspondre à l'interface Comment
-    const normalizedComment: Comment = {
-      ...newComment,
-      replies: [], // Nouveau commentaire n'a pas de réponses
-      _count: { replies: 0 }, // Initialiser le compteur
-    }
-    setComments(prev => [normalizedComment, ...prev])
-    setPagination(prev => ({ ...prev, total: prev.total + 1 }))
-  }
-
-  // Ajouter une réponse à un commentaire existant
-  const handleReplyAdded = (parentId: string, reply: any) => {
-    // Normaliser la réponse
-    const normalizedReply: Comment = {
-      ...reply,
-      replies: [], // Les réponses n'ont pas de sous-réponses (max 2 niveaux)
-      _count: { replies: 0 },
-    }
-
-    setComments(prev =>
-      prev.map(comment => {
-        if (comment.id === parentId) {
-          return {
-            ...comment,
-            replies: [...comment.replies, normalizedReply],
-            _count: { replies: comment._count.replies + 1 },
+      setComments(prev =>
+        prev.map(comment => {
+          if (comment.id === parentId) {
+            return {
+              ...comment,
+              replies: [...comment.replies, normalizedReply],
+              _count: { replies: comment._count.replies + 1 },
+            }
           }
-        }
-        return comment
-      })
-    )
-  }
+          return comment
+        })
+      )
 
-  // Mettre à jour un commentaire
-  const handleCommentUpdated = (updatedComment: Comment) => {
-    setComments(prev =>
-      prev.map(comment => (comment.id === updatedComment.id ? updatedComment : comment))
-    )
-  }
+      // Revalider les données SWR
+      mutate()
+    },
+    [mutate]
+  )
 
-  // Supprimer/masquer un commentaire
-  const handleCommentDeleted = (commentId: string) => {
-    setComments(prev => prev.filter(comment => comment.id !== commentId))
-    setPagination(prev => ({ ...prev, total: prev.total - 1 }))
-  }
+  // Mettre à jour un commentaire avec mutation optimiste
+  const handleCommentUpdated = useCallback(
+    (updatedComment: Comment) => {
+      setComments(prev =>
+        prev.map(comment => (comment.id === updatedComment.id ? updatedComment : comment))
+      )
 
-  // Changer de page
-  const handlePageChange = (newPage: number) => {
-    fetchComments(newPage)
-  }
+      // Revalider les données SWR
+      mutate()
+    },
+    [mutate]
+  )
+
+  // Supprimer/masquer un commentaire avec mutation optimiste
+  const handleCommentDeleted = useCallback(
+    (commentId: string) => {
+      setComments(prev => prev.filter(comment => comment.id !== commentId))
+
+      // Revalider les données SWR
+      mutate()
+    },
+    [mutate]
+  )
+
+  // Changer de page avec SWR
+  const handlePageChange = useCallback((newPage: number) => {
+    setPage(newPage)
+  }, [])
 
   return (
     <section className={`mt-12 pt-8 border-t border-subtle/20 ${className}`} data-graph-shield>
@@ -184,7 +193,7 @@ export function CommentSection({
 
       {/* Liste des commentaires */}
       <div className="space-y-6">
-        {loading ? (
+        {isLoading ? (
           <div className="text-center py-8">
             <div className="inline-block animate-pulse text-subtle">
               Chargement des commentaires...
@@ -219,7 +228,7 @@ export function CommentSection({
               <CommentPagination
                 pagination={pagination}
                 onPageChange={handlePageChange}
-                loading={loading}
+                loading={isLoading}
               />
             )}
           </>

@@ -2,7 +2,7 @@
 
 /**
  * Script de création de snapshot depuis la production
- * 
+ *
  * Ce script :
  * 1. Se connecte à la BDD de production
  * 2. Récupère les données publiques (Articles/Billets non scellés, Comments approuvés)
@@ -72,19 +72,18 @@ function setupDevCloudinary() {
 async function migrateCloudinaryFile(prodUrl: string, fileName: string): Promise<string> {
   try {
     console.log(`  📦 Migration ${fileName}...`)
-    
+
     // Upload depuis l'URL de production vers le compte dev
     const result = await cloudinary.uploader.upload(prodUrl, {
       resource_type: 'raw',
       folder: 'athanor-articles-dev', // Dossier séparé pour dev
       public_id: `dev_${Date.now()}_${fileName}`,
       use_filename: false,
-      access_mode: 'public'
+      access_mode: 'public',
     })
-    
+
     console.log(`    ✅ Migré vers: ${result.secure_url}`)
     return result.secure_url
-    
   } catch (error) {
     console.error(`    ❌ Erreur migration ${fileName}:`, error)
     // Retourner l'URL originale en cas d'échec
@@ -94,29 +93,29 @@ async function migrateCloudinaryFile(prodUrl: string, fileName: string): Promise
 
 async function createSnapshot() {
   console.log('🏗️  Création du snapshot depuis la production...\n')
-  
+
   // Configuration Cloudinary dev
   setupDevCloudinary()
-  
+
   // Connexion à la BDD de production (via variables d'env)
   const prisma = new PrismaClient()
-  
+
   try {
     // 1. Récupérer les articles publics
     console.log('📄 Récupération des articles publics...')
     const rawArticles = await prisma.article.findMany({
       where: {
-        isSealed: false // Seulement les articles non scellés
+        isSealed: false, // Seulement les articles non scellés
       },
-      orderBy: { publishedAt: 'desc' }
+      orderBy: { publishedAt: 'desc' },
     })
-    
+
     // 2. Migration Cloudinary des articles
     console.log('☁️  Migration des fichiers Cloudinary...')
     const articles = []
     for (const article of rawArticles) {
       const devUrl = await migrateCloudinaryFile(article.filePath, article.fileName)
-      
+
       articles.push({
         id: article.id,
         title: article.title,
@@ -128,19 +127,19 @@ async function createSnapshot() {
         tags: article.tags,
         category: article.category ?? undefined,
         publishedAt: article.publishedAt.toISOString(),
-        isPublished: article.isPublished
+        isPublished: article.isPublished,
       })
     }
-    
+
     // 3. Récupérer les billets publics
     console.log('📝 Récupération des billets publics...')
     const rawBillets = await prisma.billet.findMany({
       where: {
-        isSealed: false // Seulement les billets non scellés
+        isSealed: false, // Seulement les billets non scellés
       },
-      orderBy: { date: 'desc' }
+      orderBy: { date: 'desc' },
     })
-    
+
     const billets = rawBillets.map(billet => ({
       id: billet.id,
       slug: billet.slug,
@@ -148,19 +147,19 @@ async function createSnapshot() {
       content: billet.content,
       excerpt: billet.excerpt ?? undefined,
       tags: billet.tags,
-      date: billet.date.toISOString()
+      date: billet.date.toISOString(),
     }))
-    
+
     // 4. Récupérer les commentaires publics (anonymisés)
     console.log('💬 Récupération des commentaires publics...')
     const rawComments = await prisma.comment.findMany({
       where: {
         isApproved: true,
-        isVisible: true
+        isVisible: true,
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     })
-    
+
     const comments = rawComments.map(comment => ({
       id: comment.id,
       content: comment.content,
@@ -170,9 +169,9 @@ async function createSnapshot() {
       parentId: comment.parentId ?? undefined,
       isApproved: comment.isApproved,
       isVisible: comment.isVisible,
-      createdAt: comment.createdAt.toISOString()
+      createdAt: comment.createdAt.toISOString(),
     }))
-    
+
     // 5. Créer le snapshot
     const snapshot: SnapshotData = {
       articles,
@@ -183,20 +182,19 @@ async function createSnapshot() {
         source: 'production',
         totalArticles: articles.length,
         totalBillets: billets.length,
-        totalComments: comments.length
-      }
+        totalComments: comments.length,
+      },
     }
-    
+
     // 6. Sauvegarder le snapshot
     const snapshotPath = path.join(process.cwd(), 'prisma', 'snapshot.json')
     await fs.writeFile(snapshotPath, JSON.stringify(snapshot, null, 2))
-    
+
     console.log('\n✅ Snapshot créé avec succès!')
     console.log(`📊 Articles: ${articles.length}`)
-    console.log(`📊 Billets: ${billets.length}`) 
+    console.log(`📊 Billets: ${billets.length}`)
     console.log(`📊 Commentaires: ${comments.length}`)
     console.log(`💾 Fichier: ${snapshotPath}`)
-    
   } catch (error) {
     console.error('❌ Erreur lors de la création du snapshot:', error)
     process.exit(1)

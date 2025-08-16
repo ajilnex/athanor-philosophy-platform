@@ -18,25 +18,36 @@ function escapeRegex(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-function extractSnippet(text: string, searchTerm: string, contextLength: number = 200): { snippet: string; hasMatch: boolean } {
+function extractSnippet(
+  text: string,
+  searchTerm: string,
+  contextLength: number = 200
+): { snippet: string; hasMatch: boolean } {
   if (!searchTerm.trim()) {
-    return { 
-      snippet: text.substring(0, contextLength) + '...', 
-      hasMatch: false 
+    return {
+      snippet: text.substring(0, contextLength) + '...',
+      hasMatch: false,
     }
   }
 
   // Normalize text and search term
-  const normalizedText = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-  const normalizedTerm = searchTerm.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
+  const normalizedText = text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+  const normalizedTerm = searchTerm
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
 
   // Find first occurrence
   const index = normalizedText.indexOf(normalizedTerm)
-  
+
   if (index === -1) {
-    return { 
-      snippet: text.substring(0, contextLength) + '...', 
-      hasMatch: false 
+    return {
+      snippet: text.substring(0, contextLength) + '...',
+      hasMatch: false,
     }
   }
 
@@ -44,14 +55,14 @@ function extractSnippet(text: string, searchTerm: string, contextLength: number 
   const halfContext = Math.floor(contextLength / 2)
   const start = Math.max(0, index - halfContext)
   const end = Math.min(text.length, index + normalizedTerm.length + halfContext)
-  
+
   // Extract snippet from original text (preserves case and accents)
   let snippet = text.substring(start, end)
-  
+
   // Add ellipsis if truncated
   if (start > 0) snippet = '...' + snippet
   if (end < text.length) snippet = snippet + '...'
-  
+
   // Highlight all occurrences of search term (case insensitive)
   const regex = new RegExp(`(${escapeRegex(searchTerm)})`, 'gi')
   snippet = snippet.replace(regex, '<strong class="bg-yellow-200 px-1 rounded">$1</strong>')
@@ -85,19 +96,19 @@ export async function GET(request: NextRequest) {
           // Handle billet with real file content
           const slug = id.replace('billet-', '')
           const filePath = path.join(process.cwd(), 'content', 'billets', `${slug}.mdx`)
-          
+
           try {
             const fileContent = await fs.readFile(filePath, 'utf8')
             const { data, content } = matter(fileContent)
-            
+
             const fullText = `${data.title || ''} ${content}`
             const { snippet, hasMatch } = extractSnippet(fullText, query, 300)
-            
+
             response[id] = {
               snippet,
               hasMatch,
               title: data.title || slug,
-              type: 'billet'
+              type: 'billet',
             }
           } catch (error) {
             console.warn(`⚠️  Could not read billet: ${slug}`)
@@ -105,7 +116,7 @@ export async function GET(request: NextRequest) {
               snippet: 'Contenu non disponible',
               hasMatch: false,
               title: slug,
-              type: 'billet'
+              type: 'billet',
             }
           }
         } else if (id.startsWith('publication-')) {
@@ -113,12 +124,12 @@ export async function GET(request: NextRequest) {
           const publicationId = id.replace('publication-', '')
           const mockText = `Contenu de la publication ${publicationId}. Le terme ${query} apparaît dans ce document PDF.`
           const { snippet, hasMatch } = extractSnippet(mockText, query, 400)
-          
+
           response[id] = {
             snippet,
             hasMatch,
             title: `Publication ${publicationId}`,
-            type: 'publication'
+            type: 'publication',
           }
         }
       } catch (error) {
@@ -127,19 +138,15 @@ export async function GET(request: NextRequest) {
           snippet: 'Erreur lors du traitement',
           hasMatch: false,
           title: 'Document',
-          type: id.startsWith('billet-') ? 'billet' : 'publication'
+          type: id.startsWith('billet-') ? 'billet' : 'publication',
         }
       }
     }
 
     console.log(`✅ Generated ${Object.keys(response).length} snippets`)
     return NextResponse.json(response)
-
   } catch (error) {
     console.error('❌ Snippets API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

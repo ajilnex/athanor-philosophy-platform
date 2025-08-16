@@ -16,7 +16,7 @@
   ],
   "billets": [
     {
-      "id": "example-billet-1", 
+      "id": "example-billet-1",
       "slug": "billet-exemple",
       "title": "Billet d'exemple",
       "content": "# Billet d'exemple\n\nCeci est un contenu d'exemple pour tester le système de snapshot.",

@@ -49,12 +49,9 @@ export function AdminArticleActions({ article }: AdminArticleActionsProps) {
       >
         <ExternalLink className="h-4 w-4" />
       </a>
-      
-      <SealPublicationButton 
-        articleId={article.id} 
-        initialSealed={article.isSealed || false} 
-      />
-      
+
+      <SealPublicationButton articleId={article.id} initialSealed={article.isSealed || false} />
+
       <button
         onClick={handleDeletePublication}
         disabled={isLoading}

@@ -11,7 +11,7 @@ interface CiteProps {
 
 export function Cite({ item, className = '' }: CiteProps) {
   const { bibliography, addCitation, isLoading } = useBibliography()
-  
+
   if (isLoading) {
     return <span className="text-subtle">[...]</span>
   }

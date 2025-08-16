@@ -1,21 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { generateBilletContent, updateFileWithContribution, moveFileToTrash, getFileFromGitHub } from '@/lib/github.server'
+import {
+  generateBilletContent,
+  updateFileWithContribution,
+  moveFileToTrash,
+  getFileFromGitHub,
+} from '@/lib/github.server'
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     // Vérification authentification (ADMIN ou USER connecté)
     const session = await getServerSession(authOptions)
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Authentification requise' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Authentification requise' }, { status: 401 })
     }
 
     const { slug } = await params
@@ -23,17 +22,14 @@ export async function PUT(
     const { title, content, tags = [], excerpt = '' } = body
 
     if (!title || !content) {
-      return NextResponse.json(
-        { error: 'Titre et contenu sont obligatoires' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Titre et contenu sont obligatoires' }, { status: 400 })
     }
 
     // Vérifier si le fichier existe sur GitHub (essayer .mdx puis .md)
     const extensions = ['mdx', 'md']
     let existingFile: { content: string; sha: string } | null = null
     let filePath = ''
-    
+
     for (const ext of extensions) {
       const testPath = `content/billets/${slug}.${ext}`
       existingFile = await getFileFromGitHub(testPath)
@@ -44,10 +40,7 @@ export async function PUT(
     }
 
     if (!existingFile) {
-      return NextResponse.json(
-        { error: 'Billet introuvable' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Billet introuvable' }, { status: 404 })
     }
 
     // Extraire la date du contenu existant (ou utiliser aujourd'hui)
@@ -78,8 +71,8 @@ Co-Authored-By: Claude <noreply@anthropic.com>`,
       author: {
         name: session.user.name || 'Utilisateur',
         email: session.user.email!,
-        role: (session.user as any).role
-      }
+        role: (session.user as any).role,
+      },
     })
 
     console.log(`✏️ Billet mis à jour: ${slug}`)
@@ -107,13 +100,9 @@ Co-Authored-By: Claude <noreply@anthropic.com>`,
         { status: 200 }
       )
     }
-
   } catch (error) {
     console.error('Erreur mise à jour billet:', error)
-    return NextResponse.json(
-      { error: 'Erreur interne du serveur' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 })
   }
 }
 
@@ -124,12 +113,9 @@ export async function DELETE(
   try {
     // Vérification authentification admin
     const session = await getServerSession(authOptions)
-    
+
     if (!session?.user || (session.user as any).role !== 'ADMIN') {
-      return NextResponse.json(
-        { error: 'Authentification admin requise' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Authentification admin requise' }, { status: 401 })
     }
 
     const { slug } = await params
@@ -137,7 +123,7 @@ export async function DELETE(
     // Vérifier si le fichier existe sur GitHub (essayer .mdx puis .md)
     const extensions = ['mdx', 'md']
     let filePath = ''
-    
+
     for (const ext of extensions) {
       const testPath = `content/billets/${slug}.${ext}`
       const existingFile = await getFileFromGitHub(testPath)
@@ -148,10 +134,7 @@ export async function DELETE(
     }
 
     if (!filePath) {
-      return NextResponse.json(
-        { error: 'Billet introuvable' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Billet introuvable' }, { status: 404 })
     }
 
     // Déplacement du fichier vers trash (suppression douce)
@@ -173,12 +156,8 @@ Co-Authored-By: Claude <noreply@anthropic.com>`
       },
       { status: 200 }
     )
-
   } catch (error) {
     console.error('Erreur suppression billet:', error)
-    return NextResponse.json(
-      { error: 'Erreur interne du serveur' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 })
   }
 }

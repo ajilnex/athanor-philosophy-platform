@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     if (!isAdmin) {
       whereConditions.OR = [
         { isApproved: true }, // Commentaires approuvés pour tous
-        ...(currentUserId ? [{ authorId: currentUserId }] : []) // Ses propres commentaires pour l'auteur connecté
+        ...(currentUserId ? [{ authorId: currentUserId }] : []), // Ses propres commentaires pour l'auteur connecté
       ]
     }
 
@@ -69,12 +69,14 @@ export async function GET(request: NextRequest) {
         replies: {
           where: {
             isVisible: true,
-            ...(isAdmin ? {} : {
-              OR: [
-                { isApproved: true },
-                ...(currentUserId ? [{ authorId: currentUserId }] : [])
-              ]
-            }),
+            ...(isAdmin
+              ? {}
+              : {
+                  OR: [
+                    { isApproved: true },
+                    ...(currentUserId ? [{ authorId: currentUserId }] : []),
+                  ],
+                }),
           },
           include: {
             author: {
@@ -131,10 +133,7 @@ export async function POST(request: NextRequest) {
     // Vérification authentification
     const session = await getServerSession(authOptions)
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Authentification requise' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Authentification requise' }, { status: 401 })
     }
 
     const userId = (session.user as any).id
@@ -160,10 +159,7 @@ export async function POST(request: NextRequest) {
       })
 
       if (!parentComment) {
-        return NextResponse.json(
-          { error: 'Commentaire parent introuvable' },
-          { status: 404 }
-        )
+        return NextResponse.json({ error: 'Commentaire parent introuvable' }, { status: 404 })
       }
 
       // Empêcher plus de 2 niveaux de profondeur
@@ -176,10 +172,7 @@ export async function POST(request: NextRequest) {
 
       // Vérifier que le parent cible la même ressource
       if (parentComment.targetType !== targetType || parentComment.targetId !== targetId) {
-        return NextResponse.json(
-          { error: 'Commentaire parent incompatible' },
-          { status: 400 }
-        )
+        return NextResponse.json({ error: 'Commentaire parent incompatible' }, { status: 400 })
       }
     }
 
@@ -187,26 +180,26 @@ export async function POST(request: NextRequest) {
     // En production, utiliser Upstash Redis ou middleware externe
     const isProduction = process.env.NODE_ENV === 'production'
     const rateLimit = process.env.DISABLE_COMMENT_RATELIMIT !== 'true'
-    
+
     if (rateLimit && !isProduction) {
       const userKey = `comment_rate_${userId}`
       const now = Date.now()
       const rateWindow = 60000 // 1 minute
-      
+
       // Cache en mémoire pour développement uniquement
       const globalThis = global as any
       if (!globalThis.commentRateLimit) {
         globalThis.commentRateLimit = new Map()
       }
-      
+
       const lastComment = globalThis.commentRateLimit.get(userKey)
-      if (lastComment && (now - lastComment) < rateWindow) {
+      if (lastComment && now - lastComment < rateWindow) {
         return NextResponse.json(
           { error: 'Veuillez attendre avant de poster un autre commentaire' },
           { status: 429 }
         )
       }
-      
+
       // Mettre à jour le rate limit
       globalThis.commentRateLimit.set(userKey, now)
     }
@@ -235,7 +228,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(comment, { status: 201 })
   } catch (error) {
     console.error('Erreur création commentaire:', error)
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Données invalides', details: error.issues },

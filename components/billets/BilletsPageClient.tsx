@@ -15,7 +15,7 @@ export function BilletsPageClient({ initialBillets }: BilletsPageClientProps) {
   const { data: session } = useSession()
   const [showEditor, setShowEditor] = useState(false)
   const [billets, setBillets] = useState(initialBillets)
-  
+
   const isAdmin = (session?.user as any)?.role === 'ADMIN'
 
   const handleCreateBillet = async (data: any) => {
@@ -34,7 +34,7 @@ export function BilletsPageClient({ initialBillets }: BilletsPageClientProps) {
       }
 
       const result = await response.json()
-      
+
       // Rafraîchir la page pour voir le nouveau billet
       window.location.reload()
     } catch (error) {
@@ -47,10 +47,8 @@ export function BilletsPageClient({ initialBillets }: BilletsPageClientProps) {
     <>
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl sm:text-3xl font-light text-foreground">
-            Billets
-          </h1>
-          
+          <h1 className="text-2xl sm:text-3xl font-light text-foreground">Billets</h1>
+
           {isAdmin && (
             <button
               onClick={() => setShowEditor(true)}
@@ -61,10 +59,10 @@ export function BilletsPageClient({ initialBillets }: BilletsPageClientProps) {
             </button>
           )}
         </div>
-        
+
         <p className="text-sm sm:text-base text-subtle max-w-3xl font-light">
-          Pensées, réflexions et explorations philosophiques publiées au fil des jours. 
-          Un laboratoire d'idées en mouvement.
+          Pensées, réflexions et explorations philosophiques publiées au fil des jours. Un
+          laboratoire d'idées en mouvement.
         </p>
       </div>
 

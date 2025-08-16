@@ -76,18 +76,14 @@ export function CommentPagination({ pagination, onPageChange, loading }: Comment
           {pageNumbers.map((pageNum, index) => {
             if (pageNum === '...') {
               return (
-                <span 
-                  key={`dots-${index}`}
-                  className="px-3 py-2 text-subtle"
-                  aria-hidden="true"
-                >
+                <span key={`dots-${index}`} className="px-3 py-2 text-subtle" aria-hidden="true">
                   <MoreHorizontal className="h-4 w-4" />
                 </span>
               )
             }
 
             const isCurrentPage = pageNum === page
-            
+
             return (
               <button
                 key={pageNum}
@@ -95,9 +91,10 @@ export function CommentPagination({ pagination, onPageChange, loading }: Comment
                 disabled={loading}
                 className={`
                   px-3 py-2 text-sm rounded-lg transition-colors
-                  ${isCurrentPage 
-                    ? 'bg-accent text-white' 
-                    : 'text-subtle hover:text-foreground hover:bg-muted'
+                  ${
+                    isCurrentPage
+                      ? 'bg-accent text-white'
+                      : 'text-subtle hover:text-foreground hover:bg-muted'
                   }
                   disabled:opacity-50 disabled:cursor-not-allowed
                 `}
@@ -139,7 +136,7 @@ export function CommentPagination({ pagination, onPageChange, loading }: Comment
             disabled={loading}
             className="w-16 px-2 py-1 text-center border border-subtle/30 rounded
                      focus:outline-none focus:ring-2 focus:ring-accent/50"
-            onKeyDown={(e) => {
+            onKeyDown={e => {
               if (e.key === 'Enter') {
                 const target = e.target as HTMLInputElement
                 const newPage = parseInt(target.value)

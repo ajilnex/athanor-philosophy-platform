@@ -7,9 +7,9 @@ const REPO_NAME = process.env.GITHUB_REPO || 'athanor-philosophy-platform'
 // Lazy loading du client GitHub
 function getOctokit() {
   const GITHUB_TOKEN = process.env.GITHUB_TOKEN
-  
+
   if (!GITHUB_TOKEN) {
-    throw new Error('GITHUB_TOKEN manquant dans les variables d\'environnement')
+    throw new Error("GITHUB_TOKEN manquant dans les variables d'environnement")
   }
 
   return new Octokit({
@@ -37,7 +37,7 @@ export async function isFileInTrash(originalPath: string): Promise<boolean> {
     const octokit = getOctokit()
     // Convertir le chemin vers le trash
     const trashPath = originalPath.replace('content/', 'trash/')
-    
+
     await octokit.repos.getContent({
       owner: REPO_OWNER,
       repo: REPO_NAME,
@@ -52,7 +52,9 @@ export async function isFileInTrash(originalPath: string): Promise<boolean> {
 /**
  * Récupère le contenu d'un fichier depuis GitHub
  */
-export async function getFileFromGitHub(path: string): Promise<{ content: string; sha: string } | null> {
+export async function getFileFromGitHub(
+  path: string
+): Promise<{ content: string; sha: string } | null> {
   try {
     const octokit = getOctokit()
     const response = await octokit.repos.getContent({
@@ -82,7 +84,7 @@ export async function getFileFromGitHub(path: string): Promise<{ content: string
 export async function updateFileOnGitHub(fileUpdate: GitHubFileUpdate): Promise<{ sha: string }> {
   const octokit = getOctokit()
   const content = Buffer.from(fileUpdate.content, 'utf-8').toString('base64')
-  
+
   const params: any = {
     owner: REPO_OWNER,
     repo: REPO_NAME,
@@ -96,7 +98,7 @@ export async function updateFileOnGitHub(fileUpdate: GitHubFileUpdate): Promise<
   }
 
   const response = await octokit.repos.createOrUpdateFileContents(params)
-  
+
   return {
     sha: response.data.content?.sha || '',
   }
@@ -127,7 +129,7 @@ export async function deleteFileOnGitHub(path: string, message: string): Promise
  */
 export async function moveFileToTrash(sourcePath: string, message: string): Promise<void> {
   const octokit = getOctokit()
-  
+
   // Récupérer le contenu du fichier source
   const sourceFile = await getFileFromGitHub(sourcePath)
   if (!sourceFile) {
@@ -142,7 +144,7 @@ export async function moveFileToTrash(sourcePath: string, message: string): Prom
   await updateFileOnGitHub({
     path: trashPath,
     content: sourceFile.content,
-    message: `trash: Déplacement de ${sourcePath} vers trash\n\n${message}`
+    message: `trash: Déplacement de ${sourcePath} vers trash\n\n${message}`,
   })
 
   // Supprimer le fichier original
@@ -180,20 +182,20 @@ ${content}`
  */
 export async function createBranch(branchName: string): Promise<void> {
   const octokit = getOctokit()
-  
+
   // Récupérer le SHA de main
   const mainBranch = await octokit.repos.getBranch({
     owner: REPO_OWNER,
     repo: REPO_NAME,
-    branch: 'main'
+    branch: 'main',
   })
-  
+
   // Créer la nouvelle branche
   await octokit.git.createRef({
     owner: REPO_OWNER,
     repo: REPO_NAME,
     ref: `refs/heads/${branchName}`,
-    sha: mainBranch.data.commit.sha
+    sha: mainBranch.data.commit.sha,
   })
 }
 
@@ -206,55 +208,55 @@ export async function createPullRequest(
   body: string
 ): Promise<{ number: number; html_url: string }> {
   const octokit = getOctokit()
-  
+
   const response = await octokit.pulls.create({
     owner: REPO_OWNER,
     repo: REPO_NAME,
     title,
     head: branchName,
     base: 'main',
-    body
+    body,
   })
-  
+
   return {
     number: response.data.number,
-    html_url: response.data.html_url
+    html_url: response.data.html_url,
   }
 }
 
 /**
  * Version améliorée de updateFileOnGitHub qui gère les contributions USER vs ADMIN
  */
-export async function updateFileWithContribution(fileUpdate: GitHubFileUpdate): Promise<{ 
+export async function updateFileWithContribution(fileUpdate: GitHubFileUpdate): Promise<{
   sha?: string
   pullRequest?: { number: number; html_url: string }
 }> {
   const octokit = getOctokit()
-  
+
   // Si c'est un ADMIN, écrire directement sur main
   if (fileUpdate.author?.role === 'ADMIN') {
     const result = await updateFileOnGitHub(fileUpdate)
     return { sha: result.sha }
   }
-  
+
   // Si c'est un USER, créer une branche et une PR
   if (fileUpdate.author?.role === 'USER') {
     const timestamp = Date.now()
     const branchName = `contribution/${fileUpdate.author.email.split('@')[0]}-${timestamp}`
-    
+
     // Créer la branche
     await createBranch(branchName)
-    
+
     // Créer le fichier sur la branche
     const content = Buffer.from(fileUpdate.content, 'utf-8').toString('base64')
-    
+
     const params: any = {
       owner: REPO_OWNER,
       repo: REPO_NAME,
       path: fileUpdate.path,
       message: fileUpdate.message,
       content,
-      branch: branchName
+      branch: branchName,
     }
 
     if (fileUpdate.sha) {
@@ -262,17 +264,17 @@ export async function updateFileWithContribution(fileUpdate: GitHubFileUpdate): 
     }
 
     await octokit.repos.createOrUpdateFileContents(params)
-    
+
     // Créer la Pull Request
     const pullRequest = await createPullRequest(
       branchName,
       `Contribution: ${fileUpdate.path}`,
       `Cette modification a été proposée par ${fileUpdate.author.name} (${fileUpdate.author.email}).\n\n**Message de commit :**\n${fileUpdate.message}\n\n---\n🤖 Généré automatiquement par L'athanor`
     )
-    
+
     return { pullRequest }
   }
-  
+
   // Fallback: si pas d'auteur spécifié, comportement par défaut (ADMIN)
   const result = await updateFileOnGitHub(fileUpdate)
   return { sha: result.sha }

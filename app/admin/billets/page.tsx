@@ -9,7 +9,7 @@ import { SealBilletButton } from '@/components/admin/SealBilletButton'
 
 export default async function AdminBilletsPage() {
   const session = await getServerSession(authOptions)
-  
+
   if (!session || (session.user as any)?.role !== 'ADMIN') {
     redirect('/admin')
   }
@@ -17,39 +17,42 @@ export default async function AdminBilletsPage() {
   // Récupérer tous les billets avec leur état de scellement
   const slugs = await getBilletSlugs()
   const billets = await Promise.all(
-    slugs.map(async (slug) => {
+    slugs.map(async slug => {
       const billet = await getBilletBySlug(slug)
       if (!billet) return null
-      
+
       // Récupérer l'état de scellement depuis la base
       const billetRecord = await prisma.billet.findUnique({
-        where: { slug }
+        where: { slug },
       })
-      
-      return { 
-        ...billet, 
+
+      return {
+        ...billet,
         slug,
-        isSealed: billetRecord?.isSealed || false
+        isSealed: billetRecord?.isSealed || false,
       }
     })
   )
-  
-  const validBillets = billets.filter((billet): billet is NonNullable<typeof billet> => billet !== null)
+
+  const validBillets = billets.filter(
+    (billet): billet is NonNullable<typeof billet> => billet !== null
+  )
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">
       <div className="mb-8">
-        <Link 
-          href="/admin" 
+        <Link
+          href="/admin"
           className="inline-flex items-center text-subtle hover:text-foreground mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour à l'administration
         </Link>
-        
+
         <h1 className="text-3xl font-light text-foreground mb-2">Gestion des Billets</h1>
         <p className="text-subtle">
-          Gérez l'accès et la visibilité de vos billets. Les billets scellés ne sont visibles que par les administrateurs.
+          Gérez l'accès et la visibilité de vos billets. Les billets scellés ne sont visibles que
+          par les administrateurs.
         </p>
       </div>
 
@@ -61,19 +64,17 @@ export default async function AdminBilletsPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {validBillets.map((billet) => (
+          {validBillets.map(billet => (
             <div key={billet.slug} className="card border-subtle">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-light text-foreground">
-                      {billet.title}
-                    </h3>
+                    <h3 className="text-lg font-light text-foreground">{billet.title}</h3>
                     <span className="px-2 py-1 text-xs bg-gray-100 text-foreground rounded">
                       {billet.slug}
                     </span>
                   </div>
-                  
+
                   <div className="flex items-center gap-4 text-sm text-subtle mb-3">
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
@@ -85,7 +86,7 @@ export default async function AdminBilletsPage() {
                         })}
                       </span>
                     </div>
-                    
+
                     {billet.tags && billet.tags.length > 0 && (
                       <div className="flex items-center gap-1">
                         <Tag className="h-4 w-4" />
@@ -93,11 +94,9 @@ export default async function AdminBilletsPage() {
                       </div>
                     )}
                   </div>
-                  
-                  {billet.excerpt && (
-                    <p className="text-subtle text-sm mb-3">{billet.excerpt}</p>
-                  )}
-                  
+
+                  {billet.excerpt && <p className="text-subtle text-sm mb-3">{billet.excerpt}</p>}
+
                   <div className="flex items-center gap-4">
                     <Link
                       href={`/billets/${billet.slug}`}
@@ -107,12 +106,9 @@ export default async function AdminBilletsPage() {
                     </Link>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-2 ml-4">
-                  <SealBilletButton 
-                    slug={billet.slug} 
-                    initialSealed={billet.isSealed}
-                  />
+                  <SealBilletButton slug={billet.slug} initialSealed={billet.isSealed} />
                 </div>
               </div>
             </div>

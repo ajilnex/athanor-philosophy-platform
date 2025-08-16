@@ -32,7 +32,7 @@ export function StaticGraph({ className = '' }: StaticGraphProps) {
   return (
     <div className={`${className}`}>
       {/* Graphe statique en arrière-plan (non-interactif) */}
-      <div 
+      <div
         className="interactive-graph-background"
         style={{ pointerEvents: 'none' }}
         dangerouslySetInnerHTML={{ __html: svgContent }}

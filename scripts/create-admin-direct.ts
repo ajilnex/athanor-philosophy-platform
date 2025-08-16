@@ -7,17 +7,17 @@ async function main() {
   try {
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await prisma.user.findUnique({
-      where: { email: 'aub.robert@gmail.com' }
+      where: { email: 'aub.robert@gmail.com' },
     })
 
     if (existingUser) {
       console.log('👤 Utilisateur existant trouvé, mise à jour du rôle...')
-      
+
       const updated = await prisma.user.update({
         where: { email: 'aub.robert@gmail.com' },
-        data: { role: 'ADMIN' }
+        data: { role: 'ADMIN' },
       })
-      
+
       console.log('✅ Utilisateur promu ADMIN:')
       console.log(`   Email: ${updated.email}`)
       console.log(`   Rôle: ${updated.role}`)
@@ -25,8 +25,8 @@ async function main() {
     }
 
     // Créer un nouveau compte admin
-    console.log('🆕 Création d\'un nouveau compte admin...')
-    
+    console.log("🆕 Création d'un nouveau compte admin...")
+
     // Hash d'un mot de passe temporaire
     const tempPassword = 'admin2025'
     const hashedPassword = await bcrypt.hash(tempPassword, 12)
@@ -50,7 +50,6 @@ async function main() {
     console.log('🔑 Pour te connecter:')
     console.log(`   Email: aub.robert@gmail.com`)
     console.log(`   Mot de passe: ${tempPassword}`)
-    
   } catch (error) {
     console.error('❌ Erreur:', error)
   } finally {

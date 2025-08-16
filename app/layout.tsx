@@ -27,22 +27,18 @@ export const metadata: Metadata = {
   description: "L'athanor — Une collection d'articles de philosophie contemporaine",
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
-      <body className={`min-h-screen bg-background text-foreground ${inter.variable} ${ibmPlexSerif.variable}`}>
+      <body
+        className={`min-h-screen bg-background text-foreground ${inter.variable} ${ibmPlexSerif.variable}`}
+      >
         <AppSessionProvider>
           <div className="flex flex-col min-h-screen">
             <Navbar />
-            <main className="flex-grow">
-                {children}
-              </main>
-              <Footer />
-            </div>
+            <main className="flex-grow">{children}</main>
+            <Footer />
+          </div>
           <Toaster
             position="top-right"
             toastOptions={{
@@ -54,7 +50,7 @@ export default function RootLayout({
               },
             }}
           />
-          </AppSessionProvider>
+        </AppSessionProvider>
       </body>
     </html>
   )

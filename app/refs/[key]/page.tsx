@@ -38,16 +38,14 @@ interface CitationsMap {
 export async function generateStaticParams() {
   try {
     const bibliographyPath = path.join(process.cwd(), 'public', 'bibliography.json')
-    
+
     if (!fs.existsSync(bibliographyPath)) {
       return []
     }
-    
-    const bibliography: BibliographyEntry[] = JSON.parse(
-      fs.readFileSync(bibliographyPath, 'utf8')
-    )
-    
-    return bibliography.map((entry) => ({
+
+    const bibliography: BibliographyEntry[] = JSON.parse(fs.readFileSync(bibliographyPath, 'utf8'))
+
+    return bibliography.map(entry => ({
       key: entry.key,
     }))
   } catch (error) {
@@ -59,47 +57,46 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ key: string }> }) {
   try {
     const bibliographyPath = path.join(process.cwd(), 'public', 'bibliography.json')
-    const bibliography: BibliographyEntry[] = JSON.parse(
-      fs.readFileSync(bibliographyPath, 'utf8')
-    )
-    
+    const bibliography: BibliographyEntry[] = JSON.parse(fs.readFileSync(bibliographyPath, 'utf8'))
+
     const { key } = await params
     const entry = bibliography.find(item => item.key === key)
     if (!entry) {
       return {
-        title: 'Référence introuvable - Athanor'
+        title: 'Référence introuvable - Athanor',
       }
     }
-    
-    const authors = entry.authors.length > 0
-      ? entry.authors.map(author => author.family).join(', ')
-      : 'Auteur inconnu'
-    
+
+    const authors =
+      entry.authors.length > 0
+        ? entry.authors.map(author => author.family).join(', ')
+        : 'Auteur inconnu'
+
     const title = `${authors} (${entry.year || 's.d.'}) — ${entry.title}`
-    
+
     return {
       title: `${title} - Athanor`,
-      description: `Référence bibliographique: ${entry.title}. ${authors}, ${entry.year || 's.d.'}`
+      description: `Référence bibliographique: ${entry.title}. ${authors}, ${entry.year || 's.d.'}`,
     }
   } catch (error) {
     return {
-      title: 'Référence - Athanor'
+      title: 'Référence - Athanor',
     }
   }
 }
 
 function formatAuthors(authors: BibliographyEntry['authors']): string {
   if (authors.length === 0) return 'Auteur inconnu'
-  
+
   if (authors.length === 1) {
     const author = authors[0]
     return `${author.family}, ${author.given}`
   }
-  
+
   if (authors.length === 2) {
     return `${authors[0].family}, ${authors[0].given} et ${authors[1].family}, ${authors[1].given}`
   }
-  
+
   // Plus de 2 auteurs: premiers auteurs + "et al."
   return `${authors[0].family}, ${authors[0].given} et al.`
 }
@@ -107,29 +104,29 @@ function formatAuthors(authors: BibliographyEntry['authors']): string {
 function formatFullCitation(entry: BibliographyEntry): string {
   const authors = formatAuthors(entry.authors)
   let citation = `${authors}. ${entry.title}.`
-  
+
   if (entry.container) {
     citation += ` ${entry.container}`
-    
+
     if (entry.volume) citation += `, vol. ${entry.volume}`
     if (entry.issue) citation += `, no ${entry.issue}`
     if (entry.pages) citation += `, p. ${entry.pages}`
   }
-  
+
   if (entry.publisher) {
     citation += ` ${entry.publisher}`
   }
-  
+
   if (entry.place) {
     citation += `, ${entry.place}`
   }
-  
+
   if (entry.year) {
     citation += `, ${entry.year}`
   }
-  
+
   citation += '.'
-  
+
   return citation
 }
 
@@ -137,37 +134,31 @@ export default async function RefPage({ params }: { params: Promise<{ key: strin
   const { key } = await params
   let entry: BibliographyEntry | null = null
   let citedIn: CitationContext[] = []
-  
+
   try {
     // Charger la bibliographie
     const bibliographyPath = path.join(process.cwd(), 'public', 'bibliography.json')
-    const bibliography: BibliographyEntry[] = JSON.parse(
-      fs.readFileSync(bibliographyPath, 'utf8')
-    )
-    
+    const bibliography: BibliographyEntry[] = JSON.parse(fs.readFileSync(bibliographyPath, 'utf8'))
+
     entry = bibliography.find(item => item.key === key) || null
-    
+
     // Charger la carte des citations
     const citationsMapPath = path.join(process.cwd(), 'public', 'citations-map.json')
     if (fs.existsSync(citationsMapPath)) {
-      const citationsMap: CitationsMap = JSON.parse(
-        fs.readFileSync(citationsMapPath, 'utf8')
-      )
+      const citationsMap: CitationsMap = JSON.parse(fs.readFileSync(citationsMapPath, 'utf8'))
       citedIn = citationsMap[key] || []
     }
   } catch (error) {
     console.error('Erreur lors du chargement des données:', error)
   }
-  
+
   if (!entry) {
     notFound()
   }
-  
+
   const fullCitation = formatFullCitation(entry)
-  const shortAuthors = entry.authors.length > 0 
-    ? entry.authors[0].family 
-    : 'Auteur inconnu'
-  
+  const shortAuthors = entry.authors.length > 0 ? entry.authors[0].family : 'Auteur inconnu'
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
       {/* Navigation */}
@@ -179,7 +170,7 @@ export default async function RefPage({ params }: { params: Promise<{ key: strin
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour à la bibliographie
         </Link>
-        
+
         {/* En-tête de la référence */}
         <div className="mb-6">
           <div className="flex items-start justify-between mb-4">
@@ -187,20 +178,20 @@ export default async function RefPage({ params }: { params: Promise<{ key: strin
               {entry.title}
             </h1>
           </div>
-          
+
           <div className="flex flex-wrap items-center gap-4 text-sm text-subtle mb-4">
             <div className="flex items-center space-x-2">
               <Users className="h-4 w-4" />
               <span>{formatAuthors(entry.authors)}</span>
             </div>
-            
+
             {entry.year && (
               <div className="flex items-center space-x-2">
                 <Calendar className="h-4 w-4" />
                 <span>{entry.year}</span>
               </div>
             )}
-            
+
             <div className="flex items-center space-x-2">
               <BookOpen className="h-4 w-4" />
               <span className="capitalize">{entry.type}</span>
@@ -219,7 +210,7 @@ export default async function RefPage({ params }: { params: Promise<{ key: strin
               <p className="text-foreground leading-relaxed text-sm">{fullCitation}</p>
             </div>
           </section>
-          
+
           {/* Informations détaillées */}
           <section>
             <h2 className="text-lg font-serif font-light text-foreground mb-3">Détails</h2>
@@ -230,21 +221,21 @@ export default async function RefPage({ params }: { params: Promise<{ key: strin
                   <span className="text-subtle">{entry.container}</span>
                 </div>
               )}
-              
+
               {entry.publisher && (
                 <div>
                   <span className="font-medium text-foreground">Éditeur : </span>
                   <span className="text-subtle">{entry.publisher}</span>
                 </div>
               )}
-              
+
               {entry.place && (
                 <div>
                   <span className="font-medium text-foreground">Lieu : </span>
                   <span className="text-subtle">{entry.place}</span>
                 </div>
               )}
-              
+
               {(entry.volume || entry.issue || entry.pages) && (
                 <div>
                   <span className="font-medium text-foreground">Référence : </span>
@@ -255,14 +246,14 @@ export default async function RefPage({ params }: { params: Promise<{ key: strin
                   </span>
                 </div>
               )}
-              
+
               {entry.ISBN && (
                 <div>
                   <span className="font-medium text-foreground">ISBN : </span>
                   <span className="text-subtle font-mono">{entry.ISBN}</span>
                 </div>
               )}
-              
+
               <div>
                 <span className="font-medium text-foreground">Clé de citation : </span>
                 <code className="text-subtle bg-gray-100 px-2 py-1 rounded text-xs font-mono">
@@ -272,7 +263,7 @@ export default async function RefPage({ params }: { params: Promise<{ key: strin
             </div>
           </section>
         </div>
-        
+
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Liens externes */}
@@ -304,17 +295,14 @@ export default async function RefPage({ params }: { params: Promise<{ key: strin
               )}
             </div>
           </section>
-          
+
           {/* Tags */}
           {entry.tags.length > 0 && (
             <section>
               <h3 className="text-base font-serif font-light text-foreground mb-3">Mots-clés</h3>
               <div className="flex flex-wrap gap-1">
-                {entry.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2 py-1 text-xs bg-gray-100 text-foreground rounded"
-                  >
+                {entry.tags.map(tag => (
+                  <span key={tag} className="px-2 py-1 text-xs bg-gray-100 text-foreground rounded">
                     {tag}
                   </span>
                 ))}
@@ -323,16 +311,16 @@ export default async function RefPage({ params }: { params: Promise<{ key: strin
           )}
         </div>
       </div>
-      
+
       {/* Section "Cité dans" */}
       {citedIn.length > 0 && (
         <section className="mt-12 pt-8 border-t border-subtle/20">
           <h2 className="text-xl font-serif font-light text-foreground mb-6">
             Cité dans ({citedIn.length})
           </h2>
-          
+
           <div className="space-y-4">
-            {citedIn.map((citation) => (
+            {citedIn.map(citation => (
               <div
                 key={citation.slug}
                 className="bg-background/50 rounded-lg border border-subtle/20 p-4 hover:border-subtle/40 transition-colors"
@@ -345,9 +333,7 @@ export default async function RefPage({ params }: { params: Promise<{ key: strin
                     {citation.title}
                   </Link>
                 </h3>
-                <p className="text-subtle text-sm leading-relaxed">
-                  {citation.excerpt}
-                </p>
+                <p className="text-subtle text-sm leading-relaxed">{citation.excerpt}</p>
               </div>
             ))}
           </div>

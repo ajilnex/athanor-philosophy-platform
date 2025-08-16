@@ -1,12 +1,12 @@
-'use client';
+'use client'
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useSession, signOut } from 'next-auth/react';
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useSession, signOut } from 'next-auth/react'
 
 function NavItem({ href, children }: { href: string; children: React.ReactNode }) {
-  const pathname = usePathname();
-  const active = pathname === href;
+  const pathname = usePathname()
+  const active = pathname === href
   return (
     <Link
       href={href}
@@ -14,16 +14,16 @@ function NavItem({ href, children }: { href: string; children: React.ReactNode }
     >
       {children}
     </Link>
-  );
+  )
 }
 
 export function Navbar() {
-  const { data: session } = useSession();
-  
+  const { data: session } = useSession()
+
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/' })
   }
-  
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-subtle/30 bg-background/80 backdrop-blur-lg">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 h-14 flex items-center justify-between">
@@ -38,7 +38,7 @@ export function Navbar() {
           <NavItem href="/publications">Publications</NavItem>
           <NavItem href="/search">Recherche</NavItem>
           {session ? (
-            <button 
+            <button
               onClick={handleSignOut}
               className="px-3 py-1.5 text-sm font-light bg-slate-900/90 hover:bg-slate-800/95 text-slate-50 rounded-md transition-all duration-200 border border-slate-700/30 backdrop-blur-sm"
             >
@@ -56,9 +56,11 @@ export function Navbar() {
 
         {/* Mobile: simple lien recherche (optionnel) */}
         <nav className="sm:hidden">
-          <Link href="/search" className="text-sm underline underline-offset-4">Recherche</Link>
+          <Link href="/search" className="text-sm underline underline-offset-4">
+            Recherche
+          </Link>
         </nav>
       </div>
     </header>
-  );
+  )
 }

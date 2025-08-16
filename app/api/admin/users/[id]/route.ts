@@ -3,20 +3,17 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params
   try {
     const session = await getServerSession(authOptions)
-    
+
     if (!session?.user || (session.user as any).role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { role } = await request.json()
-    
+
     if (!role || !['USER', 'ADMIN'].includes(role)) {
       return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
     }
@@ -31,7 +28,7 @@ export async function PUT(
         role: true,
         createdAt: true,
         emailVerified: true,
-      }
+      },
     })
 
     return NextResponse.json(updatedUser)

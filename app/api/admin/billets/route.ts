@@ -7,12 +7,9 @@ export async function POST(request: NextRequest) {
   try {
     // Vérification authentification admin
     const session = await getServerSession(authOptions)
-    
+
     if (!session?.user || (session.user as any).role !== 'ADMIN') {
-      return NextResponse.json(
-        { error: 'Authentification admin requise' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Authentification admin requise' }, { status: 401 })
     }
 
     const body = await request.json()
@@ -35,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     // Génération de la date (aujourd'hui par défaut)
     const today = new Date().toISOString().split('T')[0]
-    
+
     // Génération du contenu MDX
     const mdxContent = generateBilletContent(
       title,
@@ -47,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     // Création du fichier sur GitHub
     const filePath = `content/billets/${slug}.mdx`
-    
+
     try {
       const result = await updateFileOnGitHub({
         path: filePath,
@@ -74,22 +71,15 @@ Co-Authored-By: Claude <noreply@anthropic.com>`,
       )
     } catch (githubError: any) {
       console.error('Erreur GitHub:', githubError)
-      
+
       if (githubError.status === 422) {
-        return NextResponse.json(
-          { error: 'Un billet avec ce slug existe déjà' },
-          { status: 409 }
-        )
+        return NextResponse.json({ error: 'Un billet avec ce slug existe déjà' }, { status: 409 })
       }
-      
+
       throw githubError
     }
-
   } catch (error) {
     console.error('Erreur création billet:', error)
-    return NextResponse.json(
-      { error: 'Erreur interne du serveur' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 })
   }
 }

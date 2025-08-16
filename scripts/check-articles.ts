@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 async function main() {
   try {
     console.log('🔍 Vérification des articles/publications existants...\n')
-    
+
     const articles = await prisma.article.findMany({
       select: {
         id: true,
@@ -15,9 +15,9 @@ async function main() {
         filePath: true,
         fileSize: true,
         isPublished: true,
-        createdAt: true
+        createdAt: true,
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     })
 
     if (articles.length === 0) {
@@ -37,7 +37,6 @@ async function main() {
         console.log('')
       })
     }
-    
   } catch (error) {
     console.error('❌ Erreur:', error)
   } finally {

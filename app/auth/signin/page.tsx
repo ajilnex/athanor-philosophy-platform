@@ -9,13 +9,11 @@ export default function SignInPage() {
           <Link href="/" className="font-serif text-2xl tracking-tight">
             L'athanor
           </Link>
-          <h2 className="mt-6 text-3xl font-bold text-foreground">
-            Connexion
-          </h2>
+          <h2 className="mt-6 text-3xl font-bold text-foreground">Connexion</h2>
         </div>
-        
+
         <SignInForm />
-        
+
         <div className="text-center space-y-2">
           <p className="text-sm text-subtle">
             Pas encore de compte ?{' '}

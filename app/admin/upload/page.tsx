@@ -24,7 +24,7 @@ export default function UploadPage() {
   // 🛡️ PROTECTION: Vérifier l'autorisation admin
   useEffect(() => {
     if (status === 'loading') return // Attendre le chargement
-    
+
     if (!session || session.user?.role !== 'admin') {
       router.push('/') // Rediriger vers la page d'accueil
     }
@@ -47,13 +47,14 @@ export default function UploadPage() {
         setError('Veuillez sélectionner un fichier PDF')
         return
       }
-      if (file.size > 50 * 1024 * 1024) { // 50MB limit
+      if (file.size > 50 * 1024 * 1024) {
+        // 50MB limit
         setError('Le fichier est trop volumineux (max 50MB)')
         return
       }
       setSelectedFile(file)
       setError('')
-      
+
       // Auto-fill title from filename if not already set
       if (!formData.title) {
         const fileName = file.name.replace('.pdf', '')
@@ -62,19 +63,21 @@ export default function UploadPage() {
     }
   }
 
-  function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+  function handleInputChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    
+
     if (!selectedFile) {
       setError('Veuillez sélectionner un fichier PDF')
       return
     }
-    
+
     if (!formData.title.trim()) {
       setError('Le titre est requis')
       return
@@ -82,7 +85,7 @@ export default function UploadPage() {
 
     setIsUploading(true)
     setError('')
-    
+
     try {
       const uploadFormData = new FormData()
       uploadFormData.append('file', selectedFile)
@@ -90,7 +93,7 @@ export default function UploadPage() {
       uploadFormData.append('description', formData.description.trim())
       uploadFormData.append('author', formData.author.trim())
       uploadFormData.append('category', formData.category.trim())
-      
+
       // Convert tags string to array for the server action
       const tagsArray = formData.tags
         .split(',')
@@ -103,7 +106,7 @@ export default function UploadPage() {
       const result = await uploadArticle(uploadFormData)
 
       if (result && !result.success) {
-        setError(result.error || 'Erreur lors de l\'upload')
+        setError(result.error || "Erreur lors de l'upload")
       } else {
         setSuccess('Publication ajoutée avec succès!')
         // Redirect to publications page after success
@@ -128,7 +131,7 @@ export default function UploadPage() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour à l'administration
         </Link>
-        
+
         <h1 className="text-2xl sm:text-3xl font-light text-foreground mb-4">
           Ajouter une Publication
         </h1>
@@ -178,9 +181,7 @@ export default function UploadPage() {
                     <p className="text-sm sm:text-lg font-medium text-gray-900 mb-2">
                       Cliquez pour sélectionner un fichier PDF
                     </p>
-                    <p className="text-xs sm:text-sm text-gray-500">
-                      Taille maximale: 50MB
-                    </p>
+                    <p className="text-xs sm:text-sm text-gray-500">Taille maximale: 50MB</p>
                   </div>
                 )}
               </label>
@@ -189,7 +190,10 @@ export default function UploadPage() {
 
           {/* Title */}
           <div>
-            <label htmlFor="title" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="title"
+              className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
+            >
               Titre *
             </label>
             <input
@@ -206,7 +210,10 @@ export default function UploadPage() {
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="description"
+              className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
+            >
               Description
             </label>
             <textarea
@@ -222,7 +229,10 @@ export default function UploadPage() {
 
           {/* Author */}
           <div>
-            <label htmlFor="author" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="author"
+              className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
+            >
               Auteur
             </label>
             <input
@@ -238,7 +248,10 @@ export default function UploadPage() {
 
           {/* Tags */}
           <div>
-            <label htmlFor="tags" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="tags"
+              className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
+            >
               Mots-clés
             </label>
             <input
@@ -257,7 +270,10 @@ export default function UploadPage() {
 
           {/* Category */}
           <div>
-            <label htmlFor="category" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="category"
+              className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
+            >
               Catégorie
             </label>
             <select
@@ -295,10 +311,7 @@ export default function UploadPage() {
 
           {/* Submit Button */}
           <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
-            <Link
-              href="/admin"
-              className="btn-secondary"
-            >
+            <Link href="/admin" className="btn-secondary">
               Annuler
             </Link>
             <button

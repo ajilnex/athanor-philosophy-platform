@@ -11,17 +11,11 @@ const updateSchema = z.object({
 })
 
 // PATCH - Modifier un commentaire
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Authentification requise' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Authentification requise' }, { status: 401 })
     }
 
     const { id } = await params
@@ -36,10 +30,7 @@ export async function PATCH(
     })
 
     if (!existingComment) {
-      return NextResponse.json(
-        { error: 'Commentaire introuvable' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Commentaire introuvable' }, { status: 404 })
     }
 
     const body = await request.json()
@@ -47,12 +38,12 @@ export async function PATCH(
 
     // Vérifications d'autorisation
     const isAuthor = existingComment.authorId === userId
-    
+
     // Seul l'auteur peut modifier le contenu (dans les 15 premières minutes)
     if (updates.content && !isAdmin) {
       if (!isAuthor) {
         return NextResponse.json(
-          { error: 'Seul l\'auteur peut modifier ce commentaire' },
+          { error: "Seul l'auteur peut modifier ce commentaire" },
           { status: 403 }
         )
       }
@@ -69,10 +60,7 @@ export async function PATCH(
 
     // Seuls les admins peuvent modifier l'approbation et la visibilité
     if ((updates.isApproved !== undefined || updates.isVisible !== undefined) && !isAdmin) {
-      return NextResponse.json(
-        { error: 'Action non autorisée' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'Action non autorisée' }, { status: 403 })
     }
 
     // Appliquer les modifications
@@ -93,7 +81,7 @@ export async function PATCH(
     return NextResponse.json(updatedComment)
   } catch (error) {
     console.error('Erreur modification commentaire:', error)
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Données invalides', details: error.issues },
@@ -116,10 +104,7 @@ export async function DELETE(
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Authentification requise' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Authentification requise' }, { status: 401 })
     }
 
     const { id } = await params
@@ -130,17 +115,14 @@ export async function DELETE(
     // Récupérer le commentaire existant
     const existingComment = await prisma.comment.findUnique({
       where: { id },
-      include: { 
+      include: {
         author: true,
         replies: true,
       },
     })
 
     if (!existingComment) {
-      return NextResponse.json(
-        { error: 'Commentaire introuvable' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Commentaire introuvable' }, { status: 404 })
     }
 
     const isAuthor = existingComment.authorId === userId
@@ -148,10 +130,7 @@ export async function DELETE(
     // Seuls les admins peuvent supprimer
     // Les auteurs peuvent masquer leur propre commentaire
     if (!isAdmin && !isAuthor) {
-      return NextResponse.json(
-        { error: 'Action non autorisée' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'Action non autorisée' }, { status: 403 })
     }
 
     // Si l'utilisateur est l'auteur mais pas admin, masquer seulement

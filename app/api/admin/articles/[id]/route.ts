@@ -3,14 +3,11 @@ import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params
   // 🛡️ PROTECTION: Vérifier l'autorisation admin
   const session = await getServerSession(authOptions)
-  
+
   if (!session || session.user?.role !== 'admin') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }
@@ -26,10 +23,7 @@ export async function PATCH(
     return NextResponse.json(article)
   } catch (error) {
     console.error('Error updating article:', error)
-    return NextResponse.json(
-      { error: 'Failed to update article' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to update article' }, { status: 500 })
   }
 }
 

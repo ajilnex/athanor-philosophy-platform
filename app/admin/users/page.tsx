@@ -6,7 +6,7 @@ import UserDashboard from '@/components/admin/UserDashboard'
 
 export const metadata = {
   title: "Gestion des utilisateurs - Admin - L'athanor",
-  description: 'Interface de gestion des utilisateurs et des rôles'
+  description: 'Interface de gestion des utilisateurs et des rôles',
 }
 
 export default async function UsersPage() {
@@ -26,8 +26,8 @@ export default async function UsersPage() {
       emailVerified: true,
     },
     orderBy: {
-      createdAt: 'desc'
-    }
+      createdAt: 'desc',
+    },
   })
 
   return (
@@ -36,9 +36,7 @@ export default async function UsersPage() {
         <h1 className="font-serif text-3xl font-bold text-foreground mb-2">
           Gestion des utilisateurs
         </h1>
-        <p className="text-subtle">
-          Gérez les utilisateurs et leurs rôles d'accès.
-        </p>
+        <p className="text-subtle">Gérez les utilisateurs et leurs rôles d'accès.</p>
       </div>
 
       <UserDashboard users={users} />

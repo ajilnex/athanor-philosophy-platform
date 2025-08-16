@@ -8,26 +8,26 @@ import { StaticGraph } from '@/components/graph/StaticGraph'
 export default async function BilletsPage() {
   const session = await getServerSession(authOptions)
   const allBillets = await getAllBillets()
-  
+
   // Enrichir avec les infos de scellement et filtrer selon le rôle
   const billetsWithSealInfo = await Promise.all(
-    allBillets.map(async (billet) => {
+    allBillets.map(async billet => {
       const billetRecord = await prisma.billet.findUnique({
-        where: { slug: billet.slug }
+        where: { slug: billet.slug },
       })
-      
+
       const isSealed = billetRecord?.isSealed || false
       const isAdmin = (session?.user as any)?.role === 'ADMIN'
-      
+
       return {
         ...billet,
         isSealed,
         // Masquer les billets scellés pour les non-admins
-        shouldHide: isSealed && !isAdmin
+        shouldHide: isSealed && !isAdmin,
       }
     })
   )
-  
+
   // Filtrer les billets selon les permissions
   const visibleBillets = billetsWithSealInfo.filter(billet => !billet.shouldHide)
 
@@ -40,9 +40,7 @@ export default async function BilletsPage() {
 
       {/* Contenu au premier plan */}
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        <BilletsPageClient 
-          initialBillets={visibleBillets}
-        />
+        <BilletsPageClient initialBillets={visibleBillets} />
       </div>
     </>
   )

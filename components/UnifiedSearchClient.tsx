@@ -30,7 +30,6 @@ interface SearchIndex {
   }
 }
 
-
 export function UnifiedSearchClient() {
   const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState('')
@@ -47,22 +46,21 @@ export function UnifiedSearchClient() {
         if (!response.ok) {
           throw new Error('Failed to load search index')
         }
-        
+
         const data: SearchIndex = await response.json()
         setSearchIndex(data)
-        
+
         // Reconstruct Lunr index from serialized data
         const index = lunr.Index.load(data.index)
         setLunrIndex(index)
-        
       } catch (err) {
         console.error('Error loading search index:', err)
-        setError('Erreur lors du chargement de l\'index de recherche')
+        setError("Erreur lors du chargement de l'index de recherche")
       } finally {
         setLoading(false)
       }
     }
-    
+
     loadSearchIndex()
   }, [])
 
@@ -82,16 +80,17 @@ export function UnifiedSearchClient() {
 
     try {
       const results = lunrIndex.search(searchQuery.trim())
-      return results.map(result => {
-        const doc = searchIndex.documents.find(d => d.id === result.ref)
-        return doc ? { ...doc, score: result.score } : null
-      }).filter(Boolean) as (SearchDocument & { score: number })[]
+      return results
+        .map(result => {
+          const doc = searchIndex.documents.find(d => d.id === result.ref)
+          return doc ? { ...doc, score: result.score } : null
+        })
+        .filter(Boolean) as (SearchDocument & { score: number })[]
     } catch (err) {
       console.error('Search error:', err)
       return []
     }
   }, [searchQuery, lunrIndex, searchIndex])
-
 
   if (loading) {
     return (
@@ -114,9 +113,7 @@ export function UnifiedSearchClient() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center py-12">
           <Search className="h-16 w-16 text-subtle mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-foreground mb-2">
-            Erreur de recherche
-          </h3>
+          <h3 className="text-xl font-semibold text-foreground mb-2">Erreur de recherche</h3>
           <p className="text-subtle mb-6">{error}</p>
         </div>
       </div>
@@ -126,12 +123,11 @@ export function UnifiedSearchClient() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-8">
-        <h1 className="text-4xl font-serif font-bold text-foreground mb-4">
-          Recherche Unifiée
-        </h1>
+        <h1 className="text-4xl font-serif font-bold text-foreground mb-4">Recherche Unifiée</h1>
         <p className="text-lg text-subtle max-w-3xl">
-          Recherchez simultanément dans les billets et les publications de L'Athanor. 
-          Index généré le {searchIndex && new Date(searchIndex.metadata.generatedAt).toLocaleDateString('fr-FR')}.
+          Recherchez simultanément dans les billets et les publications de L'Athanor. Index généré
+          le {searchIndex && new Date(searchIndex.metadata.generatedAt).toLocaleDateString('fr-FR')}
+          .
         </p>
       </div>
 
@@ -146,22 +142,25 @@ export function UnifiedSearchClient() {
               type="text"
               placeholder="Rechercher dans billets et publications..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               className="block w-full pl-10 pr-3 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-transparent text-foreground text-lg transition-all duration-300 bg-background/20 backdrop-blur-md border border-white/10 shadow-lg hover:shadow-xl hover:bg-background/30"
               style={{
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(0, 0, 0, 0.1)'
+                background:
+                  'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+                boxShadow:
+                  '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(0, 0, 0, 0.1)',
               }}
             />
           </div>
         </div>
-        
+
         {/* Mini Graph - shows context for top search result */}
         <div className="lg:w-80">
-          <MiniGraph 
-            centerNodeId={searchResults.length > 0 && searchResults[0].type === 'billet' 
-              ? searchResults[0].id 
-              : undefined
+          <MiniGraph
+            centerNodeId={
+              searchResults.length > 0 && searchResults[0].type === 'billet'
+                ? searchResults[0].id
+                : undefined
             }
             maxNodes={5}
             className="h-full"
@@ -183,8 +182,7 @@ export function UnifiedSearchClient() {
           <div className="text-xs">
             {searchQuery.trim()
               ? `${searchResults.length} résultat(s) pour "${searchQuery}"`
-              : `${searchIndex.metadata.totalDocuments} document(s) indexé(s)`
-            }
+              : `${searchIndex.metadata.totalDocuments} document(s) indexé(s)`}
           </div>
         </div>
       )}
@@ -197,10 +195,9 @@ export function UnifiedSearchClient() {
             {searchQuery.trim() ? 'Aucun résultat trouvé' : 'Commencez votre recherche'}
           </h3>
           <p className="text-subtle mb-6">
-            {searchQuery.trim() 
+            {searchQuery.trim()
               ? 'Essayez avec des termes différents ou moins spécifiques.'
-              : 'Tapez dans la barre de recherche pour explorer le contenu.'
-            }
+              : 'Tapez dans la barre de recherche pour explorer le contenu.'}
           </p>
           {searchQuery.trim() && (
             <button
@@ -213,7 +210,7 @@ export function UnifiedSearchClient() {
         </div>
       ) : (
         <div className="grid gap-6">
-          {searchResults.map((doc) => (
+          {searchResults.map(doc => (
             <article
               key={doc.id}
               className="p-6 rounded-lg border border-subtle/20 bg-background/50 shadow-sm backdrop-blur-sm hover:border-subtle/50 hover:shadow-md transition-all duration-300"
@@ -230,32 +227,29 @@ export function UnifiedSearchClient() {
                       {doc.type === 'billet' ? 'Billet' : 'Publication'}
                     </span>
                   </div>
-                  
+
                   <h2 className="text-2xl font-serif font-semibold text-foreground mb-3">
-                    <Link
-                      href={doc.url}
-                      className="hover:text-accent transition-colors"
-                    >
+                    <Link href={doc.url} className="hover:text-accent transition-colors">
                       {doc.title}
                     </Link>
                   </h2>
-                  
+
                   {/* Smart contextual snippet */}
                   {(() => {
                     // Génère un snippet intelligent côté client
                     const content = doc.content || doc.excerpt || ''
-                    const snippetHtml = searchQuery.trim() 
+                    const snippetHtml = searchQuery.trim()
                       ? makeSnippet(content, searchQuery, 300)
                       : content.substring(0, 300) + (content.length > 300 ? '...' : '')
-                    
+
                     return (
-                      <div 
+                      <div
                         className="text-foreground/80 text-sm leading-relaxed mb-4 card-search-result"
                         dangerouslySetInnerHTML={{ __html: snippetHtml }}
                       />
                     )
                   })()}
-                  
+
                   <div className="flex flex-wrap items-center gap-4 text-sm text-subtle mb-4">
                     <div className="flex items-center space-x-1">
                       <Calendar className="h-4 w-4" />
@@ -273,12 +267,12 @@ export function UnifiedSearchClient() {
                       </div>
                     )}
                   </div>
-                  
+
                   {doc.tags && doc.tags.length > 0 && (
                     <div className="flex items-center space-x-2">
                       <Tag className="h-4 w-4 text-subtle" />
                       <div className="flex flex-wrap gap-2">
-                        {doc.tags.map((tag) => (
+                        {doc.tags.map(tag => (
                           <span
                             key={tag}
                             className="px-2 py-1 text-xs bg-accent/10 text-accent rounded-full"
@@ -290,7 +284,7 @@ export function UnifiedSearchClient() {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="lg:w-48 flex flex-col space-y-3">
                   <Link
                     href={

@@ -25,10 +25,10 @@ function formatFileSize(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
 }
 
-export default async function PublicationPage({ 
-  params, 
-  searchParams 
-}: { 
+export default async function PublicationPage({
+  params,
+  searchParams,
+}: {
   params: Promise<{ id: string }>
   searchParams: Promise<{ page?: string; q?: string }>
 }) {
@@ -56,13 +56,11 @@ export default async function PublicationPage({
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour aux publications
         </Link>
-        
+
         <div className="text-center py-12">
           <Lock className="h-12 w-12 mx-auto mb-4 text-subtle" />
           <h1 className="text-2xl font-light text-foreground mb-2">Publication scellée</h1>
-          <p className="text-subtle mb-6">
-            Cette publication est réservée aux administrateurs.
-          </p>
+          <p className="text-subtle mb-6">Cette publication est réservée aux administrateurs.</p>
           {!session && (
             <Link
               href="/auth/signin"
@@ -83,7 +81,7 @@ export default async function PublicationPage({
         `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/find-in-pdf?url=${encodeURIComponent(publication.filePath)}&q=${encodeURIComponent(searchParamsResolved.q)}`,
         { cache: 'no-store' } // Important pour les recherches dynamiques
       )
-      
+
       if (searchResponse.ok) {
         const searchResult = await searchResponse.json()
         if (searchResult.found && searchResult.pageNumber) {
@@ -107,18 +105,18 @@ export default async function PublicationPage({
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour aux publications
         </Link>
-        
+
         <div className="card border-subtle p-8">
           <h1 className="text-2xl sm:text-3xl font-light text-foreground mb-4 sm:mb-6">
             {publication.title}
           </h1>
-          
+
           {publication.description && (
             <p className="text-sm sm:text-base text-subtle mb-4 sm:mb-6 leading-relaxed font-light">
               {publication.description}
             </p>
           )}
-          
+
           <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm text-subtle mb-4 sm:mb-6">
             {publication.author && (
               <div className="flex items-center space-x-2">
@@ -141,23 +139,20 @@ export default async function PublicationPage({
               <span>{formatFileSize(publication.fileSize)}</span>
             </div>
           </div>
-          
+
           {publication.tags && publication.tags.length > 0 && (
             <div className="flex items-center space-x-2 mb-6">
               <Tag className="h-4 w-4 text-subtle" />
               <div className="flex flex-wrap gap-2">
-                {publication.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 text-sm bg-gray-100 text-foreground"
-                  >
+                {publication.tags.map(tag => (
+                  <span key={tag} className="px-3 py-1 text-sm bg-gray-100 text-foreground">
                     {tag}
                   </span>
                 ))}
               </div>
             </div>
           )}
-          
+
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <Link
               href={`/api/articles/${publication.id}/download`}
@@ -176,8 +171,8 @@ export default async function PublicationPage({
 
       {/* PDF Viewer */}
       <div className="mt-8">
-        <PdfClientViewer 
-          pdfUrl={publication.filePath} 
+        <PdfClientViewer
+          pdfUrl={publication.filePath}
           title={publication.title}
           initialPage={initialPage}
         />
@@ -193,10 +188,14 @@ export default async function PublicationPage({
       {/* Publication Summary */}
       <div className="card border-subtle mt-6 sm:mt-8">
         <div className="p-4 sm:p-6">
-          <h2 className="text-base sm:text-lg font-light text-foreground mb-3 sm:mb-4">À propos de cette publication</h2>
+          <h2 className="text-base sm:text-lg font-light text-foreground mb-3 sm:mb-4">
+            À propos de cette publication
+          </h2>
           <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <h3 className="text-sm sm:text-base font-light text-foreground mb-2 sm:mb-3">Détails du document</h3>
+              <h3 className="text-sm sm:text-base font-light text-foreground mb-2 sm:mb-3">
+                Détails du document
+              </h3>
               <div className="space-y-2 text-xs sm:text-sm text-subtle">
                 <div className="flex justify-between">
                   <span>Nom du fichier:</span>
@@ -212,9 +211,11 @@ export default async function PublicationPage({
                 </div>
               </div>
             </div>
-            
+
             <div>
-              <h3 className="text-sm sm:text-base font-light text-foreground mb-2 sm:mb-3">Téléchargement</h3>
+              <h3 className="text-sm sm:text-base font-light text-foreground mb-2 sm:mb-3">
+                Téléchargement
+              </h3>
               <div className="space-y-3 sm:space-y-4">
                 <p className="text-xs sm:text-sm text-subtle font-light">
                   Cliquez sur le lien ci-dessous pour télécharger ce document.

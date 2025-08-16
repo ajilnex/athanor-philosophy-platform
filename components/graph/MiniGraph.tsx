@@ -51,7 +51,7 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
   // Generate linear horizontal graph layout
   const miniGraphData = React.useMemo(() => {
     if (!graphData || !centerNodeId) return null
-    
+
     const centerNode = graphData.nodes.find(n => n.id === centerNodeId)
     if (!centerNode) return null
 
@@ -68,7 +68,7 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
     // Linear horizontal layout
     const nodes = [centerNode, ...neighbors]
     const spacing = 200 // Generous spacing for readability
-    
+
     // Center node at origin
     centerNode.x = 0
     centerNode.y = 0
@@ -81,11 +81,11 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
       node.y = 0 // All on the same horizontal line
     })
 
-    return { 
-      nodes, 
-      edges: graphData.edges.filter(e => 
-        nodes.some(n => n.id === e.source) && nodes.some(n => n.id === e.target)
-      )
+    return {
+      nodes,
+      edges: graphData.edges.filter(
+        e => nodes.some(n => n.id === e.source) && nodes.some(n => n.id === e.target)
+      ),
     }
   }, [graphData, centerNodeId, maxNodes])
 
@@ -102,7 +102,9 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
 
   if (!miniGraphData || miniGraphData.nodes.length === 0) {
     return (
-      <div className={`bg-background/50 rounded-lg border border-subtle/20 p-4 text-center ${className}`}>
+      <div
+        className={`bg-background/50 rounded-lg border border-subtle/20 p-4 text-center ${className}`}
+      >
         <div className="text-subtle text-sm">Pas de graphe contextuel</div>
       </div>
     )
@@ -110,10 +112,7 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
 
   return (
     <div className={`w-full ${className}`}>
-      <svg
-        viewBox="-500 -60 1000 120"
-        className="w-full h-full"
-      >
+      <svg viewBox="-500 -60 1000 120" className="w-full h-full">
         {/* Render edges */}
         {miniGraphData.edges.map((edge, index) => {
           const fromNode = miniGraphData.nodes.find(n => n.id === edge.source)
@@ -135,13 +134,11 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
         })}
 
         {/* Render nodes */}
-        {miniGraphData.nodes.map((node) => {
+        {miniGraphData.nodes.map(node => {
           const isCenter = node.id === centerNodeId
           const nodeRadius = isCenter ? 8 : 6
-          const labelText = node.label.length > 25 
-            ? node.label.substring(0, 22) + '…' 
-            : node.label
-          
+          const labelText = node.label.length > 25 ? node.label.substring(0, 22) + '…' : node.label
+
           return (
             <g key={node.id}>
               {/* Node halo for center node */}
@@ -154,7 +151,7 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
                   stroke="none"
                 />
               )}
-              
+
               {/* Main node */}
               <circle
                 cx={node.x}
@@ -164,7 +161,7 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
                 stroke="hsl(var(--background))"
                 strokeWidth="2"
               />
-              
+
               {/* Node labels with maximum visibility */}
               <text
                 x={node.x}
@@ -174,12 +171,12 @@ export function MiniGraph({ centerNodeId, maxNodes = 5, className = '' }: MiniGr
                 fontWeight="500"
                 fontFamily="var(--font-serif)"
                 fill="hsl(var(--foreground))"
-                style={{ 
+                style={{
                   userSelect: 'none',
                   paintOrder: 'stroke',
                   stroke: 'hsl(var(--background))',
                   strokeWidth: '4px',
-                  strokeLinejoin: 'round'
+                  strokeLinejoin: 'round',
                 }}
               >
                 {labelText}

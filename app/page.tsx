@@ -8,7 +8,7 @@ import { InteractiveGraph } from '@/components/graph/InteractiveGraph'
 export default async function HomePage() {
   const allBillets = await getAllBillets()
   const latestBillet = allBillets.length > 0 ? allBillets[0] : null
-  
+
   // Read graph stats for meta info
   let graphStats = { nodes: 0, edges: 0 }
   try {
@@ -20,8 +20,8 @@ export default async function HomePage() {
         .filter((node: any) => (node.degree || 0) >= 1)
         .slice(0, 30)
       const nodeIds = new Set(filteredNodes.map((n: any) => n.id))
-      const filteredEdges = graphData.edges.filter((edge: any) => 
-        nodeIds.has(edge.source) && nodeIds.has(edge.target)
+      const filteredEdges = graphData.edges.filter(
+        (edge: any) => nodeIds.has(edge.source) && nodeIds.has(edge.target)
       )
       graphStats = { nodes: filteredNodes.length, edges: filteredEdges.length }
     }
@@ -54,10 +54,12 @@ export default async function HomePage() {
             </form>
           </div>
 
-
           {/* Maison d'édition */}
           <div className="my-12 text-center">
-            <Link href="/edition" className="inline-flex items-center px-6 py-3 bg-slate-900/90 hover:bg-slate-800/95 rounded-lg text-slate-50 transition-all duration-200 font-light border border-slate-700/30 backdrop-blur-sm">
+            <Link
+              href="/edition"
+              className="inline-flex items-center px-6 py-3 bg-slate-900/90 hover:bg-slate-800/95 rounded-lg text-slate-50 transition-all duration-200 font-light border border-slate-700/30 backdrop-blur-sm"
+            >
               Maison d'édition
             </Link>
           </div>

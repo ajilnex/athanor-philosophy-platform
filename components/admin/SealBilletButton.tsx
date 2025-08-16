@@ -15,7 +15,7 @@ export function SealBilletButton({ slug, initialSealed = false }: SealBilletButt
 
   const handleToggleSeal = async () => {
     setIsLoading(true)
-    
+
     try {
       const response = await fetch(`/api/admin/billets/${slug}/seal`, {
         method: 'PATCH',
@@ -32,7 +32,7 @@ export function SealBilletButton({ slug, initialSealed = false }: SealBilletButt
 
       const result = await response.json()
       setIsSealed(result.isSealed)
-      
+
       // Recharger la page pour voir les changements
       window.location.reload()
     } catch (error) {
@@ -52,7 +52,9 @@ export function SealBilletButton({ slug, initialSealed = false }: SealBilletButt
           ? 'bg-destructive/10 text-destructive hover:bg-destructive/20'
           : 'bg-muted text-subtle hover:bg-muted/70'
       } disabled:opacity-50 disabled:cursor-not-allowed`}
-      title={isSealed ? 'Désceller ce billet (visible par tous)' : 'Sceller ce billet (admin uniquement)'}
+      title={
+        isSealed ? 'Désceller ce billet (visible par tous)' : 'Sceller ce billet (admin uniquement)'
+      }
     >
       {isLoading ? (
         <Loader2 className="h-3 w-3 animate-spin" />

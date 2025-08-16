@@ -13,19 +13,19 @@ import { isFileInTrash } from '@/lib/github.server'
 
 export async function generateStaticParams() {
   const slugs = await getBilletSlugs()
-  return slugs.map((slug) => ({ slug }))
+  return slugs.map(slug => ({ slug }))
 }
 
 export default async function BilletPage({ params }: { params: Promise<{ slug: string }> }) {
   const session = await getServerSession(authOptions)
   const { slug } = await params
-  
+
   // Vérifier d'abord si le billet est supprimé (dans le trash GitHub)
   const isDeleted = await isFileInTrash(`content/billets/${slug}.mdx`)
   if (isDeleted) {
     notFound()
   }
-  
+
   const billet = await getBilletBySlug(slug)
 
   if (!billet) {
@@ -34,7 +34,7 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
 
   // Vérifier si le billet est scellé
   const billetRecord = await prisma.billet.findUnique({
-    where: { slug }
+    where: { slug },
   })
 
   const isSealed = billetRecord?.isSealed || false
@@ -52,13 +52,11 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour aux billets
         </Link>
-        
+
         <div className="text-center py-12">
           <Lock className="h-12 w-12 mx-auto mb-4 text-subtle" />
           <h1 className="text-2xl font-light text-foreground mb-2">Contenu scellé</h1>
-          <p className="text-subtle mb-6">
-            Ce billet est réservé aux administrateurs.
-          </p>
+          <p className="text-subtle mb-6">Ce billet est réservé aux administrateurs.</p>
           {!session && (
             <Link
               href="/auth/signin"
@@ -83,22 +81,20 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour aux billets
         </Link>
-        
+
         <div className="mb-6">
           <div className="flex items-start justify-between mb-4">
-            <h1 className="text-2xl sm:text-3xl font-light text-foreground">
-              {billet.title}
-            </h1>
-            <EditBilletButton 
+            <h1 className="text-2xl sm:text-3xl font-light text-foreground">{billet.title}</h1>
+            <EditBilletButton
               slug={slug}
               title={billet.title}
               content={billet.content}
               tags={billet.tags}
               excerpt={billet.excerpt}
-              className="ml-4 flex-shrink-0" 
+              className="ml-4 flex-shrink-0"
             />
           </div>
-          
+
           <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-subtle mb-4">
             <div className="flex items-center space-x-2">
               <Calendar className="h-4 w-4" />
@@ -111,16 +107,13 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
               </span>
             </div>
           </div>
-          
+
           {billet.tags && billet.tags.length > 0 && (
             <div className="flex items-center space-x-2">
               <Tag className="h-4 w-4 text-subtle" />
               <div className="flex flex-wrap gap-2">
-                {billet.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 text-sm bg-gray-100 text-foreground"
-                  >
+                {billet.tags.map(tag => (
+                  <span key={tag} className="px-3 py-1 text-sm bg-gray-100 text-foreground">
                     {tag}
                   </span>
                 ))}
@@ -131,24 +124,15 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
       </div>
 
       {/* Content */}
-      <article className="max-w-none">
-        {await compileMDX(billet.content, billet.isMdx)}
-      </article>
+      <article className="max-w-none">{await compileMDX(billet.content, billet.isMdx)}</article>
 
       {/* Section commentaires */}
-      <CommentSection
-        targetType="billet"
-        targetId={slug}
-        title={billet.title}
-      />
+      <CommentSection targetType="billet" targetId={slug} title={billet.title} />
 
       {/* Ligne de pensée */}
       <section className="mt-16 pt-8 border-t border-subtle/20">
         <div className="w-full max-w-4xl mx-auto h-40">
-          <MiniGraph 
-            centerNodeId={`billet:${slug}`} 
-            maxNodes={5}
-          />
+          <MiniGraph centerNodeId={`billet:${slug}`} maxNodes={5} />
         </div>
       </section>
 

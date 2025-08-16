@@ -5,6 +5,7 @@ Ce document explique comment utiliser le système de snapshot pour synchroniser 
 ## 🎯 Objectif
 
 Le système de snapshot permet de :
+
 - Récupérer les données publiques de production
 - Migrer les fichiers Cloudinary de prod vers dev
 - Créer un environnement de développement réaliste
@@ -15,6 +16,7 @@ Le système de snapshot permet de :
 ### 1. Variables d'environnement
 
 Créez un fichier `.env.production` avec :
+
 ```bash
 # Base de données de production
 DATABASE_URL="postgresql://user:password@prod-host:5432/athanor_prod"
@@ -45,6 +47,7 @@ npm run snapshot:create
 ```
 
 Cette commande :
+
 1. Se connecte à la BDD de production
 2. Récupère les données publiques (articles/billets non scellés)
 3. Migre les fichiers PDF de Cloudinary prod vers dev
@@ -63,6 +66,7 @@ npm run db:reset
 ```
 
 Cette commande unifiée :
+
 1. Reset la base de données locale (`prisma migrate reset`)
 2. Restaure les données du snapshot
 3. Crée un utilisateur admin local (`admin@athanor.com` / `admin123`)
@@ -98,12 +102,14 @@ npm run db:dev:reset        # Reset Docker + migrations
 ## 📊 Contenu du Snapshot
 
 ### ✅ Données Incluses
+
 - **Articles** : Publications publiques (`isSealed = false`)
 - **Billets** : Billets publics (`isSealed = false`)
 - **Commentaires** : Commentaires approuvés et visibles
 - **Fichiers** : PDFs migrés vers Cloudinary dev
 
 ### ❌ Données Exclues/Anonymisées
+
 - **Utilisateurs** : Données sensibles non incluses
 - **Sessions/Comptes** : Auth NextAuth exclu
 - **Commentaires** : AuthorId anonymisé vers `admin`
@@ -112,11 +118,13 @@ npm run db:dev:reset        # Reset Docker + migrations
 ## 🔐 Sécurité
 
 ### Données Anonymisées
+
 - Les commentaires sont associés à l'admin local
 - Aucune donnée utilisateur sensible n'est copiée
 - Les contenus privés (`isSealed = true`) sont exclus
 
 ### Fichiers Cloudinary
+
 - Migration de compte à compte (prod → dev)
 - Dossier séparé : `athanor-articles-dev`
 - Pas de risque de conflit avec la prod
@@ -124,6 +132,7 @@ npm run db:dev:reset        # Reset Docker + migrations
 ## 🚀 Cas d'Usage
 
 ### Nouveau Développeur
+
 ```bash
 git clone repo
 npm install
@@ -134,6 +143,7 @@ npm run dev
 ```
 
 ### Synchronisation Équipe
+
 ```bash
 git pull  # Récupère le nouveau snapshot.json
 npm run db:reset
@@ -141,6 +151,7 @@ npm run db:reset
 ```
 
 ### Test d'une Feature
+
 ```bash
 npm run db:reset  # État propre
 # Développement/tests
@@ -150,6 +161,7 @@ npm run db:reset  # Reset si besoin
 ## 🐛 Dépannage
 
 ### Erreur "snapshot.json introuvable"
+
 ```bash
 # Vérifiez la présence du fichier
 ls prisma/snapshot.json
@@ -160,11 +172,13 @@ npm run snapshot:restore
 ```
 
 ### Erreur Cloudinary
+
 - Vérifiez les clés API dans `.env.production`
 - Vérifiez les permissions des comptes Cloudinary
 - Le script continue même si la migration échoue
 
 ### Erreur Base de Données
+
 - Vérifiez que Docker PostgreSQL est démarré (`npm run db:dev:start`)
 - Vérifiez les variables dans `.env.local`
 - Consultez les logs pour plus de détails

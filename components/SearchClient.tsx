@@ -30,7 +30,7 @@ function formatFileSize(bytes: number): string {
 
 export function SearchClient({ articles }: SearchClientProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  
+
   // Initialize Fuse.js with articles
   const fuse = useMemo(() => {
     return new Fuse(articles, {
@@ -60,7 +60,8 @@ export function SearchClient({ articles }: SearchClientProps) {
           Rechercher des Articles
         </h1>
         <p className="text-lg text-gray-600 max-w-3xl">
-          Explorez notre collection d'articles philosophiques en utilisant la recherche par titre, auteur, description ou tags.
+          Explorez notre collection d'articles philosophiques en utilisant la recherche par titre,
+          auteur, description ou tags.
         </p>
       </div>
 
@@ -74,7 +75,7 @@ export function SearchClient({ articles }: SearchClientProps) {
             type="text"
             placeholder="Rechercher des articles..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
             className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-lg"
           />
         </div>
@@ -85,8 +86,7 @@ export function SearchClient({ articles }: SearchClientProps) {
         <p className="text-gray-600">
           {searchQuery.trim()
             ? `${searchResults.length} résultat(s) pour "${searchQuery}"`
-            : `${articles.length} article(s) disponible(s)`
-          }
+            : `${articles.length} article(s) disponible(s)`}
         </p>
       </div>
 
@@ -97,16 +97,12 @@ export function SearchClient({ articles }: SearchClientProps) {
             {searchQuery.trim() ? 'Aucun résultat trouvé' : 'Aucun article disponible'}
           </h3>
           <p className="text-gray-500 mb-6">
-            {searchQuery.trim() 
+            {searchQuery.trim()
               ? 'Essayez avec des termes différents ou moins spécifiques.'
-              : 'Les articles seront bientôt disponibles.'
-            }
+              : 'Les articles seront bientôt disponibles.'}
           </p>
           {searchQuery.trim() && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="btn-primary"
-            >
+            <button onClick={() => setSearchQuery('')} className="btn-primary">
               Voir tous les articles
             </button>
           )}
@@ -128,13 +124,11 @@ export function SearchClient({ articles }: SearchClientProps) {
                       {article.title}
                     </Link>
                   </h2>
-                  
+
                   {article.description && (
-                    <p className="text-gray-600 mb-4 line-clamp-3">
-                      {article.description}
-                    </p>
+                    <p className="text-gray-600 mb-4 line-clamp-3">{article.description}</p>
                   )}
-                  
+
                   <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
                     {article.author && (
                       <div className="flex items-center space-x-1">
@@ -145,8 +139,8 @@ export function SearchClient({ articles }: SearchClientProps) {
                     <div className="flex items-center space-x-1">
                       <Calendar className="h-4 w-4" />
                       <span>
-                        {(article.publishedAt instanceof Date 
-                          ? article.publishedAt 
+                        {(article.publishedAt instanceof Date
+                          ? article.publishedAt
                           : new Date(article.publishedAt)
                         ).toLocaleDateString('fr-FR', {
                           year: 'numeric',
@@ -160,12 +154,12 @@ export function SearchClient({ articles }: SearchClientProps) {
                       <span>{formatFileSize(article.fileSize)}</span>
                     </div>
                   </div>
-                  
+
                   {article.tags && article.tags.length > 0 && (
                     <div className="flex items-center space-x-2 mb-4">
                       <Tag className="h-4 w-4 text-gray-400" />
                       <div className="flex flex-wrap gap-2">
-                        {article.tags.map((tag) => (
+                        {article.tags.map(tag => (
                           <span
                             key={tag}
                             className="px-2 py-1 text-xs bg-primary-100 text-primary-700 rounded-full"
@@ -177,7 +171,7 @@ export function SearchClient({ articles }: SearchClientProps) {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="lg:w-48 flex flex-col space-y-3">
                   <Link
                     href={`/billets/${article.id}`}

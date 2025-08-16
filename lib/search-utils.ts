@@ -16,7 +16,7 @@ function escapeHtml(text: string): string {
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#x27;')
   }
-  
+
   // Version client - utilise le DOM
   const div = document.createElement('div')
   div.textContent = text
@@ -27,23 +27,25 @@ function escapeHtml(text: string): string {
  * Convertit le markdown basique en texte plain avec nettoyage
  */
 function toPlainText(markdown: string): string {
-  return markdown
-    // Supprime les titres markdown (### Titre)
-    .replace(/^#{1,6}\s+(.+)$/gm, '$1')
-    // Supprime le gras/italique (**bold**, *italic*)
-    .replace(/\*\*([^*]+)\*\*/g, '$1')
-    .replace(/\*([^*]+)\*/g, '$1')
-    // Supprime les liens [texte](url)
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-    // Supprime les blocs de code ```
-    .replace(/```[\s\S]*?```/g, '')
-    // Supprime le code inline `code`
-    .replace(/`([^`]+)`/g, '$1')
-    // Supprime les citations > 
-    .replace(/^>\s+(.+)$/gm, '$1')
-    // Normalise les espaces multiples
-    .replace(/\s+/g, ' ')
-    .trim()
+  return (
+    markdown
+      // Supprime les titres markdown (### Titre)
+      .replace(/^#{1,6}\s+(.+)$/gm, '$1')
+      // Supprime le gras/italique (**bold**, *italic*)
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/\*([^*]+)\*/g, '$1')
+      // Supprime les liens [texte](url)
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      // Supprime les blocs de code ```
+      .replace(/```[\s\S]*?```/g, '')
+      // Supprime le code inline `code`
+      .replace(/`([^`]+)`/g, '$1')
+      // Supprime les citations >
+      .replace(/^>\s+(.+)$/gm, '$1')
+      // Normalise les espaces multiples
+      .replace(/\s+/g, ' ')
+      .trim()
+  )
 }
 
 /**
@@ -88,11 +90,7 @@ function parseQuery(query: string): {
 /**
  * Génère un snippet contextuel intelligent avec surlignage sécurisé
  */
-export function makeSnippet(
-  content: string, 
-  query: string, 
-  maxLength: number = 300
-): string {
+export function makeSnippet(content: string, query: string, maxLength: number = 300): string {
   if (!content || !query.trim()) {
     return escapeHtml(content.substring(0, maxLength) + '...')
   }
@@ -103,7 +101,7 @@ export function makeSnippet(
 
   // Combine tous les termes à rechercher
   const allTerms = [...required, ...optional, ...phrases]
-  
+
   if (allTerms.length === 0) {
     return escapeHtml(plainText.substring(0, maxLength) + '...')
   }
@@ -123,7 +121,7 @@ export function makeSnippet(
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
-    
+
     const index = normalizedText.indexOf(normalizedTerm)
     if (index !== -1 && (bestMatch === -1 || index < bestMatch)) {
       bestMatch = index
@@ -143,7 +141,7 @@ export function makeSnippet(
 
   // Extrait le snippet
   let snippet = plainText.substring(start, end)
-  
+
   // Ajoute des ellipses si tronqué
   if (start > 0) snippet = '...' + snippet
   if (end < plainText.length) snippet = snippet + '...'
@@ -154,7 +152,7 @@ export function makeSnippet(
   // Puis surligne tous les termes de recherche
   for (const term of allTerms) {
     if (!term.trim()) continue
-    
+
     // Échappe le terme pour la regex
     const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     const regex = new RegExp(`(${escapedTerm})`, 'gi')

@@ -12,7 +12,8 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
 - 🚀 **Performance** - ISR, optimisation images, pipeline parallélisé
 - 💬 **Système de commentaires** - Modération et hiérarchie
 - 📚 **Bibliographie Zotero** - Intégration citations automatiques
-- 🧪 **Tests automatisés** - Playwright avec capture de logs
+- 🧪 **Tests automatisés** - Jest + React Testing Library + Playwright
+- 🔧 **Qualité code** - Pre-commit hooks automatiques (ESLint + Prettier)
 - 📂 **Workflow de synchronisation** - Snapshot prod → dev avec Cloudinary
 - 📱 **Responsive** - Optimisé pour tous les appareils
 
@@ -205,9 +206,26 @@ La section "Billets" fonctionne sur un principe de "Git-as-a-CMS". Toute gestion
 
 #### Tests
 
-- `npm test` - Tous les tests Playwright
-- `npm run test:ui` - Interface Playwright
-- `npm run typecheck` - TypeScript check
+```bash
+# Tests unitaires et d'intégration
+npm test                  # Jest + React Testing Library
+npm run test:watch        # Mode watch pour développement
+npm run test:coverage     # Rapport de couverture
+
+# Tests E2E
+npm run test:e2e          # Tests Playwright
+npm run test:ui           # Interface Playwright
+
+# Qualité code
+npm run typecheck         # Vérification TypeScript
+npm run lint              # ESLint + correction automatique
+npm run format            # Formatage Prettier
+npm run format:check      # Vérifier format sans modifier
+
+# Git hooks (automatiques)
+# git commit -> ESLint --fix + Prettier --write
+# git push -> npm run typecheck (bloque si erreurs)
+```
 
 ### Ajout d'articles
 
@@ -268,11 +286,37 @@ Les polices sont optimisées via next/font dans `app/layout.tsx` :
 
 ## Tests & Qualité
 
-### Tests Automatisés
+### Infrastructure Tests
+
+- **Jest + React Testing Library** - Tests unitaires et d'intégration avec mocks complets
+- **Configuration Jest** - Support Next.js, TypeScript, path mapping (@/\*)
+- **Mocks automatiques** - NextAuth, Prisma, Cloudinary, next/router, next/image
+- **Coverage** - Rapports de couverture de code pour composants critiques
+
+### Git Hooks Automatiques
+
+- **Pre-commit** - ESLint --fix + Prettier --write via lint-staged
+- **Pre-push** - Vérification TypeScript obligatoire (bloque si erreurs)
+- **Performance** - Traitement uniquement des fichiers modifiés
+- **Workflow** - Qualité code garantie automatiquement
+
+### Configuration Prettier
+
+```json
+{
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "tabWidth": 2,
+  "printWidth": 100
+}
+```
+
+### Tests E2E
 
 - **Playwright** - Tests E2E avec capture de logs en temps réel
-- **TypeScript** - Analyse statique stricte avec `npm run typecheck`
-- **ESLint** - Qualité de code avec `npm run lint`
+- **TypeScript** - Analyse statique stricte avec exclusion tests pour performance
+- **ESLint** - 0 warnings maintenu automatiquement (react-hooks/exhaustive-deps résolu)
 
 ### Workflow de Synchronisation
 

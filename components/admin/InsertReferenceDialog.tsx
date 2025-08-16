@@ -25,7 +25,7 @@ export function InsertReferenceDialog({ isOpen, onClose, onSelect }: InsertRefer
         .then(response => response.json())
         .then((data: BibliographyEntry[]) => {
           setBibliography(data)
-          
+
           // Configurer Fuse.js pour la recherche fuzzy
           const fuseInstance = new Fuse(data, {
             keys: [
@@ -34,11 +34,11 @@ export function InsertReferenceDialog({ isOpen, onClose, onSelect }: InsertRefer
               { name: 'authors.given', weight: 0.2 },
               { name: 'year', weight: 0.1 },
               { name: 'key', weight: 0.2 },
-              { name: 'container', weight: 0.1 }
+              { name: 'container', weight: 0.1 },
             ],
             threshold: 0.3,
             includeScore: true,
-            minMatchCharLength: 2
+            minMatchCharLength: 2,
           })
           setFuse(fuseInstance)
         })
@@ -55,9 +55,8 @@ export function InsertReferenceDialog({ isOpen, onClose, onSelect }: InsertRefer
   }, [isOpen])
 
   // Résultats de recherche
-  const searchResults = fuse && searchTerm.trim()
-    ? fuse.search(searchTerm).map(result => result.item)
-    : bibliography
+  const searchResults =
+    fuse && searchTerm.trim() ? fuse.search(searchTerm).map(result => result.item) : bibliography
 
   const handleSelect = (key: string) => {
     onSelect(key)
@@ -80,14 +79,9 @@ export function InsertReferenceDialog({ isOpen, onClose, onSelect }: InsertRefer
         <div className="flex items-center justify-between p-6 border-b border-subtle/20">
           <div className="flex items-center space-x-2">
             <Book className="h-5 w-5 text-accent" />
-            <h2 className="text-lg font-serif font-light text-foreground">
-              Insérer une référence
-            </h2>
+            <h2 className="text-lg font-serif font-light text-foreground">Insérer une référence</h2>
           </div>
-          <button
-            onClick={onClose}
-            className="text-subtle hover:text-foreground transition-colors"
-          >
+          <button onClick={onClose} className="text-subtle hover:text-foreground transition-colors">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -100,7 +94,7 @@ export function InsertReferenceDialog({ isOpen, onClose, onSelect }: InsertRefer
               type="text"
               placeholder="Rechercher par auteur, titre, année ou clé..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-subtle/30 rounded-lg focus:outline-none focus:border-accent transition-colors"
               autoFocus
             />
@@ -121,7 +115,7 @@ export function InsertReferenceDialog({ isOpen, onClose, onSelect }: InsertRefer
             </div>
           ) : (
             <div className="space-y-3">
-              {searchResults.map((entry) => (
+              {searchResults.map(entry => (
                 <button
                   key={entry.key}
                   onClick={() => handleSelect(entry.key)}
@@ -132,28 +126,28 @@ export function InsertReferenceDialog({ isOpen, onClose, onSelect }: InsertRefer
                     <h3 className="font-medium text-foreground group-hover:text-accent transition-colors">
                       {entry.title}
                     </h3>
-                    
+
                     {/* Metadata */}
                     <div className="flex flex-wrap items-center gap-4 text-sm text-subtle">
                       <div className="flex items-center space-x-1">
                         <Users className="h-3 w-3" />
                         <span>{formatAuthors(entry.authors)}</span>
                       </div>
-                      
+
                       {entry.year && (
                         <div className="flex items-center space-x-1">
                           <Calendar className="h-3 w-3" />
                           <span>{entry.year}</span>
                         </div>
                       )}
-                      
+
                       {entry.container && (
                         <div className="text-xs bg-gray-100 px-2 py-1 rounded">
                           {entry.container}
                         </div>
                       )}
                     </div>
-                    
+
                     {/* Key */}
                     <div className="text-xs font-mono text-subtle bg-gray-50 px-2 py-1 rounded inline-block">
                       {entry.key}
@@ -168,7 +162,8 @@ export function InsertReferenceDialog({ isOpen, onClose, onSelect }: InsertRefer
         {/* Footer */}
         <div className="p-6 border-t border-subtle/20">
           <div className="text-sm text-subtle">
-            {searchResults.length} référence{searchResults.length !== 1 ? 's' : ''} disponible{searchResults.length !== 1 ? 's' : ''}
+            {searchResults.length} référence{searchResults.length !== 1 ? 's' : ''} disponible
+            {searchResults.length !== 1 ? 's' : ''}
           </div>
         </div>
       </div>

@@ -15,22 +15,22 @@ export function getBaseUrl(): string {
 // When you need to build an absolute URL safely
 export function toAbsolute(path: string = '/'): string {
   const base = getBaseUrl()
-  
+
   // Handle empty or relative paths safely
   if (!path || path === '') {
     path = '/'
   }
-  
+
   // If path is already absolute, return as-is
   if (path.startsWith('http://') || path.startsWith('https://')) {
     return path
   }
-  
+
   // Ensure path starts with /
   if (!path.startsWith('/')) {
     path = '/' + path
   }
-  
+
   try {
     // Build absolute URL safely
     return new URL(path, base).toString()

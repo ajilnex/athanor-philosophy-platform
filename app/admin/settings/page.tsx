@@ -13,7 +13,7 @@ export default function AdminSettingsPage() {
 
   useEffect(() => {
     if (status === 'loading') return
-    
+
     if (!session || session.user?.role !== 'admin') {
       router.push('/')
     }
@@ -50,10 +50,8 @@ export default function AdminSettingsPage() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour à l'administration
         </Link>
-        
-        <h1 className="text-2xl sm:text-3xl font-light text-foreground mb-4">
-          Paramètres
-        </h1>
+
+        <h1 className="text-2xl sm:text-3xl font-light text-foreground mb-4">Paramètres</h1>
         <p className="text-sm sm:text-base text-subtle font-light">
           Configuration et préférences du site.
         </p>
@@ -64,7 +62,7 @@ export default function AdminSettingsPage() {
           <h2 className="text-base sm:text-lg font-light text-foreground mb-4 sm:mb-6">
             Apparence
           </h2>
-          
+
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-4 border-b border-subtle gap-3 sm:gap-0">
             <div>
               <h3 className="text-sm sm:text-base font-light text-foreground">Mode sombre</h3>
@@ -93,7 +91,8 @@ export default function AdminSettingsPage() {
 
           <div className="mt-4 sm:mt-6">
             <p className="text-xs sm:text-xs text-subtle font-light">
-              Note: Le mode sombre est en cours de développement et s'appliquera à toute l'interface dans une future mise à jour.
+              Note: Le mode sombre est en cours de développement et s'appliquera à toute l'interface
+              dans une future mise à jour.
             </p>
           </div>
         </div>

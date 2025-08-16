@@ -14,10 +14,7 @@ export async function POST() {
     const userRole = (session?.user as any)?.role
 
     if (userRole !== 'ADMIN') {
-      return NextResponse.json(
-        { error: 'Admin access required' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
     console.log('🔄 Starting database migration...')
@@ -121,20 +118,21 @@ export async function POST() {
 
     // Test de fonctionnement
     const commentCount = await prisma.comment.count()
-    console.log(`✅ Migration completed successfully! Comment table ready (${commentCount} existing comments)`)
+    console.log(
+      `✅ Migration completed successfully! Comment table ready (${commentCount} existing comments)`
+    )
 
     return NextResponse.json({
       success: true,
       message: 'Migration completed successfully',
-      commentCount
+      commentCount,
     })
-
   } catch (error) {
     console.error('❌ Migration failed:', error)
     return NextResponse.json(
-      { 
-        error: 'Migration failed', 
-        details: error instanceof Error ? error.message : String(error) 
+      {
+        error: 'Migration failed',
+        details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
     )
@@ -148,10 +146,7 @@ export async function GET() {
     const userRole = (session?.user as any)?.role
 
     if (userRole !== 'ADMIN') {
-      return NextResponse.json(
-        { error: 'Admin access required' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
     // Vérifier si la table Comment existe
@@ -168,14 +163,13 @@ export async function GET() {
     return NextResponse.json({
       tableExists: (tableExists as any)[0]?.exists || false,
       commentCount,
-      ready: commentCount !== null
+      ready: commentCount !== null,
     })
-
   } catch (error) {
     return NextResponse.json(
-      { 
-        error: 'Status check failed', 
-        details: error instanceof Error ? error.message : String(error) 
+      {
+        error: 'Status check failed',
+        details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
     )

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "npx prisma generate && npx dotenv-cli -e .env.local -- bash -c '(node scripts/build-bibliography.js && node scripts/validate-citations.js && node scripts/build-citation-map.js) & (node scripts/build-graph-billets.cjs && node scripts/render-graph-svg.cjs) & (node scripts/build-search-index.js); wait' && next build",
+    "build:analyze": "ANALYZE=true npm run build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "npx tsc --noEmit",
@@ -73,11 +74,13 @@
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
     "remark-parse": "^11.0.0",
+    "swr": "^2.3.6",
     "tailwind-merge": "^2.2.0",
     "ts-node": "^10.9.2",
     "zod": "^4.0.17"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^15.4.6",
     "@playwright/test": "^1.47.1",
     "@testing-library/jest-dom": "^6.7.0",
     "@testing-library/react": "^16.3.0",

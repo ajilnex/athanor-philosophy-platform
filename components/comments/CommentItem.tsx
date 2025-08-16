@@ -45,7 +45,7 @@ export function CommentItem({
   onCommentDeleted,
   isAdmin,
   currentUserId,
-  depth = 0
+  depth = 0,
 }: CommentItemProps) {
   const [showReplyForm, setShowReplyForm] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -122,7 +122,7 @@ export function CommentItem({
   const handleDelete = async () => {
     const action = isAdmin ? 'supprimer définitivement' : 'masquer'
     const confirmMessage = `Êtes-vous sûr de vouloir ${action} ce commentaire ?`
-    
+
     if (!confirm(confirmMessage)) return
 
     try {
@@ -136,7 +136,7 @@ export function CommentItem({
       }
 
       const result = await response.json()
-      
+
       if (isAdmin || result.comment?.isVisible === false) {
         onCommentDeleted(comment.id)
       } else if (result.comment) {
@@ -180,10 +180,10 @@ export function CommentItem({
     const now = new Date()
     const diffMinutes = (now.getTime() - date.getTime()) / (1000 * 60)
 
-    if (diffMinutes < 1) return 'À l\'instant'
+    if (diffMinutes < 1) return "À l'instant"
     if (diffMinutes < 60) return `Il y a ${Math.floor(diffMinutes)} min`
     if (diffMinutes < 1440) return `Il y a ${Math.floor(diffMinutes / 60)}h`
-    
+
     return date.toLocaleDateString('fr-FR', {
       day: 'numeric',
       month: 'short',
@@ -205,8 +205,8 @@ export function CommentItem({
             {/* Avatar */}
             <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center overflow-hidden">
               {comment.author.image ? (
-                <Image 
-                  src={comment.author.image} 
+                <Image
+                  src={comment.author.image}
                   alt={comment.author.name || 'Avatar'}
                   width={32}
                   height={32}
@@ -224,7 +224,7 @@ export function CommentItem({
                 <span className="font-medium text-foreground text-sm">
                   {comment.author.name || 'Utilisateur anonyme'}
                 </span>
-                
+
                 {/* Badges de statut */}
                 {isModerated && (
                   <span className="px-2 py-1 text-xs bg-amber-100 text-amber-800 rounded">
@@ -232,17 +232,13 @@ export function CommentItem({
                   </span>
                 )}
                 {!comment.isVisible && (
-                  <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">
-                    Masqué
-                  </span>
+                  <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">Masqué</span>
                 )}
               </div>
-              
+
               <div className="flex items-center gap-1 text-xs text-subtle">
                 <Clock className="h-3 w-3" />
-                <time dateTime={comment.createdAt}>
-                  {formatDate(comment.createdAt)}
-                </time>
+                <time dateTime={comment.createdAt}>{formatDate(comment.createdAt)}</time>
                 {comment.updatedAt !== comment.createdAt && (
                   <span className="text-subtle/70">• modifié</span>
                 )}
@@ -261,12 +257,12 @@ export function CommentItem({
                 <Edit3 className="h-4 w-4" />
               </button>
             )}
-            
+
             {(isAuthor || isAdmin) && (
               <button
                 onClick={handleDelete}
                 className="p-1 text-subtle hover:text-destructive rounded transition-colors"
-                title={isAdmin ? "Supprimer définitivement" : "Masquer"}
+                title={isAdmin ? 'Supprimer définitivement' : 'Masquer'}
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -300,7 +296,7 @@ export function CommentItem({
             <textarea
               ref={editTextareaRef}
               value={editContent}
-              onChange={(e) => setEditContent(e.target.value)}
+              onChange={e => setEditContent(e.target.value)}
               className="w-full p-2 border border-subtle/30 rounded text-sm resize-none
                        focus:outline-none focus:ring-2 focus:ring-accent/50"
               maxLength={2000}
@@ -328,9 +324,7 @@ export function CommentItem({
           </div>
         ) : (
           <div className="prose prose-sm max-w-none mb-3">
-            <p className="text-foreground whitespace-pre-wrap leading-relaxed">
-              {comment.content}
-            </p>
+            <p className="text-foreground whitespace-pre-wrap leading-relaxed">{comment.content}</p>
           </div>
         )}
 
@@ -373,7 +367,7 @@ export function CommentItem({
       {/* Réponses */}
       {comment.replies.length > 0 && (
         <div className="mt-4 space-y-4">
-          {comment.replies.map((reply) => (
+          {comment.replies.map(reply => (
             <CommentItem
               key={reply.id}
               comment={reply}

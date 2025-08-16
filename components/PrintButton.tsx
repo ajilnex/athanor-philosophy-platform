@@ -7,10 +7,7 @@ interface PrintButtonProps {
 
 export function PrintButton({ className, children }: PrintButtonProps) {
   return (
-    <button
-      onClick={() => window.print()}
-      className={className}
-    >
+    <button onClick={() => window.print()} className={className}>
       {children}
     </button>
   )

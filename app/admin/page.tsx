@@ -1,10 +1,20 @@
 import Link from 'next/link'
-import { Plus, FileText, Settings, Upload, Lock, ShieldAlert, LogOut, Edit3, Users } from 'lucide-react'
+import {
+  Plus,
+  FileText,
+  Settings,
+  Upload,
+  Lock,
+  ShieldAlert,
+  LogOut,
+  Edit3,
+  Users,
+} from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 
-const isPreview = process.env.VERCEL_ENV === 'preview';
+const isPreview = process.env.VERCEL_ENV === 'preview'
 
 async function getPublicationStats() {
   try {
@@ -48,7 +58,9 @@ async function AdminNormalPage() {
         >
           Se connecter avec GitHub
         </Link>
-        <p className="text-xs text-subtle mt-4 font-light">Après connexion, tu reviendras ici automatiquement.</p>
+        <p className="text-xs text-subtle mt-4 font-light">
+          Après connexion, tu reviendras ici automatiquement.
+        </p>
       </div>
     )
   }
@@ -60,13 +72,18 @@ async function AdminNormalPage() {
         <ShieldAlert className="h-10 w-10 mx-auto mb-4 text-subtle" />
         <h1 className="text-2xl font-light text-foreground mb-2">Accès refusé (403)</h1>
         <p className="text-subtle mb-4 font-light">
-          Connecté en tant que <span className="font-medium">{session.user?.email ?? 'utilisateur'}</span>, mais sans droits admin.
+          Connecté en tant que{' '}
+          <span className="font-medium">{session.user?.email ?? 'utilisateur'}</span>, mais sans
+          droits admin.
         </p>
         <div className="bg-gray-50 text-left text-xs p-3 border border-subtle mb-6 overflow-x-auto">
           <p className="mb-2">Pour te promouvoir admin (à exécuter côté base) :</p>
           <code>UPDATE "User" SET role = 'admin' WHERE email = 'ton-email@github';</code>
         </div>
-        <Link href="/api/auth/signout?callbackUrl=/" className="inline-flex items-center gap-2 underline text-sm">
+        <Link
+          href="/api/auth/signout?callbackUrl=/"
+          className="inline-flex items-center gap-2 underline text-sm"
+        >
           <LogOut className="h-4 w-4" /> Se déconnecter
         </Link>
       </div>
@@ -109,7 +126,9 @@ async function AdminNormalPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs sm:text-sm text-subtle">Taille totale</p>
-              <p className="text-xl sm:text-2xl font-light text-foreground">{formatFileSize(stats.totalSize)}</p>
+              <p className="text-xl sm:text-2xl font-light text-foreground">
+                {formatFileSize(stats.totalSize)}
+              </p>
             </div>
             <Upload className="h-6 w-6 text-subtle" />
           </div>
@@ -118,7 +137,10 @@ async function AdminNormalPage() {
 
       {/* Quick Actions */}
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Link href="/admin/upload" className="card border-subtle hover:border-foreground transition-colors group">
+        <Link
+          href="/admin/upload"
+          className="card border-subtle hover:border-foreground transition-colors group"
+        >
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 flex items-center justify-center">
               <Plus className="h-5 w-5 text-foreground" />
@@ -130,7 +152,10 @@ async function AdminNormalPage() {
           </div>
         </Link>
 
-        <Link href="/admin/publications" className="card border-subtle hover:border-foreground transition-colors group">
+        <Link
+          href="/admin/publications"
+          className="card border-subtle hover:border-foreground transition-colors group"
+        >
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 flex items-center justify-center">
               <FileText className="h-5 w-5 text-foreground" />
@@ -142,7 +167,10 @@ async function AdminNormalPage() {
           </div>
         </Link>
 
-        <Link href="/admin/billets" className="card border-subtle hover:border-foreground transition-colors group">
+        <Link
+          href="/admin/billets"
+          className="card border-subtle hover:border-foreground transition-colors group"
+        >
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 flex items-center justify-center">
               <Edit3 className="h-5 w-5 text-foreground" />
@@ -154,7 +182,10 @@ async function AdminNormalPage() {
           </div>
         </Link>
 
-        <Link href="/admin/tina" className="card border-subtle hover:border-foreground transition-colors group">
+        <Link
+          href="/admin/tina"
+          className="card border-subtle hover:border-foreground transition-colors group"
+        >
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 flex items-center justify-center">
               <Edit3 className="h-5 w-5 text-foreground" />
@@ -166,7 +197,10 @@ async function AdminNormalPage() {
           </div>
         </Link>
 
-        <Link href="/admin/users" className="card border-subtle hover:border-foreground transition-colors group">
+        <Link
+          href="/admin/users"
+          className="card border-subtle hover:border-foreground transition-colors group"
+        >
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 flex items-center justify-center">
               <Users className="h-5 w-5 text-foreground" />
@@ -178,7 +212,10 @@ async function AdminNormalPage() {
           </div>
         </Link>
 
-        <Link href="/admin/settings" className="card border-subtle hover:border-foreground transition-colors group">
+        <Link
+          href="/admin/settings"
+          className="card border-subtle hover:border-foreground transition-colors group"
+        >
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 flex items-center justify-center">
               <Settings className="h-5 w-5 text-foreground" />

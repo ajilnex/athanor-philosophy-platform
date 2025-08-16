@@ -9,13 +9,16 @@ interface SealPublicationButtonProps {
   initialSealed?: boolean
 }
 
-export function SealPublicationButton({ articleId, initialSealed = false }: SealPublicationButtonProps) {
+export function SealPublicationButton({
+  articleId,
+  initialSealed = false,
+}: SealPublicationButtonProps) {
   const [isSealed, setIsSealed] = useState(initialSealed)
   const [isLoading, setIsLoading] = useState(false)
 
   const handleToggleSeal = async () => {
     setIsLoading(true)
-    
+
     try {
       const response = await fetch(`/api/admin/publications/${articleId}/seal`, {
         method: 'PATCH',
@@ -32,7 +35,7 @@ export function SealPublicationButton({ articleId, initialSealed = false }: Seal
 
       const result = await response.json()
       setIsSealed(result.isSealed)
-      
+
       // Recharger la page pour voir les changements
       window.location.reload()
     } catch (error) {
@@ -52,7 +55,11 @@ export function SealPublicationButton({ articleId, initialSealed = false }: Seal
           ? 'text-destructive hover:bg-destructive/10'
           : 'text-subtle hover:text-foreground hover:bg-muted'
       } disabled:opacity-50 disabled:cursor-not-allowed`}
-      title={isSealed ? 'Désceller cette publication (visible par tous)' : 'Sceller cette publication (admin uniquement)'}
+      title={
+        isSealed
+          ? 'Désceller cette publication (visible par tous)'
+          : 'Sceller cette publication (admin uniquement)'
+      }
     >
       {isLoading ? (
         <Loader2 className="h-4 w-4 animate-spin" />

@@ -6,10 +6,10 @@ const prisma = new PrismaClient()
 async function main() {
   try {
     const admin = await prisma.user.findFirst({
-      where: { 
+      where: {
         role: 'ADMIN',
-        email: 'admin@athanor.com'
-      }
+        email: 'admin@athanor.com',
+      },
     })
 
     if (!admin) {
@@ -18,7 +18,7 @@ async function main() {
     }
 
     if (!admin.hashedPassword) {
-      console.log('❌ L\'admin n\'a pas de mot de passe défini')
+      console.log("❌ L'admin n'a pas de mot de passe défini")
       return
     }
 
@@ -29,11 +29,11 @@ async function main() {
       'password',
       'admin123',
       'athanor',
-      '123456'
+      '123456',
     ]
 
     console.log('🔑 Test des mots de passe pour admin@athanor.com...\n')
-    
+
     for (const password of commonPasswords) {
       const isMatch = await bcrypt.compare(password, admin.hashedPassword)
       if (isMatch) {
@@ -46,7 +46,6 @@ async function main() {
 
     console.log('\n⚠️  Aucun des mots de passe testés ne correspond.')
     console.log('   Essayez de vous souvenir du mot de passe utilisé.')
-    
   } catch (error) {
     console.error('❌ Erreur:', error)
   } finally {

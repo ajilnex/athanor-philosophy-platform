@@ -211,9 +211,18 @@ UPSTASH_REDIS_REST_TOKEN="votre-token-redis"
 
 ## ✅ Statut Déploiement (Août 2025)
 
-**🎉 SUCCÈS** : Build production Vercel réussi avec les dernières optimisations
+**🎉 SUCCÈS** : Build production Vercel + Infrastructure tests & qualité code complète
 
-### Résolutions Appliquées
+### Réalisations Récentes
+
+- ✅ **Tests Jest + RTL** : Configuration complète avec mocks Next.js/Prisma/Cloudinary
+- ✅ **Pre-commit Hooks** : Husky + lint-staged + Prettier automatique
+- ✅ **ESLint 0 warnings** : Résolution warnings react-hooks/exhaustive-deps
+- ✅ **Pipeline qualité** : Pre-commit (format + lint) + Pre-push (typecheck)
+- ✅ **TypeScript robuste** : Exclusion tests + analyse statique rapide
+- ✅ **Prettier uniformisé** : Configuration projet (single quotes, no semicolons)
+
+### Résolutions Appliquées Précédentes
 
 - ✅ **TypeScript** : Erreurs `null` vs `undefined` résolues avec opérateur `??`
 - ✅ **Variables d'env** : DATABASE_URL configurée en production
@@ -305,19 +314,30 @@ npm run db:reset           # Reset complet + restore
 # Note : db push abandonné pour migrations robustes
 ```
 
-### 3. Tests Automatisés (Playwright)
+### 3. Tests Automatisés Complets
 
 ```bash
-# Tests end-to-end automatisés
-npm test                    # Tous les tests
+# Tests unitaires et d'intégration
+npm test                    # Jest + React Testing Library
+npm run test:watch         # Mode watch pour développement
+npm run test:coverage      # Rapport de couverture
+
+# Tests end-to-end
+npm run test:e2e           # Tests Playwright
 npm run test:backlink      # Test spécifique backlinks avec logs
 npm run test:ui            # Interface Playwright
 
 # Tests avec capture de logs (debug)
 PLAYWRIGHT_WEB_SERVER=none npm run test:backlink --headed
+
+# Qualité code (automatique via hooks)
+npm run lint               # ESLint + fix automatique
+npm run format:check       # Vérifier formatage Prettier
 ```
 
 ### 4. Tests Fonctionnels Manuels
+
+#### Fonctionnalités Core
 
 - [ ] **Accueil** : Page charge avec polices optimisées (IBM Plex Serif + Inter)
 - [ ] **Recherche** : Index unifié billets + publications (`/search`)
@@ -327,10 +347,23 @@ PLAYWRIGHT_WEB_SERVER=none npm run test:backlink --headed
 - [ ] **Admin** : Upload Cloudinary + suppression synchronisée (`/admin`)
 - [ ] **Editor** : Backlink picker avec recherche billets (`/admin/editor`)
 - [ ] **Comments** : Système commentaires avec avatars next/image optimisés
-- [ ] **Performance** : Web Core Vitals (LCP < 2.5s, CLS < 0.1)
 - [ ] **Bibliographie** : Citations Zotero + composant `<Bibliography />`
+
+#### Performance & Technique
+
+- [ ] **Performance** : Web Core Vitals (LCP < 2.5s, CLS < 0.1)
 - [ ] **Migrations** : Système Prisma migrate (pas db push)
 - [ ] **TypeScript** : Analyse statique scripts (<2s) + app (<5s)
+
+#### Tests & Qualité Code
+
+- [ ] **Tests Jest** : Tests unitaires passent (npm test)
+- [ ] **Tests E2E** : Tests Playwright passent (npm run test:e2e)
+- [ ] **Pre-commit Hooks** : ESLint --fix + Prettier --write automatiques
+- [ ] **Pre-push Hooks** : TypeScript check bloque si erreurs
+- [ ] **Code Quality** : ESLint 0 warnings + Prettier formatage uniforme
+- [ ] **Mocks** : NextAuth, Prisma, Cloudinary fonctionnent en tests
+- [ ] **Coverage** : Rapport de couverture généré correctement
 
 ## ⚠️ Limitations Serverless
 
@@ -392,6 +425,45 @@ Si les scripts de build dépassent les timeouts :
 2. Optimiser les scripts (pagination, cache)
 3. Pre-build via GitHub Actions
 4. Séparer en API routes
+
+### Tests Failed
+
+```bash
+# Tests Jest
+npm test -- --verbose      # Mode débogage
+npm run test:coverage      # Vérifier couverture
+
+# Tests Playwright
+npm run test:e2e -- --headed  # Mode visuel
+npm run test:ui               # Interface debug
+
+# Nettoyer cache tests
+npm test -- --clearCache
+```
+
+### Git Hooks Issues
+
+```bash
+# Réinstaller Husky si nécessaire
+npm run prepare
+
+# Vérifier configuration lint-staged
+npm run lint -- --fix        # Test ESLint manuel
+npm run format               # Test Prettier manuel
+
+# Déboguer pre-commit
+git commit --no-verify       # Bypass temporaire
+```
+
+### Code Quality Issues
+
+Problèmes de qualité code :
+
+1. **ESLint warnings** : Fix automatique via pre-commit hooks
+2. **Format inconsistant** : Prettier force uniformité
+3. **TypeScript errors** : Pre-push hook bloque push
+4. **Tests failing** : `npm test -- --watch` pour débogage
+5. **Mock issues** : Vérifier jest.setup.js configuration
 
 ---
 

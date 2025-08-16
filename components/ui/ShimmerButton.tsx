@@ -8,12 +8,12 @@ interface ShimmerButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   variant?: 'primary' | 'secondary'
 }
 
-export function ShimmerButton({ 
-  children, 
-  className = '', 
+export function ShimmerButton({
+  children,
+  className = '',
   variant = 'secondary',
   onClick,
-  ...props 
+  ...props
 }: ShimmerButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -23,7 +23,7 @@ export function ShimmerButton({
     const size = Math.max(rect.width, rect.height)
     const x = event.clientX - rect.left - size / 2
     const y = event.clientY - rect.top - size / 2
-    
+
     const ripple = document.createElement('span')
     ripple.style.cssText = `
       position: absolute;
@@ -37,9 +37,9 @@ export function ShimmerButton({
       animation: ripple-effect 0.6s ease-out;
       pointer-events: none;
     `
-    
+
     button.appendChild(ripple)
-    
+
     setTimeout(() => {
       if (ripple.parentNode) {
         ripple.parentNode.removeChild(ripple)
@@ -49,10 +49,12 @@ export function ShimmerButton({
     if (onClick) onClick(event)
   }
 
-  const baseClasses = "relative overflow-hidden rounded-lg px-4 py-2 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-  const variantClasses = variant === 'primary' 
-    ? "bg-foreground text-background shadow-sm hover:bg-foreground/90" 
-    : "bg-background/80 border border-subtle/30 text-foreground shadow-sm backdrop-blur-sm hover:border-subtle/50 hover:shadow-md"
+  const baseClasses =
+    'relative overflow-hidden rounded-lg px-4 py-2 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+  const variantClasses =
+    variant === 'primary'
+      ? 'bg-foreground text-background shadow-sm hover:bg-foreground/90'
+      : 'bg-background/80 border border-subtle/30 text-foreground shadow-sm backdrop-blur-sm hover:border-subtle/50 hover:shadow-md'
 
   return (
     <button

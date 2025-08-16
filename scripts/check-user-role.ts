@@ -11,17 +11,17 @@ async function main() {
 
   try {
     console.log(`🔍 Recherche de l'utilisateur: ${userEmail}`)
-    
+
     const user = await prisma.user.findUnique({
       where: { email: userEmail },
       include: {
         accounts: {
           select: {
             provider: true,
-            providerAccountId: true
-          }
-        }
-      }
+            providerAccountId: true,
+          },
+        },
+      },
     })
 
     if (!user) {
@@ -34,8 +34,11 @@ async function main() {
     console.log('👤 Nom:', user.name || 'Non défini')
     console.log('🔑 Rôle:', user.role)
     console.log('📅 Créé:', user.createdAt.toLocaleDateString('fr-FR'))
-    console.log('🔗 Comptes liés:', user.accounts.map(a => `${a.provider} (${a.providerAccountId})`).join(', ') || 'Aucun')
-    
+    console.log(
+      '🔗 Comptes liés:',
+      user.accounts.map(a => `${a.provider} (${a.providerAccountId})`).join(', ') || 'Aucun'
+    )
+
     // Vérification spécifique du rôle
     if (user.role === 'ADMIN') {
       console.log('\n🎯 ✅ Le rôle est correctement défini à ADMIN en base')
@@ -44,7 +47,6 @@ async function main() {
       console.log('💡 Commande pour corriger:')
       console.log(`   UPDATE "User" SET role = 'ADMIN' WHERE email = '${userEmail}';`)
     }
-    
   } catch (error) {
     console.error('❌ Erreur lors de la vérification:', error)
   } finally {
