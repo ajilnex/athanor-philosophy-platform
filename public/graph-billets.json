@@ -177,6 +177,22 @@
       "y": 150.46300669808826
     },
     {
+      "id": "billet:2025-08-16-alp",
+      "label": "alp",
+      "url": "/billets/2025-08-16-alp",
+      "degree": 0,
+      "x": -13.3502851366365,
+      "y": -179.50423361795816
+    },
+    {
+      "id": "billet:2025-08-16-nouveau",
+      "label": "nouveau",
+      "url": "/billets/2025-08-16-nouveau",
+      "degree": 0,
+      "x": -178.5341008044069,
+      "y": 189.01210239019585
+    },
+    {
       "id": "billet:gamma",
       "label": "gamma",
       "url": "/billets/gamma",
@@ -261,9 +277,9 @@
     }
   ],
   "metadata": {
-    "generatedAt": "2025-08-16T05:36:39.819Z",
-    "billetsCount": 24,
-    "nodesCount": 24,
+    "generatedAt": "2025-08-16T07:57:12.059Z",
+    "billetsCount": 26,
+    "nodesCount": 26,
     "stability": {
       "pivotsLocked": 8,
       "newNodes": 0,
