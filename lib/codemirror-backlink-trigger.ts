@@ -5,11 +5,19 @@ import { Extension } from '@codemirror/state'
  * Extension CodeMirror 6 pour détecter la saisie `[[` et déclencher l'ouverture de la palette backlink
  */
 export function backlinkTriggerExtension(onTrigger: (position: number) => void): Extension {
+  console.log('🚀 Extension backlinkTrigger initialisée')
   return EditorView.updateListener.of((viewUpdate: ViewUpdate) => {
-    if (!viewUpdate.docChanged) return
+    if (!viewUpdate.docChanged) {
+      return
+    }
+    
+    console.log('📝 Document modifié, vérification des changements...')
     
     // Ignorer pendant composition IME pour éviter déclenchements prématurés
-    if (viewUpdate.view.composing) return
+    if (viewUpdate.view.composing) {
+      console.log('⌨️  Composition IME en cours, trigger ignoré')
+      return
+    }
     
     // Parcourir toutes les insertions de texte dans cette transaction
     viewUpdate.changes.iterChanges((fromA, toA, fromB, toB, inserted) => {
