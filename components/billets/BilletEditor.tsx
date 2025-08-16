@@ -12,8 +12,7 @@ import CodeMirror from '@uiw/react-codemirror'
 import { markdown } from '@codemirror/lang-markdown'
 import { EditorView } from '@codemirror/view'
 // Déclencheur [[ retiré
-import { closeBrackets } from '@codemirror/autocomplete'
-import { Prec } from '@codemirror/state'
+// closeBrackets/Prec non utilisés (auto-close désactivé via basicSetup au besoin)
 
 interface BilletEditorProps {
   isOpen: boolean
@@ -196,8 +195,6 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
       '.cm-focused': { outline: 'none' },
       '.cm-editor': { borderRadius: '8px' }
     }),
-    // Désactiver l'auto‑complétion des crochets [] pour éviter les ]] ajoutés automatiquement
-    Prec.highest(closeBrackets({ brackets: '(){}""\'\'' })),
   ], [])
 
   // Actions toolbar

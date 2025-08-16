@@ -7,8 +7,7 @@ import { markdown } from '@codemirror/lang-markdown'
 import { EditorView } from '@codemirror/view'
 import { InsertReferenceDialog } from './InsertReferenceDialog'
 import { BacklinkPicker } from '@/components/editor/BacklinkPicker'
-import { closeBrackets } from '@codemirror/autocomplete'
-import { Prec } from '@codemirror/state'
+// closeBrackets/Prec non utilisés (auto-close désactivé via basicSetup)
 import toast from 'react-hot-toast'
 
 interface EditorClientProps {
