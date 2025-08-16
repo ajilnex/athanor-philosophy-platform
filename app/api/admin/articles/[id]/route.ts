@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { unlink } from 'fs/promises'
-import { existsSync } from 'fs'
-import path from 'path'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
@@ -36,53 +33,5 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const resolvedParams = await params
-  // 🛡️ PROTECTION: Vérifier l'autorisation admin
-  const session = await getServerSession(authOptions)
-  
-  if (!session || session.user?.role !== 'admin') {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
-  }
-
-  try {
-    // Get article info first
-    const article = await prisma.article.findUnique({
-      where: { id: resolvedParams.id },
-    })
-
-    if (!article) {
-      return NextResponse.json(
-        { error: 'Article not found' },
-        { status: 404 }
-      )
-    }
-
-    // Delete from database
-    await prisma.article.delete({
-      where: { id: resolvedParams.id },
-    })
-
-    // Delete file from filesystem
-    const filePath = path.join(process.cwd(), 'public', article.filePath)
-    if (existsSync(filePath)) {
-      try {
-        await unlink(filePath)
-      } catch (error) {
-        console.error('Error deleting file:', error)
-        // Continue even if file deletion fails
-      }
-    }
-
-    return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('Error deleting article:', error)
-    return NextResponse.json(
-      { error: 'Failed to delete article' },
-      { status: 500 }
-    )
-  }
-}
+// DELETE function removed - Using Server Actions instead
+// All deletion logic moved to app/admin/actions.ts -> deleteArticle()

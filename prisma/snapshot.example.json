@@ -1,0 +1,48 @@
+{
+  "articles": [
+    {
+      "id": "example-article-1",
+      "title": "Article d'exemple",
+      "description": "Ceci est un article d'exemple pour tester le système de snapshot",
+      "author": "Équipe de développement",
+      "fileName": "example-article.pdf",
+      "filePath": "https://example.com/example-article.pdf",
+      "fileSize": 1024000,
+      "tags": ["exemple", "test"],
+      "category": "développement",
+      "publishedAt": "2025-08-16T09:00:00.000Z",
+      "isPublished": true
+    }
+  ],
+  "billets": [
+    {
+      "id": "example-billet-1", 
+      "slug": "billet-exemple",
+      "title": "Billet d'exemple",
+      "content": "# Billet d'exemple\n\nCeci est un contenu d'exemple pour tester le système de snapshot.",
+      "excerpt": "Billet d'exemple pour les tests",
+      "tags": ["exemple", "test"],
+      "date": "2025-08-16T09:00:00.000Z"
+    }
+  ],
+  "comments": [
+    {
+      "id": "example-comment-1",
+      "content": "Commentaire d'exemple",
+      "authorId": "anonymous-user",
+      "targetType": "billet",
+      "targetId": "billet-exemple",
+      "parentId": null,
+      "isApproved": true,
+      "isVisible": true,
+      "createdAt": "2025-08-16T09:05:00.000Z"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2025-08-16T09:00:00.000Z",
+    "source": "example",
+    "totalArticles": 1,
+    "totalBillets": 1,
+    "totalComments": 1
+  }
+}

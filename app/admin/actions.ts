@@ -44,6 +44,44 @@ export async function deleteArticle(articleId: string) {
   try {
     await requireAdmin() // Vérification admin obligatoire
     
+    // 1. Lire l'article pour obtenir l'URL Cloudinary
+    const article = await prisma.article.findUnique({
+      where: { id: articleId },
+    })
+    
+    if (!article) {
+      return { success: false, error: 'Article not found' }
+    }
+
+    // 2. Extraire le public_id de l'URL Cloudinary
+    // Format URL: https://res.cloudinary.com/[cloud]/raw/upload/v[version]/[folder]/[public_id].[ext]
+    let publicId = null
+    if (article.filePath) {
+      const urlParts = article.filePath.split('/')
+      const fileName = urlParts[urlParts.length - 1] // Dernier segment
+      const folderIndex = urlParts.indexOf('athanor-articles')
+      
+      if (folderIndex !== -1) {
+        // Reconstruire le public_id avec le dossier
+        const fileNameWithoutExt = fileName.split('.')[0]
+        publicId = `athanor-articles/${fileNameWithoutExt}`
+      }
+    }
+
+    // 3. Supprimer le fichier de Cloudinary si possible
+    if (publicId) {
+      try {
+        await cloudinary.uploader.destroy(publicId, { 
+          resource_type: 'raw' 
+        })
+        console.log(`✅ Fichier Cloudinary supprimé: ${publicId}`)
+      } catch (cloudError) {
+        console.error('⚠️ Erreur suppression Cloudinary:', cloudError)
+        // Continuer même si la suppression Cloudinary échoue
+      }
+    }
+
+    // 4. Supprimer l'enregistrement de la base de données
     await prisma.article.delete({
       where: { id: articleId },
     })
