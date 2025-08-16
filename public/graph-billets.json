@@ -137,6 +137,22 @@
       "y": -155.53175830454808
     },
     {
+      "id": "billet:2025-08-15-giovanni-maddalena-dans-le-pragmatisme-vivant",
+      "label": "Giovanni Maddalena dans le pragmatisme vivant",
+      "url": "/billets/2025-08-15-giovanni-maddalena-dans-le-pragmatisme-vivant",
+      "degree": 0,
+      "x": 253.64340484105668,
+      "y": -57.14038134835841
+    },
+    {
+      "id": "billet:2025-08-15-peirce-la-raisonnabilite-concrete",
+      "label": "Peirce : la raisonnabilité concrète",
+      "url": "/billets/2025-08-15-peirce-la-raisonnabilite-concrete",
+      "degree": 0,
+      "x": 41.90064217032928,
+      "y": -90.79832699843111
+    },
+    {
       "id": "billet:alpha",
       "label": "Alpha",
       "url": "/billets/alpha",
@@ -227,12 +243,12 @@
     }
   ],
   "metadata": {
-    "generatedAt": "2025-08-15T19:29:07.359Z",
-    "billetsCount": 21,
-    "nodesCount": 21,
+    "generatedAt": "2025-08-16T04:16:27.162Z",
+    "billetsCount": 23,
+    "nodesCount": 23,
     "stability": {
       "pivotsLocked": 8,
-      "newNodes": 0,
+      "newNodes": 2,
       "avgMovement": 0
     }
   }
