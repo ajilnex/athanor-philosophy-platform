@@ -5,22 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { CommentSection } from '@/components/comments/CommentSection'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import dynamic from 'next/dynamic'
-
-const PdfClientViewer = dynamic(
-  () => import('@/components/publications/PdfClientViewer').then(mod => mod.PdfClientViewer),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-accent border-t-transparent mx-auto mb-4"></div>
-          <p className="text-subtle">Chargement du lecteur PDF...</p>
-        </div>
-      </div>
-    ),
-  }
-)
+import { PublicationViewer } from './PublicationViewer'
 
 async function getPublication(id: string) {
   try {
@@ -186,7 +171,7 @@ export default async function PublicationPage({
 
       {/* PDF Viewer */}
       <div className="mt-8">
-        <PdfClientViewer
+        <PublicationViewer
           pdfUrl={publication.filePath}
           title={publication.title}
           initialPage={initialPage}
