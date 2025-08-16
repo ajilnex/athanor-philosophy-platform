@@ -1,0 +1,123 @@
+---
+title: "Éditer un billet et citer avec Zotero — Guide complet"
+tags: ["tutoriel", "éditeur", "zotero", "citations", "backlinks"]
+excerpt: "Collez votre texte, liez vos idées, et citez en 2 minutes avec Zotero 
+— tout ce qu’il faut savoir pour publier un billet sur Athanor."
+---
+
+# Éditer un billet et citer avec Zotero — Guide complet
+
+Bienvenue dans l’éditeur d’Athanor. Ce billet “showcase” vous guide pas à pas po
+ur:
+- écrire en Markdown,
+- créer des liens internes (backlinks),
+- citer avec Zotero (Better BibTeX),
+- afficher automatiquement la bibliographie.
+
+> Note: vous pouvez coller tel quel un billet généré par un LLM. S’il contient u
+n frontmatter YAML ou un Titre `#`, le système déduira automatiquement le titre 
+et le slug.
+
+## 1) Découvrir l’éditeur (Markdown)
+
+- Gras: `**important**` → **important**
+- Italique: `*nuancé*` → *nuancé*
+- Titres: `#`, `##`, `###`
+- Listes:
+  1. Première idée
+  2. Seconde idée
+- Lien externe: `[Athanor](https://athanor-philosophy-platform.vercel.app/)`
+
+Exemple minimal collable (avec frontmatter):
+```md
+---
+title: "Mon super billet"
+tags: ["demo", "markdown"]
+excerpt: "Une petite démonstration"
+---
+
+# Mon super billet
+
+Du texte avec **gras**, *italique*, et un [lien](https://exemple.org).
+```
+
+Sans frontmatter, un simple `# Mon super titre` au début suffit: le titre et le 
+slug seront inférés.
+
+## 2) Mailler vos idées (backlinks)
+
+Reliez vos billets entre eux:
+- `[[slug-du-billet]]`
+- `[[slug-du-billet|Alias lisible]]`
+
+Exemples:
+- [[bibliographie-collective|Index bibliographique]]
+- [[a-propos|À propos d’Athanor]]
+
+Astuce: utilisez le bouton “Backlink” pour chercher et insérer.
+
+## 3) Citer avec Zotero (Better BibTeX)
+
+Pré-requis (côté auteur):
+- Installez Zotero (zotero.org) + l’extension Better BibTeX (BBT).
+- Ajoutez vos références dans le groupe Zotero d’Athanor.
+- Chaque référence a une clé BBT (ex: `Adorno1984`, `Boulnois1994`, `Brandom2019
+`).
+
+Insérer une citation:
+- Cliquez “Citer” dans l’éditeur, cherchez par auteur/titre/année/clé, puis insé
+rez.
+- Ou tapez directement: <Cite item="Adorno1984" />
+
+Exemples en contexte:
+- La critique de la “réconciliation extorquée” <Cite item="Adorno1984" /> éclair
+e notre propos.
+- Voir aussi l’étude historique <Cite item="Boulnois1994" /> et une lecture mode
+rne de Hegel <Cite item="Brandom2019" />.
+- Hors-série Lukács (Romanesques) <Cite item="RomanesquesLukacs2024" />.
+
+Le validateur signale les clés inconnues et propose une correction proche. L’édi
+teur affiche aussi la clé BBT pour vérification.
+
+## 4) Afficher la bibliographie
+
+Placez ce composant à la fin: il liste automatiquement toutes les références cit
+ées, dans l’ordre d’apparition.
+
+<Bibliography />
+
+Pour parcourir toutes nos références: [[bibliographie-collective|voir l’index co
+mplet]].
+
+## 5) Images et médias
+
+Chargez une image avec le bouton “Image” ou en Markdown:
+```md
+![Légende de l’image](/uploads/chemin/vers/image.jpg)
+```
+
+## 6) Raccourcis utiles
+
+- `**gras**`, `*italique*`, `# Titre`, `> Citation`, `1. ` (liste numérotée)
+- Backlinks: `[[slug]]` ou `[[slug|Alias]]`
+- Citations: `<Cite item="CleBBT" />` + fin de billet: `<Bibliography />`
+- Blocs de code:
+```md
+```md
+# Un exemple Markdown
+Citez ainsi: <Cite item="Adorno1984" />
+```
+```
+
+## 7) Bonnes pratiques
+
+- Citez tôt et souvent: traçabilité, vérifiabilité, respect des sources.
+- Préférez des clés BBT claires (AuteurAnnée).
+- Maillage interne généreux: le graphe d’Athanor s’enrichit avec chaque backlink
+.
+
+## 8) Résumé express
+
+1) Écrivez en Markdown, 2) reliez avec `[[...]]`, 3) citez avec Zotero, 4) termi
+nez par `<Bibliography />`.  
+C’est tout — bon billet !
