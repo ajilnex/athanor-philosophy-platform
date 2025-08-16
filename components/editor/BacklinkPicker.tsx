@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Search, Plus, ArrowDown, ArrowUp, X } from 'lucide-react'
 
 interface BilletItem {
@@ -18,13 +18,13 @@ interface BacklinkPickerProps {
   selectedText?: string
 }
 
-export function BacklinkPicker({ 
-  isOpen, 
-  onClose, 
-  onSelect, 
+export function BacklinkPicker({
+  isOpen,
+  onClose,
+  onSelect,
   onCreateNew,
   initialQuery = '',
-  selectedText = ''
+  selectedText = '',
 }: BacklinkPickerProps) {
   const [query, setQuery] = useState(initialQuery)
   const [alias, setAlias] = useState(selectedText)
@@ -33,7 +33,7 @@ export function BacklinkPicker({
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  
+
   const searchInputRef = useRef<HTMLInputElement>(null)
   const aliasInputRef = useRef<HTMLInputElement>(null)
 
@@ -44,13 +44,13 @@ export function BacklinkPicker({
     const fetchBillets = async () => {
       setLoading(true)
       setError(null)
-      
+
       try {
         const response = await fetch('/api/billets/list')
         if (!response.ok) {
           throw new Error('Erreur lors du chargement des billets')
         }
-        
+
         const data = await response.json()
         setBillets(data)
       } catch (err) {
@@ -74,10 +74,13 @@ export function BacklinkPicker({
       }
 
       const searchTerm = query.toLowerCase()
-      const filtered = billets.filter(billet => 
-        billet.title.toLowerCase().includes(searchTerm) ||
-        billet.slug.toLowerCase().includes(searchTerm)
-      ).slice(0, 10)
+      const filtered = billets
+        .filter(
+          billet =>
+            billet.title.toLowerCase().includes(searchTerm) ||
+            billet.slug.toLowerCase().includes(searchTerm)
+        )
+        .slice(0, 10)
 
       setFilteredBillets(filtered)
       setSelectedIndex(0)
@@ -93,7 +96,7 @@ export function BacklinkPicker({
       setTimeout(() => {
         searchInputRef.current?.focus()
       }, 100)
-      
+
       // Préremplir l'alias si du texte était sélectionné
       if (selectedText) {
         setAlias(selectedText)
@@ -106,6 +109,21 @@ export function BacklinkPicker({
       setError(null)
     }
   }, [isOpen, initialQuery, selectedText])
+
+  // Fonction de sélection
+  const handleSelect = useCallback(() => {
+    if (selectedIndex < filteredBillets.length) {
+      // Sélection d'un billet existant
+      const selectedBillet = filteredBillets[selectedIndex]
+      onSelect(selectedBillet.slug, alias.trim() || undefined)
+    } else if (selectedIndex === filteredBillets.length && query.trim()) {
+      // Création d'un nouveau billet
+      if (onCreateNew) {
+        onCreateNew(query.trim(), alias.trim() || undefined)
+      }
+    }
+    onClose()
+  }, [selectedIndex, filteredBillets, onSelect, alias, query, onCreateNew, onClose])
 
   // Navigation clavier
   useEffect(() => {
@@ -121,8 +139,8 @@ export function BacklinkPicker({
       if (document.activeElement === searchInputRef.current) {
         if (e.key === 'ArrowDown') {
           e.preventDefault()
-          setSelectedIndex(prev => 
-            Math.min(prev + 1, filteredBillets.length) // +1 pour inclure "Nouveau billet"
+          setSelectedIndex(
+            prev => Math.min(prev + 1, filteredBillets.length) // +1 pour inclure "Nouveau billet"
           )
         } else if (e.key === 'ArrowUp') {
           e.preventDefault()
@@ -145,21 +163,7 @@ export function BacklinkPicker({
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, filteredBillets.length, selectedIndex])
-
-  const handleSelect = () => {
-    if (selectedIndex < filteredBillets.length) {
-      // Sélection d'un billet existant
-      const selectedBillet = filteredBillets[selectedIndex]
-      onSelect(selectedBillet.slug, alias.trim() || undefined)
-    } else if (selectedIndex === filteredBillets.length && query.trim()) {
-      // Création d'un nouveau billet
-      if (onCreateNew) {
-        onCreateNew(query.trim(), alias.trim() || undefined)
-      }
-    }
-    onClose()
-  }
+  }, [isOpen, filteredBillets.length, selectedIndex, handleSelect, onClose])
 
   const handleBilletClick = (billet: BilletItem) => {
     onSelect(billet.slug, alias.trim() || undefined)
@@ -181,11 +185,7 @@ export function BacklinkPicker({
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <h3 className="text-lg font-medium">Insérer un backlink</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 p-1"
-            type="button"
-          >
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 p-1" type="button">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -198,7 +198,7 @@ export function BacklinkPicker({
               ref={searchInputRef}
               type="text"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={e => setQuery(e.target.value)}
               placeholder="Rechercher un billet par titre ou slug..."
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
@@ -214,7 +214,7 @@ export function BacklinkPicker({
             ref={aliasInputRef}
             type="text"
             value={alias}
-            onChange={(e) => setAlias(e.target.value)}
+            onChange={e => setAlias(e.target.value)}
             placeholder="Laissez vide pour utiliser le titre du billet"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
@@ -223,27 +223,17 @@ export function BacklinkPicker({
         {/* Results */}
         <div className="max-h-64 overflow-y-auto">
           {loading && (
-            <div className="p-4 text-center text-gray-500">
-              Chargement des billets...
-            </div>
+            <div className="p-4 text-center text-gray-500">Chargement des billets...</div>
           )}
 
-          {error && (
-            <div className="p-4 text-center text-red-600">
-              {error}
-            </div>
-          )}
+          {error && <div className="p-4 text-center text-red-600">{error}</div>}
 
           {!loading && !error && filteredBillets.length === 0 && !query.trim() && (
-            <div className="p-4 text-center text-gray-500">
-              Tapez pour rechercher un billet
-            </div>
+            <div className="p-4 text-center text-gray-500">Tapez pour rechercher un billet</div>
           )}
 
           {!loading && !error && filteredBillets.length === 0 && query.trim() && (
-            <div className="p-4 text-center text-gray-500">
-              Aucun billet trouvé pour "{query}"
-            </div>
+            <div className="p-4 text-center text-gray-500">Aucun billet trouvé pour "{query}"</div>
           )}
 
           {!loading && !error && (

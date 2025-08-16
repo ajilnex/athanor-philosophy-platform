@@ -1,0 +1,32 @@
+# Next.js
+.next
+out
+
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+build
+
+# Logs
+*.log
+
+# Generated files
+public/graph-billets.json
+public/graph-billets.svg
+public/search-index.json
+public/bibliography.json
+public/citations-map.json
+
+# MDX content (preserve original formatting)
+content/**/*.mdx
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Playwright
+test-results
+playwright-report

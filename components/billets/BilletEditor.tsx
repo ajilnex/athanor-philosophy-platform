@@ -1,7 +1,21 @@
 'use client'
 
 import { useState, useRef, useMemo, useCallback } from 'react'
-import { X, Save, Image as ImageIcon, GraduationCap, Bold, Italic, Heading, Quote, ListOrdered, Link, Eye, EyeOff, Link2 } from 'lucide-react'
+import {
+  X,
+  Save,
+  Image as ImageIcon,
+  GraduationCap,
+  Bold,
+  Italic,
+  Heading,
+  Quote,
+  ListOrdered,
+  Link,
+  Eye,
+  EyeOff,
+  Link2,
+} from 'lucide-react'
 import { remark } from 'remark'
 import html from 'remark-html'
 import { ImageUpload } from './ImageUpload'
@@ -37,7 +51,14 @@ interface BilletData {
   excerpt: string
 }
 
-export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onSave }: BilletEditorProps) {
+export function BilletEditor({
+  isOpen,
+  onClose,
+  mode,
+  userRole,
+  initialData,
+  onSave,
+}: BilletEditorProps) {
   const [title, setTitle] = useState(initialData?.title || '')
   const [slug, setSlug] = useState(initialData?.slug || '')
   const [tags] = useState<string[]>([]) // Champs supprimés mais nécessaires pour la compatibilité
@@ -51,7 +72,7 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
   const [selectedTextForBacklink, setSelectedTextForBacklink] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  
+
   const editorRef = useRef<any>(null)
 
   // Rendu markdown pour l'aperçu
@@ -70,10 +91,11 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
     const today = new Date().toISOString().split('T')[0]
     const slugFromTitle = titleText
       .toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '')
-    
+
     return `${today}-${slugFromTitle}`
   }
 
@@ -88,16 +110,16 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
     if (editorRef.current?.view) {
       const view = editorRef.current.view
       const pos = view.state.selection.main.head
-      
+
       view.dispatch({
         changes: { from: pos, insert: text },
-        selection: { anchor: pos + text.length }
+        selection: { anchor: pos + text.length },
       })
-      
+
       // Mettre à jour l'état local
       const newContent = view.state.doc.toString()
       setContent(newContent)
-      
+
       // Remettre le focus sur l'éditeur
       view.focus()
     } else {
@@ -129,7 +151,7 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
   const handleCreateNewBillet = async (title: string, alias?: string) => {
     // Générer le slug à partir du titre
     const slug = generateSlug(title)
-    
+
     if (userRole === 'ADMIN') {
       try {
         // Créer le nouveau billet via API
@@ -141,10 +163,10 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
             title,
             content: '# ' + title + '\n\nContenu à venir...',
             tags: [],
-            excerpt: ''
-          })
+            excerpt: '',
+          }),
         })
-        
+
         if (response.ok) {
           // Insérer le backlink avec la même logique que handleBacklinkSelected
           const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
@@ -165,7 +187,7 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
       insertBacklink(backlinkText)
       // TODO: Toast "Billet à créer par un admin"
     }
-    
+
     setShowBacklinkPicker(false)
   }
 
@@ -186,16 +208,19 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
   }
 
   // Configuration CodeMirror - memoizé pour éviter recréation
-  const extensions = useMemo(() => [
-    markdown(),
-    EditorView.lineWrapping,
-    EditorView.theme({
-      '&': { fontSize: '14px' },
-      '.cm-content': { padding: '16px', minHeight: '400px' },
-      '.cm-focused': { outline: 'none' },
-      '.cm-editor': { borderRadius: '8px' }
-    }),
-  ], [])
+  const extensions = useMemo(
+    () => [
+      markdown(),
+      EditorView.lineWrapping,
+      EditorView.theme({
+        '&': { fontSize: '14px' },
+        '.cm-content': { padding: '16px', minHeight: '400px' },
+        '.cm-focused': { outline: 'none' },
+        '.cm-editor': { borderRadius: '8px' },
+      }),
+    ],
+    []
+  )
 
   // Actions toolbar
   const insertMarkdown = (before: string, after: string = '') => {
@@ -237,7 +262,7 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
         tags: tags,
         excerpt: excerpt,
       })
-      
+
       onClose()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la sauvegarde')
@@ -250,16 +275,16 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col">
+      <div
+        data-testid="billet-editor"
+        className="bg-white rounded-lg shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col"
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-2xl font-light">
             {mode === 'create' ? 'Nouveau billet' : 'Éditer le billet'}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 p-1"
-          >
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 p-1">
             <X className="h-6 w-6" />
           </button>
         </div>
@@ -275,20 +300,23 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
             {showPreview ? 'Éditer' : 'Aperçu'}
           </button>
           <div>
-          <ShimmerButton
-            onClick={handleSave}
-            disabled={isSaving}
-            variant="primary"
-            className="disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Save className="h-4 w-4" />
-            <span>
-              {isSaving 
-                ? (userRole === 'ADMIN' ? 'Sauvegarde...' : 'Envoi de la proposition...') 
-                : (userRole === 'ADMIN' ? 'Sauvegarder et Publier' : 'Proposer la modification')
-              }
-            </span>
-          </ShimmerButton>
+            <ShimmerButton
+              onClick={handleSave}
+              disabled={isSaving}
+              variant="primary"
+              className="disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Save className="h-4 w-4" />
+              <span>
+                {isSaving
+                  ? userRole === 'ADMIN'
+                    ? 'Sauvegarde...'
+                    : 'Envoi de la proposition...'
+                  : userRole === 'ADMIN'
+                    ? 'Sauvegarder et Publier'
+                    : 'Proposer la modification'}
+              </span>
+            </ShimmerButton>
           </div>
         </div>
 
@@ -297,13 +325,11 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
           <div className="flex-1 p-6 overflow-y-auto">
             {/* Meta Fields - Simplifié */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Titre *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Titre *</label>
               <input
                 type="text"
                 value={title}
-                onChange={(e) => handleTitleChange(e.target.value)}
+                onChange={e => handleTitleChange(e.target.value)}
                 className="input-field w-full"
                 placeholder="Titre de votre billet"
               />
@@ -311,10 +337,8 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
 
             {/* Éditeur Markdown avec preview intégré */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Contenu *
-              </label>
-              
+              <label className="block text-sm font-medium text-gray-700 mb-2">Contenu *</label>
+
               <div className="border border-gray-300 rounded-md overflow-hidden">
                 {!showPreview && (
                   <>
@@ -362,7 +386,7 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
                     <CodeMirror
                       ref={editorRef}
                       value={content}
-                      onChange={(value) => setContent(value)}
+                      onChange={value => setContent(value)}
                       basicSetup={{ closeBrackets: false }}
                       extensions={extensions}
                       placeholder="# Votre billet en Markdown
@@ -410,11 +434,8 @@ Vous pouvez utiliser la **syntaxe Markdown** et insérer des images et citations
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              
-              <ImageUpload 
-                onImageUploaded={handleImageUploaded}
-                autoInsert={false}
-              />
+
+              <ImageUpload onImageUploaded={handleImageUploaded} autoInsert={false} />
             </div>
           </div>
         )}
