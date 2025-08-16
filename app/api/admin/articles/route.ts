@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { getAllArticlesForAdmin } from '@/lib/articles'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 
@@ -12,9 +12,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const articles = await prisma.article.findMany({
-      orderBy: { createdAt: 'desc' },
-    })
+    const articles = await getAllArticlesForAdmin()
     return NextResponse.json(articles)
   } catch (error) {
     console.error('Error fetching articles:', error)

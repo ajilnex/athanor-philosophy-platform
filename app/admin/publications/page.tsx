@@ -1,20 +1,10 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { prisma } from '@/lib/prisma'
+import { getAllArticlesForAdmin } from '@/lib/articles'
 import { AdminArticleActions } from '@/components/admin/AdminArticleActions'
 import { getServerSession } from 'next-auth/next'
 import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
-
-async function getAllPublications() {
-  try {
-    return await prisma.article.findMany({
-      orderBy: { createdAt: 'desc' },
-    })
-  } catch (error) {
-    return []
-  }
-}
 
 function formatFileSize(bytes: number): string {
   if (bytes === 0) return '0 B'
@@ -31,7 +21,7 @@ export default async function AdminPublicationsPage() {
     redirect('/admin')
   }
 
-  const publications = await getAllPublications()
+  const publications = await getAllArticlesForAdmin()
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-12">

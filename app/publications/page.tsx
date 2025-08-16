@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { FileText, User, Calendar, Tag, Download } from 'lucide-react'
+import { getPublishedArticles } from '@/lib/articles'
 
 // Publication type definition
 type Publication = {
@@ -11,33 +12,6 @@ type Publication = {
   tags: string[]
   publishedAt: string | Date
   fileSize: number
-}
-
-import { prisma } from '@/lib/prisma'
-
-// Direct Prisma call for build time, fallback to API for runtime
-async function getPublications(): Promise<Publication[]> {
-  try {
-    console.log('🔍 Fetching publications...')
-
-    // During build, use direct Prisma connection
-    if (process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV !== 'production') {
-      // Build time - return empty array to avoid build failures
-      console.log('⚠️ Build time - returning empty publications array')
-      return []
-    }
-
-    // Runtime - use direct Prisma (show all publications)
-    const publications = await prisma.article.findMany({
-      orderBy: { publishedAt: 'desc' },
-    })
-
-    console.log(`📄 Found ${publications.length} publications`)
-    return publications
-  } catch (error) {
-    console.error('❌ Error fetching publications:', error)
-    return []
-  }
 }
 
 function formatFileSize(bytes: number): string {
@@ -52,7 +26,7 @@ function formatFileSize(bytes: number): string {
 export const revalidate = 300
 
 export default async function PublicationsPage() {
-  const publications = await getPublications()
+  const publications = await getPublishedArticles()
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">

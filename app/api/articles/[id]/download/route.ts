@@ -1,29 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { getPublishedArticleById, getPublishedArticlesSummary } from '@/lib/articles'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params
   try {
     console.log('📥 Download request for article:', resolvedParams.id)
 
-    // Connect to database first
-    await prisma.$connect()
-
-    const article = await prisma.article.findFirst({
-      where: {
-        id: resolvedParams.id,
-        isPublished: true,
-      },
-    })
+    const article = await getPublishedArticleById(resolvedParams.id)
 
     if (!article) {
       console.log('❌ Article not found or not published')
       console.log('🔍 Searching all articles...')
 
-      // Debug: list all articles
-      const allArticles = await prisma.article.findMany({
-        select: { id: true, title: true, isPublished: true },
-      })
+      // Debug: list all articles avec select optimisé
+      const allArticles = await getPublishedArticlesSummary()
       console.log('📋 All articles:', allArticles)
 
       return new NextResponse('Article not found', { status: 404 })
@@ -58,7 +48,5 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       `Download failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       { status: 500 }
     )
-  } finally {
-    await prisma.$disconnect()
   }
 }

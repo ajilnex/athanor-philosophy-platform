@@ -1,22 +1,9 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { getPublishedArticlesSummary } from '@/lib/articles'
 
 export async function GET() {
   try {
-    const articles = await prisma.article.findMany({
-      where: { isPublished: true },
-      orderBy: { publishedAt: 'desc' },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        author: true,
-        fileName: true,
-        tags: true,
-        publishedAt: true,
-        fileSize: true,
-      },
-    })
+    const articles = await getPublishedArticlesSummary()
 
     return NextResponse.json(articles)
   } catch (error) {
