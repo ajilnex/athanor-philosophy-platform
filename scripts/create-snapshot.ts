@@ -120,13 +120,13 @@ async function createSnapshot() {
       articles.push({
         id: article.id,
         title: article.title,
-        description: article.description,
-        author: article.author,
+        description: article.description || undefined,
+        author: article.author || undefined,
         fileName: article.fileName,
         filePath: devUrl, // URL dev après migration
         fileSize: article.fileSize,
         tags: article.tags,
-        category: article.category,
+        category: article.category || undefined,
         publishedAt: article.publishedAt.toISOString(),
         isPublished: article.isPublished
       })
@@ -146,7 +146,7 @@ async function createSnapshot() {
       slug: billet.slug,
       title: billet.title,
       content: billet.content,
-      excerpt: billet.excerpt,
+      excerpt: billet.excerpt || undefined,
       tags: billet.tags,
       date: billet.date.toISOString()
     }))
@@ -167,7 +167,7 @@ async function createSnapshot() {
       authorId: 'anonymous-user', // Anonymisation
       targetType: comment.targetType,
       targetId: comment.targetId,
-      parentId: comment.parentId,
+      parentId: comment.parentId || undefined,
       isApproved: comment.isApproved,
       isVisible: comment.isVisible,
       createdAt: comment.createdAt.toISOString()
