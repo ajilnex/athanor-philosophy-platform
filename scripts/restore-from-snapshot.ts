@@ -129,13 +129,13 @@ async function restoreFromSnapshot() {
           data: {
             id: article.id,
             title: article.title,
-            description: article.description || null,
-            author: article.author || null,
+            description: article.description ?? null,
+            author: article.author ?? null,
             fileName: article.fileName,
             filePath: article.filePath, // URL Cloudinary dev
             fileSize: article.fileSize,
             tags: article.tags,
-            category: article.category || null,
+            category: article.category ?? null,
             publishedAt: new Date(article.publishedAt),
             isPublished: article.isPublished,
             isSealed: false // Toujours false pour les données de dev
@@ -155,7 +155,7 @@ async function restoreFromSnapshot() {
             slug: billet.slug,
             title: billet.title,
             content: billet.content,
-            excerpt: billet.excerpt || null,
+            excerpt: billet.excerpt ?? null,
             tags: billet.tags,
             date: new Date(billet.date),
             isSealed: false // Toujours false pour les données de dev
@@ -176,7 +176,7 @@ async function restoreFromSnapshot() {
             authorId: adminUserId, // Assigner à l'admin dev
             targetType: comment.targetType,
             targetId: comment.targetId,
-            parentId: comment.parentId || null,
+            parentId: comment.parentId ?? null,
             isApproved: comment.isApproved,
             isVisible: comment.isVisible,
             createdAt: new Date(comment.createdAt)
