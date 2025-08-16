@@ -78,7 +78,7 @@ async function AdminNormalPage() {
         </p>
         <div className="bg-gray-50 text-left text-xs p-3 border border-subtle mb-6 overflow-x-auto">
           <p className="mb-2">Pour te promouvoir admin (à exécuter côté base) :</p>
-          <code>UPDATE "User" SET role = 'admin' WHERE email = 'ton-email@github';</code>
+          <code>UPDATE "User" SET role = 'ADMIN' WHERE email = 'ton-email@github';</code>
         </div>
         <Link
           href="/api/auth/signout?callbackUrl=/"

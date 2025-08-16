@@ -147,6 +147,13 @@ enum Role {
 }
 ```
 
+⚠️ **CONVENTION CRITIQUE : Rôle ADMIN**
+
+- **Base de données** : `role: "ADMIN"` (MAJUSCULES obligatoire)
+- **Vérifications code** : `session.user?.role !== 'ADMIN'` (MAJUSCULES)
+- **❌ ERREUR FRÉQUENTE** : `'admin'` (minuscules) → cause redirection accueil
+- **Scripts SQL** : `UPDATE "User" SET role = 'ADMIN' WHERE email = '...'`
+
 **Workflow de contribution :**
 
 - **ADMIN** : Écriture directe sur `main` via GitHub API

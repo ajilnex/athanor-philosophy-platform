@@ -8,7 +8,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   // 🛡️ PROTECTION: Vérifier l'autorisation admin
   const session = await getServerSession(authOptions)
 
-  if (!session || session.user?.role !== 'admin') {
+  if (!session || session.user?.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }
 

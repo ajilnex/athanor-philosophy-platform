@@ -14,7 +14,7 @@ export default function AdminSettingsPage() {
   useEffect(() => {
     if (status === 'loading') return
 
-    if (!session || session.user?.role !== 'admin') {
+    if (!session || session.user?.role !== 'ADMIN') {
       router.push('/')
     }
   }, [session, status, router])
@@ -23,7 +23,7 @@ export default function AdminSettingsPage() {
     return <div>Chargement...</div>
   }
 
-  if (!session || session.user?.role !== 'admin') {
+  if (!session || session.user?.role !== 'ADMIN') {
     return null
   }
 
