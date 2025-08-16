@@ -32,7 +32,11 @@ export async function toggleArticlePublished(articleId: string) {
       data: { isPublished: !article.isPublished },
     })
 
-    revalidatePath('/admin/articles')
+    // Revalidate the admin list and the public list
+    revalidatePath('/admin/publications')
+    revalidatePath('/publications')
+    revalidatePath(`/publications/${articleId}`)
+
     return { success: true }
   } catch (error) {
     console.error('Error toggling article:', error)
@@ -54,18 +58,14 @@ export async function deleteArticle(articleId: string) {
     }
 
     // 2. Extraire le public_id de l'URL Cloudinary
-    // Format URL: https://res.cloudinary.com/[cloud]/raw/upload/v[version]/[folder]/[public_id].[ext]
     let publicId = null
-    if (article.filePath) {
+    if (article.filePath.includes('cloudinary')) {
       const urlParts = article.filePath.split('/')
-      const fileName = urlParts[urlParts.length - 1] // Dernier segment
-      const folderIndex = urlParts.indexOf('athanor-articles')
-
-      if (folderIndex !== -1) {
-        // Reconstruire le public_id avec le dossier
-        const fileNameWithoutExt = fileName.split('.')[0]
-        publicId = `athanor-articles/${fileNameWithoutExt}`
-      }
+      const publicIdWithFolder = urlParts.slice(urlParts.indexOf('athanor-articles')).join('/')
+      publicId = publicIdWithFolder.substring(
+        0,
+        publicIdWithFolder.lastIndexOf('.') || publicIdWithFolder.length
+      )
     }
 
     // 3. Supprimer le fichier de Cloudinary si possible
@@ -86,7 +86,11 @@ export async function deleteArticle(articleId: string) {
       where: { id: articleId },
     })
 
-    revalidatePath('/admin/articles')
+    // Revalidate the admin list and the public list
+    revalidatePath('/admin/publications')
+    revalidatePath('/publications')
+    revalidatePath(`/publications/${articleId}`)
+
     return { success: true }
   } catch (error) {
     console.error('Error deleting article:', error)
@@ -118,23 +122,19 @@ export async function uploadArticle(formData: FormData) {
       return { success: false, error: 'Seuls les fichiers PDF sont autorisés' }
     }
 
-    // 🛡️ PROTECTION: Limite de taille (50MB max)
     const maxSize = 50 * 1024 * 1024 // 50MB
     if (file.size > maxSize) {
       return { success: false, error: 'La taille du fichier doit être inférieure à 50MB' }
     }
 
-    // 🛡️ PROTECTION: Vérifier le nom de fichier (plus permissif)
     if (!file.name.toLowerCase().endsWith('.pdf')) {
       return { success: false, error: "Le fichier doit avoir l'extension .pdf" }
     }
 
-    // Vérifier la longueur du nom de fichier
     if (file.name.length > 255) {
       return { success: false, error: 'Le nom de fichier est trop long (maximum 255 caractères)' }
     }
 
-    // Parse tags
     let tags: string[] = []
     try {
       tags = JSON.parse(tagsString || '[]')
@@ -142,28 +142,25 @@ export async function uploadArticle(formData: FormData) {
       tags = tagsString ? tagsString.split(',').map(t => t.trim()) : []
     }
 
-    // Convert file to buffer for Cloudinary upload
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    // Nettoyer le nom de fichier pour Cloudinary (conserver les caractères français)
     const cleanFileName = file.name
-      .normalize('NFD') // Décomposer les caractères accentués
-      .replace(/[\u0300-\u036f]/g, '') // Supprimer les diacritiques
-      .replace(/[^a-zA-Z0-9.-]/g, '_') // Remplacer les caractères spéciaux par des underscores
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9.-]/g, '_')
       .toLowerCase()
 
-    // Upload to Cloudinary with public access
     const uploadResult = await new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
           {
-            resource_type: 'raw', // For PDF files
-            folder: 'athanor-articles', // Organize in folder
+            resource_type: 'raw',
+            folder: 'athanor-articles',
             public_id: `${Date.now()}_${cleanFileName}`,
-            use_filename: false, // Use our cleaned public_id instead
-            access_mode: 'public', // Make files publicly accessible
-            type: 'upload', // Ensure upload type
+            use_filename: false,
+            access_mode: 'public',
+            type: 'upload',
           },
           (error, result) => {
             if (error) reject(error)
@@ -175,14 +172,13 @@ export async function uploadArticle(formData: FormData) {
 
     const cloudinaryResult = uploadResult as any
 
-    // Save to database with Cloudinary URL
     const article = await prisma.article.create({
       data: {
         title: title.trim(),
         description: description?.trim() || null,
         author: author?.trim() || null,
         fileName: file.name,
-        filePath: cloudinaryResult.secure_url, // Store Cloudinary URL
+        filePath: cloudinaryResult.secure_url,
         fileSize: file.size,
         tags: tags,
         category: category?.trim() || null,
@@ -190,7 +186,10 @@ export async function uploadArticle(formData: FormData) {
       },
     })
 
-    revalidatePath('/admin/articles')
+    // Revalidate the admin list and the public list
+    revalidatePath('/admin/publications')
+    revalidatePath('/publications')
+
     return { success: true, articleId: article.id }
   } catch (error) {
     console.error('Upload error:', error)
