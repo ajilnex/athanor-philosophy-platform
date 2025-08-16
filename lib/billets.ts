@@ -86,23 +86,28 @@ export async function isBilletInTrash(slug: string): Promise<boolean> {
   }
 }
 
-// Ne traite QUE les backlinks [[...]] en sécurité
+// Ne traite QUE les backlinks [[...]] en sécurité avec support alias [[slug|alias]]
 async function transformBacklinks(content: string): Promise<string> {
   const allSlugs = await getBilletSlugs()
-  return content.replace(/\[\[([^\]]+)\]\]/g, (_m, linkText) => {
-    const targetSlug = String(linkText)
+  return content.replace(/\[\[([^|]+)(?:\|([^\]]+))?\]\]/g, (_m, slug, alias) => {
+    // slug = partie avant |, alias = partie après | (optionnel)
+    const targetSlug = String(slug)
       .toLowerCase()
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '')
+    
     const found = allSlugs.find(s =>
       s.includes(targetSlug) ||
       s.endsWith(targetSlug) ||
       s.replace(/^\d{4}-\d{2}-\d{2}-/,'') === targetSlug
     )
+    
     const href = `/billets/${found ?? targetSlug}`
     const missing = !found
-    return `<a href="${href}" className="backlink" data-backlink="${linkText}" ${missing ? 'data-missing="true"' : ''}>${linkText}</a>`
+    const displayText = alias || slug // Utilise l'alias si présent, sinon le slug
+    
+    return `<a href="${href}" className="backlink" data-backlink="${slug}" ${missing ? 'data-missing="true"' : ''}>${displayText}</a>`
   })
 }
 

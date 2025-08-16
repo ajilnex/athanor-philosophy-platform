@@ -153,10 +153,18 @@
       "y": -90.79832699843111
     },
     {
+      "id": "billet:2025-08-15-theta",
+      "label": "theta",
+      "url": "/billets/2025-08-15-theta",
+      "degree": 2,
+      "x": -90.82150654019992,
+      "y": -41.85037574226094
+    },
+    {
       "id": "billet:alpha",
-      "label": "Alpha",
+      "label": "alpha",
       "url": "/billets/alpha",
-      "degree": 3,
+      "degree": 4,
       "x": 99.32044820329828,
       "y": -150.11811539150077
     },
@@ -164,7 +172,7 @@
       "id": "billet:beta",
       "label": "beta",
       "url": "/billets/beta",
-      "degree": 3,
+      "degree": 4,
       "x": 212.03981610860504,
       "y": 150.46300669808826
     },
@@ -222,6 +230,16 @@
       "target": "billet:2025-08-06-peirce-sellars"
     },
     {
+      "id": "billet:2025-08-15-theta→billet:alpha",
+      "source": "billet:2025-08-15-theta",
+      "target": "billet:alpha"
+    },
+    {
+      "id": "billet:2025-08-15-theta→billet:beta",
+      "source": "billet:2025-08-15-theta",
+      "target": "billet:beta"
+    },
+    {
       "id": "billet:alpha→billet:beta",
       "source": "billet:alpha",
       "target": "billet:beta"
@@ -243,12 +261,12 @@
     }
   ],
   "metadata": {
-    "generatedAt": "2025-08-16T04:16:27.162Z",
-    "billetsCount": 23,
-    "nodesCount": 23,
+    "generatedAt": "2025-08-16T05:08:29.013Z",
+    "billetsCount": 24,
+    "nodesCount": 24,
     "stability": {
       "pivotsLocked": 8,
-      "newNodes": 2,
+      "newNodes": 0,
       "avgMovement": 0
     }
   }

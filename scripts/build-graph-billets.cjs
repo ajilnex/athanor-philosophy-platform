@@ -175,10 +175,10 @@ async function main() {
       })
     }
 
-    // a) Wikilinks [[slug]] - Exclure les billets supprimés
-    const wikiMatches = [...content.matchAll(/\[\[([^\]]+)\]\]/g)]
+    // a) Wikilinks [[slug]] et [[slug|alias]] - Exclure les billets supprimés
+    const wikiMatches = [...content.matchAll(/\[\[([^|\]]+)(?:\|([^\]]+))?\]\]/g)]
     for (const m of wikiMatches) {
-      const targetSlug = m[1].trim()
+      const targetSlug = m[1].trim() // Ignorer la partie alias (m[2]) pour le graphe
       if (!targetSlug || trashedSlugs.has(targetSlug)) continue
       const to = `billet:${targetSlug}`
       if (!nodes.has(to)) {

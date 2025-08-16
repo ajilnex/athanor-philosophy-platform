@@ -1,11 +1,13 @@
 'use client'
 
 import React, { useState, useRef } from 'react'
-import { Save, BookOpen, List, AlertCircle, CheckCircle } from 'lucide-react'
+import { Save, BookOpen, List, AlertCircle, CheckCircle, Link2 } from 'lucide-react'
 import CodeMirror from '@uiw/react-codemirror'
 import { markdown } from '@codemirror/lang-markdown'
 import { EditorView } from '@codemirror/view'
 import { InsertReferenceDialog } from './InsertReferenceDialog'
+import { BacklinkPicker } from '@/components/editor/BacklinkPicker'
+import { backlinkTriggerExtension, cleanupBacklinkTrigger } from '@/lib/codemirror-backlink-trigger'
 import toast from 'react-hot-toast'
 
 interface EditorClientProps {
@@ -18,6 +20,8 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
   const [content, setContent] = useState(initialContent)
   const [isSaving, setIsSaving] = useState(false)
   const [showReferenceDialog, setShowReferenceDialog] = useState(false)
+  const [showBacklinkPicker, setShowBacklinkPicker] = useState(false)
+  const [backlinkTriggerPosition, setBacklinkTriggerPosition] = useState<number | null>(null)
   const editorRef = useRef<any>(null)
 
   const handleSave = async () => {
@@ -114,6 +118,86 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
     toast.success('Bibliographie ajoutée en fin de document')
   }
 
+  const handleBacklinkSelected = (slug: string, alias?: string) => {
+    const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
+    
+    if (backlinkTriggerPosition !== null && editorRef.current?.view) {
+      // Mode déclencheur : remplacer les [[ par le backlink complet
+      const view = editorRef.current.view
+      view.dispatch({
+        changes: {
+          from: backlinkTriggerPosition - 2, // Position des [[
+          to: backlinkTriggerPosition, // Position actuelle
+          insert: backlinkText
+        },
+        selection: { anchor: backlinkTriggerPosition - 2 + backlinkText.length }
+      })
+      
+      const newContent = view.state.doc.toString()
+      setContent(newContent)
+      view.focus()
+      
+      setBacklinkTriggerPosition(null)
+    } else {
+      // Mode bouton : insérer au curseur
+      insertText(backlinkText)
+    }
+    
+    setShowBacklinkPicker(false)
+  }
+
+  const handleCreateNewBillet = async (title: string, alias?: string) => {
+    // Générer le slug depuis le titre
+    const today = new Date().toISOString().split('T')[0]
+    const slugFromTitle = title
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+    const slug = `${today}-${slugFromTitle}`
+    
+    try {
+      // Créer le nouveau billet
+      const response = await fetch('/api/admin/billets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slug,
+          title,
+          content: `# ${title}\n\nContenu à venir...`,
+          tags: [],
+          excerpt: ''
+        })
+      })
+      
+      if (response.ok) {
+        toast.success(`Nouveau billet "${title}" créé`)
+      }
+    } catch (error) {
+      console.error('Erreur création billet:', error)
+      toast.error('Erreur lors de la création du billet')
+    }
+    
+    // Insérer le backlink dans tous les cas
+    const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
+    insertText(backlinkText)
+    setShowBacklinkPicker(false)
+  }
+
+  const handleBacklinkTrigger = (position: number) => {
+    setBacklinkTriggerPosition(position)
+    setShowBacklinkPicker(true)
+  }
+
+  const handleBacklinkPickerClose = () => {
+    // Nettoyer les [[ orphelins si on ferme sans sélection
+    if (backlinkTriggerPosition !== null && editorRef.current?.view) {
+      cleanupBacklinkTrigger(editorRef.current.view, backlinkTriggerPosition)
+      setBacklinkTriggerPosition(null)
+    }
+    setShowBacklinkPicker(false)
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* Toolbar */}
@@ -139,6 +223,14 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
           >
             <List className="h-4 w-4 mr-2" />
             Insérer Bibliography
+          </button>
+          
+          <button
+            onClick={() => setShowBacklinkPicker(true)}
+            className="inline-flex items-center px-3 py-2 text-sm bg-background border border-subtle/50 text-foreground rounded-md hover:bg-muted transition-colors"
+          >
+            <Link2 className="h-4 w-4 mr-2" />
+            Backlink
           </button>
           
           <button
@@ -190,6 +282,7 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
                 height: '100%',
               }
             }),
+            backlinkTriggerExtension(handleBacklinkTrigger)
           ]}
           onChange={(value) => setContent(value)}
         />
@@ -220,6 +313,14 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
         isOpen={showReferenceDialog}
         onClose={() => setShowReferenceDialog(false)}
         onSelect={handleInsertReference}
+      />
+
+      {/* Backlink Picker */}
+      <BacklinkPicker
+        isOpen={showBacklinkPicker}
+        onClose={handleBacklinkPickerClose}
+        onSelect={handleBacklinkSelected}
+        onCreateNew={handleCreateNewBillet}
       />
     </div>
   )

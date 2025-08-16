@@ -100,126 +100,73 @@
   
   <!-- Edges -->
   <g class="edges">
-    <line x1="410.32601116868" y1="292.7692368951456" x2="1077.95765922819" y2="419.08059027226784" 
+    <line x1="637.5877942530341" y1="476.6114130077277" x2="608.2359076390677" y2="626.443534340878" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
-                    class="edge" data-source="billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani" data-target="billet:2025-08-06-peirce-sellars"/>
-<line x1="410.32601116868" y1="292.7692368951456" x2="602.893598067591" y2="544.9166268469048" 
+                    class="edge" data-source="billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani" data-target="billet:2025-08-06-peirce-sellars]] pour un rappel sur le continu et la sémiose illimitée : l’esprit est un **processus** plus qu’une chose — il s’étend dans des chaînes d’inférences et de signes qui nous dépassent.
+
+## Apprentissages et normes (l’héritage sellarsien)
+Suivant l’axe sellarsien, Negarestani insiste sur la dimension **normative** des états mentaux : savoir, c’est être pris dans des **règles** qu’on peut expliciter et améliorer. L’IA qui viserait l’esprit ne copie pas seulement des régularités ; elle doit pouvoir **justifier** et **réviser** ses prises de position à la lumière de raisons publiques.
+
+## Art, rituels et milieux
+Ce cadre éclaire des pratiques où le **milieu** façonne les formes de vie et d’attention. Le « grown-art » d’Iri Berkleid met en scène des dynamiques **symbiotiques** et des seuils de perception qui redistribuent l’agentivité entre humain et non-humain — un bon laboratoire pour penser comment nos normes se **reconfigurent** en contact avec d’autres puissances du vivant. Voir [[2025-08-10-iri-berkleid-sublime-bacteriologique]].
+
+## Fil directeur
+- L’esprit comme **milieu continu** de pratiques inférentielles (écho à Peirce).  
+- L’intelligence comme **tenue de comptes** dans l’espace des raisons (écho à Sellars/Negarestani).  
+- Les milieux artistiques et techniques comme **dispositifs d’apprentissage** qui requalifient le sensible et le normatif.
+
+## À discuter
+1. Quelles conditions minimales pour une **IA responsable** (au sens normatif) ?  
+2. Comment articuler **continuité** peircéenne et **discrétisation** technique sans trahir l’une ou l’autre ?  
+3. Quels rituels/écologies d’attention favorisent l’**auto-correction collective** ?
+
+*Billet relié :* [[2025-08-06-peirce-sellars]] • [[2025-08-10-iri-berkleid-sublime-bacteriologique"/>
+<line x1="878.4285468913079" y1="356.705287467487" x2="1059.4365515839481" y2="571.4819503832994" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
-                    class="edge" data-source="billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani" data-target="billet:2025-08-10-iri-berkleid-sublime-bacteriologique"/>
-<line x1="259.6205352554193" y1="462.14072685176603" x2="406.84350038890426" y2="678.2680000000001" 
+                    class="edge" data-source="billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide" data-target="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet]]
+- Exemple d’analyse : [[2025-08-10-18-56-32-intelligence-and-spirit-negarestani]]
+- Exemple artistique corrélé : [[2025-08-10-iri-berkleid-sublime-bacteriologique"/>
+<line x1="590.2625289343725" y1="201.28761212407716" x2="809.2427572446995" y2="141.7319999999999" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
-                    class="edge" data-source="billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide" data-target="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet"/>
-<line x1="259.6205352554193" y1="462.14072685176603" x2="410.32601116868" y2="292.7692368951456" 
+                    class="edge" data-source="billet:2025-08-10-iri-berkleid-sublime-bacteriologique" data-target="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet]]
+- Pour la logique de médiations et de signes : [[2025-08-06-peirce-sellars]]
+- Sur le rythme travail/rituel et la micro-itération : [[2025-08-05-dialectique-du-pomodoro"/>
+<line x1="190.61682314998313" y1="641.5270800619522" x2="252.8941885792446" y2="320.98699663481705" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
-                    class="edge" data-source="billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide" data-target="billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani"/>
-<line x1="259.6205352554193" y1="462.14072685176603" x2="602.893598067591" y2="544.9166268469048" 
+                    class="edge" data-source="billet:2025-08-15-theta" data-target="billet:alpha]] et [[beta"/>
+<line x1="1066.3077736964578" y1="459.46407688481224" x2="267.8167886225305" y2="428.5761967739457" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
-                    class="edge" data-source="billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide" data-target="billet:2025-08-10-iri-berkleid-sublime-bacteriologique"/>
-<line x1="602.893598067591" y1="544.9166268469048" x2="406.84350038890426" y2="678.2680000000001" 
+                    class="edge" data-source="billet:alpha" data-target="billet:beta]] et [[gamma"/>
+<line x1="1215.0894517394097" y1="456.8160637772813" x2="1066.3077736964578" y2="459.46407688481224" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
-                    class="edge" data-source="billet:2025-08-10-iri-berkleid-sublime-bacteriologique" data-target="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet"/>
-<line x1="602.893598067591" y1="544.9166268469048" x2="1077.95765922819" y2="419.08059027226784" 
-                    stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
-                    class="edge" data-source="billet:2025-08-10-iri-berkleid-sublime-bacteriologique" data-target="billet:2025-08-06-peirce-sellars"/>
-<line x1="1180.3794647445807" y1="296.52555472417714" x2="1088.5825212526177" y2="459.4681966239135" 
-                    stroke="hsl(220, 10%, 60%)" stroke-width="1.8" opacity="0.15"
-                    class="edge" data-source="billet:alpha" data-target="billet:beta"/>
-<line x1="1180.3794647445807" y1="296.52555472417714" x2="964.7378781402654" y2="141.73200000000008" 
-                    stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
-                    class="edge" data-source="billet:alpha" data-target="billet:gamma"/>
-<line x1="1088.5825212526177" y1="459.4681966239135" x2="964.7378781402654" y2="141.73200000000008" 
+                    class="edge" data-source="billet:beta" data-target="billet:alpha"/>
+<line x1="1215.0894517394097" y1="456.8160637772813" x2="1249.3831768500172" y2="678.2679999999999" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
                     class="edge" data-source="billet:beta" data-target="billet:gamma"/>
   </g>
   
   <!-- Nodes -->
   <g class="nodes">
-    <a href="/billets/2025-08-06-peirce-sellars" class="graph-link" data-node-id="billet:2025-08-06-peirce-sellars">
-                <g class="node-group tier-2" data-degree="2" data-id="billet:2025-08-06-peirce-sellars">
-                  <title>BNF, rayon philosophie — Peirce &amp; les Sellars (étagère, fragments) (2 connexions)</title>
+    <a href="/billets/2025-08-10-18-56-32-intelligence-and-spirit-negarestani" class="graph-link" data-node-id="billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani">
+                <g class="node-group tier-1" data-degree="1" data-id="billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani">
+                  <title>Notes sur *Intelligence and Spirit* (Reza Negarestani) — continuité, apprentissage, esprit collectif (1 connexions)</title>
                   <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="1077.95765922819" cy="419.08059027226784" r="21" 
-                          fill="transparent" class="node-hit" 
-                          data-id="billet:2025-08-06-peirce-sellars" tabindex="0"
-                          aria-label="BNF, rayon philosophie — Peirce &amp; les Sellars (étagère, fragments)"/>
-                  <circle cx="1077.95765922819" cy="419.08059027226784" r="12" 
-                          fill="hsl(220, 15%, 20%)" 
-                          class="node-halo" 
-                          opacity="0" 
-                          filter="url(#glow)"/>
-                  <circle cx="1077.95765922819" cy="419.08059027226784" r="6" 
-                           fill="hsl(220, 15%, 20%)" 
-                           filter="url(#shadow)" 
-                           stroke="hsl(220, 10%, 98%)" 
-                           stroke-width="1.5"
-                           class="node-main"/>
-                  <text x="1077.95765922819" y="441.08059027226784" 
-                    text-anchor="middle" 
-                    font-size="10" 
-                    font-family="IBM Plex Serif, serif" 
-                    fill="hsl(220, 15%, 20%)"
-                    class="node-label node-label-t2"
-                    paint-order="stroke" 
-                    stroke="hsl(220, 10%, 98%)" 
-                    stroke-width="3px"
-                    opacity="0">
-                    BNF, rayon philosophie —…
-                  </text>
-                </g>
-              </a>
-<a href="/billets/2025-08-06-resume-la-procedure-de-publication-dun-billet" class="graph-link" data-node-id="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet">
-                <g class="node-group tier-2" data-degree="2" data-id="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet">
-                  <title>Résume la procédure de publication d&#39;un billet (2 connexions)</title>
-                  <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="406.84350038890426" cy="678.2680000000001" r="21" 
-                          fill="transparent" class="node-hit" 
-                          data-id="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet" tabindex="0"
-                          aria-label="Résume la procédure de publication d&#39;un billet"/>
-                  <circle cx="406.84350038890426" cy="678.2680000000001" r="12" 
-                          fill="hsl(220, 15%, 20%)" 
-                          class="node-halo" 
-                          opacity="0" 
-                          filter="url(#glow)"/>
-                  <circle cx="406.84350038890426" cy="678.2680000000001" r="6" 
-                           fill="hsl(220, 15%, 20%)" 
-                           filter="url(#shadow)" 
-                           stroke="hsl(220, 10%, 98%)" 
-                           stroke-width="1.5"
-                           class="node-main"/>
-                  <text x="406.84350038890426" y="700.2680000000001" 
-                    text-anchor="middle" 
-                    font-size="10" 
-                    font-family="IBM Plex Serif, serif" 
-                    fill="hsl(220, 15%, 20%)"
-                    class="node-label node-label-t2"
-                    paint-order="stroke" 
-                    stroke="hsl(220, 10%, 98%)" 
-                    stroke-width="3px"
-                    opacity="0">
-                    Résume la procédure de p…
-                  </text>
-                </g>
-              </a>
-<a href="/billets/2025-08-10-18-56-32-intelligence-and-spirit-negarestani" class="graph-link" data-node-id="billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani">
-                <g class="node-group tier-1" data-degree="3" data-id="billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani">
-                  <title>Notes sur *Intelligence and Spirit* (Reza Negarestani) — continuité, apprentissage, esprit collectif (3 connexions)</title>
-                  <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="410.32601116868" cy="292.7692368951456" r="23" 
+                  <circle cx="637.5877942530341" cy="476.6114130077277" r="23" 
                           fill="transparent" class="node-hit" 
                           data-id="billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani" tabindex="0"
                           aria-label="Notes sur *Intelligence and Spirit* (Reza Negarestani) — continuité, apprentissage, esprit collectif"/>
-                  <circle cx="410.32601116868" cy="292.7692368951456" r="14" 
+                  <circle cx="637.5877942530341" cy="476.6114130077277" r="14" 
                           fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="410.32601116868" cy="292.7692368951456" r="8" 
+                  <circle cx="637.5877942530341" cy="476.6114130077277" r="8" 
                            fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="410.32601116868" y="320.7692368951456" 
+                  <text x="637.5877942530341" y="504.6114130077277" 
                     text-anchor="middle" 
                     font-size="12" 
                     font-family="IBM Plex Serif, serif" 
@@ -232,26 +179,134 @@
                   </text>
                 </g>
               </a>
-<a href="/billets/2025-08-10-iri-berkleid-sublime-bacteriologique" class="graph-link" data-node-id="billet:2025-08-10-iri-berkleid-sublime-bacteriologique">
-                <g class="node-group tier-1" data-degree="4" data-id="billet:2025-08-10-iri-berkleid-sublime-bacteriologique">
-                  <title>2025-08-10-iri-berkleid-sublime-bacteriologique (4 connexions)</title>
+<a href="/billets/2025-08-06-peirce-sellars]] pour un rappel sur le continu et la sémiose illimitée : l’esprit est un **processus** plus qu’une chose — il s’étend dans des chaînes d’inférences et de signes qui nous dépassent.
+
+## Apprentissages et normes (l’héritage sellarsien)
+Suivant l’axe sellarsien, Negarestani insiste sur la dimension **normative** des états mentaux : savoir, c’est être pris dans des **règles** qu’on peut expliciter et améliorer. L’IA qui viserait l’esprit ne copie pas seulement des régularités ; elle doit pouvoir **justifier** et **réviser** ses prises de position à la lumière de raisons publiques.
+
+## Art, rituels et milieux
+Ce cadre éclaire des pratiques où le **milieu** façonne les formes de vie et d’attention. Le « grown-art » d’Iri Berkleid met en scène des dynamiques **symbiotiques** et des seuils de perception qui redistribuent l’agentivité entre humain et non-humain — un bon laboratoire pour penser comment nos normes se **reconfigurent** en contact avec d’autres puissances du vivant. Voir [[2025-08-10-iri-berkleid-sublime-bacteriologique]].
+
+## Fil directeur
+- L’esprit comme **milieu continu** de pratiques inférentielles (écho à Peirce).  
+- L’intelligence comme **tenue de comptes** dans l’espace des raisons (écho à Sellars/Negarestani).  
+- Les milieux artistiques et techniques comme **dispositifs d’apprentissage** qui requalifient le sensible et le normatif.
+
+## À discuter
+1. Quelles conditions minimales pour une **IA responsable** (au sens normatif) ?  
+2. Comment articuler **continuité** peircéenne et **discrétisation** technique sans trahir l’une ou l’autre ?  
+3. Quels rituels/écologies d’attention favorisent l’**auto-correction collective** ?
+
+*Billet relié :* [[2025-08-06-peirce-sellars]] • [[2025-08-10-iri-berkleid-sublime-bacteriologique" class="graph-link" data-node-id="billet:2025-08-06-peirce-sellars]] pour un rappel sur le continu et la sémiose illimitée : l’esprit est un **processus** plus qu’une chose — il s’étend dans des chaînes d’inférences et de signes qui nous dépassent.
+
+## Apprentissages et normes (l’héritage sellarsien)
+Suivant l’axe sellarsien, Negarestani insiste sur la dimension **normative** des états mentaux : savoir, c’est être pris dans des **règles** qu’on peut expliciter et améliorer. L’IA qui viserait l’esprit ne copie pas seulement des régularités ; elle doit pouvoir **justifier** et **réviser** ses prises de position à la lumière de raisons publiques.
+
+## Art, rituels et milieux
+Ce cadre éclaire des pratiques où le **milieu** façonne les formes de vie et d’attention. Le « grown-art » d’Iri Berkleid met en scène des dynamiques **symbiotiques** et des seuils de perception qui redistribuent l’agentivité entre humain et non-humain — un bon laboratoire pour penser comment nos normes se **reconfigurent** en contact avec d’autres puissances du vivant. Voir [[2025-08-10-iri-berkleid-sublime-bacteriologique]].
+
+## Fil directeur
+- L’esprit comme **milieu continu** de pratiques inférentielles (écho à Peirce).  
+- L’intelligence comme **tenue de comptes** dans l’espace des raisons (écho à Sellars/Negarestani).  
+- Les milieux artistiques et techniques comme **dispositifs d’apprentissage** qui requalifient le sensible et le normatif.
+
+## À discuter
+1. Quelles conditions minimales pour une **IA responsable** (au sens normatif) ?  
+2. Comment articuler **continuité** peircéenne et **discrétisation** technique sans trahir l’une ou l’autre ?  
+3. Quels rituels/écologies d’attention favorisent l’**auto-correction collective** ?
+
+*Billet relié :* [[2025-08-06-peirce-sellars]] • [[2025-08-10-iri-berkleid-sublime-bacteriologique">
+                <g class="node-group tier-1" data-degree="1" data-id="billet:2025-08-06-peirce-sellars]] pour un rappel sur le continu et la sémiose illimitée : l’esprit est un **processus** plus qu’une chose — il s’étend dans des chaînes d’inférences et de signes qui nous dépassent.
+
+## Apprentissages et normes (l’héritage sellarsien)
+Suivant l’axe sellarsien, Negarestani insiste sur la dimension **normative** des états mentaux : savoir, c’est être pris dans des **règles** qu’on peut expliciter et améliorer. L’IA qui viserait l’esprit ne copie pas seulement des régularités ; elle doit pouvoir **justifier** et **réviser** ses prises de position à la lumière de raisons publiques.
+
+## Art, rituels et milieux
+Ce cadre éclaire des pratiques où le **milieu** façonne les formes de vie et d’attention. Le « grown-art » d’Iri Berkleid met en scène des dynamiques **symbiotiques** et des seuils de perception qui redistribuent l’agentivité entre humain et non-humain — un bon laboratoire pour penser comment nos normes se **reconfigurent** en contact avec d’autres puissances du vivant. Voir [[2025-08-10-iri-berkleid-sublime-bacteriologique]].
+
+## Fil directeur
+- L’esprit comme **milieu continu** de pratiques inférentielles (écho à Peirce).  
+- L’intelligence comme **tenue de comptes** dans l’espace des raisons (écho à Sellars/Negarestani).  
+- Les milieux artistiques et techniques comme **dispositifs d’apprentissage** qui requalifient le sensible et le normatif.
+
+## À discuter
+1. Quelles conditions minimales pour une **IA responsable** (au sens normatif) ?  
+2. Comment articuler **continuité** peircéenne et **discrétisation** technique sans trahir l’une ou l’autre ?  
+3. Quels rituels/écologies d’attention favorisent l’**auto-correction collective** ?
+
+*Billet relié :* [[2025-08-06-peirce-sellars]] • [[2025-08-10-iri-berkleid-sublime-bacteriologique">
+                  <title>2025-08-06-peirce-sellars]] pour un rappel sur le continu et la sémiose illimitée : l’esprit est un **processus** plus qu’une chose — il s’étend dans des chaînes d’inférences et de signes qui nous dépassent.
+
+## Apprentissages et normes (l’héritage sellarsien)
+Suivant l’axe sellarsien, Negarestani insiste sur la dimension **normative** des états mentaux : savoir, c’est être pris dans des **règles** qu’on peut expliciter et améliorer. L’IA qui viserait l’esprit ne copie pas seulement des régularités ; elle doit pouvoir **justifier** et **réviser** ses prises de position à la lumière de raisons publiques.
+
+## Art, rituels et milieux
+Ce cadre éclaire des pratiques où le **milieu** façonne les formes de vie et d’attention. Le « grown-art » d’Iri Berkleid met en scène des dynamiques **symbiotiques** et des seuils de perception qui redistribuent l’agentivité entre humain et non-humain — un bon laboratoire pour penser comment nos normes se **reconfigurent** en contact avec d’autres puissances du vivant. Voir [[2025-08-10-iri-berkleid-sublime-bacteriologique]].
+
+## Fil directeur
+- L’esprit comme **milieu continu** de pratiques inférentielles (écho à Peirce).  
+- L’intelligence comme **tenue de comptes** dans l’espace des raisons (écho à Sellars/Negarestani).  
+- Les milieux artistiques et techniques comme **dispositifs d’apprentissage** qui requalifient le sensible et le normatif.
+
+## À discuter
+1. Quelles conditions minimales pour une **IA responsable** (au sens normatif) ?  
+2. Comment articuler **continuité** peircéenne et **discrétisation** technique sans trahir l’une ou l’autre ?  
+3. Quels rituels/écologies d’attention favorisent l’**auto-correction collective** ?
+
+*Billet relié :* [[2025-08-06-peirce-sellars]] • [[2025-08-10-iri-berkleid-sublime-bacteriologique (1 connexions)</title>
                   <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="602.893598067591" cy="544.9166268469048" r="23" 
+                  <circle cx="608.2359076390677" cy="626.443534340878" r="23" 
                           fill="transparent" class="node-hit" 
-                          data-id="billet:2025-08-10-iri-berkleid-sublime-bacteriologique" tabindex="0"
-                          aria-label="2025-08-10-iri-berkleid-sublime-bacteriologique"/>
-                  <circle cx="602.893598067591" cy="544.9166268469048" r="14" 
+                          data-id="billet:2025-08-06-peirce-sellars]] pour un rappel sur le continu et la sémiose illimitée : l’esprit est un **processus** plus qu’une chose — il s’étend dans des chaînes d’inférences et de signes qui nous dépassent.
+
+## Apprentissages et normes (l’héritage sellarsien)
+Suivant l’axe sellarsien, Negarestani insiste sur la dimension **normative** des états mentaux : savoir, c’est être pris dans des **règles** qu’on peut expliciter et améliorer. L’IA qui viserait l’esprit ne copie pas seulement des régularités ; elle doit pouvoir **justifier** et **réviser** ses prises de position à la lumière de raisons publiques.
+
+## Art, rituels et milieux
+Ce cadre éclaire des pratiques où le **milieu** façonne les formes de vie et d’attention. Le « grown-art » d’Iri Berkleid met en scène des dynamiques **symbiotiques** et des seuils de perception qui redistribuent l’agentivité entre humain et non-humain — un bon laboratoire pour penser comment nos normes se **reconfigurent** en contact avec d’autres puissances du vivant. Voir [[2025-08-10-iri-berkleid-sublime-bacteriologique]].
+
+## Fil directeur
+- L’esprit comme **milieu continu** de pratiques inférentielles (écho à Peirce).  
+- L’intelligence comme **tenue de comptes** dans l’espace des raisons (écho à Sellars/Negarestani).  
+- Les milieux artistiques et techniques comme **dispositifs d’apprentissage** qui requalifient le sensible et le normatif.
+
+## À discuter
+1. Quelles conditions minimales pour une **IA responsable** (au sens normatif) ?  
+2. Comment articuler **continuité** peircéenne et **discrétisation** technique sans trahir l’une ou l’autre ?  
+3. Quels rituels/écologies d’attention favorisent l’**auto-correction collective** ?
+
+*Billet relié :* [[2025-08-06-peirce-sellars]] • [[2025-08-10-iri-berkleid-sublime-bacteriologique" tabindex="0"
+                          aria-label="2025-08-06-peirce-sellars]] pour un rappel sur le continu et la sémiose illimitée : l’esprit est un **processus** plus qu’une chose — il s’étend dans des chaînes d’inférences et de signes qui nous dépassent.
+
+## Apprentissages et normes (l’héritage sellarsien)
+Suivant l’axe sellarsien, Negarestani insiste sur la dimension **normative** des états mentaux : savoir, c’est être pris dans des **règles** qu’on peut expliciter et améliorer. L’IA qui viserait l’esprit ne copie pas seulement des régularités ; elle doit pouvoir **justifier** et **réviser** ses prises de position à la lumière de raisons publiques.
+
+## Art, rituels et milieux
+Ce cadre éclaire des pratiques où le **milieu** façonne les formes de vie et d’attention. Le « grown-art » d’Iri Berkleid met en scène des dynamiques **symbiotiques** et des seuils de perception qui redistribuent l’agentivité entre humain et non-humain — un bon laboratoire pour penser comment nos normes se **reconfigurent** en contact avec d’autres puissances du vivant. Voir [[2025-08-10-iri-berkleid-sublime-bacteriologique]].
+
+## Fil directeur
+- L’esprit comme **milieu continu** de pratiques inférentielles (écho à Peirce).  
+- L’intelligence comme **tenue de comptes** dans l’espace des raisons (écho à Sellars/Negarestani).  
+- Les milieux artistiques et techniques comme **dispositifs d’apprentissage** qui requalifient le sensible et le normatif.
+
+## À discuter
+1. Quelles conditions minimales pour une **IA responsable** (au sens normatif) ?  
+2. Comment articuler **continuité** peircéenne et **discrétisation** technique sans trahir l’une ou l’autre ?  
+3. Quels rituels/écologies d’attention favorisent l’**auto-correction collective** ?
+
+*Billet relié :* [[2025-08-06-peirce-sellars]] • [[2025-08-10-iri-berkleid-sublime-bacteriologique"/>
+                  <circle cx="608.2359076390677" cy="626.443534340878" r="14" 
                           fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="602.893598067591" cy="544.9166268469048" r="8" 
+                  <circle cx="608.2359076390677" cy="626.443534340878" r="8" 
                            fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="602.893598067591" y="572.9166268469048" 
+                  <text x="608.2359076390677" y="654.443534340878" 
                     text-anchor="middle" 
                     font-size="12" 
                     font-family="IBM Plex Serif, serif" 
@@ -260,30 +315,30 @@
                     paint-order="stroke" 
                     stroke="hsl(220, 10%, 98%)" 
                     stroke-width="4px">
-                    2025-08-10-iri-berkleid-…
+                    2025-08-06-peirce-sellar…
                   </text>
                 </g>
               </a>
 <a href="/billets/2025-08-10-19-13-04-termd-a-termux-github-vercel-guide" class="graph-link" data-node-id="billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide">
-                <g class="node-group tier-1" data-degree="3" data-id="billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide">
-                  <title>Publier un billet avec termd → Termux → GitHub → Vercel (procédure compacte) (3 connexions)</title>
+                <g class="node-group tier-1" data-degree="1" data-id="billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide">
+                  <title>Publier un billet avec termd → Termux → GitHub → Vercel (procédure compacte) (1 connexions)</title>
                   <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="259.6205352554193" cy="462.14072685176603" r="23" 
+                  <circle cx="878.4285468913079" cy="356.705287467487" r="23" 
                           fill="transparent" class="node-hit" 
                           data-id="billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide" tabindex="0"
                           aria-label="Publier un billet avec termd → Termux → GitHub → Vercel (procédure compacte)"/>
-                  <circle cx="259.6205352554193" cy="462.14072685176603" r="14" 
+                  <circle cx="878.4285468913079" cy="356.705287467487" r="14" 
                           fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="259.6205352554193" cy="462.14072685176603" r="8" 
+                  <circle cx="878.4285468913079" cy="356.705287467487" r="8" 
                            fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="259.6205352554193" y="490.14072685176603" 
+                  <text x="878.4285468913079" y="384.705287467487" 
                     text-anchor="middle" 
                     font-size="12" 
                     font-family="IBM Plex Serif, serif" 
@@ -296,26 +351,210 @@
                   </text>
                 </g>
               </a>
-<a href="/billets/alpha" class="graph-link" data-node-id="billet:alpha">
-                <g class="node-group tier-1" data-degree="3" data-id="billet:alpha">
-                  <title>Alpha (3 connexions)</title>
+<a href="/billets/2025-08-06-resume-la-procedure-de-publication-dun-billet]]
+- Exemple d’analyse : [[2025-08-10-18-56-32-intelligence-and-spirit-negarestani]]
+- Exemple artistique corrélé : [[2025-08-10-iri-berkleid-sublime-bacteriologique" class="graph-link" data-node-id="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet]]
+- Exemple d’analyse : [[2025-08-10-18-56-32-intelligence-and-spirit-negarestani]]
+- Exemple artistique corrélé : [[2025-08-10-iri-berkleid-sublime-bacteriologique">
+                <g class="node-group tier-1" data-degree="1" data-id="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet]]
+- Exemple d’analyse : [[2025-08-10-18-56-32-intelligence-and-spirit-negarestani]]
+- Exemple artistique corrélé : [[2025-08-10-iri-berkleid-sublime-bacteriologique">
+                  <title>2025-08-06-resume-la-procedure-de-publication-dun-billet]]
+- Exemple d’analyse : [[2025-08-10-18-56-32-intelligence-and-spirit-negarestani]]
+- Exemple artistique corrélé : [[2025-08-10-iri-berkleid-sublime-bacteriologique (1 connexions)</title>
                   <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="1180.3794647445807" cy="296.52555472417714" r="23" 
+                  <circle cx="1059.4365515839481" cy="571.4819503832994" r="23" 
                           fill="transparent" class="node-hit" 
-                          data-id="billet:alpha" tabindex="0"
-                          aria-label="Alpha"/>
-                  <circle cx="1180.3794647445807" cy="296.52555472417714" r="14" 
+                          data-id="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet]]
+- Exemple d’analyse : [[2025-08-10-18-56-32-intelligence-and-spirit-negarestani]]
+- Exemple artistique corrélé : [[2025-08-10-iri-berkleid-sublime-bacteriologique" tabindex="0"
+                          aria-label="2025-08-06-resume-la-procedure-de-publication-dun-billet]]
+- Exemple d’analyse : [[2025-08-10-18-56-32-intelligence-and-spirit-negarestani]]
+- Exemple artistique corrélé : [[2025-08-10-iri-berkleid-sublime-bacteriologique"/>
+                  <circle cx="1059.4365515839481" cy="571.4819503832994" r="14" 
                           fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="1180.3794647445807" cy="296.52555472417714" r="8" 
+                  <circle cx="1059.4365515839481" cy="571.4819503832994" r="8" 
                            fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="1180.3794647445807" y="324.52555472417714" 
+                  <text x="1059.4365515839481" y="599.4819503832994" 
+                    text-anchor="middle" 
+                    font-size="12" 
+                    font-family="IBM Plex Serif, serif" 
+                    fill="hsl(220, 15%, 20%)"
+                    class="node-label node-label-t1"
+                    paint-order="stroke" 
+                    stroke="hsl(220, 10%, 98%)" 
+                    stroke-width="4px">
+                    2025-08-06-resume-la-pro…
+                  </text>
+                </g>
+              </a>
+<a href="/billets/2025-08-10-iri-berkleid-sublime-bacteriologique" class="graph-link" data-node-id="billet:2025-08-10-iri-berkleid-sublime-bacteriologique">
+                <g class="node-group tier-1" data-degree="1" data-id="billet:2025-08-10-iri-berkleid-sublime-bacteriologique">
+                  <title>Iri Berkleid — À la recherche d’un sublime bactériologique (1 connexions)</title>
+                  <!-- Zone de hit pour deux-calques système -->
+                  <circle cx="590.2625289343725" cy="201.28761212407716" r="23" 
+                          fill="transparent" class="node-hit" 
+                          data-id="billet:2025-08-10-iri-berkleid-sublime-bacteriologique" tabindex="0"
+                          aria-label="Iri Berkleid — À la recherche d’un sublime bactériologique"/>
+                  <circle cx="590.2625289343725" cy="201.28761212407716" r="14" 
+                          fill="hsl(220, 90%, 55%)" 
+                          class="node-halo" 
+                          opacity="0" 
+                          filter="url(#glow)"/>
+                  <circle cx="590.2625289343725" cy="201.28761212407716" r="8" 
+                           fill="hsl(220, 90%, 55%)" 
+                           filter="url(#shadow)" 
+                           stroke="hsl(220, 10%, 98%)" 
+                           stroke-width="1.5"
+                           class="node-main"/>
+                  <text x="590.2625289343725" y="229.28761212407716" 
+                    text-anchor="middle" 
+                    font-size="12" 
+                    font-family="IBM Plex Serif, serif" 
+                    fill="hsl(220, 15%, 20%)"
+                    class="node-label node-label-t1"
+                    paint-order="stroke" 
+                    stroke="hsl(220, 10%, 98%)" 
+                    stroke-width="4px">
+                    Iri Berkleid — À la rech…
+                  </text>
+                </g>
+              </a>
+<a href="/billets/2025-08-06-resume-la-procedure-de-publication-dun-billet]]
+- Pour la logique de médiations et de signes : [[2025-08-06-peirce-sellars]]
+- Sur le rythme travail/rituel et la micro-itération : [[2025-08-05-dialectique-du-pomodoro" class="graph-link" data-node-id="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet]]
+- Pour la logique de médiations et de signes : [[2025-08-06-peirce-sellars]]
+- Sur le rythme travail/rituel et la micro-itération : [[2025-08-05-dialectique-du-pomodoro">
+                <g class="node-group tier-1" data-degree="1" data-id="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet]]
+- Pour la logique de médiations et de signes : [[2025-08-06-peirce-sellars]]
+- Sur le rythme travail/rituel et la micro-itération : [[2025-08-05-dialectique-du-pomodoro">
+                  <title>2025-08-06-resume-la-procedure-de-publication-dun-billet]]
+- Pour la logique de médiations et de signes : [[2025-08-06-peirce-sellars]]
+- Sur le rythme travail/rituel et la micro-itération : [[2025-08-05-dialectique-du-pomodoro (1 connexions)</title>
+                  <!-- Zone de hit pour deux-calques système -->
+                  <circle cx="809.2427572446995" cy="141.7319999999999" r="23" 
+                          fill="transparent" class="node-hit" 
+                          data-id="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet]]
+- Pour la logique de médiations et de signes : [[2025-08-06-peirce-sellars]]
+- Sur le rythme travail/rituel et la micro-itération : [[2025-08-05-dialectique-du-pomodoro" tabindex="0"
+                          aria-label="2025-08-06-resume-la-procedure-de-publication-dun-billet]]
+- Pour la logique de médiations et de signes : [[2025-08-06-peirce-sellars]]
+- Sur le rythme travail/rituel et la micro-itération : [[2025-08-05-dialectique-du-pomodoro"/>
+                  <circle cx="809.2427572446995" cy="141.7319999999999" r="14" 
+                          fill="hsl(220, 90%, 55%)" 
+                          class="node-halo" 
+                          opacity="0" 
+                          filter="url(#glow)"/>
+                  <circle cx="809.2427572446995" cy="141.7319999999999" r="8" 
+                           fill="hsl(220, 90%, 55%)" 
+                           filter="url(#shadow)" 
+                           stroke="hsl(220, 10%, 98%)" 
+                           stroke-width="1.5"
+                           class="node-main"/>
+                  <text x="809.2427572446995" y="169.7319999999999" 
+                    text-anchor="middle" 
+                    font-size="12" 
+                    font-family="IBM Plex Serif, serif" 
+                    fill="hsl(220, 15%, 20%)"
+                    class="node-label node-label-t1"
+                    paint-order="stroke" 
+                    stroke="hsl(220, 10%, 98%)" 
+                    stroke-width="4px">
+                    2025-08-06-resume-la-pro…
+                  </text>
+                </g>
+              </a>
+<a href="/billets/2025-08-15-theta" class="graph-link" data-node-id="billet:2025-08-15-theta">
+                <g class="node-group tier-1" data-degree="1" data-id="billet:2025-08-15-theta">
+                  <title>theta (1 connexions)</title>
+                  <!-- Zone de hit pour deux-calques système -->
+                  <circle cx="190.61682314998313" cy="641.5270800619522" r="23" 
+                          fill="transparent" class="node-hit" 
+                          data-id="billet:2025-08-15-theta" tabindex="0"
+                          aria-label="theta"/>
+                  <circle cx="190.61682314998313" cy="641.5270800619522" r="14" 
+                          fill="hsl(220, 90%, 55%)" 
+                          class="node-halo" 
+                          opacity="0" 
+                          filter="url(#glow)"/>
+                  <circle cx="190.61682314998313" cy="641.5270800619522" r="8" 
+                           fill="hsl(220, 90%, 55%)" 
+                           filter="url(#shadow)" 
+                           stroke="hsl(220, 10%, 98%)" 
+                           stroke-width="1.5"
+                           class="node-main"/>
+                  <text x="190.61682314998313" y="669.5270800619522" 
+                    text-anchor="middle" 
+                    font-size="12" 
+                    font-family="IBM Plex Serif, serif" 
+                    fill="hsl(220, 15%, 20%)"
+                    class="node-label node-label-t1"
+                    paint-order="stroke" 
+                    stroke="hsl(220, 10%, 98%)" 
+                    stroke-width="4px">
+                    theta
+                  </text>
+                </g>
+              </a>
+<a href="/billets/alpha]] et [[beta" class="graph-link" data-node-id="billet:alpha]] et [[beta">
+                <g class="node-group tier-1" data-degree="1" data-id="billet:alpha]] et [[beta">
+                  <title>alpha]] et [[beta (1 connexions)</title>
+                  <!-- Zone de hit pour deux-calques système -->
+                  <circle cx="252.8941885792446" cy="320.98699663481705" r="23" 
+                          fill="transparent" class="node-hit" 
+                          data-id="billet:alpha]] et [[beta" tabindex="0"
+                          aria-label="alpha]] et [[beta"/>
+                  <circle cx="252.8941885792446" cy="320.98699663481705" r="14" 
+                          fill="hsl(220, 90%, 55%)" 
+                          class="node-halo" 
+                          opacity="0" 
+                          filter="url(#glow)"/>
+                  <circle cx="252.8941885792446" cy="320.98699663481705" r="8" 
+                           fill="hsl(220, 90%, 55%)" 
+                           filter="url(#shadow)" 
+                           stroke="hsl(220, 10%, 98%)" 
+                           stroke-width="1.5"
+                           class="node-main"/>
+                  <text x="252.8941885792446" y="348.98699663481705" 
+                    text-anchor="middle" 
+                    font-size="12" 
+                    font-family="IBM Plex Serif, serif" 
+                    fill="hsl(220, 15%, 20%)"
+                    class="node-label node-label-t1"
+                    paint-order="stroke" 
+                    stroke="hsl(220, 10%, 98%)" 
+                    stroke-width="4px">
+                    alpha]] et [[beta
+                  </text>
+                </g>
+              </a>
+<a href="/billets/alpha" class="graph-link" data-node-id="billet:alpha">
+                <g class="node-group tier-1" data-degree="2" data-id="billet:alpha">
+                  <title>Alpha (2 connexions)</title>
+                  <!-- Zone de hit pour deux-calques système -->
+                  <circle cx="1066.3077736964578" cy="459.46407688481224" r="23" 
+                          fill="transparent" class="node-hit" 
+                          data-id="billet:alpha" tabindex="0"
+                          aria-label="Alpha"/>
+                  <circle cx="1066.3077736964578" cy="459.46407688481224" r="14" 
+                          fill="hsl(220, 90%, 55%)" 
+                          class="node-halo" 
+                          opacity="0" 
+                          filter="url(#glow)"/>
+                  <circle cx="1066.3077736964578" cy="459.46407688481224" r="8" 
+                           fill="hsl(220, 90%, 55%)" 
+                           filter="url(#shadow)" 
+                           stroke="hsl(220, 10%, 98%)" 
+                           stroke-width="1.5"
+                           class="node-main"/>
+                  <text x="1066.3077736964578" y="487.46407688481224" 
                     text-anchor="middle" 
                     font-size="12" 
                     font-family="IBM Plex Serif, serif" 
@@ -328,26 +567,26 @@
                   </text>
                 </g>
               </a>
-<a href="/billets/beta" class="graph-link" data-node-id="billet:beta">
-                <g class="node-group tier-1" data-degree="3" data-id="billet:beta">
-                  <title>beta (3 connexions)</title>
+<a href="/billets/beta]] et [[gamma" class="graph-link" data-node-id="billet:beta]] et [[gamma">
+                <g class="node-group tier-1" data-degree="1" data-id="billet:beta]] et [[gamma">
+                  <title>beta]] et [[gamma (1 connexions)</title>
                   <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="1088.5825212526177" cy="459.4681966239135" r="23" 
+                  <circle cx="267.8167886225305" cy="428.5761967739457" r="23" 
                           fill="transparent" class="node-hit" 
-                          data-id="billet:beta" tabindex="0"
-                          aria-label="beta"/>
-                  <circle cx="1088.5825212526177" cy="459.4681966239135" r="14" 
+                          data-id="billet:beta]] et [[gamma" tabindex="0"
+                          aria-label="beta]] et [[gamma"/>
+                  <circle cx="267.8167886225305" cy="428.5761967739457" r="14" 
                           fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="1088.5825212526177" cy="459.4681966239135" r="8" 
+                  <circle cx="267.8167886225305" cy="428.5761967739457" r="8" 
                            fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="1088.5825212526177" y="487.4681966239135" 
+                  <text x="267.8167886225305" y="456.5761967739457" 
                     text-anchor="middle" 
                     font-size="12" 
                     font-family="IBM Plex Serif, serif" 
@@ -356,39 +595,70 @@
                     paint-order="stroke" 
                     stroke="hsl(220, 10%, 98%)" 
                     stroke-width="4px">
-                    beta
+                    beta]] et [[gamma
                   </text>
                 </g>
               </a>
-<a href="/billets/gamma" class="graph-link" data-node-id="billet:gamma">
-                <g class="node-group tier-2" data-degree="2" data-id="billet:gamma">
-                  <title>gamma (2 connexions)</title>
+<a href="/billets/beta" class="graph-link" data-node-id="billet:beta">
+                <g class="node-group tier-1" data-degree="2" data-id="billet:beta">
+                  <title>Beta (2 connexions)</title>
                   <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="964.7378781402654" cy="141.73200000000008" r="21" 
+                  <circle cx="1215.0894517394097" cy="456.8160637772813" r="23" 
                           fill="transparent" class="node-hit" 
-                          data-id="billet:gamma" tabindex="0"
-                          aria-label="gamma"/>
-                  <circle cx="964.7378781402654" cy="141.73200000000008" r="12" 
-                          fill="hsl(220, 15%, 20%)" 
+                          data-id="billet:beta" tabindex="0"
+                          aria-label="Beta"/>
+                  <circle cx="1215.0894517394097" cy="456.8160637772813" r="14" 
+                          fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="964.7378781402654" cy="141.73200000000008" r="6" 
-                           fill="hsl(220, 15%, 20%)" 
+                  <circle cx="1215.0894517394097" cy="456.8160637772813" r="8" 
+                           fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="964.7378781402654" y="163.73200000000008" 
+                  <text x="1215.0894517394097" y="484.8160637772813" 
                     text-anchor="middle" 
-                    font-size="10" 
+                    font-size="12" 
                     font-family="IBM Plex Serif, serif" 
                     fill="hsl(220, 15%, 20%)"
-                    class="node-label node-label-t2"
+                    class="node-label node-label-t1"
                     paint-order="stroke" 
                     stroke="hsl(220, 10%, 98%)" 
-                    stroke-width="3px"
-                    opacity="0">
+                    stroke-width="4px">
+                    Beta
+                  </text>
+                </g>
+              </a>
+<a href="/billets/gamma" class="graph-link" data-node-id="billet:gamma">
+                <g class="node-group tier-1" data-degree="1" data-id="billet:gamma">
+                  <title>gamma (1 connexions)</title>
+                  <!-- Zone de hit pour deux-calques système -->
+                  <circle cx="1249.3831768500172" cy="678.2679999999999" r="23" 
+                          fill="transparent" class="node-hit" 
+                          data-id="billet:gamma" tabindex="0"
+                          aria-label="gamma"/>
+                  <circle cx="1249.3831768500172" cy="678.2679999999999" r="14" 
+                          fill="hsl(220, 90%, 55%)" 
+                          class="node-halo" 
+                          opacity="0" 
+                          filter="url(#glow)"/>
+                  <circle cx="1249.3831768500172" cy="678.2679999999999" r="8" 
+                           fill="hsl(220, 90%, 55%)" 
+                           filter="url(#shadow)" 
+                           stroke="hsl(220, 10%, 98%)" 
+                           stroke-width="1.5"
+                           class="node-main"/>
+                  <text x="1249.3831768500172" y="706.2679999999999" 
+                    text-anchor="middle" 
+                    font-size="12" 
+                    font-family="IBM Plex Serif, serif" 
+                    fill="hsl(220, 15%, 20%)"
+                    class="node-label node-label-t1"
+                    paint-order="stroke" 
+                    stroke="hsl(220, 10%, 98%)" 
+                    stroke-width="4px">
                     gamma
                   </text>
                 </g>

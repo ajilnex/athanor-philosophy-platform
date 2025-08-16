@@ -1,15 +1,17 @@
 'use client'
 
 import { useState, useRef, useMemo } from 'react'
-import { X, Save, Image as ImageIcon, GraduationCap, Bold, Italic, Heading, Quote, ListOrdered, Link, Eye, EyeOff } from 'lucide-react'
+import { X, Save, Image as ImageIcon, GraduationCap, Bold, Italic, Heading, Quote, ListOrdered, Link, Eye, EyeOff, Link2 } from 'lucide-react'
 import { remark } from 'remark'
 import html from 'remark-html'
 import { ImageUpload } from './ImageUpload'
 import { ShimmerButton } from '@/components/ui/ShimmerButton'
 import { CitationPicker } from '@/components/editor/CitationPicker'
+import { BacklinkPicker } from '@/components/editor/BacklinkPicker'
 import CodeMirror from '@uiw/react-codemirror'
 import { markdown } from '@codemirror/lang-markdown'
 import { EditorView } from '@codemirror/view'
+import { backlinkTriggerExtension, cleanupBacklinkTrigger } from '@/lib/codemirror-backlink-trigger'
 
 interface BilletEditorProps {
   isOpen: boolean
@@ -43,6 +45,8 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
   const [showImageUpload, setShowImageUpload] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
   const [showCitationPicker, setShowCitationPicker] = useState(false)
+  const [showBacklinkPicker, setShowBacklinkPicker] = useState(false)
+  const [backlinkTriggerPosition, setBacklinkTriggerPosition] = useState<number | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   
@@ -79,12 +83,21 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
   }
 
   const insertTextAtCursor = (text: string) => {
-    if (editorRef.current && editorRef.current.editor) {
-      const editor = editorRef.current.editor
-      const doc = editor.codemirror.getDoc()
-      const cursor = doc.getCursor()
-      doc.replaceRange(text, cursor)
-      editor.codemirror.focus()
+    if (editorRef.current?.view) {
+      const view = editorRef.current.view
+      const pos = view.state.selection.main.head
+      
+      view.dispatch({
+        changes: { from: pos, insert: text },
+        selection: { anchor: pos + text.length }
+      })
+      
+      // Mettre à jour l'état local
+      const newContent = view.state.doc.toString()
+      setContent(newContent)
+      
+      // Remettre le focus sur l'éditeur
+      view.focus()
     } else {
       // Fallback : ajouter à la fin
       setContent(prev => prev + text)
@@ -101,6 +114,91 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
     setShowCitationPicker(false)
   }
 
+  const handleBacklinkSelected = (slug: string, alias?: string) => {
+    const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
+    
+    if (backlinkTriggerPosition !== null && editorRef.current?.view) {
+      // Mode déclencheur : remplacer les [[ par le backlink complet
+      const view = editorRef.current.view
+      view.dispatch({
+        changes: {
+          from: backlinkTriggerPosition - 2, // Position des [[
+          to: backlinkTriggerPosition, // Position actuelle
+          insert: backlinkText
+        },
+        selection: { anchor: backlinkTriggerPosition - 2 + backlinkText.length }
+      })
+      
+      const newContent = view.state.doc.toString()
+      setContent(newContent)
+      view.focus()
+      
+      setBacklinkTriggerPosition(null)
+    } else {
+      // Mode bouton : insérer au curseur
+      insertTextAtCursor(backlinkText)
+    }
+    
+    setShowBacklinkPicker(false)
+  }
+
+  const handleCreateNewBillet = async (title: string, alias?: string) => {
+    // Générer le slug à partir du titre
+    const slug = generateSlug(title)
+    
+    if (userRole === 'ADMIN') {
+      try {
+        // Créer le nouveau billet via API
+        const response = await fetch('/api/admin/billets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            slug,
+            title,
+            content: '# ' + title + '\n\nContenu à venir...',
+            tags: [],
+            excerpt: ''
+          })
+        })
+        
+        if (response.ok) {
+          // Insérer le backlink
+          const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
+          insertTextAtCursor(backlinkText)
+        } else {
+          // Fallback : insérer quand même le lien
+          const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
+          insertTextAtCursor(backlinkText)
+        }
+      } catch (error) {
+        // Fallback : insérer le lien
+        const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
+        insertTextAtCursor(backlinkText)
+      }
+    } else {
+      // Non-admin : insérer le lien + message
+      const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
+      insertTextAtCursor(backlinkText)
+      // TODO: Toast "Billet à créer par un admin"
+    }
+    
+    setShowBacklinkPicker(false)
+  }
+
+  const handleBacklinkTrigger = (position: number) => {
+    setBacklinkTriggerPosition(position)
+    setShowBacklinkPicker(true)
+  }
+
+  const handleBacklinkPickerClose = () => {
+    // Nettoyer les [[ orphelins si on ferme sans sélection
+    if (backlinkTriggerPosition !== null && editorRef.current?.view) {
+      cleanupBacklinkTrigger(editorRef.current.view, backlinkTriggerPosition)
+      setBacklinkTriggerPosition(null)
+    }
+    setShowBacklinkPicker(false)
+  }
+
   // Configuration CodeMirror
   const extensions = [
     markdown(),
@@ -110,7 +208,8 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
       '.cm-content': { padding: '16px', minHeight: '400px' },
       '.cm-focused': { outline: 'none' },
       '.cm-editor': { borderRadius: '8px' }
-    })
+    }),
+    backlinkTriggerExtension(handleBacklinkTrigger)
   ]
 
   // Actions toolbar
@@ -264,6 +363,14 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
                       >
                         <GraduationCap className="h-4 w-4" />
                       </button>
+                      <button
+                        onClick={() => setShowBacklinkPicker(true)}
+                        title="Insérer un backlink"
+                        className="p-2 rounded hover:bg-gray-200 transition-colors"
+                        type="button"
+                      >
+                        <Link2 className="h-4 w-4" />
+                      </button>
                     </div>
 
                     {/* Éditeur CodeMirror */}
@@ -331,6 +438,14 @@ Vous pouvez utiliser la **syntaxe Markdown** et insérer des images et citations
           isOpen={showCitationPicker}
           onClose={() => setShowCitationPicker(false)}
           onCitationSelect={handleCitationSelected}
+        />
+
+        {/* Backlink Picker Modal */}
+        <BacklinkPicker
+          isOpen={showBacklinkPicker}
+          onClose={handleBacklinkPickerClose}
+          onSelect={handleBacklinkSelected}
+          onCreateNew={handleCreateNewBillet}
         />
       </div>
     </div>
