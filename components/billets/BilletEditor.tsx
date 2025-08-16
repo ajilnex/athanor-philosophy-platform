@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useCallback } from 'react'
 import { X, Save, Image as ImageIcon, GraduationCap, Bold, Italic, Heading, Quote, ListOrdered, Link, Eye, EyeOff, Link2 } from 'lucide-react'
 import { remark } from 'remark'
 import html from 'remark-html'
@@ -189,7 +189,7 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
     setShowBacklinkPicker(false)
   }
 
-  const handleBacklinkTrigger = (position: number) => {
+  const handleBacklinkTrigger = useCallback((position: number) => {
     console.log('🎯 handleBacklinkTrigger appelé avec position:', position)
     // Ignorer les déclencheurs quand le picker est déjà ouvert (mode bouton)
     if (showBacklinkPicker) {
@@ -200,7 +200,7 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
     console.log('🎯 Ouverture picker, position:', position)
     setBacklinkTriggerPosition(position)
     setShowBacklinkPicker(true)
-  }
+  }, [showBacklinkPicker])
 
   const handleBacklinkPickerClose = () => {
     // Nettoyer les [[ orphelins si on ferme sans sélection
@@ -211,8 +211,8 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
     setShowBacklinkPicker(false)
   }
 
-  // Configuration CodeMirror
-  const extensions = [
+  // Configuration CodeMirror - memoizé pour éviter recréation
+  const extensions = useMemo(() => [
     markdown(),
     EditorView.lineWrapping,
     EditorView.theme({
@@ -222,7 +222,7 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
       '.cm-editor': { borderRadius: '8px' }
     }),
     backlinkTriggerExtension(handleBacklinkTrigger)
-  ]
+  ], [handleBacklinkTrigger])
 
   // Actions toolbar
   const insertMarkdown = (before: string, after: string = '') => {

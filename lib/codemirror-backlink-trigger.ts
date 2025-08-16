@@ -5,8 +5,10 @@ import { Extension } from '@codemirror/state'
  * Extension CodeMirror 6 pour détecter la saisie `[[` et déclencher l'ouverture de la palette backlink
  */
 export function backlinkTriggerExtension(onTrigger: (position: number) => void): Extension {
-  console.log('🚀 Extension backlinkTrigger initialisée')
-  return EditorView.updateListener.of((viewUpdate: ViewUpdate) => {
+  console.log('🚀 Extension backlinkTrigger créée')
+  
+  const updateListener = EditorView.updateListener.of((viewUpdate: ViewUpdate) => {
+    console.log('🔄 UpdateListener déclenché')
     if (!viewUpdate.docChanged) {
       return
     }
@@ -22,6 +24,7 @@ export function backlinkTriggerExtension(onTrigger: (position: number) => void):
     // Parcourir toutes les insertions de texte dans cette transaction
     viewUpdate.changes.iterChanges((fromA, toA, fromB, toB, inserted) => {
       const insertedText = inserted.toString()
+      console.log('🔍 Texte inséré:', JSON.stringify(insertedText))
       
       // Vérifier si l'insertion contient `[[`
       const bracketIndex = insertedText.indexOf('[[')
@@ -37,9 +40,26 @@ export function backlinkTriggerExtension(onTrigger: (position: number) => void):
           console.log('🔥 Appel onTrigger')
           onTrigger(absolutePosition)
         }, 0)
+      } else if (insertedText === '[') {
+        // Vérifier si on a maintenant [[ dans le document à cette position
+        const doc = viewUpdate.state.doc
+        const textBefore = doc.sliceString(Math.max(0, fromB - 1), fromB + 1)
+        console.log('🔍 Caractère [ détecté, texte autour:', JSON.stringify(textBefore))
+        
+        if (textBefore === '[[') {
+          console.log('🔥 Séquence [[ détectée après insertion individuelle')
+          const absolutePosition = fromB + 1 // Position après les [[
+          
+          setTimeout(() => {
+            console.log('🔥 Appel onTrigger (méthode alternative)')
+            onTrigger(absolutePosition)
+          }, 0)
+        }
       }
     })
   })
+  
+  return updateListener
 }
 
 /**
