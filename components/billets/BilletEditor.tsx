@@ -120,13 +120,15 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
     if (backlinkTriggerPosition !== null && editorRef.current?.view) {
       // Mode déclencheur : remplacer les [[ par le backlink complet
       const view = editorRef.current.view
+      const backlinkStart = backlinkTriggerPosition - 2 // Position des [[
+      
       view.dispatch({
         changes: {
-          from: backlinkTriggerPosition - 2, // Position des [[
-          to: backlinkTriggerPosition, // Position actuelle
-          insert: backlinkText
+          from: backlinkStart, // Position des [[
+          to: backlinkTriggerPosition, // Position actuelle (après [[)
+          insert: backlinkText // Remplacer tout par le backlink complet
         },
-        selection: { anchor: backlinkTriggerPosition - 2 + backlinkText.length }
+        selection: { anchor: backlinkStart + backlinkText.length }
       })
       
       const newContent = view.state.doc.toString()
@@ -186,6 +188,11 @@ export function BilletEditor({ isOpen, onClose, mode, userRole, initialData, onS
   }
 
   const handleBacklinkTrigger = (position: number) => {
+    // Ignorer les déclencheurs quand le picker est déjà ouvert (mode bouton)
+    if (showBacklinkPicker) {
+      return
+    }
+    
     setBacklinkTriggerPosition(position)
     setShowBacklinkPicker(true)
   }

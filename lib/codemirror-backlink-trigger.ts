@@ -8,6 +8,9 @@ export function backlinkTriggerExtension(onTrigger: (position: number) => void):
   return EditorView.updateListener.of((viewUpdate: ViewUpdate) => {
     if (!viewUpdate.docChanged) return
     
+    // Ignorer pendant composition IME pour éviter déclenchements prématurés
+    if (viewUpdate.view.composing) return
+    
     // Parcourir toutes les insertions de texte dans cette transaction
     viewUpdate.changes.iterChanges((fromA, toA, fromB, toB, inserted) => {
       const insertedText = inserted.toString()
