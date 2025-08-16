@@ -39,15 +39,26 @@ function loadBibliography() {
 }
 
 /**
- * Extrait toutes les citations d'un contenu MDX
+ * Supprime les blocs de code (``` ... ```) et le code inline (`...`) pour éviter les faux positifs
+ */
+function stripCode(content) {
+  // Blocs de code fenced
+  let stripped = content.replace(/```[\s\S]*?```/g, '')
+  // Code inline
+  stripped = stripped.replace(/`[^`]*`/g, '')
+  return stripped
+}
+
+/**
+ * Extrait toutes les citations d'un contenu MDX (hors zones de code)
  */
 function extractCitations(content) {
-  // Regex pour capturer <Cite item="clé" /> et <Cite item='clé' />
+  const text = stripCode(content)
   const citeRegex = /<Cite\s+item=["']([^"']+)["'][^>]*\/?>(?:<\/Cite>)?/gi
   const citations = []
   let match
 
-  while ((match = citeRegex.exec(content)) !== null) {
+  while ((match = citeRegex.exec(text)) !== null) {
     citations.push({
       key: match[1],
       fullMatch: match[0],
@@ -58,10 +69,46 @@ function extractCitations(content) {
   return citations
 }
 
+/** Levenshtein distance pour suggestions de clés proches */
+function levenshtein(a, b) {
+  const an = a.length
+  const bn = b.length
+  if (an === 0) return bn
+  if (bn === 0) return an
+  const matrix = Array.from({ length: an + 1 }, () => new Array(bn + 1).fill(0))
+  for (let i = 0; i <= an; i++) matrix[i][0] = i
+  for (let j = 0; j <= bn; j++) matrix[0][j] = j
+  for (let i = 1; i <= an; i++) {
+    for (let j = 1; j <= bn; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1,
+        matrix[i][j - 1] + 1,
+        matrix[i - 1][j - 1] + cost
+      )
+    }
+  }
+  return matrix[an][bn]
+}
+
+function suggestClosestKey(targetKey, bibliographyEntries) {
+  let best = { key: null, dist: Infinity }
+  bibliographyEntries.forEach(entry => {
+    const candidates = [entry.key, entry.legacyKey].filter(Boolean)
+    candidates.forEach(candidate => {
+      const d = levenshtein(String(targetKey), String(candidate))
+      if (d < best.dist) best = { key: candidate, dist: d }
+    })
+  })
+  // Seuil simple: suggérer si distance <= 3 ou si longueur courte
+  if (best.key && (best.dist <= 3 || String(targetKey).length <= 6)) return best.key
+  return null
+}
+
 /**
  * Valide les citations dans un fichier
  */
-function validateFile(filePath, bibliography) {
+function validateFile(filePath, bibliography, bibliographyEntries) {
   try {
     const content = fs.readFileSync(filePath, 'utf8')
     const citations = extractCitations(content)
@@ -72,11 +119,13 @@ function validateFile(filePath, bibliography) {
         // Calculer la ligne approximative pour un meilleur diagnostic
         const beforeContent = content.substring(0, citation.index)
         const lineNumber = beforeContent.split('\n').length
+        const suggestion = suggestClosestKey(citation.key, bibliographyEntries)
 
         errors.push({
           key: citation.key,
           line: lineNumber,
           context: citation.fullMatch,
+          suggestion,
         })
       }
     })
@@ -104,6 +153,12 @@ function validateAllCitations() {
 
   // Charger la bibliographie
   const bibliography = loadBibliography()
+  const bibliographyEntries = []
+  try {
+    const raw = fs.readFileSync(BIBLIOGRAPHY_PATH, 'utf8')
+    const entries = JSON.parse(raw)
+    if (Array.isArray(entries)) bibliographyEntries.push(...entries)
+  } catch {}
   const bibliographyCount = Object.keys(bibliography).length
   console.log(`   📚 ${bibliographyCount} entrées dans la bibliographie`)
 
@@ -123,7 +178,7 @@ function validateAllCitations() {
   const fileErrors = []
 
   files.forEach(file => {
-    const result = validateFile(file, bibliography)
+    const result = validateFile(file, bibliography, bibliographyEntries)
     totalCitations += result.totalCitations
 
     if (result.errors.length > 0) {
@@ -152,6 +207,9 @@ function validateAllCitations() {
         console.log(`   ❌ Erreur de lecture: ${error.context}`)
       } else {
         console.log(`   ❌ Ligne ${error.line}: Citation introuvable "${error.key}"`)
+        if (error.suggestion) {
+          console.log(`      Suggestion: avez-vous voulu écrire "${error.suggestion}" ?`)
+        }
         console.log(`      Contexte: ${error.context}`)
       }
     })

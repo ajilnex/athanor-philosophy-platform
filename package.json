@@ -18,6 +18,7 @@
     "graph:build": "npx dotenv-cli -e .env.local -- node scripts/build-graph-billets.cjs",
     "graph:svg": "npx dotenv-cli -e .env.local -- node scripts/render-graph-svg.cjs",
     "bibliography:build": "npx dotenv-cli -e .env.local -- node scripts/build-bibliography.js",
+    "bibliography:migrate-keys": "npx dotenv-cli -e .env.local -- npx ts-node --esm scripts/migrate-citation-keys.ts",
     "search:build": "npx dotenv-cli -e .env.local -- node scripts/build-search-index.js",
     "snapshot:create": "npx dotenv-cli -e .env.production -- npx ts-node --esm scripts/create-snapshot.ts",
     "snapshot:restore": "npx dotenv-cli -e .env.local -- npx ts-node --esm scripts/restore-from-snapshot.ts",

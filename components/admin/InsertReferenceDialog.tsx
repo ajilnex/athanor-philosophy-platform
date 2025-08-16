@@ -5,6 +5,8 @@ import { Search, X, Book, Calendar, Users } from 'lucide-react'
 import Fuse from 'fuse.js'
 import { BibliographyEntry } from '@/lib/bibliography'
 
+type BibliographyEntryExtended = BibliographyEntry & { bbtKey?: string }
+
 interface InsertReferenceDialogProps {
   isOpen: boolean
   onClose: () => void
@@ -12,10 +14,10 @@ interface InsertReferenceDialogProps {
 }
 
 export function InsertReferenceDialog({ isOpen, onClose, onSelect }: InsertReferenceDialogProps) {
-  const [bibliography, setBibliography] = useState<BibliographyEntry[]>([])
+  const [bibliography, setBibliography] = useState<BibliographyEntryExtended[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [fuse, setFuse] = useState<Fuse<BibliographyEntry> | null>(null)
+  const [fuse, setFuse] = useState<Fuse<BibliographyEntryExtended> | null>(null)
 
   // Charger la bibliographie au montage
   useEffect(() => {
@@ -23,7 +25,7 @@ export function InsertReferenceDialog({ isOpen, onClose, onSelect }: InsertRefer
       setIsLoading(true)
       fetch('/bibliography.json')
         .then(response => response.json())
-        .then((data: BibliographyEntry[]) => {
+        .then((data: BibliographyEntryExtended[]) => {
           setBibliography(data)
 
           // Configurer Fuse.js pour la recherche fuzzy
@@ -34,6 +36,7 @@ export function InsertReferenceDialog({ isOpen, onClose, onSelect }: InsertRefer
               { name: 'authors.given', weight: 0.2 },
               { name: 'year', weight: 0.1 },
               { name: 'key', weight: 0.2 },
+              { name: 'bbtKey', weight: 0.15 },
               { name: 'container', weight: 0.1 },
             ],
             threshold: 0.3,
@@ -151,6 +154,9 @@ export function InsertReferenceDialog({ isOpen, onClose, onSelect }: InsertRefer
                     {/* Key */}
                     <div className="text-xs font-mono text-subtle bg-gray-50 px-2 py-1 rounded inline-block">
                       {entry.key}
+                      {entry.bbtKey ? (
+                        <span className="ml-2 text-[11px] text-subtle">(BBT: {entry.bbtKey})</span>
+                      ) : null}
                     </div>
                   </div>
                 </button>

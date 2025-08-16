@@ -1,6 +1,8 @@
 [
   {
     "key": "anonymous-nodate-defender-favicon",
+    "bbtKey": "",
+    "legacyKey": "anonymous-nodate-defender-favicon",
     "type": "webpage",
     "title": "DEFENDER OF THE FAVICON by @p01",
     "authors": [],
@@ -14,10 +16,17 @@
     "issue": "",
     "pages": "",
     "publisher": "",
-    "place": ""
+    "place": "",
+    "author": [],
+    "editor": [],
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "anonymous-2024-georg-lukacs",
+    "key": "RomanesquesLukacs2024",
+    "bbtKey": "RomanesquesLukacs2024",
+    "legacyKey": "anonymous-2024-georg-lukacs",
     "type": "book",
     "title": "Georg lukács, la théorie du roman. Hors-série de <i>Romanesques</i> 2023",
     "authors": [],
@@ -31,10 +40,28 @@
     "issue": "",
     "pages": "",
     "publisher": "Classiques Garnier",
-    "place": "Paris"
+    "place": "Paris",
+    "author": [],
+    "editor": [
+      "Rusch, Pierre",
+      "Reffait, Cyril",
+      "Arcuri, Carlo U."
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2024
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "anonymous-1994-puissance-son",
+    "key": "Boulnois1994",
+    "bbtKey": "Boulnois1994",
+    "legacyKey": "anonymous-1994-puissance-son",
     "type": "book",
     "title": "La puissance et son ombre : De pierre lombard à luther",
     "authors": [],
@@ -48,10 +75,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Aubier",
-    "place": "Paris"
+    "place": "Paris",
+    "author": [],
+    "editor": [
+      "Boulnois, Olivier"
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          1994
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "adorno-1984-reconciliation-extorquee",
+    "key": "Adorno1984",
+    "bbtKey": "Adorno1984",
+    "legacyKey": "adorno-1984-reconciliation-extorquee",
     "type": "bookSection",
     "title": "Réconciliation extorquée",
     "authors": [
@@ -70,10 +113,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Flammarion",
-    "place": "Paris"
+    "place": "Paris",
+    "author": [
+      "Adorno, Theodor W."
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1984
+        ]
+      ]
+    },
+    "container-title": "Notes sur la littérature",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "adorno-1958-erprete-versohnung",
+    "key": "Adorno1958",
+    "bbtKey": "Adorno1958",
+    "legacyKey": "adorno-1958-erprete-versohnung",
     "type": "bookSection",
     "title": "Erpreßte versöhnung – zu georg lukács: “Wider den mißverstandenen realismus”",
     "authors": [
@@ -92,10 +151,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Suhrkamp Verlag",
-    "place": "Frankfurt am Main"
+    "place": "Frankfurt am Main",
+    "author": [
+      "Adorno, Theodor W."
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1958
+        ]
+      ]
+    },
+    "container-title": "Noten zur literatur",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "block-1978-troubles-with",
+    "key": "Block1978",
+    "bbtKey": "Block1978",
+    "legacyKey": "block-1978-troubles-with",
     "type": "bookSection",
     "title": "Troubles with functionalism",
     "authors": [
@@ -114,10 +189,28 @@
     "issue": "",
     "pages": "261–325",
     "publisher": "University of Minnesota Press",
-    "place": "Minneapolis"
+    "place": "Minneapolis",
+    "author": [
+      "Block, Ned"
+    ],
+    "editor": [
+      "Savage, C. W."
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          1978
+        ]
+      ]
+    },
+    "container-title": "Perception and cognition: Issues in the foundations of psychology",
+    "page": "261–325",
+    "abstract": ""
   },
   {
-    "key": "boulnois-2010-connaissance-dieu",
+    "key": "Boulnois2010",
+    "bbtKey": "Boulnois2010",
+    "legacyKey": "boulnois-2010-connaissance-dieu",
     "type": "book",
     "title": "Sur La Connaissance de Dieu et l'univocité de l'étant",
     "authors": [
@@ -136,10 +229,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Presses Universitaires de France",
-    "place": "Paris"
+    "place": "Paris",
+    "author": [
+      "Boulnois, Olivier"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          2010
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "brandom-2019-spirit-trust",
+    "key": "brandomSpiritTrustReading2019",
+    "bbtKey": "brandomSpiritTrustReading2019",
+    "legacyKey": "brandom-2019-spirit-trust",
     "type": "book",
     "title": "A Spirit of Trust: A Reading of Hegel's Phenomenology",
     "authors": [
@@ -158,10 +267,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Harvard University Press",
-    "place": "Cambridge, MA"
+    "place": "Cambridge, MA",
+    "author": [
+      "Brandom, Robert"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          2019
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "brecht-1980-against-georg",
+    "key": "Brecht1980",
+    "bbtKey": "Brecht1980",
+    "legacyKey": "brecht-1980-against-georg",
     "type": "bookSection",
     "title": "Against georg lukács",
     "authors": [
@@ -180,10 +305,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Verso Books",
-    "place": "London"
+    "place": "London",
+    "author": [
+      "Brecht, Bertolt"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1980
+        ]
+      ]
+    },
+    "container-title": "Aesthetics and politics",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "chauvir-2004-grand-miroir",
+    "key": "chauvireGrandMiroirEssais2004",
+    "bbtKey": "chauvireGrandMiroirEssais2004",
+    "legacyKey": "chauvir-2004-grand-miroir",
     "type": "book",
     "title": "Le Grand Miroir: Essais sur Peirce et Wittgenstein",
     "authors": [
@@ -202,10 +343,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Presses universitaires franc-comtoises",
-    "place": "Besan\\çon"
+    "place": "Besan\\çon",
+    "author": [
+      "Chauvir\\é, Christine"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          2004
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "daquin-1929-scriptum-super",
+    "key": "ThomasAquinas1929",
+    "bbtKey": "ThomasAquinas1929",
+    "legacyKey": "daquin-1929-scriptum-super",
     "type": "book",
     "title": "Scriptum super libros Sententiarum, Livre I, distinctions 42–44",
     "authors": [
@@ -224,10 +381,28 @@
     "issue": "",
     "pages": "",
     "publisher": "Lethielleux",
-    "place": "Paris"
+    "place": "Paris",
+    "author": [
+      "d'Aquin, Thomas"
+    ],
+    "editor": [
+      "Mandonnet, P."
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          1929
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "daquin-1925-somme-theologique",
+    "key": "ThomasAquinas1925",
+    "bbtKey": "ThomasAquinas1925",
+    "legacyKey": "daquin-1925-somme-theologique",
     "type": "book",
     "title": "Somme théologique, I, q. 25, a. 5",
     "authors": [
@@ -246,10 +421,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Éditions du Cerf",
-    "place": "Paris"
+    "place": "Paris",
+    "author": [
+      "d'Aquin, Thomas"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1925
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "detienne-2000-quand-lapparence",
+    "key": "detienneQuandLapparenceSe2000",
+    "bbtKey": "detienneQuandLapparenceSe2000",
+    "legacyKey": "detienne-2000-quand-lapparence",
     "type": "journalArticle",
     "title": "Quand l'apparence (se) fait signe: La gen\\èse de la repr\\ésentation chez Peirce",
     "authors": [
@@ -268,10 +459,26 @@
     "issue": "",
     "pages": "95–144",
     "publisher": "",
-    "place": ""
+    "place": "",
+    "author": [
+      "De Tienne, Andr\\é"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          2000
+        ]
+      ]
+    },
+    "container-title": "Recherches s\\émiotiques / Semiotic Inquiry",
+    "page": "95–144",
+    "abstract": ""
   },
   {
-    "key": "descartes-2021-meditations-metaphysiques",
+    "key": "Descartes2021",
+    "bbtKey": "Descartes2021",
+    "legacyKey": "descartes-2021-meditations-metaphysiques",
     "type": "book",
     "title": "Méditations métaphysiques",
     "authors": [
@@ -290,10 +497,26 @@
     "issue": "",
     "pages": "",
     "publisher": "GF",
-    "place": "Paris"
+    "place": "Paris",
+    "author": [
+      "Descartes, René"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          2021
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "dewey-1934-art-experience",
+    "key": "Dewey1934",
+    "bbtKey": "Dewey1934",
+    "legacyKey": "dewey-1934-art-experience",
     "type": "book",
     "title": "Art as experience",
     "authors": [
@@ -312,10 +535,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Minton, Balch & Company",
-    "place": "New York"
+    "place": "New York",
+    "author": [
+      "Dewey, John"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1934
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "drayson-2015-philosophy-phenomenal",
+    "key": "Drayson2015",
+    "bbtKey": "Drayson2015",
+    "legacyKey": "drayson-2015-philosophy-phenomenal",
     "type": "bookSection",
     "title": "The philosophy of phenomenal consciousness: An introduction",
     "authors": [
@@ -334,10 +573,28 @@
     "issue": "",
     "pages": "273–292",
     "publisher": "John Benjamins Publishing Company",
-    "place": "Amsterdam"
+    "place": "Amsterdam",
+    "author": [
+      "Drayson, Zoe"
+    ],
+    "editor": [
+      "Miller, Susan M."
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2015
+        ]
+      ]
+    },
+    "container-title": "The constitution of phenomenal consciousness: Toward a science and theory",
+    "page": "273–292",
+    "abstract": ""
   },
   {
-    "key": "dunsscot-1950-ordinatio-liber",
+    "key": "DunsScotus1950",
+    "bbtKey": "DunsScotus1950",
+    "legacyKey": "dunsscot-1950-ordinatio-liber",
     "type": "book",
     "title": "Ordinatio, liber I (= opera omnia, vols. I–VI)",
     "authors": [
@@ -356,10 +613,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Typis Polyglottis Vaticanis",
-    "place": "Civitas Vaticana"
+    "place": "Civitas Vaticana",
+    "author": [
+      "Duns Scot, John"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1950
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "foisneau-2000-hobbes-toutepuissance",
+    "key": "Foisneau2000",
+    "bbtKey": "Foisneau2000",
+    "legacyKey": "foisneau-2000-hobbes-toutepuissance",
     "type": "book",
     "title": "Hobbes et la toute-puissance de Dieu",
     "authors": [
@@ -378,10 +651,26 @@
     "issue": "",
     "pages": "",
     "publisher": "PUF",
-    "place": "Paris"
+    "place": "Paris",
+    "author": [
+      "Foisneau, Luc"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          2000
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "girel-2021-pragmatisme-positivisme",
+    "key": "girelPragmatismePositivismeVerification2021",
+    "bbtKey": "girelPragmatismePositivismeVerification2021",
+    "legacyKey": "girel-2021-pragmatisme-positivisme",
     "type": "journalArticle",
     "title": "Pragmatisme, positivisme et V\\érification: Peirce critique de Comte",
     "authors": [
@@ -400,10 +689,26 @@
     "issue": "2",
     "pages": "135–156",
     "publisher": "",
-    "place": ""
+    "place": "",
+    "author": [
+      "Girel, Mathias"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          2021
+        ]
+      ]
+    },
+    "container-title": "Revue de M\\étaphysique et de Morale",
+    "page": "135–156",
+    "abstract": ""
   },
   {
-    "key": "haack-1976-justification-deduction",
+    "key": "haackJustificationDeduction1976",
+    "bbtKey": "haackJustificationDeduction1976",
+    "legacyKey": "haack-1976-justification-deduction",
     "type": "journalArticle",
     "title": "The Justification of Deduction",
     "authors": [
@@ -422,10 +727,26 @@
     "issue": "337",
     "pages": "112–119",
     "publisher": "",
-    "place": ""
+    "place": "",
+    "author": [
+      "Haack, Susan"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1976
+        ]
+      ]
+    },
+    "container-title": "Mind; a quarterly review of psychology and philosophy",
+    "page": "112–119",
+    "abstract": ""
   },
   {
-    "key": "hegel-2023-phenomenologie-lesprit",
+    "key": "Hegel2023",
+    "bbtKey": "Hegel2023",
+    "legacyKey": "hegel-2023-phenomenologie-lesprit",
     "type": "book",
     "title": "Phénoménologie de l'esprit",
     "authors": [
@@ -444,10 +765,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Flammarion",
-    "place": "Paris"
+    "place": "Paris",
+    "author": [
+      "Hegel, G. W. F."
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          2023
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "hegel-2006-phenomenologie-lesprit",
+    "key": "hegelPhenomenologieLesprit2006",
+    "bbtKey": "hegelPhenomenologieLesprit2006",
+    "legacyKey": "hegel-2006-phenomenologie-lesprit",
     "type": "book",
     "title": "Ph\\énom\\énologie de l'esprit",
     "authors": [
@@ -466,10 +803,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Aubier",
-    "place": "Paris"
+    "place": "Paris",
+    "author": [
+      "Hegel, G. W. F."
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          2006
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "hobbes-1971-leviathan-matiere",
+    "key": "Hobbes1971",
+    "bbtKey": "Hobbes1971",
+    "legacyKey": "hobbes-1971-leviathan-matiere",
     "type": "book",
     "title": "Léviathan ou Matière, forme et puissance d'un État ecclésiastique et civil",
     "authors": [
@@ -488,10 +841,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Sirey",
-    "place": "Paris"
+    "place": "Paris",
+    "author": [
+      "Hobbes, Thomas"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1971
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "james-2018-complete-works",
+    "key": "James2018",
+    "bbtKey": "James2018",
+    "legacyKey": "james-2018-complete-works",
     "type": "book",
     "title": "The complete works of william james (illustrated)",
     "authors": [
@@ -510,10 +879,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Delphi Classics",
-    "place": "Hastings"
+    "place": "Hastings",
+    "author": [
+      "James, William"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          2018
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "laudan-1981-confutation-convergent",
+    "key": "laudanConfutationConvergentRealism1981",
+    "bbtKey": "laudanConfutationConvergentRealism1981",
+    "legacyKey": "laudan-1981-confutation-convergent",
     "type": "journalArticle",
     "title": "A Confutation of Convergent Realism",
     "authors": [
@@ -532,10 +917,26 @@
     "issue": "1",
     "pages": "19–49",
     "publisher": "",
-    "place": ""
+    "place": "",
+    "author": [
+      "Laudan, Larry"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1981
+        ]
+      ]
+    },
+    "container-title": "Philosophy of Science",
+    "page": "19–49",
+    "abstract": ""
   },
   {
-    "key": "lefebvre-2003-comment-bien",
+    "key": "Lefebvre2003",
+    "bbtKey": "Lefebvre2003",
+    "legacyKey": "lefebvre-2003-comment-bien",
     "type": "journalArticle",
     "title": "Comment bien définir une puissance? Sur la notion de puissance des contraires (Aristote, Métaphysique, Θ2)",
     "authors": [
@@ -554,10 +955,26 @@
     "issue": "",
     "pages": "121–144",
     "publisher": "",
-    "place": ""
+    "place": "",
+    "author": [
+      "Lefebvre, David"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          2003
+        ]
+      ]
+    },
+    "container-title": "Philosophie antique",
+    "page": "121–144",
+    "abstract": ""
   },
   {
-    "key": "mcdowell-1994-mind-world",
+    "key": "mcdowellMindWorld1994",
+    "bbtKey": "mcdowellMindWorld1994",
+    "legacyKey": "mcdowell-1994-mind-world",
     "type": "book",
     "title": "Mind and World",
     "authors": [
@@ -576,10 +993,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Harvard University Press",
-    "place": "Cambridge, MA"
+    "place": "Cambridge, MA",
+    "author": [
+      "McDowell, John"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1994
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "nagel-1974-what-like",
+    "key": "Nagel1974",
+    "bbtKey": "Nagel1974",
+    "legacyKey": "nagel-1974-what-like",
     "type": "journalArticle",
     "title": "What is it like to be a bat?",
     "authors": [
@@ -598,10 +1031,26 @@
     "issue": "4",
     "pages": "435–450",
     "publisher": "",
-    "place": ""
+    "place": "",
+    "author": [
+      "Nagel, Thomas"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1974
+        ]
+      ]
+    },
+    "container-title": "The Philosophical Review",
+    "page": "435–450",
+    "abstract": ""
   },
   {
-    "key": "niiniluoto-2018-truthseeking-abduction",
+    "key": "niiniluotoTruthSeekingAbduction2018",
+    "bbtKey": "niiniluotoTruthSeekingAbduction2018",
+    "legacyKey": "niiniluoto-2018-truthseeking-abduction",
     "type": "book",
     "title": "Truth-Seeking by Abduction",
     "authors": [
@@ -620,10 +1069,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Springer",
-    "place": "Cham"
+    "place": "Cham",
+    "author": [
+      "Niiniluoto, Ilkka"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          2018
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "oshea-2007-wilfrid-sellars",
+    "key": "osheaWilfridSellarsNaturalism2007",
+    "bbtKey": "osheaWilfridSellarsNaturalism2007",
+    "legacyKey": "oshea-2007-wilfrid-sellars",
     "type": "book",
     "title": "Wilfrid Sellars: Naturalism with a Normative Turn",
     "authors": [
@@ -642,10 +1107,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Polity Press",
-    "place": "Cambridge"
+    "place": "Cambridge",
+    "author": [
+      "O'Shea, James R."
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          2007
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "peirce-1998-essential-peirce",
+    "key": "peirceEssentialPeirceSelected1998",
+    "bbtKey": "peirceEssentialPeirceSelected1998",
+    "legacyKey": "peirce-1998-essential-peirce",
     "type": "book",
     "title": "The Essential Peirce: Selected Philosophical Writings, Volume II",
     "authors": [
@@ -664,10 +1145,30 @@
     "issue": "",
     "pages": "",
     "publisher": "Indiana University Press",
-    "place": "Bloomington"
+    "place": "Bloomington",
+    "author": [
+      "Peirce, Charles S."
+    ],
+    "editor": [
+      "Houser, Nathan",
+      "De Tienne, Andr\\é",
+      "Eller, James R."
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          1998
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "peirce-1992-essential-peirce",
+    "key": "peirceEssentialPeirceSelected1992",
+    "bbtKey": "peirceEssentialPeirceSelected1992",
+    "legacyKey": "peirce-1992-essential-peirce",
     "type": "book",
     "title": "The Essential Peirce: Selected Philosophical Writings, Volume I",
     "authors": [
@@ -686,10 +1187,29 @@
     "issue": "",
     "pages": "",
     "publisher": "Indiana University Press",
-    "place": "Bloomington"
+    "place": "Bloomington",
+    "author": [
+      "Peirce, Charles S."
+    ],
+    "editor": [
+      "Houser, Nathan",
+      "Kloesel, Christian"
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          1992
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "peirce-1931-collected-papers",
+    "key": "Peirce1931",
+    "bbtKey": "Peirce1931",
+    "legacyKey": "peirce-1931-collected-papers",
     "type": "book",
     "title": "Collected papers",
     "authors": [
@@ -708,10 +1228,28 @@
     "issue": "",
     "pages": "",
     "publisher": "Harvard University Press",
-    "place": "Cambridge, MA"
+    "place": "Cambridge, MA",
+    "author": [
+      "Peirce, Charles Sanders"
+    ],
+    "editor": [
+      "Burks, Arthur"
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          1931
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "peirce-1871-frasers-emphthe",
+    "key": "peirceFrasersEmphTheWorks1871",
+    "bbtKey": "peirceFrasersEmphTheWorks1871",
+    "legacyKey": "peirce-1871-frasers-emphthe",
     "type": "journalArticle",
     "title": "Fraser's \\emphThe Works of George Berkeley",
     "authors": [
@@ -730,10 +1268,26 @@
     "issue": "",
     "pages": "",
     "publisher": "",
-    "place": ""
+    "place": "",
+    "author": [
+      "Peirce, Charles S."
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1871
+        ]
+      ]
+    },
+    "container-title": "North American Review",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "putnam-1975-philosophical-papers",
+    "key": "putnamPhilosophicalPapersVolume1975",
+    "bbtKey": "putnamPhilosophicalPapersVolume1975",
+    "legacyKey": "putnam-1975-philosophical-papers",
     "type": "book",
     "title": "Philosophical Papers, Volume 1: Mathematics, Matter and Method",
     "authors": [
@@ -752,10 +1306,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Cambridge University Press",
-    "place": "Cambridge"
+    "place": "Cambridge",
+    "author": [
+      "Putnam, Hilary"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1975
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "rosenberg-2007-wilfrid-sellars",
+    "key": "rosenbergWilfridSellarsFusing2007",
+    "bbtKey": "rosenbergWilfridSellarsFusing2007",
+    "legacyKey": "rosenberg-2007-wilfrid-sellars",
     "type": "book",
     "title": "Wilfrid Sellars: Fusing the Images",
     "authors": [
@@ -774,10 +1344,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Oxford University Press",
-    "place": "Oxford"
+    "place": "Oxford",
+    "author": [
+      "Rosenberg, Jay F."
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          2007
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "rosenberg-1988-comparing-incommensurable",
+    "key": "rosenbergComparingIncommensurableAnother1988",
+    "bbtKey": "rosenbergComparingIncommensurableAnother1988",
+    "legacyKey": "rosenberg-1988-comparing-incommensurable",
     "type": "journalArticle",
     "title": "Comparing the Incommensurable: Another Look at Convergent Realism",
     "authors": [
@@ -796,10 +1382,26 @@
     "issue": "",
     "pages": "163–193",
     "publisher": "",
-    "place": ""
+    "place": "",
+    "author": [
+      "Rosenberg, Jay F."
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1988
+        ]
+      ]
+    },
+    "container-title": "Philosophical Studies",
+    "page": "163–193",
+    "abstract": ""
   },
   {
-    "key": "rosenberg-1982-place-color",
+    "key": "Rosenberg1982",
+    "bbtKey": "Rosenberg1982",
+    "legacyKey": "rosenberg-1982-place-color",
     "type": "journalArticle",
     "title": "The place of color in the scheme of things: a roadmap to sellars's carus lectures",
     "authors": [
@@ -818,10 +1420,26 @@
     "issue": "3",
     "pages": "315–335",
     "publisher": "",
-    "place": ""
+    "place": "",
+    "author": [
+      "Rosenberg, Jay F."
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1982
+        ]
+      ]
+    },
+    "container-title": "The Monist",
+    "page": "315–335",
+    "abstract": ""
   },
   {
-    "key": "sellars-1997-empiricism-philosophy",
+    "key": "Sellars1997",
+    "bbtKey": "Sellars1997",
+    "legacyKey": "sellars-1997-empiricism-philosophy",
     "type": "book",
     "title": "Empiricism and the philosophy of mind",
     "authors": [
@@ -840,10 +1458,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Harvard University Press",
-    "place": "Cambridge, MA"
+    "place": "Cambridge, MA",
+    "author": [
+      "Sellars, Wilfrid"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1997
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "sellars-1992-empirisme-philosophie",
+    "key": "sellarsEmpirismePhilosophieLesprit1992",
+    "bbtKey": "sellarsEmpirismePhilosophieLesprit1992",
+    "legacyKey": "sellars-1992-empirisme-philosophie",
     "type": "book",
     "title": "Empirisme et Philosophie de l'esprit",
     "authors": [
@@ -862,10 +1496,26 @@
     "issue": "",
     "pages": "",
     "publisher": "L'Éclat",
-    "place": "Combas"
+    "place": "Combas",
+    "author": [
+      "Sellars, Wilfrid"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1992
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "sellars-1981-foundations-for",
+    "key": "sellarsFoundationsMetaphysicsPure1981",
+    "bbtKey": "sellarsFoundationsMetaphysicsPure1981",
+    "legacyKey": "sellars-1981-foundations-for",
     "type": "journalArticle",
     "title": "Foundations for a Metaphysics of Pure Process: The Carus Lectures",
     "authors": [
@@ -884,10 +1534,26 @@
     "issue": "1",
     "pages": "3–90",
     "publisher": "",
-    "place": ""
+    "place": "",
+    "author": [
+      "Sellars, Wilfrid"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1981
+        ]
+      ]
+    },
+    "container-title": "The Monist",
+    "page": "3–90",
+    "abstract": ""
   },
   {
-    "key": "sellars-1981-foundations-for-1",
+    "key": "Sellars1981",
+    "bbtKey": "Sellars1981",
+    "legacyKey": "sellars-1981-foundations-for",
     "type": "journalArticle",
     "title": "Foundations for a metaphysics of pure process",
     "authors": [
@@ -906,10 +1572,26 @@
     "issue": "1",
     "pages": "3–90",
     "publisher": "",
-    "place": ""
+    "place": "",
+    "author": [
+      "Sellars, Wilfrid"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1981
+        ]
+      ]
+    },
+    "container-title": "The Monist",
+    "page": "3–90",
+    "abstract": ""
   },
   {
-    "key": "sellars-1979-naturalism-ontology",
+    "key": "sellarsNaturalismOntology1979",
+    "bbtKey": "sellarsNaturalismOntology1979",
+    "legacyKey": "sellars-1979-naturalism-ontology",
     "type": "book",
     "title": "Naturalism and Ontology",
     "authors": [
@@ -928,10 +1610,26 @@
     "issue": "",
     "pages": "",
     "publisher": "Ridgeview Publishing Company",
-    "place": "Reseda"
+    "place": "Reseda",
+    "author": [
+      "Sellars, Wilfrid"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1979
+        ]
+      ]
+    },
+    "container-title": "",
+    "page": "",
+    "abstract": ""
   },
   {
-    "key": "sellars-1954-some-reflections",
+    "key": "sellarsReflectionsLanguageGames1954",
+    "bbtKey": "sellarsReflectionsLanguageGames1954",
+    "legacyKey": "sellars-1954-some-reflections",
     "type": "journalArticle",
     "title": "Some Reflections on Language Games",
     "authors": [
@@ -950,10 +1648,26 @@
     "issue": "3",
     "pages": "213–214",
     "publisher": "",
-    "place": ""
+    "place": "",
+    "author": [
+      "Sellars, Wilfrid"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1954
+        ]
+      ]
+    },
+    "container-title": "Philosophy of Science",
+    "page": "213–214",
+    "abstract": ""
   },
   {
-    "key": "thibaud-2018-vers-philosophie",
+    "key": "thibaudVersPhilosophieLimite2018",
+    "bbtKey": "thibaudVersPhilosophieLimite2018",
+    "legacyKey": "thibaud-2018-vers-philosophie",
     "type": "journalArticle",
     "title": "Vers une philosophie de la limite",
     "authors": [
@@ -972,10 +1686,26 @@
     "issue": "",
     "pages": "143–166",
     "publisher": "",
-    "place": ""
+    "place": "",
+    "author": [
+      "Thibaud, Pierre"
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          2018
+        ]
+      ]
+    },
+    "container-title": "Archives de Philosophie",
+    "page": "143–166",
+    "abstract": ""
   },
   {
-    "key": "wright-1985-defense-sellars",
+    "key": "Wright1985",
+    "bbtKey": "Wright1985",
+    "legacyKey": "wright-1985-defense-sellars",
     "type": "journalArticle",
     "title": "A defense of sellars",
     "authors": [
@@ -994,6 +1724,20 @@
     "issue": "1",
     "pages": "73–90",
     "publisher": "",
-    "place": ""
+    "place": "",
+    "author": [
+      "Wright, Edmond L."
+    ],
+    "editor": [],
+    "issued": {
+      "date-parts": [
+        [
+          1985
+        ]
+      ]
+    },
+    "container-title": "Philosophy and Phenomenological Research",
+    "page": "73–90",
+    "abstract": ""
   }
 ]

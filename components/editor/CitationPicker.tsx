@@ -5,6 +5,7 @@ import { Search, X, Book, Calendar, User } from 'lucide-react'
 
 interface BibliographyItem {
   key: string
+  bbtKey?: string
   type: string
   title: string
   author?: string[]
@@ -65,13 +66,15 @@ export function CitationPicker({ isOpen, onClose, onCitationSelect }: CitationPi
       const editors = item.editor?.join(' ').toLowerCase() || ''
       const container = item['container-title']?.toLowerCase() || ''
       const key = item.key?.toLowerCase() || ''
+      const bbt = item.bbtKey?.toLowerCase() || ''
 
       return (
         title.includes(term) ||
         authors.includes(term) ||
         editors.includes(term) ||
         container.includes(term) ||
-        key.includes(term)
+        key.includes(term) ||
+        bbt.includes(term)
       )
     })
   }, [bibliography, searchTerm])
@@ -98,6 +101,7 @@ export function CitationPicker({ isOpen, onClose, onCitationSelect }: CitationPi
       book: 'Livre',
       chapter: 'Chapitre',
       'paper-conference': 'Conférence',
+      bookSection: 'Chapitre',
       thesis: 'Thèse',
       webpage: 'Page web',
     }
@@ -192,7 +196,15 @@ export function CitationPicker({ isOpen, onClose, onCitationSelect }: CitationPi
                         </p>
                       )}
 
-                      <p className="text-xs text-gray-400 font-mono">Clé: {ref.key}</p>
+                      <p className="text-xs text-gray-400 font-mono">
+                        Clé: {ref.key}
+                        {ref.bbtKey ? (
+                          <>
+                            {' '}
+                            <span className="text-gray-300">|</span> BBT: {ref.bbtKey}
+                          </>
+                        ) : null}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -202,8 +214,11 @@ export function CitationPicker({ isOpen, onClose, onCitationSelect }: CitationPi
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-gray-50 border-t">
-          <p className="text-xs text-gray-500">
+        <div className="p-4 bg-gray-50 border-t text-xs text-gray-600 space-y-1">
+          <p>
+            Insertion avec la clé Zotero officielle (BBT): <code>key</code>
+          </p>
+          <p>
             Cliquez sur une référence pour l'insérer comme <code>&lt;Cite item="key" /&gt;</code>
           </p>
         </div>
