@@ -1,22 +1,21 @@
 # Mémoire Externe pour Claude Code - Plateforme L'Athanor
 
-## ÉTAT ACTUEL - Optimisations Performance & Documentation Complète ✅
+## ÉTAT ACTUEL - Workflow de Synchronisation Complet ✅
 
-**Dernière réalisation majeure** : Suite d'optimisations performance + documentation harmonisée
-- ✅ **Polices** : Migration vers next/font (IBM Plex Serif + Inter) avec variable CSS
-- ✅ **ISR** : Publications en cache statique avec revalidation 300s
-- ✅ **Images** : Optimisation avatars avec next/image + remotePatterns
-- ✅ **Build** : Pipeline parallélisé (bibliographie & graph & recherche)
-- ✅ **Background LUCE** : Image industrielle intégrée avec transformation CSS
-- ✅ **Documentation** : README, DEPLOY.md, SECURITY.md harmonisés
+**Dernière réalisation majeure** : Système de snapshot prod→dev opérationnel
+- ✅ **Workflow Snapshot** : Scripts create-snapshot.ts + restore-from-snapshot.ts
+- ✅ **Synchronisation BDD** : Données publiques prod → dev avec anonymisation
+- ✅ **Migration Cloudinary** : Fichiers prod → dev automatique (comptes séparés)
+- ✅ **Commande unifiée** : `npm run db:reset` (migrate reset + restore)
+- ✅ **Sécurité** : Données sensibles exclues, contenu scellé filtré
+- ✅ **Documentation** : Guide complet dans docs/SNAPSHOT_WORKFLOW.md
 
-**Fichiers modifiés récemment :**
-- `app/layout.tsx` : Configuration next/font avec variables CSS
-- `app/publications/page.tsx` : ISR avec revalidate = 300
-- `components/comments/CommentItem.tsx` : next/image pour avatars
-- `next.config.js` : remotePatterns pour domaines d'images
-- `package.json` : Build pipeline parallélisé avec bash
-- `app/edition/[slug]/page.tsx` : Background LUCE avec rotate(180deg)
+**Fichiers créés/modifiés récemment :**
+- `scripts/create-snapshot.ts` : Création snapshot BDD + migration Cloudinary
+- `scripts/restore-from-snapshot.ts` : Restauration avec admin local
+- `package.json` : Scripts snapshot + commande db:reset unifiée
+- `docs/SNAPSHOT_WORKFLOW.md` : Documentation équipe complète
+- `.env.production.example` : Template variables prod
 
 ---
 
@@ -48,21 +47,30 @@
 ### COMMANDES ESSENTIELLES
 ```bash
 # Développement (avec Docker PostgreSQL)
-npm run db:dev:start  # Démarre DB locale
-npm run dev           # Serveur de développement
+npm run db:dev:start        # Démarre DB locale
+npm run dev                 # Serveur de développement
 
-# Build complet optimisé
-npm run build         # Pipeline parallélisé complet
-npm run graph:build   # Graph seul
-npm run graph:svg     # SVG seul
+# Build complet optimisé (avec dotenv-cli standardisé)
+npm run build               # Pipeline parallélisé complet avec variables d'env
+npm run graph:build         # Graph seul avec variables d'env
+npm run graph:svg           # SVG seul avec variables d'env
+npm run bibliography:build  # Bibliographie Zotero seule
+npm run search:build        # Index de recherche seul
 
 # Performance & Optimisations
-npm run typecheck     # Vérification TypeScript
-npm run lint          # ESLint + code quality
+npm run lint                # ESLint + code quality
 
-# Base de données
-npm run db:push       # Sync schema
-npm run db:studio     # Interface Prisma
+# Base de données (migrations standardisées)
+npm run db:migrate:dev      # Migration dev (local) avec dotenv-cli
+npm run db:migrate:deploy   # Migration prod (sans prompt)
+npm run db:migrate:status   # Statut des migrations avec dotenv-cli
+npm run db:studio           # Interface Prisma avec variables d'env
+npm run db:dev:reset        # Reset complet Docker + migrations
+
+# Synchronisation prod↔dev (nouveau workflow)
+npm run snapshot:create     # Créer snapshot depuis production
+npm run snapshot:restore    # Restaurer depuis snapshot existant
+npm run db:reset            # Reset + restore (commande unifiée développeurs)
 ```
 
 ### MODÈLES DE DONNÉES (Prisma Schema)
