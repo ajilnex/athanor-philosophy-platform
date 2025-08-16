@@ -15,7 +15,8 @@ test.describe('Homepage', () => {
 
     await page.goto('/')
 
-    await expect(page.getByRole('heading', { name: /athanor/i })).toBeVisible()
+    // Use level:1 to avoid matching other headings with "Athanor" in text
+    await expect(page.getByRole('heading', { level: 1, name: /athanor/i })).toBeVisible()
     await expect(page.getByPlaceholder('Rechercher...')).toBeVisible()
 
     // Ensure graph asset is present (built during `npm run build`)
@@ -31,4 +32,3 @@ test.describe('Homepage', () => {
     }
   })
 })
-
