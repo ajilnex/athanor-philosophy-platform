@@ -74,13 +74,23 @@ export function PdfClientViewer({ pdfUrl, title, initialPage = 1 }: PdfClientVie
       <div className="flex flex-col items-center justify-center h-96 text-subtle bg-background/50 rounded-lg border border-subtle/20">
         <div className="text-center">
           <div className="mb-4">
-            <svg className="mx-auto h-12 w-12 text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <svg
+              className="mx-auto h-12 w-12 text-subtle"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
           </div>
           <h3 className="text-lg font-medium text-foreground mb-2">Erreur de chargement</h3>
           <p className="text-sm text-subtle">{error}</p>
-          <button 
+          <button
             onClick={downloadPdf}
             className="mt-4 px-4 py-2 bg-accent text-background rounded-lg hover:bg-accent/90 transition-colors text-sm"
           >
@@ -91,9 +101,9 @@ export function PdfClientViewer({ pdfUrl, title, initialPage = 1 }: PdfClientVie
     )
   }
 
-  const containerClasses = isFullscreen 
-    ? "fixed inset-0 z-50 bg-background"
-    : "rounded-lg border border-subtle/20 bg-background shadow-sm"
+  const containerClasses = isFullscreen
+    ? 'fixed inset-0 z-50 bg-background'
+    : 'rounded-lg border border-subtle/20 bg-background shadow-sm'
 
   return (
     <div className={containerClasses}>
@@ -114,7 +124,10 @@ export function PdfClientViewer({ pdfUrl, title, initialPage = 1 }: PdfClientVie
               {loading ? (
                 <span className="text-subtle">Chargement...</span>
               ) : (
-                <>Page <span className="font-semibold">{pageNumber}</span> sur <span className="font-semibold">{numPages}</span></>
+                <>
+                  Page <span className="font-semibold">{pageNumber}</span> sur{' '}
+                  <span className="font-semibold">{numPages}</span>
+                </>
               )}
             </div>
             <button
@@ -155,7 +168,7 @@ export function PdfClientViewer({ pdfUrl, title, initialPage = 1 }: PdfClientVie
             <button
               onClick={toggleFullscreen}
               className="p-2 rounded-lg bg-background border border-subtle/30 hover:bg-subtle/10 transition-colors"
-              title={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
+              title={isFullscreen ? 'Quitter le plein écran' : 'Plein écran'}
             >
               <Maximize2 className="h-4 w-4" />
             </button>
@@ -171,7 +184,9 @@ export function PdfClientViewer({ pdfUrl, title, initialPage = 1 }: PdfClientVie
       </div>
 
       {/* PDF Document */}
-      <div className={`flex-1 overflow-auto bg-subtle/5 p-4 ${isFullscreen ? 'h-[calc(100vh-80px)]' : 'h-[70vh]'}`}>
+      <div
+        className={`flex-1 overflow-auto bg-subtle/5 p-4 ${isFullscreen ? 'h-[calc(100vh-80px)]' : 'h-[70vh]'}`}
+      >
         <div className="flex justify-center">
           <Document
             file={pdfUrl}
@@ -205,10 +220,7 @@ export function PdfClientViewer({ pdfUrl, title, initialPage = 1 }: PdfClientVie
 
       {/* Fullscreen overlay background */}
       {isFullscreen && (
-        <div 
-          className="fixed inset-0 bg-background z-40"
-          onClick={toggleFullscreen}
-        />
+        <div className="fixed inset-0 bg-background z-40" onClick={toggleFullscreen} />
       )}
     </div>
   )

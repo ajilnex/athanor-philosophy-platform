@@ -8,26 +8,20 @@ export async function GET(request: NextRequest) {
     const q = searchParams.get('q')
 
     if (!url || !q) {
-      return NextResponse.json(
-        { error: 'Missing required parameters: url and q' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Missing required parameters: url and q' }, { status: 400 })
     }
 
     // Recherche le terme dans le PDF
     const result = await findInPdf(url, q)
 
     if (result === null) {
-      return NextResponse.json(
-        { error: 'Error processing PDF' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Error processing PDF' }, { status: 500 })
     }
 
     if (!result.found) {
       return NextResponse.json({
         found: false,
-        message: 'Search term not found in PDF'
+        message: 'Search term not found in PDF',
       })
     }
 
@@ -35,13 +29,10 @@ export async function GET(request: NextRequest) {
       found: true,
       pageNumber: result.pageNumber,
       snippet: result.snippet,
-      context: result.context
+      context: result.context,
     })
   } catch (error) {
     console.error('Error in find-in-pdf API:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

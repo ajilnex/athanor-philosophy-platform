@@ -6,10 +6,10 @@ export async function uploadToGitHub(file: File, fileName: string): Promise<stri
   // In production, this would use GitHub API to upload files
   const baseUrl = 'https://raw.githubusercontent.com/ajilnex/athanor/main/public/pdfs'
   const fileUrl = `${baseUrl}/${fileName}`
-  
+
   console.log('📁 GitHub storage placeholder for:', fileName)
   console.log('🔗 Would be accessible at:', fileUrl)
-  
+
   return fileUrl
 }
 

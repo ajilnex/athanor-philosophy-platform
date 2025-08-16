@@ -4,10 +4,7 @@ import { existsSync } from 'fs'
 import path from 'path'
 import { prisma } from '@/lib/prisma'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const article = await prisma.article.findUnique({
@@ -19,13 +16,13 @@ export async function GET(
     }
 
     const filePath = path.join(process.cwd(), 'public', article.filePath)
-    
+
     if (!existsSync(filePath)) {
       return new NextResponse('PDF file not found', { status: 404 })
     }
 
     const fileBuffer = await readFile(filePath)
-    
+
     return new NextResponse(fileBuffer as unknown as BodyInit, {
       headers: {
         'Content-Type': 'application/pdf',

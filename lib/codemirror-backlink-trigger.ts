@@ -28,7 +28,7 @@ export function backlinkTriggerExtension(onTrigger: (position: number) => void):
 export function cleanupBacklinkTrigger(view: EditorView, triggerPosition: number): void {
   const doc = view.state.doc
   const triggerStart = triggerPosition - 2 // Position des `[[`
-  
+
   if (triggerStart >= 0) {
     const hasOpen = doc.sliceString(triggerStart, triggerPosition) === '[['
     const hasClose = doc.sliceString(triggerPosition, triggerPosition + 2) === ']]'
@@ -36,13 +36,13 @@ export function cleanupBacklinkTrigger(view: EditorView, triggerPosition: number
       // Supprimer le pattern complet `[[]]`
       view.dispatch({
         changes: { from: triggerStart, to: triggerPosition + 2, insert: '' },
-        selection: { anchor: triggerStart }
+        selection: { anchor: triggerStart },
       })
     } else if (hasOpen) {
       // Supprimer uniquement les `[[`
       view.dispatch({
         changes: { from: triggerStart, to: triggerPosition, insert: '' },
-        selection: { anchor: triggerStart }
+        selection: { anchor: triggerStart },
       })
     }
   }

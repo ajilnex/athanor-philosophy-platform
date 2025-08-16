@@ -1,3 +1,7 @@
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
+
 /** @type {import('next').NextConfig} */
 const withMDX = require('@next/mdx')({
   extension: /\.mdx?$/,
@@ -9,10 +13,10 @@ const withMDX = require('@next/mdx')({
 
 const nextConfig = {
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
-  webpack: (config) => {
-    config.resolve.alias.canvas = false;
-    config.resolve.alias.encoding = false;
-    return config;
+  webpack: config => {
+    config.resolve.alias.canvas = false
+    config.resolve.alias.encoding = false
+    return config
   },
   serverExternalPackages: ['@prisma/client'],
   images: {
@@ -33,4 +37,4 @@ const nextConfig = {
   },
 }
 
-module.exports = withMDX(nextConfig)
+module.exports = withBundleAnalyzer(withMDX(nextConfig))

@@ -1,26 +1,38 @@
 # Mémoire Externe pour Claude Code - Plateforme L'Athanor
 
-## ÉTAT ACTUEL - Système Production-Ready avec Rigueur Technique ✅
+## ÉTAT ACTUEL - Standardisation Data Fetching avec SWR ✅
 
-**Dernière réalisation majeure** : Infrastructure complète + déploiement production réussi
+**Dernière réalisation majeure** : Modernisation data fetching côté client
 
+- ✅ **SWR intégré** : Remplacement useEffect/fetch par hooks SWR standardisés
+- ✅ **BacklinkPicker refactorisé** : useSWR avec cache automatique et conditional fetching
+- ✅ **CommentSection refactorisé** : Pagination SWR + mutations optimistes
+- ✅ **Code simplifié** : Suppression logique fetch manuelle, états loading/error unifiés
+- ✅ **Performance améliorée** : Cache partagé entre composants, revalidation intelligente
+- ✅ **UX préservée** : Tests Playwright confirmant fonctionnalité identique
+
+**Infrastructure précédente conservée** :
+
+- ✅ **Tests Jest + RTL** : Configuration complète avec mocks Next.js/Prisma/Cloudinary
+- ✅ **Pre-commit Hooks** : Husky + lint-staged + Prettier automatique
+- ✅ **ESLint 0 warnings** : Résolution warnings react-hooks/exhaustive-deps
+- ✅ **Pipeline qualité** : Pre-commit (format + lint) + Pre-push (typecheck)
+- ✅ **TypeScript robuste** : Exclusion tests + analyse statique rapide
+- ✅ **Prettier uniformisé** : Configuration projet (single quotes, no semicolons)
 - ✅ **Déploiement Production** : Build Vercel réussi avec DATABASE_URL configurée
 - ✅ **Qualité Code** : Précision sémantique (?? vs ||) + TypeScript rigoureux
 - ✅ **Workflow Snapshot** : Système complet prod→dev opérationnel
 - ✅ **Synchronisation BDD** : Données publiques avec anonymisation sécurisée
 - ✅ **Migration Cloudinary** : Fichiers automatiques entre environnements
 - ✅ **Tests Automatisés** : Playwright configuré pour capture logs + debug
-- ✅ **Documentation Complète** : Guides équipe + processus standardisés
 
 **Fichiers créés/modifiés récemment (session actuelle) :**
 
-- `scripts/create-snapshot.ts` : Snapshot BDD + migration Cloudinary (sémantique ??)
-- `scripts/restore-from-snapshot.ts` : Restauration avec admin local (sémantique ??)
-- `tsconfig.scripts.json` : Configuration TypeScript dédiée aux scripts Node.js
-- `package.json` : Scripts harmonisés + typecheck:scripts pour analyse rapide
-- `tests/e2e/backlink-editor.spec.ts` : Tests Playwright capture logs
-- `docs/SNAPSHOT_WORKFLOW.md` : Documentation workflow synchronisation
-- `app/admin/actions.ts` : CRUD Articles avec suppression Cloudinary propre
+- `package.json` : Ajout dépendance SWR pour data fetching modernisé
+- `components/editor/BacklinkPicker.tsx` : Refactorisation complète avec useSWR
+- `components/comments/CommentSection.tsx` : Migration vers SWR + pagination + mutations optimistes
+- `__tests__/swr-components.test.tsx` : Tests pour validation refactorisation SWR
+- `CLAUDE.md` : Documentation architecture SWR + patterns standardisés
 
 ---
 
@@ -32,6 +44,7 @@
 - **React** : 19.0.0 (version finale)
 - **Base de données** : PostgreSQL (Docker local / Neon prod) + Prisma 6.14.0
 - **Authentification** : NextAuth.js 4.24.5 + GitHub OAuth + Credentials
+- **Data Fetching** : SWR pour cache côté client + revalidation automatique
 - **Contenu** : MDX natif (@mdx-js/mdx 3.1.0) + Git-as-CMS
 - **Polices** : next/font/google (IBM Plex Serif + Inter) avec CSS variables
 - **Images** : next/image avec optimisation automatique + remotePatterns
@@ -65,10 +78,18 @@ npm run graph:svg           # SVG seul avec variables d'env
 npm run bibliography:build  # Bibliographie Zotero seule
 npm run search:build        # Index de recherche seul
 
-# Performance & Optimisations
+# Tests & Qualité (NOUVEAU)
+npm test                    # Tests Jest + React Testing Library
+npm run test:watch          # Tests en mode watch
 npm run lint                # ESLint + code quality
 npm run typecheck           # TypeScript app Next.js (<5s)
 npm run typecheck:scripts   # TypeScript scripts Node.js (<2s)
+npm run format              # Prettier formatting
+npm run format:check        # Vérifier format sans modifier
+
+# Git Hooks (automatiques)
+# Pre-commit : ESLint --fix + Prettier --write (lint-staged)
+# Pre-push : npm run typecheck (obligatoire)
 
 # Base de données (migrations standardisées)
 npm run db:migrate:dev      # Migration dev (local) avec dotenv-cli
@@ -160,10 +181,14 @@ enum Role {
 
 1. **Toujours** Docker DB locale avant `npm run dev`
 2. **Jamais** éditer directement les fichiers `public/*.json`
-3. **Tester** build complet avant commit important
-4. **Vérifier** que MDX components sont exportés dans `lib/mdx.tsx`
-5. **Performance** : `npm run lint` et `npm run typecheck` avant push
-6. **Images** : Utiliser next/image et configurer remotePatterns si besoin
+3. **Data Fetching** : Utiliser SWR pour tout fetch côté client (pas useEffect + fetch)
+4. **Automatique** : Pre-commit hooks formatent et fixent le code
+5. **Obligatoire** : Pre-push hook vérifie TypeScript (bloque si erreurs)
+6. **Tests** : Utiliser Jest + RTL pour nouveaux composants
+7. **Qualité** : ESLint 0 warnings maintenu automatiquement
+8. **Format** : Prettier uniforme (single quotes, no semicolons, trailing commas)
+9. **Performance** : TypeScript rapide avec exclusion **tests**
+10. **Images** : Utiliser next/image et configurer remotePatterns si besoin
 
 ### 🚀 Déploiement
 
@@ -201,7 +226,8 @@ enum Role {
   "react": "19.0.0",
   "@mdx-js/mdx": "3.1.0",
   "@prisma/client": "6.14.0",
-  "next-auth": "4.24.5"
+  "next-auth": "4.24.5",
+  "swr": "2.2.5"
 }
 ```
 
@@ -219,6 +245,70 @@ enum Role {
 
 ---
 
+## INFRASTRUCTURE TESTS & QUALITÉ
+
+### Jest + React Testing Library
+
+**Configuration** : `jest.config.js` avec support Next.js complet
+
+- **Mocks** : NextAuth, Prisma, Cloudinary, next/router, next/image
+- **Path mapping** : Support alias `@/*` pour imports
+- **Types** : @types/jest pour autocomplétion TypeScript
+- **Setup** : jest.setup.js avec mocks globaux et nettoyage console
+
+### Pre-commit Hooks (Husky + lint-staged)
+
+**Workflow automatique** :
+
+1. **Staging** : `git add` fichiers modifiés
+2. **Pre-commit** : lint-staged exécute ESLint --fix + Prettier --write
+3. **Pre-push** : npm run typecheck bloque si erreurs TypeScript
+4. **Performance** : Traitement uniquement des fichiers modifiés
+
+### Prettier Configuration
+
+```json
+{
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "tabWidth": 2,
+  "printWidth": 100
+}
+```
+
+## STANDARDISATION DATA FETCHING
+
+### SWR (Stale-While-Revalidate)
+
+**Stratégie** : Cache intelligent avec revalidation automatique
+
+- **Composants refactorisés** : `BacklinkPicker`, `CommentSection`
+- **Avantages** : Cache partagé, revalidation en arrière-plan, mutations optimistes
+- **Pattern** : `const { data, error, isLoading, mutate } = useSWR(key, fetcher)`
+
+### Fetcher Function Standardisée
+
+```typescript
+const fetcher = (url: string) => fetch(url).then(res => res.json())
+```
+
+### Pagination SWR
+
+```typescript
+// Clé dynamique pour pagination
+const { data, error, isLoading } = useSWR(
+  `/api/comments?targetType=${targetType}&targetId=${targetId}&page=${page}`,
+  fetcher
+)
+```
+
+### Mutations Optimistes
+
+- **Principe** : Mise à jour UI immédiate + revalidation background
+- **Implémentation** : `mutate()` après actions CRUD locales
+- **Avantages** : Interface réactive sans attendre le serveur
+
 ## PROBLÈMES CONNUS & SOLUTIONS
 
 ### MDX Components
@@ -226,6 +316,12 @@ enum Role {
 **Symptôme** : "Expected component X to be defined"
 **Cause** : Composant pas exporté dans `mdxComponents`
 **Fix** : Ajouter import + export dans `lib/mdx.tsx`
+
+### React Hooks Warnings
+
+**Symptôme** : react-hooks/exhaustive-deps ESLint warnings
+**Cause** : Dépendances manquantes ou références instables
+**Fix** : useCallback + dependency arrays complets (déjà résolu)
 
 ### Build Performance
 
@@ -238,6 +334,12 @@ enum Role {
 **Symptôme** : Déconnexions fréquentes dev
 **Cause** : Hot reload + cookies dev
 **Fix** : `NEXTAUTH_SECRET` stable en .env.local
+
+### Tests Isolation
+
+**Symptôme** : Tests interfèrent entre eux
+**Cause** : Mocks globaux persistants
+**Fix** : clearAllMocks dans jest.setup.js + beforeEach cleanup
 
 ---
 
@@ -276,10 +378,12 @@ git diff HEAD~3  # Derniers commits
 
 ### Court Terme (Sessions suivantes)
 
-- **Tests** automatisés (build, API, components)
-- **Monitoring** erreurs production
+- **Tests coverage** : Étendre Jest tests aux composants critiques
+- **E2E Playwright** : Intégrer avec pipeline CI/CD
+- **Monitoring** erreurs production avec Sentry
 - **Cache** intelligent pour recherche
 - **Analytics** Web Core Vitals avec optimisations intégrées
+- **Linting rules** : Étendre ESLint avec règles accessibilité
 
 ### Moyen Terme
 
@@ -303,3 +407,4 @@ git diff HEAD~3  # Derniers commits
 2. Mettre à jour après modifications majeures
 3. Maintenir cohérence avec réalité du code
 4. Garder format concis mais complet
+5. **NOUVEAU** : Infrastructure tests + hooks automatique garantit qualité code

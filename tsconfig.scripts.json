@@ -17,14 +17,6 @@
     "types": ["node"],
     "lib": ["ES2022", "DOM"]
   },
-  "include": [
-    "scripts/**/*.ts",
-    "scripts/**/*.tsx",
-    "types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    ".next",
-    "out"
-  ]
+  "include": ["scripts/**/*.ts", "scripts/**/*.tsx", "types/**/*.ts"],
+  "exclude": ["node_modules", ".next", "out"]
 }

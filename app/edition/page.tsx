@@ -3,12 +3,8 @@ import Link from 'next/link'
 export default function EditionPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
-      <h1 className="font-serif text-3xl text-center text-foreground mb-2">
-        Maison d'édition
-      </h1>
-      <p className="text-center text-subtle mb-12">
-        Un espace dédié à des auteur.es partenaires.
-      </p>
+      <h1 className="font-serif text-3xl text-center text-foreground mb-2">Maison d'édition</h1>
+      <p className="text-center text-subtle mb-12">Un espace dédié à des auteur.es partenaires.</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
         {/* Carte Auteur : Luce Lefèbvre-Goldmann */}

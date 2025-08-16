@@ -43,7 +43,7 @@ export default async function AdminPublicationsPage() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour à l'administration
         </Link>
-        
+
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-light text-foreground mb-4">
@@ -101,7 +101,7 @@ export default async function AdminPublicationsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-subtle">
-                {publications.map((publication) => (
+                {publications.map(publication => (
                   <tr key={publication.id} className="hover:bg-gray-50">
                     <td className="py-3 sm:py-4 px-1 sm:px-2">
                       <div>

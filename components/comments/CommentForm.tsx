@@ -15,14 +15,14 @@ interface CommentFormProps {
   className?: string
 }
 
-export function CommentForm({ 
-  targetType, 
-  targetId, 
-  parentId, 
-  onCommentAdded, 
+export function CommentForm({
+  targetType,
+  targetId,
+  parentId,
+  onCommentAdded,
   onCancel,
-  placeholder = "Partagez votre réflexion...",
-  className = '' 
+  placeholder = 'Partagez votre réflexion...',
+  className = '',
 }: CommentFormProps) {
   const { data: session } = useSession()
   const [content, setContent] = useState('')
@@ -37,7 +37,7 @@ export function CommentForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!canComment) {
       setError('Vous devez être connecté pour commenter')
       return
@@ -92,7 +92,7 @@ export function CommentForm({
       const newComment = await response.json()
       onCommentAdded(newComment)
       setContent('')
-      
+
       if (onCancel) {
         onCancel() // Fermer le formulaire de réponse
       }
@@ -117,8 +117,8 @@ export function CommentForm({
         <p className="text-sm text-subtle text-center">
           <Link href="/auth/signin" className="text-accent hover:underline">
             Connectez-vous
-          </Link>
-          {' '}pour participer à la discussion
+          </Link>{' '}
+          pour participer à la discussion
         </p>
       </div>
     )
@@ -129,8 +129,8 @@ export function CommentForm({
     return (
       <div className={`p-4 bg-muted rounded-lg border border-subtle/20 ${className}`}>
         <p className="text-sm text-subtle text-center">
-          Votre compte ne permet pas de commenter.
-          Contactez un administrateur pour plus d'informations.
+          Votre compte ne permet pas de commenter. Contactez un administrateur pour plus
+          d'informations.
         </p>
       </div>
     )
@@ -146,7 +146,7 @@ export function CommentForm({
             id={`website-${parentId || 'main'}`}
             type="text"
             value={honeypot}
-            onChange={(e) => setHoneypot(e.target.value)}
+            onChange={e => setHoneypot(e.target.value)}
             tabIndex={-1}
             autoComplete="off"
           />
@@ -160,7 +160,7 @@ export function CommentForm({
           <textarea
             id={`comment-${parentId || 'main'}`}
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={e => setContent(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             className="w-full min-h-[100px] p-3 border border-subtle/30 rounded-lg 
@@ -170,15 +170,11 @@ export function CommentForm({
             disabled={isSubmitting}
             maxLength={2000}
           />
-          
+
           {/* Compteur de caractères */}
           <div className="flex justify-between items-center mt-2 text-xs text-subtle">
-            <span>
-              {content.length}/2000 caractères
-            </span>
-            <span className="text-subtle/60">
-              Ctrl/Cmd + Entrée pour publier
-            </span>
+            <span>{content.length}/2000 caractères</span>
+            <span className="text-subtle/60">Ctrl/Cmd + Entrée pour publier</span>
           </div>
         </div>
 
@@ -199,7 +195,7 @@ export function CommentForm({
               <span>Commentaire en attente de modération</span>
             )}
           </div>
-          
+
           <div className="flex items-center gap-2">
             {isReply && onCancel && (
               <button
@@ -212,7 +208,7 @@ export function CommentForm({
                 <X className="h-4 w-4" />
               </button>
             )}
-            
+
             <button
               type="submit"
               disabled={isSubmitting || !content.trim()}
@@ -221,9 +217,7 @@ export function CommentForm({
                        disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="h-4 w-4" />
-              <span>
-                {isSubmitting ? 'Publication...' : isReply ? 'Répondre' : 'Publier'}
-              </span>
+              <span>{isSubmitting ? 'Publication...' : isReply ? 'Répondre' : 'Publier'}</span>
             </button>
           </div>
         </div>

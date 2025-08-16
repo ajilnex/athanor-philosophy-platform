@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Search, Plus, ArrowDown, ArrowUp, X } from 'lucide-react'
+import useSWR from 'swr'
 
 interface BilletItem {
   slug: string
@@ -18,6 +19,9 @@ interface BacklinkPickerProps {
   selectedText?: string
 }
 
+// Fetcher function pour SWR
+const fetcher = (url: string) => fetch(url).then(res => res.json())
+
 export function BacklinkPicker({
   isOpen,
   onClose,
@@ -28,45 +32,29 @@ export function BacklinkPicker({
 }: BacklinkPickerProps) {
   const [query, setQuery] = useState(initialQuery)
   const [alias, setAlias] = useState(selectedText)
-  const [billets, setBillets] = useState<BilletItem[]>([])
   const [filteredBillets, setFilteredBillets] = useState<BilletItem[]>([])
   const [selectedIndex, setSelectedIndex] = useState(0)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+
+  // Utilisation de SWR pour le data fetching
+  const {
+    data: billets,
+    error,
+    isLoading,
+  } = useSWR<BilletItem[]>(isOpen ? '/api/billets/list' : null, fetcher)
 
   const searchInputRef = useRef<HTMLInputElement>(null)
   const aliasInputRef = useRef<HTMLInputElement>(null)
 
-  // Charger la liste des billets
-  useEffect(() => {
-    if (!isOpen) return
-
-    const fetchBillets = async () => {
-      setLoading(true)
-      setError(null)
-
-      try {
-        const response = await fetch('/api/billets/list')
-        if (!response.ok) {
-          throw new Error('Erreur lors du chargement des billets')
-        }
-
-        const data = await response.json()
-        setBillets(data)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Erreur inconnue')
-        setBillets([])
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchBillets()
-  }, [isOpen])
+  // Les billets sont maintenant chargés automatiquement par SWR
 
   // Filtrer les billets avec debounce
   useEffect(() => {
     const timeoutId = setTimeout(() => {
+      if (!billets) {
+        setFilteredBillets([])
+        return
+      }
+
       if (!query.trim()) {
         setFilteredBillets(billets.slice(0, 10)) // Limiter à 10 résultats si pas de recherche
         setSelectedIndex(0)
@@ -106,7 +94,7 @@ export function BacklinkPicker({
       setQuery(initialQuery)
       setAlias(selectedText)
       setSelectedIndex(0)
-      setError(null)
+      // Note: error state est maintenant géré par SWR
     }
   }, [isOpen, initialQuery, selectedText])
 
@@ -222,21 +210,25 @@ export function BacklinkPicker({
 
         {/* Results */}
         <div className="max-h-64 overflow-y-auto">
-          {loading && (
+          {isLoading && (
             <div className="p-4 text-center text-gray-500">Chargement des billets...</div>
           )}
 
-          {error && <div className="p-4 text-center text-red-600">{error}</div>}
+          {error && (
+            <div className="p-4 text-center text-red-600">
+              {error instanceof Error ? error.message : 'Erreur lors du chargement des billets'}
+            </div>
+          )}
 
-          {!loading && !error && filteredBillets.length === 0 && !query.trim() && (
+          {!isLoading && !error && filteredBillets.length === 0 && !query.trim() && (
             <div className="p-4 text-center text-gray-500">Tapez pour rechercher un billet</div>
           )}
 
-          {!loading && !error && filteredBillets.length === 0 && query.trim() && (
+          {!isLoading && !error && filteredBillets.length === 0 && query.trim() && (
             <div className="p-4 text-center text-gray-500">Aucun billet trouvé pour "{query}"</div>
           )}
 
-          {!loading && !error && (
+          {!isLoading && !error && (
             <>
               {/* Billets existants */}
               {filteredBillets.map((billet, index) => (

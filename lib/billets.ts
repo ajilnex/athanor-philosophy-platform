@@ -34,15 +34,15 @@ function dateFrom(front: any, slug: string): string {
       }
     }
   }
-  
+
   // Ensuite le slug (format YYYY-MM-DD)
   if (/^\d{4}-\d{2}-\d{2}/.test(slug)) {
-    const slugDate = new Date(slug.slice(0,10))
+    const slugDate = new Date(slug.slice(0, 10))
     if (!isNaN(slugDate.getTime())) {
       return slugDate.toISOString().split('T')[0]
     }
   }
-  
+
   // Fallback : aujourd'hui
   return new Date().toISOString().split('T')[0]
 }
@@ -60,13 +60,13 @@ async function fsAll(): Promise<Billet[]> {
         slug,
         title: (data?.title as string) || slug,
         date: dateFrom(data, slug),
-        tags: Array.isArray(data?.tags) ? data.tags as string[] : [],
+        tags: Array.isArray(data?.tags) ? (data.tags as string[]) : [],
         content, // brut pour la liste
         excerpt: (data?.excerpt as string) || undefined,
         isMdx: isMdxFile(file),
       })
     }
-    items.sort((a,b) => (a.date < b.date ? 1 : -1))
+    items.sort((a, b) => (a.date < b.date ? 1 : -1))
     return items
   } catch (e) {
     console.error('FS fallback failed:', e)
@@ -93,20 +93,22 @@ async function transformBacklinks(content: string): Promise<string> {
     // slug = partie avant |, alias = partie après | (optionnel)
     const targetSlug = String(slug)
       .toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '')
-    
-    const found = allSlugs.find(s =>
-      s.includes(targetSlug) ||
-      s.endsWith(targetSlug) ||
-      s.replace(/^\d{4}-\d{2}-\d{2}-/,'') === targetSlug
+
+    const found = allSlugs.find(
+      s =>
+        s.includes(targetSlug) ||
+        s.endsWith(targetSlug) ||
+        s.replace(/^\d{4}-\d{2}-\d{2}-/, '') === targetSlug
     )
-    
+
     const href = `/billets/${found ?? targetSlug}`
     const missing = !found
     const displayText = alias || slug // Utilise l'alias si présent, sinon le slug
-    
+
     return `<a href="${href}" className="backlink" data-backlink="${slug}" ${missing ? 'data-missing="true"' : ''}>${displayText}</a>`
   })
 }
@@ -129,7 +131,7 @@ export async function getBilletBySlug(slug: string) {
       slug,
       title: (data?.title as string) || slug,
       date: dateFrom(data, slug),
-      tags: Array.isArray(data?.tags) ? data.tags as string[] : [],
+      tags: Array.isArray(data?.tags) ? (data.tags as string[]) : [],
       content: contentWithBacklinks,
       excerpt: (data?.excerpt as string) || undefined,
       isMdx: true,

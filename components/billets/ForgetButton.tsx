@@ -27,7 +27,7 @@ export function ForgetButton({ slug, title, onBilletDeleted }: ForgetButtonProps
     }
 
     setIsDeleting(true)
-    
+
     try {
       const response = await fetch(`/api/billets/${slug}`, {
         method: 'DELETE',
@@ -39,7 +39,6 @@ export function ForgetButton({ slug, title, onBilletDeleted }: ForgetButtonProps
 
       // Notifier le parent que le billet a été supprimé
       onBilletDeleted()
-      
     } catch (error) {
       console.error('Erreur:', error)
       toast.error('Erreur lors de la suppression du billet')

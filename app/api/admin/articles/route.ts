@@ -6,7 +6,7 @@ import { authOptions } from '@/lib/auth'
 export async function GET(request: NextRequest) {
   // 🛡️ PROTECTION: Vérifier l'autorisation admin
   const session = await getServerSession(authOptions)
-  
+
   if (!session || session.user?.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }

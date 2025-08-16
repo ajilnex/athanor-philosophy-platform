@@ -14,10 +14,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user || (session.user as any).role !== 'ADMIN') {
-      return NextResponse.json(
-        { error: 'Accès admin requis' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'Accès admin requis' }, { status: 403 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -26,7 +23,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20')
 
     let whereClause: any = {}
-    
+
     if (status === 'pending') {
       whereClause.isApproved = false
     } else if (status === 'approved') {
@@ -81,10 +78,7 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error('Erreur récupération commentaires admin:', error)
-    return NextResponse.json(
-      { error: 'Erreur lors de la récupération' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Erreur lors de la récupération' }, { status: 500 })
   }
 }
 
@@ -93,10 +87,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user || (session.user as any).role !== 'ADMIN') {
-      return NextResponse.json(
-        { error: 'Accès admin requis' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'Accès admin requis' }, { status: 403 })
     }
 
     const body = await request.json()
@@ -135,7 +126,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Erreur modération commentaires:', error)
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Données invalides', details: error.issues },
@@ -143,9 +134,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return NextResponse.json(
-      { error: 'Erreur lors de la modération' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Erreur lors de la modération' }, { status: 500 })
   }
 }

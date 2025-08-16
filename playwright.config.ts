@@ -15,14 +15,14 @@ export default defineConfig({
     video: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
-  webServer: process.env.PLAYWRIGHT_WEB_SERVER === 'none' ? undefined : {
-    command: 'npm run dev',
-    url: baseURL,
-    timeout: 120_000,
-    reuseExistingServer: !process.env.CI,
-  },
-  projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-  ],
+  webServer:
+    process.env.PLAYWRIGHT_WEB_SERVER === 'none'
+      ? undefined
+      : {
+          command: 'npm run dev',
+          url: baseURL,
+          timeout: 120_000,
+          reuseExistingServer: !process.env.CI,
+        },
+  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 })
-

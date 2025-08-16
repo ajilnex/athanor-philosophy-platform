@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 async function main() {
   try {
     console.log('🔍 Vérification des utilisateurs existants...\n')
-    
+
     const users = await prisma.user.findMany({
       select: {
         id: true,
@@ -13,9 +13,9 @@ async function main() {
         name: true,
         role: true,
         hashedPassword: true,
-        createdAt: true
+        createdAt: true,
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     })
 
     if (users.length === 0) {
@@ -32,7 +32,6 @@ async function main() {
         console.log('')
       })
     }
-    
   } catch (error) {
     console.error('❌ Erreur:', error)
   } finally {

@@ -3,13 +3,13 @@ import { test, expect } from '@playwright/test'
 test.describe('Homepage', () => {
   test('loads without console errors and shows key UI', async ({ page }) => {
     const consoleMessages: { type: string; text: string }[] = []
-    page.on('console', (msg) => {
+    page.on('console', msg => {
       const type = msg.type()
       const text = msg.text()
       consoleMessages.push({ type, text })
     })
     const pageErrors: string[] = []
-    page.on('pageerror', (err) => {
+    page.on('pageerror', err => {
       pageErrors.push(String(err))
     })
 
@@ -24,7 +24,7 @@ test.describe('Homepage', () => {
     expect(resp.ok()).toBeTruthy()
 
     // Fail test if page errors or console errors found
-    const errorLogs = consoleMessages.filter((m) => m.type === 'error')
+    const errorLogs = consoleMessages.filter(m => m.type === 'error')
     if (pageErrors.length || errorLogs.length) {
       console.log('Console logs:', consoleMessages)
       console.log('Page errors:', pageErrors)

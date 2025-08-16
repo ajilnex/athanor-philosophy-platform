@@ -2,7 +2,7 @@
 
 /**
  * Script de restauration depuis un snapshot
- * 
+ *
  * Ce script :
  * 1. Lit le fichier prisma/snapshot.json
  * 2. Nettoie la base de données locale
@@ -60,53 +60,53 @@ interface SnapshotData {
 }
 
 async function createDevUser(prisma: PrismaClient): Promise<string> {
-  console.log('👤 Création de l\'utilisateur admin de développement...')
-  
+  console.log("👤 Création de l'utilisateur admin de développement...")
+
   const hashedPassword = await bcrypt.hash('admin123', 12)
-  
+
   const adminUser = await prisma.user.create({
     data: {
       id: 'dev-admin-user',
       email: 'admin@athanor.com',
       name: 'Admin Dev',
       role: 'ADMIN',
-      hashedPassword
-    }
+      hashedPassword,
+    },
   })
-  
+
   console.log(`  ✅ Utilisateur admin créé: ${adminUser.email}`)
   console.log(`  🔑 Mot de passe: admin123`)
-  
+
   return adminUser.id
 }
 
 async function restoreFromSnapshot() {
   console.log('🔄 Restauration depuis le snapshot...\n')
-  
+
   // Vérifier l'existence du snapshot
   const snapshotPath = path.join(process.cwd(), 'prisma', 'snapshot.json')
-  
+
   try {
     await fs.access(snapshotPath)
   } catch {
     console.error('❌ Fichier snapshot.json introuvable!')
-    console.error('💡 Exécutez d\'abord: npm run snapshot:create')
+    console.error("💡 Exécutez d'abord: npm run snapshot:create")
     process.exit(1)
   }
-  
+
   // Lire le snapshot
   console.log('📖 Lecture du snapshot...')
   const snapshotContent = await fs.readFile(snapshotPath, 'utf-8')
   const snapshot: SnapshotData = JSON.parse(snapshotContent)
-  
+
   console.log(`📊 Snapshot du ${new Date(snapshot.metadata.createdAt).toLocaleString()}`)
   console.log(`📊 Articles: ${snapshot.metadata.totalArticles}`)
   console.log(`📊 Billets: ${snapshot.metadata.totalBillets}`)
   console.log(`📊 Commentaires: ${snapshot.metadata.totalComments}`)
-  
+
   // Connexion à la BDD locale
   const prisma = new PrismaClient()
-  
+
   try {
     // 1. Nettoyer la base de données (ordre important pour les contraintes)
     console.log('\n🧹 Nettoyage de la base de données...')
@@ -117,10 +117,10 @@ async function restoreFromSnapshot() {
     await prisma.account.deleteMany()
     await prisma.user.deleteMany()
     await prisma.verificationToken.deleteMany()
-    
+
     // 2. Créer l'utilisateur admin de dev
     const adminUserId = await createDevUser(prisma)
-    
+
     // 3. Restaurer les articles
     if (snapshot.articles.length > 0) {
       console.log('\n📄 Restauration des articles...')
@@ -138,13 +138,13 @@ async function restoreFromSnapshot() {
             category: article.category ?? null,
             publishedAt: new Date(article.publishedAt),
             isPublished: article.isPublished,
-            isSealed: false // Toujours false pour les données de dev
-          }
+            isSealed: false, // Toujours false pour les données de dev
+          },
         })
       }
       console.log(`  ✅ ${snapshot.articles.length} articles restaurés`)
     }
-    
+
     // 4. Restaurer les billets
     if (snapshot.billets.length > 0) {
       console.log('\n📝 Restauration des billets...')
@@ -158,13 +158,13 @@ async function restoreFromSnapshot() {
             excerpt: billet.excerpt ?? null,
             tags: billet.tags,
             date: new Date(billet.date),
-            isSealed: false // Toujours false pour les données de dev
-          }
+            isSealed: false, // Toujours false pour les données de dev
+          },
         })
       }
       console.log(`  ✅ ${snapshot.billets.length} billets restaurés`)
     }
-    
+
     // 5. Restaurer les commentaires (avec admin comme auteur)
     if (snapshot.comments.length > 0) {
       console.log('\n💬 Restauration des commentaires...')
@@ -179,16 +179,15 @@ async function restoreFromSnapshot() {
             parentId: comment.parentId ?? null,
             isApproved: comment.isApproved,
             isVisible: comment.isVisible,
-            createdAt: new Date(comment.createdAt)
-          }
+            createdAt: new Date(comment.createdAt),
+          },
         })
       }
       console.log(`  ✅ ${snapshot.comments.length} commentaires restaurés`)
     }
-    
+
     console.log('\n🎉 Restauration terminée avec succès!')
     console.log('💡 Vous pouvez maintenant vous connecter avec admin@athanor.com / admin123')
-    
   } catch (error) {
     console.error('❌ Erreur lors de la restauration:', error)
     process.exit(1)

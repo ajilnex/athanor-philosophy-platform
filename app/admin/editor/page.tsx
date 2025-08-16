@@ -18,22 +18,23 @@ interface BilletFile {
 async function getBilletsList(): Promise<BilletFile[]> {
   try {
     const contentDir = path.join(process.cwd(), 'content', 'billets')
-    
+
     if (!fs.existsSync(contentDir)) {
       return []
     }
 
-    const files = fs.readdirSync(contentDir)
+    const files = fs
+      .readdirSync(contentDir)
       .filter(file => file.endsWith('.md') || file.endsWith('.mdx'))
       .map(filename => {
         const slug = filename.replace(/\.(md|mdx)$/, '')
-        
+
         try {
           const filePath = path.join(contentDir, filename)
           const content = fs.readFileSync(filePath, 'utf8')
           const titleMatch = content.match(/^title:\s*["'](.+)["']/m)
           const title = titleMatch ? titleMatch[1] : slug
-          
+
           return { slug, filename, title }
         } catch (error) {
           return { slug, filename, title: slug }
@@ -52,7 +53,7 @@ async function getBilletContent(slug: string) {
   try {
     const safePath = slug.replace(/[^a-zA-Z0-9_-]/g, '')
     const contentDir = path.join(process.cwd(), 'content', 'billets')
-    
+
     const extensions = ['mdx', 'md']
     for (const ext of extensions) {
       const filePath = path.join(contentDir, `${safePath}.${ext}`)
@@ -62,11 +63,11 @@ async function getBilletContent(slug: string) {
           slug,
           filename: `${safePath}.${ext}`,
           content,
-          path: path.relative(process.cwd(), filePath)
+          path: path.relative(process.cwd(), filePath),
         }
       }
     }
-    
+
     return null
   } catch (error) {
     console.error('Erreur lors du chargement du billet:', error)
@@ -74,14 +75,14 @@ async function getBilletContent(slug: string) {
   }
 }
 
-export default async function AdminEditorPage({ 
-  searchParams 
-}: { 
-  searchParams: Promise<{ edit?: string }> 
+export default async function AdminEditorPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ edit?: string }>
 }) {
   // Vérification authentification admin
   const session = await getServerSession(authOptions)
-  
+
   if (!session?.user || (session.user as any).role !== 'ADMIN') {
     redirect('/auth/signin')
   }
@@ -93,16 +94,13 @@ export default async function AdminEditorPage({
   // Si un billet spécifique est demandé en édition
   if (editSlug) {
     const billetData = await getBilletContent(editSlug)
-    
+
     if (!billetData) {
       return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <div className="text-center py-12">
             <h1 className="text-2xl font-light text-foreground mb-4">Billet introuvable</h1>
-            <Link
-              href="/admin/editor"
-              className="text-accent hover:text-accent/70"
-            >
+            <Link href="/admin/editor" className="text-accent hover:text-accent/70">
               Retour à la liste
             </Link>
           </div>
@@ -122,7 +120,7 @@ export default async function AdminEditorPage({
             Retour à la liste
           </Link>
         </div>
-        
+
         {/* Editor en plein écran */}
         <div className="flex-1">
           <EditorClient
@@ -146,10 +144,10 @@ export default async function AdminEditorPage({
             Éditeur visuel
           </h1>
         </div>
-        
+
         <p className="text-subtle">
-          Sélectionnez un billet à modifier. L'éditeur permet d'insérer des références 
-          depuis la bibliographie et valide automatiquement les citations.
+          Sélectionnez un billet à modifier. L'éditeur permet d'insérer des références depuis la
+          bibliographie et valide automatiquement les citations.
         </p>
       </div>
 
@@ -161,7 +159,7 @@ export default async function AdminEditorPage({
             <p className="text-subtle">Aucun billet trouvé dans content/billets/</p>
           </div>
         ) : (
-          billets.map((billet) => (
+          billets.map(billet => (
             <Link
               key={billet.slug}
               href={`/admin/editor?edit=${billet.slug}`}
@@ -177,7 +175,7 @@ export default async function AdminEditorPage({
                     <span>Fichier: {billet.filename}</span>
                   </div>
                 </div>
-                
+
                 <div className="text-subtle group-hover:text-accent transition-colors">
                   <Edit3 className="h-4 w-4" />
                 </div>

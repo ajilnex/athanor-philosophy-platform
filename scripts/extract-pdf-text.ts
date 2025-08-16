@@ -10,7 +10,7 @@ import { extractTextFromPdfUrl, cleanPdfText } from '../lib/pdf.server'
 
 async function main() {
   const pdfUrl = process.argv[2]
-  
+
   if (!pdfUrl) {
     console.error('Usage: node extract-pdf-text.ts <pdf-url>')
     process.exit(1)
@@ -20,7 +20,7 @@ async function main() {
     console.error(`Extracting text from: ${pdfUrl}`) // Log sur stderr pour ne pas polluer stdout
     const rawText = await extractTextFromPdfUrl(pdfUrl)
     const cleanText = cleanPdfText(rawText)
-    
+
     // Résultat sur stdout pour être capturé par execSync
     console.log(cleanText)
   } catch (error) {

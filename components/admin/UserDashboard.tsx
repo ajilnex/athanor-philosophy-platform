@@ -21,9 +21,7 @@ export default function UserDashboard({ users }: UserDashboardProps) {
   const [optimisticUsers, updateOptimisticUsers] = useOptimistic(
     users,
     (state, { userId, newRole }: { userId: string; newRole: 'USER' | 'ADMIN' }) => {
-      return state.map(user => 
-        user.id === userId ? { ...user, role: newRole } : user
-      )
+      return state.map(user => (user.id === userId ? { ...user, role: newRole } : user))
     }
   )
   const router = useRouter()
@@ -62,7 +60,7 @@ export default function UserDashboard({ users }: UserDashboardProps) {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     }).format(new Date(date))
   }
 
@@ -90,7 +88,7 @@ export default function UserDashboard({ users }: UserDashboardProps) {
             </tr>
           </thead>
           <tbody className="divide-y divide-subtle/30">
-            {optimisticUsers.map((user) => (
+            {optimisticUsers.map(user => (
               <tr key={user.id} className="hover:bg-subtle/5">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-foreground">
@@ -103,7 +101,7 @@ export default function UserDashboard({ users }: UserDashboardProps) {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <select
                     value={user.role}
-                    onChange={(e) => handleRoleChange(user.id, e.target.value as 'USER' | 'ADMIN')}
+                    onChange={e => handleRoleChange(user.id, e.target.value as 'USER' | 'ADMIN')}
                     disabled={isPending}
                     className="text-sm border border-subtle/30 rounded px-2 py-1 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 disabled:opacity-50"
                   >
@@ -112,11 +110,13 @@ export default function UserDashboard({ users }: UserDashboardProps) {
                   </select>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    user.emailVerified 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-yellow-100 text-yellow-800'
-                  }`}>
+                  <span
+                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      user.emailVerified
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}
+                  >
                     {user.emailVerified ? 'Vérifié' : 'Non vérifié'}
                   </span>
                 </td>
@@ -128,13 +128,13 @@ export default function UserDashboard({ users }: UserDashboardProps) {
           </tbody>
         </table>
       </div>
-      
+
       {optimisticUsers.length === 0 && (
         <div className="text-center py-12">
           <p className="text-subtle">Aucun utilisateur trouvé.</p>
         </div>
       )}
-      
+
       <div className="px-6 py-3 bg-subtle/5 border-t border-subtle/30">
         <p className="text-sm text-subtle">
           Total : {optimisticUsers.length} utilisateur{optimisticUsers.length > 1 ? 's' : ''}

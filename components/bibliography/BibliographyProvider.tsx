@@ -31,19 +31,21 @@ export function BibliographyProvider({ children }: { children: React.ReactNode }
       }
       return [...prev, key]
     })
-    
+
     // Retourne le numéro de citation (1-indexé)
     const currentIndex = citations.indexOf(key)
     return currentIndex !== -1 ? currentIndex + 1 : citations.length + 1
   }
 
   return (
-    <BibliographyContext.Provider value={{
-      bibliography,
-      citations,
-      addCitation,
-      isLoading
-    }}>
+    <BibliographyContext.Provider
+      value={{
+        bibliography,
+        citations,
+        addCitation,
+        isLoading,
+      }}
+    >
       {children}
     </BibliographyContext.Provider>
   )

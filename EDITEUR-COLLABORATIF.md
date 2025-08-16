@@ -3,12 +3,14 @@
 ## ✨ Fonctionnalités Implémentées
 
 ### Architecture
+
 - **✅ Souveraineté MD(X)** : Une seule source de vérité (filesystem Git)
 - **✅ API GitHub Native** : Édition directe via API GitHub + commits automatiques
 - **✅ Éditeur Intégré** : Modal d'édition fluide avec toolbar personnalisée
 - **✅ Workflow Images Sans Friction** : Upload → insertion automatique de syntaxe markdown
 
 ### Interface Utilisateur
+
 - **✅ Bouton "Nouveau Billet"** sur `/billets` (visible admins uniquement)
 - **✅ Bouton "Éditer"** sur chaque billet individuel (visible admins uniquement)
 - **✅ Modal d'édition** avec :
@@ -19,6 +21,7 @@
 ## 🔧 Configuration Requise
 
 ### Variables d'Environnement
+
 Ajoutez dans `.env.local` :
 
 ```env
@@ -29,6 +32,7 @@ GITHUB_REPO="athanor-philosophy-platform"
 ```
 
 ### GitHub Personal Access Token
+
 1. Allez sur GitHub → Settings → Developer Settings → Personal Access Tokens
 2. Créez un **Fine-grained personal access token** avec :
    - **Repository access** : `athanor-philosophy-platform`
@@ -40,6 +44,7 @@ GITHUB_REPO="athanor-philosophy-platform"
 ## 🚀 Workflow d'Usage
 
 ### Créer un Nouveau Billet
+
 1. Aller sur `/billets`
 2. Cliquer sur **"Nouveau billet"** (bouton bleu, visible admins)
 3. **Saisir** :
@@ -57,6 +62,7 @@ GITHUB_REPO="athanor-philosophy-platform"
    - Redirection vers le nouveau billet
 
 ### Éditer un Billet Existant
+
 1. Aller sur n'importe quel billet (ex: `/billets/2025-08-11-mon-billet`)
 2. Cliquer **"Éditer"** (bouton en haut à droite, visible admins)
 3. **Modifier** le contenu dans l'éditeur modal
@@ -69,18 +75,21 @@ GITHUB_REPO="athanor-philosophy-platform"
 ## 🎯 Avantages de cette Architecture
 
 ### Pour l'Utilisateur
+
 - **UX Fluide** : Édition in-situ sans navigation externe
 - **Workflow Intégré** : Upload d'images → insertion automatique
 - **Pas de Formation** : Interface intuitive, pas besoin d'apprendre TinaCMS
 - **Responsivité** : Fonctionne sur mobile/desktop
 
 ### Pour le Système
+
 - **Git as CMS** : Historique complet, branches, collaboration native
 - **Aucune Synchronisation** : Plus de double source de vérité (BDD/fichiers)
 - **Commits Propres** : Messages formatés automatiquement
 - **Déploiement Automatique** : Push → Vercel build → Live
 
 ### Pour la Maintenance
+
 - **Architecture Simple** : Filesystem + API GitHub + Interface React
 - **Pas de Complexité** : Plus de TinaCMS, scripts de migration, ou synchro DB
 - **Extensible** : Ajouter nouveaux composants/boutons dans toolbar trivial
@@ -89,13 +98,16 @@ GITHUB_REPO="athanor-philosophy-platform"
 ## 🛠️ Extension Future
 
 ### Composants Additionnels
+
 La toolbar peut facilement accueillir :
+
 - **Bibliographie Zotero** : Bouton → recherche Zotero → insertion citation
 - **Références Internes** : Bouton → sélecteur d'autres billets → backlinks
 - **Médias** : Support vidéo, audio, documents
 - **Templates** : Bouton → sélection template de billet
 
 ### Collaboration Avancée
+
 - **Commentaires** : Via GitHub Issues API
 - **Suggestions** : Via GitHub Pull Requests
 - **Review** : Workflow approbation admin
@@ -104,17 +116,20 @@ La toolbar peut facilement accueillir :
 ## 📊 Statut Actuel
 
 ### ✅ Fonctionnel
+
 - Architecture complète implémentée
 - Interface utilisateur opérationnelle
 - APIs GitHub créées et testées
 - Workflow images intégré
 
 ### ⚠️ Configuration Requise
+
 - **GitHub Token** : À configurer en production
 - **Variables d'environnement** : À déployer sur Vercel
 - **Permissions** : Token avec access au repository
 
 ### 🎯 Prêt pour Production
+
 L'éditeur collaboratif est **architecturalement complet** et prêt à être utilisé dès que les variables d'environnement GitHub sont configurées.
 
 ---

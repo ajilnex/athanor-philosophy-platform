@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
   const session = await getServerSession(authOptions)
-  
+
   return NextResponse.json({
     session,
     timestamp: new Date().toISOString(),
@@ -12,7 +12,7 @@ export async function GET() {
       hasSession: !!session,
       userEmail: session?.user?.email,
       userRole: (session?.user as any)?.role,
-      userId: (session?.user as any)?.id
-    }
+      userId: (session?.user as any)?.id,
+    },
   })
 }

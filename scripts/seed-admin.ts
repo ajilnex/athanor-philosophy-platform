@@ -7,7 +7,7 @@ async function main() {
   try {
     // Vérifier si un admin existe déjà
     const existingAdmin = await prisma.user.findFirst({
-      where: { role: 'ADMIN' }
+      where: { role: 'ADMIN' },
     })
 
     if (existingAdmin) {
@@ -32,17 +32,15 @@ async function main() {
     console.log('   Email:', admin.email)
     console.log('   Mot de passe: motdepassesecurise')
     console.log('   ID:', admin.id)
-    
   } catch (error) {
-    console.error('❌ Erreur lors de la création de l\'administrateur:', error)
+    console.error("❌ Erreur lors de la création de l'administrateur:", error)
     throw error
   } finally {
     await prisma.$disconnect()
   }
 }
 
-main()
-  .catch((e) => {
-    console.error(e)
-    process.exit(1)
-  })
+main().catch(e => {
+  console.error(e)
+  process.exit(1)
+})

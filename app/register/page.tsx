@@ -3,7 +3,7 @@ import RegisterForm from '@/components/auth/RegisterForm'
 
 export const metadata = {
   title: "Inscription - L'athanor",
-  description: 'Créer un compte pour contribuer à la plateforme'
+  description: 'Créer un compte pour contribuer à la plateforme',
 }
 
 export default function RegisterPage() {
@@ -14,16 +14,12 @@ export default function RegisterPage() {
           <Link href="/" className="font-serif text-2xl tracking-tight">
             L'athanor
           </Link>
-          <h2 className="mt-6 text-3xl font-bold text-foreground">
-            Inscription
-          </h2>
-          <p className="mt-2 text-subtle">
-            Créez un compte pour contribuer à la plateforme
-          </p>
+          <h2 className="mt-6 text-3xl font-bold text-foreground">Inscription</h2>
+          <p className="mt-2 text-subtle">Créez un compte pour contribuer à la plateforme</p>
         </div>
-        
+
         <RegisterForm />
-        
+
         <div className="text-center space-y-2">
           <p className="text-sm text-subtle">
             Vous avez déjà un compte ?{' '}

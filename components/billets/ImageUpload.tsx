@@ -10,7 +10,11 @@ interface ImageUploadProps {
   autoInsert?: boolean // Si true, insère automatiquement la syntaxe
 }
 
-export function ImageUpload({ onImageUploaded, className = "", autoInsert = false }: ImageUploadProps) {
+export function ImageUpload({
+  onImageUploaded,
+  className = '',
+  autoInsert = false,
+}: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null)
   const [markdownSyntax, setMarkdownSyntax] = useState<string | null>(null)
@@ -28,9 +32,9 @@ export function ImageUpload({ onImageUploaded, className = "", autoInsert = fals
     }
 
     // Limite de taille configurée
-    const MAX_SIZE_MB = 10;
-    const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
-    
+    const MAX_SIZE_MB = 10
+    const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024
+
     if (file.size > MAX_SIZE_BYTES) {
       setError(`L'image est trop volumineuse. La taille maximale est de ${MAX_SIZE_MB} Mo.`)
       return
@@ -51,20 +55,20 @@ export function ImageUpload({ onImageUploaded, className = "", autoInsert = fals
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         // Affiche l'erreur renvoyée par l'API
-        throw new Error(errorData.error || 'Échec de l\'upload sur le serveur.')
+        throw new Error(errorData.error || "Échec de l'upload sur le serveur.")
       }
 
       const result = await response.json()
       setUploadedUrl(result.url)
-      
+
       // Créer la syntaxe markdown pour l'image
       const filename = file.name.split('.')[0] || 'image'
       const syntax = `![${filename}](${result.url})`
       setMarkdownSyntax(syntax)
-      
+
       // Callback avec URL et syntaxe markdown
       onImageUploaded?.(result.url, syntax)
-      
+
       // Si autoInsert est activé, copier dans le presse-papier
       if (autoInsert) {
         try {
@@ -89,7 +93,7 @@ export function ImageUpload({ onImageUploaded, className = "", autoInsert = fals
       fileInputRef.current.value = ''
     }
   }
-  
+
   const copyToClipboard = async () => {
     if (markdownSyntax) {
       try {
@@ -109,16 +113,13 @@ export function ImageUpload({ onImageUploaded, className = "", autoInsert = fals
             <Check className="h-4 w-4" />
             <span className="text-sm font-medium">Image uploadée !</span>
           </div>
-          <button
-            onClick={resetUpload}
-            className="text-gray-500 hover:text-gray-700"
-          >
+          <button onClick={resetUpload} className="text-gray-500 hover:text-gray-700">
             <X className="h-4 w-4" />
           </button>
         </div>
         <div className="mb-3">
-          <Image 
-            src={uploadedUrl} 
+          <Image
+            src={uploadedUrl}
             alt="Image uploadée"
             width={400}
             height={192}
@@ -126,7 +127,7 @@ export function ImageUpload({ onImageUploaded, className = "", autoInsert = fals
             style={{ width: 'auto', height: 'auto', maxHeight: '12rem' }}
           />
         </div>
-        
+
         {markdownSyntax && (
           <div className="mb-3">
             <div className="flex items-center justify-between mb-1">
@@ -144,7 +145,7 @@ export function ImageUpload({ onImageUploaded, className = "", autoInsert = fals
             </div>
           </div>
         )}
-        
+
         <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded border">
           <strong>URL:</strong> {uploadedUrl}
         </div>
@@ -153,7 +154,9 @@ export function ImageUpload({ onImageUploaded, className = "", autoInsert = fals
   }
 
   return (
-    <div className={`border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors ${className}`}>
+    <div
+      className={`border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors ${className}`}
+    >
       <input
         ref={fileInputRef}
         type="file"
@@ -161,7 +164,7 @@ export function ImageUpload({ onImageUploaded, className = "", autoInsert = fals
         onChange={handleFileSelect}
         className="hidden"
       />
-      
+
       {error && (
         <div className="mb-4 p-2 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
           {error}

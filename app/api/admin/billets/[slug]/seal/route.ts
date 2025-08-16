@@ -9,12 +9,9 @@ export async function PATCH(
 ) {
   try {
     const session = await getServerSession(authOptions)
-    
+
     if (!session || (session.user as any)?.role !== 'ADMIN') {
-      return NextResponse.json(
-        { error: 'Accès non autorisé' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'Accès non autorisé' }, { status: 403 })
     }
 
     const { sealed } = await request.json()
@@ -29,7 +26,7 @@ export async function PATCH(
 
     // Vérifier ou créer l'entrée billet dans la base
     let billet = await prisma.billet.findUnique({
-      where: { slug }
+      where: { slug },
     })
 
     if (!billet) {
@@ -40,14 +37,14 @@ export async function PATCH(
           title: `Billet ${slug}`, // Titre temporaire
           content: '',
           date: new Date(),
-          isSealed: sealed
-        }
+          isSealed: sealed,
+        },
       })
     } else {
       // Mettre à jour l'état de scellement
       billet = await prisma.billet.update({
         where: { slug },
-        data: { isSealed: sealed }
+        data: { isSealed: sealed },
       })
     }
 
@@ -55,14 +52,10 @@ export async function PATCH(
       success: true,
       slug,
       isSealed: billet.isSealed,
-      message: sealed ? 'Billet scellé avec succès' : 'Billet déscellé avec succès'
+      message: sealed ? 'Billet scellé avec succès' : 'Billet déscellé avec succès',
     })
-
   } catch (error) {
     console.error('Erreur scellement billet:', error)
-    return NextResponse.json(
-      { error: 'Erreur interne du serveur' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 })
   }
 }

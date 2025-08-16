@@ -65,12 +65,14 @@ export function CitationPicker({ isOpen, onClose, onCitationSelect }: CitationPi
       const editors = item.editor?.join(' ').toLowerCase() || ''
       const container = item['container-title']?.toLowerCase() || ''
       const key = item.key?.toLowerCase() || ''
-      
-      return title.includes(term) || 
-             authors.includes(term) || 
-             editors.includes(term) ||
-             container.includes(term) ||
-             key.includes(term)
+
+      return (
+        title.includes(term) ||
+        authors.includes(term) ||
+        editors.includes(term) ||
+        container.includes(term) ||
+        key.includes(term)
+      )
     })
   }, [bibliography, searchTerm])
 
@@ -93,11 +95,11 @@ export function CitationPicker({ isOpen, onClose, onCitationSelect }: CitationPi
   const formatType = (type: string) => {
     const types: Record<string, string> = {
       'article-journal': 'Article',
-      'book': 'Livre',
-      'chapter': 'Chapitre',
+      book: 'Livre',
+      chapter: 'Chapitre',
       'paper-conference': 'Conférence',
-      'thesis': 'Thèse',
-      'webpage': 'Page web'
+      thesis: 'Thèse',
+      webpage: 'Page web',
     }
     return types[type] || type
   }
@@ -117,10 +119,7 @@ export function CitationPicker({ isOpen, onClose, onCitationSelect }: CitationPi
             <Book className="h-5 w-5" />
             Bibliographie Zotero
           </h3>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 p-1"
-          >
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 p-1">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -132,7 +131,7 @@ export function CitationPicker({ isOpen, onClose, onCitationSelect }: CitationPi
             <input
               type="text"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               placeholder="Rechercher par titre, auteur, année..."
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               autoFocus
@@ -159,7 +158,7 @@ export function CitationPicker({ isOpen, onClose, onCitationSelect }: CitationPi
             </div>
           ) : (
             <div className="space-y-3">
-              {filteredRefs.map((ref) => (
+              {filteredRefs.map(ref => (
                 <div
                   key={ref.key}
                   onClick={() => handleSelect(ref)}
@@ -167,23 +166,21 @@ export function CitationPicker({ isOpen, onClose, onCitationSelect }: CitationPi
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900 mb-2 leading-snug">
-                        {ref.title}
-                      </h4>
-                      
+                      <h4 className="font-medium text-gray-900 mb-2 leading-snug">{ref.title}</h4>
+
                       <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-2">
                         <div className="flex items-center gap-1">
                           <User className="h-3 w-3" />
                           {formatAuthors(ref.author, ref.editor)}
                         </div>
-                        
+
                         {formatDate(ref.issued) && (
                           <div className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
                             {formatDate(ref.issued)}
                           </div>
                         )}
-                        
+
                         <span className="px-2 py-1 bg-gray-100 rounded text-xs">
                           {formatType(ref.type)}
                         </span>
@@ -195,9 +192,7 @@ export function CitationPicker({ isOpen, onClose, onCitationSelect }: CitationPi
                         </p>
                       )}
 
-                      <p className="text-xs text-gray-400 font-mono">
-                        Clé: {ref.key}
-                      </p>
+                      <p className="text-xs text-gray-400 font-mono">Clé: {ref.key}</p>
                     </div>
                   </div>
                 </div>

@@ -69,28 +69,28 @@ export async function extractPagesFromPdfUrl(pdfUrl: string): Promise<PdfPage[]>
     }
     const buffer = await response.arrayBuffer()
     const data = await pdf(Buffer.from(buffer))
-    
+
     // HEURISTIQUE: Divise le texte en pages basé sur les marqueurs typiques
     // Ceci est une approximation car pdf-parse ne donne pas accès au contenu par page
     const fullText = data.text
     const numPages = data.numpages
-    
+
     // Stratégie simple: diviser le texte par taille approximative
     const textLength = fullText.length
     const averagePageLength = Math.ceil(textLength / numPages)
-    
+
     const pages: PdfPage[] = []
     for (let i = 0; i < numPages; i++) {
       const startIndex = i * averagePageLength
       const endIndex = Math.min((i + 1) * averagePageLength, textLength)
       const pageText = fullText.slice(startIndex, endIndex)
-      
+
       pages.push({
         pageNumber: i + 1,
-        text: cleanPdfText(pageText)
+        text: cleanPdfText(pageText),
       })
     }
-    
+
     return pages
   } catch (error) {
     console.error(`Error extracting pages from PDF ${pdfUrl}:`, error)
@@ -101,7 +101,10 @@ export async function extractPagesFromPdfUrl(pdfUrl: string): Promise<PdfPage[]>
 /**
  * Trouve la première occurrence d'un terme dans un PDF et retourne la page + contexte
  */
-export async function findInPdf(pdfUrl: string, searchQuery: string): Promise<{
+export async function findInPdf(
+  pdfUrl: string,
+  searchQuery: string
+): Promise<{
   found: boolean
   pageNumber?: number
   snippet?: string
@@ -110,31 +113,31 @@ export async function findInPdf(pdfUrl: string, searchQuery: string): Promise<{
   try {
     const pages = await extractPagesFromPdfUrl(pdfUrl)
     const query = searchQuery.toLowerCase()
-    
+
     for (const page of pages) {
       const pageTextLower = page.text.toLowerCase()
       const index = pageTextLower.indexOf(query)
-      
+
       if (index !== -1) {
         // Extrait un contexte de 200 caractères autour du terme trouvé
         const contextStart = Math.max(0, index - 100)
         const contextEnd = Math.min(page.text.length, index + query.length + 100)
         const context = page.text.slice(contextStart, contextEnd)
-        
+
         // Crée un snippet plus court pour l'affichage
         const snippetStart = Math.max(0, index - 50)
         const snippetEnd = Math.min(page.text.length, index + query.length + 50)
         const snippet = page.text.slice(snippetStart, snippetEnd)
-        
+
         return {
           found: true,
           pageNumber: page.pageNumber,
           snippet: snippet.trim(),
-          context: context.trim()
+          context: context.trim(),
         }
       }
     }
-    
+
     return { found: false }
   } catch (error) {
     console.error(`Error searching in PDF ${pdfUrl}:`, error)
@@ -146,13 +149,15 @@ export async function findInPdf(pdfUrl: string, searchQuery: string): Promise<{
  * Nettoie et normalise le texte extrait d'un PDF pour l'indexation
  */
 export function cleanPdfText(rawText: string): string {
-  return rawText
-    // Supprime les caractères de contrôle et les lignes vides multiples
-    .replace(/\r\n/g, '\n')
-    .replace(/\n{3,}/g, '\n\n')
-    // Supprime les caractères spéciaux problématiques
-    .replace(/[^\w\sàâäéèêëïîôöùûüÿç.,;:!?'"()[\]{}@#$%^&*+=<>|~`-]/gi, ' ')
-    // Normalise les espaces multiples
-    .replace(/\s{2,}/g, ' ')
-    .trim()
+  return (
+    rawText
+      // Supprime les caractères de contrôle et les lignes vides multiples
+      .replace(/\r\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      // Supprime les caractères spéciaux problématiques
+      .replace(/[^\w\sàâäéèêëïîôöùûüÿç.,;:!?'"()[\]{}@#$%^&*+=<>|~`-]/gi, ' ')
+      // Normalise les espaces multiples
+      .replace(/\s{2,}/g, ' ')
+      .trim()
+  )
 }

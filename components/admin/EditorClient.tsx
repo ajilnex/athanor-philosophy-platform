@@ -26,7 +26,7 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
 
   const handleSave = async () => {
     setIsSaving(true)
-    
+
     try {
       const response = await fetch('/api/admin/billets/save', {
         method: 'POST',
@@ -53,13 +53,12 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
       }
 
       toast.success(result.message)
-      
+
       if (result.citationsCount > 0) {
         toast.success(`${result.citationsCount} citation(s) validée(s)`, {
           duration: 3000,
         })
       }
-
     } catch (error) {
       console.error('Erreur sauvegarde:', error)
       toast.error('Erreur de connexion')
@@ -72,16 +71,16 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
     if (editorRef.current?.view) {
       const view = editorRef.current.view
       const pos = view.state.selection.main.head
-      
+
       view.dispatch({
         changes: { from: pos, insert: text },
-        selection: { anchor: pos + text.length }
+        selection: { anchor: pos + text.length },
       })
-      
+
       // Mettre à jour l'état local
       const newContent = view.state.doc.toString()
       setContent(newContent)
-      
+
       // Remettre le focus sur l'éditeur
       view.focus()
     }
@@ -100,30 +99,30 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
 
     // Insérer à la fin du document
     const bibliographyText = '\n\n<Bibliography />'
-    
+
     if (editorRef.current?.view) {
       const view = editorRef.current.view
       const docLength = view.state.doc.length
-      
+
       view.dispatch({
         changes: { from: docLength, insert: bibliographyText },
-        selection: { anchor: docLength + bibliographyText.length }
+        selection: { anchor: docLength + bibliographyText.length },
       })
-      
+
       const newContent = view.state.doc.toString()
       setContent(newContent)
       view.focus()
     }
-    
+
     toast.success('Bibliographie ajoutée en fin de document')
   }
 
   const handleBacklinkSelected = (slug: string, alias?: string) => {
     const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
-    
+
     // Insertion simple au curseur (déclencheur retiré)
     insertText(backlinkText)
-    
+
     setShowBacklinkPicker(false)
   }
 
@@ -132,11 +131,12 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
     const today = new Date().toISOString().split('T')[0]
     const slugFromTitle = title
       .toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '')
     const slug = `${today}-${slugFromTitle}`
-    
+
     try {
       // Créer le nouveau billet
       const response = await fetch('/api/admin/billets', {
@@ -147,10 +147,10 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
           title,
           content: `# ${title}\n\nContenu à venir...`,
           tags: [],
-          excerpt: ''
-        })
+          excerpt: '',
+        }),
       })
-      
+
       if (response.ok) {
         toast.success(`Nouveau billet "${title}" créé`)
       }
@@ -158,7 +158,7 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
       console.error('Erreur création billet:', error)
       toast.error('Erreur lors de la création du billet')
     }
-    
+
     // Insérer le backlink dans tous les cas
     const backlinkText = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
     insertText(backlinkText)
@@ -176,11 +176,9 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
       {/* Toolbar */}
       <div className="flex items-center justify-between p-4 border-b border-subtle/20 bg-background/50">
         <div className="flex items-center space-x-1">
-          <h2 className="text-lg font-serif font-light text-foreground">
-            Éditeur : {slug}
-          </h2>
+          <h2 className="text-lg font-serif font-light text-foreground">Éditeur : {slug}</h2>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setShowReferenceDialog(true)}
@@ -189,7 +187,7 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
             <BookOpen className="h-4 w-4 mr-2" />
             Insérer une référence
           </button>
-          
+
           <button
             onClick={handleInsertBibliography}
             className="inline-flex items-center px-3 py-2 text-sm bg-background border border-subtle/50 text-foreground rounded-md hover:bg-muted transition-colors"
@@ -197,7 +195,7 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
             <List className="h-4 w-4 mr-2" />
             Insérer Bibliography
           </button>
-          
+
           <button
             onClick={() => {
               if (editorRef.current?.view) {
@@ -215,7 +213,7 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
             <Link2 className="h-4 w-4 mr-2" />
             Backlink
           </button>
-          
+
           <button
             onClick={handleSave}
             disabled={isSaving}
@@ -264,12 +262,12 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
               },
               '.cm-scroller': {
                 height: '100%',
-              }
+              },
             }),
             // Désactiver l'auto‑complétion des crochets [] pour éviter les ]] ajoutés automatiquement
             // (basicSetup.closeBrackets est déjà désactivé au niveau du composant)
           ]}
-          onChange={(value) => setContent(value)}
+          onChange={value => setContent(value)}
         />
       </div>
 
@@ -286,10 +284,8 @@ export function EditorClient({ filePath, initialContent, slug }: EditorClientPro
               </span>
             )}
           </div>
-          
-          <div className="text-xs">
-            Fichier: {filePath}
-          </div>
+
+          <div className="text-xs">Fichier: {filePath}</div>
         </div>
       </div>
 
