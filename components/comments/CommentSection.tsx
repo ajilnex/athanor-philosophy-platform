@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { MessageSquare, AlertCircle } from 'lucide-react'
 import { CommentForm } from './CommentForm'
@@ -43,7 +43,12 @@ interface ApiResponse {
   }
 }
 
-export function CommentSection({ targetType, targetId, title, className = '' }: CommentSectionProps) {
+export function CommentSection({
+  targetType,
+  targetId,
+  title,
+  className = '',
+}: CommentSectionProps) {
   const { data: session } = useSession()
   const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(true)
@@ -58,33 +63,36 @@ export function CommentSection({ targetType, targetId, title, className = '' }: 
   const isAdmin = (session?.user as any)?.role === 'ADMIN'
 
   // Charger les commentaires
-  const fetchComments = async (page = 1) => {
-    try {
-      setLoading(true)
-      const response = await fetch(
-        `/api/comments?targetType=${targetType}&targetId=${encodeURIComponent(targetId)}&page=${page}&limit=20`
-      )
+  const fetchComments = useCallback(
+    async (page = 1) => {
+      try {
+        setLoading(true)
+        const response = await fetch(
+          `/api/comments?targetType=${targetType}&targetId=${encodeURIComponent(targetId)}&page=${page}&limit=20`
+        )
 
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement des commentaires')
+        if (!response.ok) {
+          throw new Error('Erreur lors du chargement des commentaires')
+        }
+
+        const data: ApiResponse = await response.json()
+        setComments(data.comments)
+        setPagination(data.pagination)
+        setError(null)
+      } catch (err) {
+        console.error('Erreur chargement commentaires:', err)
+        setError(err instanceof Error ? err.message : 'Erreur inconnue')
+      } finally {
+        setLoading(false)
       }
-
-      const data: ApiResponse = await response.json()
-      setComments(data.comments)
-      setPagination(data.pagination)
-      setError(null)
-    } catch (err) {
-      console.error('Erreur chargement commentaires:', err)
-      setError(err instanceof Error ? err.message : 'Erreur inconnue')
-    } finally {
-      setLoading(false)
-    }
-  }
+    },
+    [targetType, targetId]
+  )
 
   // Charger les commentaires au montage
   useEffect(() => {
     fetchComments()
-  }, [targetType, targetId])
+  }, [fetchComments])
 
   // Ajouter un nouveau commentaire
   const handleCommentAdded = (newComment: any) => {
@@ -92,7 +100,7 @@ export function CommentSection({ targetType, targetId, title, className = '' }: 
     const normalizedComment: Comment = {
       ...newComment,
       replies: [], // Nouveau commentaire n'a pas de réponses
-      _count: { replies: 0 } // Initialiser le compteur
+      _count: { replies: 0 }, // Initialiser le compteur
     }
     setComments(prev => [normalizedComment, ...prev])
     setPagination(prev => ({ ...prev, total: prev.total + 1 }))
@@ -104,26 +112,28 @@ export function CommentSection({ targetType, targetId, title, className = '' }: 
     const normalizedReply: Comment = {
       ...reply,
       replies: [], // Les réponses n'ont pas de sous-réponses (max 2 niveaux)
-      _count: { replies: 0 }
+      _count: { replies: 0 },
     }
-    
-    setComments(prev => prev.map(comment => {
-      if (comment.id === parentId) {
-        return {
-          ...comment,
-          replies: [...comment.replies, normalizedReply],
-          _count: { replies: comment._count.replies + 1 }
+
+    setComments(prev =>
+      prev.map(comment => {
+        if (comment.id === parentId) {
+          return {
+            ...comment,
+            replies: [...comment.replies, normalizedReply],
+            _count: { replies: comment._count.replies + 1 },
+          }
         }
-      }
-      return comment
-    }))
+        return comment
+      })
+    )
   }
 
   // Mettre à jour un commentaire
   const handleCommentUpdated = (updatedComment: Comment) => {
-    setComments(prev => prev.map(comment => 
-      comment.id === updatedComment.id ? updatedComment : comment
-    ))
+    setComments(prev =>
+      prev.map(comment => (comment.id === updatedComment.id ? updatedComment : comment))
+    )
   }
 
   // Supprimer/masquer un commentaire
@@ -138,26 +148,19 @@ export function CommentSection({ targetType, targetId, title, className = '' }: 
   }
 
   return (
-    <section 
-      className={`mt-12 pt-8 border-t border-subtle/20 ${className}`}
-      data-graph-shield
-    >
+    <section className={`mt-12 pt-8 border-t border-subtle/20 ${className}`} data-graph-shield>
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
           <MessageSquare className="h-5 w-5 text-subtle" />
-          <h2 className="text-xl font-light text-foreground">
-            Commentaires
-          </h2>
+          <h2 className="text-xl font-light text-foreground">Commentaires</h2>
           {pagination.total > 0 && (
-            <span className="text-sm text-subtle">
-              ({pagination.total})
-            </span>
+            <span className="text-sm text-subtle">({pagination.total})</span>
           )}
         </div>
-        
+
         <p className="text-sm text-subtle max-w-2xl font-light">
-          Partagez vos réflexions sur «{title}». Les commentaires sont modérés et 
-          apparaîtront après approbation.
+          Partagez vos réflexions sur «{title}». Les commentaires sont modérés et apparaîtront après
+          approbation.
         </p>
       </div>
 
@@ -197,7 +200,7 @@ export function CommentSection({ targetType, targetId, title, className = '' }: 
           </div>
         ) : (
           <>
-            {comments.map((comment) => (
+            {comments.map(comment => (
               <CommentItem
                 key={comment.id}
                 comment={comment}
@@ -229,8 +232,8 @@ export function CommentSection({ targetType, targetId, title, className = '' }: 
           <p className="text-sm text-subtle text-center">
             <a href="/auth/signin" className="text-accent hover:underline">
               Connectez-vous
-            </a>
-            {' '}pour participer à la discussion
+            </a>{' '}
+            pour participer à la discussion
           </p>
         </div>
       )}

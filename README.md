@@ -12,11 +12,14 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
 - 🚀 **Performance** - ISR, optimisation images, pipeline parallélisé
 - 💬 **Système de commentaires** - Modération et hiérarchie
 - 📚 **Bibliographie Zotero** - Intégration citations automatiques
+- 🧪 **Tests automatisés** - Playwright avec capture de logs
+- 📂 **Workflow de synchronisation** - Snapshot prod → dev avec Cloudinary
 - 📱 **Responsive** - Optimisé pour tous les appareils
 
 ## Technologies
 
 ### Stack Principal
+
 - **Next.js 15.4.6** - Framework React avec App Router et optimisations
 - **React 19.0.0** - Bibliothèque d'interface utilisateur (version finale)
 - **TypeScript** - Typage statique strict
@@ -25,6 +28,7 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
 - **Prisma 6.14.0** - ORM moderne avec génération type-safe
 
 ### Contenu & Performance
+
 - **MDX natif** - Support MDX via @mdx-js/mdx 3.1.0
 - **next/font** - Optimisation polices (IBM Plex Serif + Inter)
 - **next/image** - Optimisation images automatique
@@ -32,70 +36,79 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
 - **Fuse.js 7.0.0** - Recherche floue avancée
 
 ### Services & Intégrations
+
 - **NextAuth.js 4.24.5** - Authentification (GitHub OAuth + Credentials)
 - **Cloudinary** - Stockage et optimisation PDF/images
 - **Zotero API** - Bibliographie et citations automatiques
+- **Playwright** - Tests E2E automatisés avec capture de logs
 - **Vercel** - Déploiement avec auto-build sur push
 
 ## Installation
 
 1. **Clonez le dépôt**
+
    ```bash
    git clone <url-du-repo>
    cd athanor
    ```
 
 2. **Installez les dépendances**
+
    ```bash
    npm install
    ```
 
 3. **Configurez l'environnement**
+
    ```bash
    cp .env.example .env.local
    ```
-   
+
    Modifiez `.env.local` avec vos variables d'environnement :
+
    ```bash
    # Base de données (Docker local)
    DATABASE_URL="postgresql://user:password@localhost:5432/athanor_dev"
    DIRECT_DATABASE_URL="postgresql://user:password@localhost:5432/athanor_dev"
-   
+
    # Authentification
    NEXTAUTH_URL="http://localhost:3000"
    NEXTAUTH_SECRET="your-secret-key-here"
-   
+
    # GitHub (pour Git-as-CMS)
    GITHUB_TOKEN="ghp_your_github_token"
    GITHUB_OWNER="your-username"
    GITHUB_REPO="philosophy-platform"
-   
+
    # Cloudinary (pour uploads)
    CLOUDINARY_CLOUD_NAME="your-cloud-name"
    CLOUDINARY_API_KEY="your-api-key"
    CLOUDINARY_API_SECRET="your-api-secret"
-   
+
    # Zotero (pour bibliographie)
    ZOTERO_GROUP_ID="your-group-id"
    ZOTERO_API_KEY="your-zotero-key"
    ```
 
 4. **Lancez PostgreSQL avec Docker**
+
    ```bash
    # Option 1: Docker command direct
    docker run --name postgres-athanor -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e POSTGRES_DB=athanor_dev -p 5432:5432 -d postgres:15
-   
+
    # Option 2: Script npm (recommandé)
    npm run db:dev:start
    ```
 
 5. **Initialisez la base de données**
+
    ```bash
    npm run db:push    # Synchronise le schéma
    npm run db:seed    # Ajoute des données de test (optionnel)
    ```
 
 6. **Lancez le serveur de développement**
+
    ```bash
    npm run dev
    ```
@@ -149,36 +162,52 @@ La section "Billets" fonctionne sur un principe de "Git-as-a-CMS". Toute gestion
 - **Pour créer un billet :** Ajoutez un nouveau fichier `.md` dans le dossier `content/billets/`, puis exécutez `git add`, `git commit`, et `git push`.
 - **Pour modifier un billet :** Éditez le fichier `.md` correspondant, puis exécutez `git add`, `git commit`, et `git push`.
 - **Pour supprimer un billet :** Utilisez la commande `git rm` pour supprimer le fichier, puis exécutez `git commit` et `git push`.
-    ```bash
-    # Exemple de suppression de billet
-    git rm content/billets/2025-08-05-dialectique-du-pomodoro.md
-    git commit -m "Suppression: billet sur le pomodoro"
-    git push
-    ```
+  ```bash
+  # Exemple de suppression de billet
+  git rm content/billets/2025-08-05-dialectique-du-pomodoro.md
+  git commit -m "Suppression: billet sur le pomodoro"
+  git push
+  ```
 
 ## Développement
 
 ### Scripts disponibles
 
 #### Développement
+
 - `npm run dev` - Serveur de développement
 - `npm run lint` - Vérification ESLint
 - `npm run typecheck` - Vérification TypeScript
 
 #### Build & Production
+
 - `npm run build` - Build optimisé avec pipeline parallélisé
 - `npm run start` - Serveur de production
 
 #### Base de données
+
 - `npm run db:dev:start` - Lance PostgreSQL Docker
-- `npm run db:push` - Synchronise le schéma
+- `npm run db:migrate:dev` - Migrations développement
+- `npm run db:migrate:deploy` - Migrations production
 - `npm run db:studio` - Interface Prisma Studio
-- `npm run db:seed` - Ajoute des données de test
+
+#### Synchronisation & Snapshots
+
+- `npm run snapshot:create` - Créer snapshot production
+- `npm run snapshot:restore` - Restaurer depuis snapshot
+- `npm run db:reset` - Reset complet + restore snapshot
 
 #### Contenu & Assets
+
 - `npm run graph:build` - Génère le graphe des billets
 - `npm run graph:svg` - Rend le SVG interactif
 - `npm run search:build` - Reconstruit l'index de recherche
+
+#### Tests
+
+- `npm test` - Tous les tests Playwright
+- `npm run test:ui` - Interface Playwright
+- `npm run typecheck` - TypeScript check
 
 ### Ajout d'articles
 
@@ -189,21 +218,26 @@ La section "Billets" fonctionne sur un principe de "Git-as-a-CMS". Toute gestion
 
 ## Production
 
+**✅ STATUT** : Production déployée avec succès sur Vercel (Août 2025)
+
 Pour déployer en production :
 
 1. **Build du projet**
+
    ```bash
-   npm run build
+   npm run build  # Pipeline parallélisé optimisé
    ```
 
 2. **Configuration de la base de données**
-   - Pour PostgreSQL : modifiez `DATABASE_URL` dans `.env`
-   - Lancez `npx prisma db push` sur le serveur
+   - PostgreSQL avec système de migrations Prisma
+   - Variables d'environnement configurées
+   - Snapshot workflow pour synchronisation prod → dev
 
 3. **Variables d'environnement**
    - `DATABASE_URL` - URL de la base de données
    - `NEXTAUTH_URL` - URL de votre site
    - `NEXTAUTH_SECRET` - Clé secrète pour l'authentification
+   - Voir `DEPLOY.md` pour la liste complète
 
 ## Personnalisation
 
@@ -221,6 +255,7 @@ colors: {
 ### Typographie
 
 Les polices sont optimisées via next/font dans `app/layout.tsx` :
+
 - **IBM Plex Serif** pour les titres et contenu (serif) avec variables CSS
 - **Inter** pour l'interface utilisateur (sans-serif) avec variables CSS
 - **Optimisations** : `display: 'swap'`, preload automatique, subsetting
@@ -230,6 +265,26 @@ Les polices sont optimisées via next/font dans `app/layout.tsx` :
 --font-serif: IBM Plex Serif (poids 300, 400, 500, 600 + italiques)
 --font-sans: Inter (poids 300, 400, 500, 600, 700)
 ```
+
+## Tests & Qualité
+
+### Tests Automatisés
+
+- **Playwright** - Tests E2E avec capture de logs en temps réel
+- **TypeScript** - Analyse statique stricte avec `npm run typecheck`
+- **ESLint** - Qualité de code avec `npm run lint`
+
+### Workflow de Synchronisation
+
+1. **Production → Développement**
+   - Script `create-snapshot.ts` pour export données + Cloudinary
+   - Script `restore-from-snapshot.ts` pour import local
+   - Commande unifiée `npm run db:reset` pour reset complet
+
+2. **Migrations Base de Données**
+   - Système Prisma migrate (pas db push)
+   - Variables d'environnement harmonisées avec dotenv-cli
+   - Séparation dev/prod avec commandes dédiées
 
 ## Support
 

@@ -19,23 +19,26 @@ Le script de build exécute automatiquement plusieurs tâches critiques :
 npm run build
 ```
 
-### Étapes du Build Optimisé (parallélisé)
+### Étapes du Build Optimisé (parallélisé + variables d'env harmonisées)
 
 1. **`npx prisma generate`** - Génération du client Prisma
-2. **Groupe A (parallèle)** :
-   - `build-bibliography.js` - Construction bibliographie Zotero
-   - `validate-citations.js` - Validation références
-   - `build-citation-map.js` - Mapping citations
-3. **Groupe B (parallèle)** :
-   - `build-graph-billets.cjs` - Analyse liens MDX
-   - `render-graph-svg.cjs` - Génération SVG interactif
-4. **Groupe C (parallèle)** :
-   - `build-search-index.js` - Index unifié (billets + publications)
-5. **`wait`** - Synchronisation de tous les groupes
-6. **`next build`** - Build Next.js avec optimisations
+2. **`npx dotenv-cli -e .env.local`** - Variables d'environnement unifiées
+3. **Groupe A (parallèle)** :
+   - `build-bibliography.js` - Construction bibliographie Zotero (avec env)
+   - `validate-citations.js` - Validation références (avec env)
+   - `build-citation-map.js` - Mapping citations (avec env)
+4. **Groupe B (parallèle)** :
+   - `build-graph-billets.cjs` - Analyse liens MDX (avec env)
+   - `render-graph-svg.cjs` - Génération SVG interactif (avec env)
+5. **Groupe C (parallèle)** :
+   - `build-search-index.js` - Index unifié billets + publications (avec env)
+6. **`wait`** - Synchronisation de tous les groupes
+7. **`next build`** - Build Next.js avec optimisations
 
 ⚙️ **Performance** : Pipeline parallélisé réduit le temps de build de ~60%
+🔧 **Variables d'env** : dotenv-cli garantit cohérence entre local/prod
 ⚠️ **Serverless** : Timeout Vercel 45s build, surveillez les scripts lourds
+🏗️ **TypeScript** : Analyse statique rapide avec `npm run typecheck:scripts`
 
 ## 🗄️ Configuration Base de Données
 
@@ -53,20 +56,36 @@ DATABASE_URL="postgresql://username:password@host:port/database"
 DIRECT_DATABASE_URL="postgresql://username:password@direct-host:port/database"
 ```
 
-#### Migration et Setup
+#### Migration et Setup (OBLIGATOIRE - migrations standardisées)
 
 ```bash
-# Après configuration de DATABASE_URL
-npx prisma db push
-
-# Ou avec migrations (recommandé en production)
+# PRODUCTION : Déploiement migrations uniquement
 npx prisma migrate deploy
 
-# Génération du client Prisma
+# DÉVELOPPEMENT : Migrations avec prompts
+npx prisma migrate dev
+
+# Génération du client Prisma (automatique dans build)
 npx prisma generate
 
-# Seed de données (optionnel)
-npx prisma db seed
+# Vérification statut migrations
+npx prisma migrate status
+
+# Note : db push abandonné au profit du système de migrations robuste
+```
+
+#### Workflow de Synchronisation Prod → Dev (Nouveau)
+
+```bash
+# Étape 1 : Créer snapshot depuis production (Admin/DevOps)
+npm run snapshot:create
+
+# Étape 2 : Distribuer snapshot.json via Git
+git add prisma/snapshot.json
+git commit -m "feat: Nouveau snapshot production"
+
+# Étape 3 : Reset développement avec données réalistes
+npm run db:reset  # = migrate reset + restore from snapshot
 ```
 
 ### Providers Recommandés
@@ -97,7 +116,7 @@ Configuration avec optimisations intégrées :
 const nextConfig = {
   serverExternalPackages: ['@prisma/client'],
   experimental: {
-    serverComponentsExternalPackages: ['@prisma/client']
+    serverComponentsExternalPackages: ['@prisma/client'],
   },
   // Optimisation images
   images: {
@@ -108,10 +127,10 @@ const nextConfig = {
         pathname: '/u/**',
       },
       {
-        protocol: 'https', 
+        protocol: 'https',
         hostname: 'res.cloudinary.com',
         pathname: '/**',
-      }
+      },
     ],
   },
   // Performance
@@ -125,30 +144,41 @@ const nextConfig = {
 Toutes les variables de `.env.example` doivent être configurées :
 
 #### 🔑 Authentification
+
 ```bash
 NEXTAUTH_URL="https://votre-site.vercel.app"
 NEXTAUTH_SECRET="votre-secret-nextauth-genere"
 ```
 
 #### 🗄️ Base de Données
+
 ```bash
 DATABASE_URL="postgresql://username:password@host:port/database"
 DIRECT_DATABASE_URL="postgresql://username:password@direct-host:port/database"  # Optionnel
 ```
 
 #### 🔐 Sécurité API
+
 ```bash
 ADMIN_API_KEY="cle-api-forte-generee"
 ```
 
 #### ☁️ Cloudinary (Stockage)
+
 ```bash
+# Production (compte principal)
 CLOUDINARY_CLOUD_NAME="votre-cloud-name"
 CLOUDINARY_API_KEY="votre-api-key"
 CLOUDINARY_API_SECRET="votre-api-secret"
+
+# Développement (pour workflow snapshot - optionnel)
+CLOUDINARY_CLOUD_NAME_DEV="votre-dev-cloud-name"
+CLOUDINARY_API_KEY_DEV="votre-dev-api-key"
+CLOUDINARY_API_SECRET_DEV="votre-dev-api-secret"
 ```
 
 #### 🤝 GitHub (Édition Collaborative)
+
 ```bash
 GITHUB_TOKEN="ghp_votre-personal-access-token"
 GITHUB_OWNER="votre-username"
@@ -158,22 +188,48 @@ GITHUB_SECRET="oauth-app-secret"
 ```
 
 #### 📚 Zotero (Bibliographie)
+
 ```bash
 ZOTERO_GROUP_ID="6096924"  # ID du groupe Zotero public
 ZOTERO_API_KEY="votre-zotero-api-key"  # Optionnel pour groupes privés
 ```
 
 #### 🎨 Application
+
 ```bash
 NEXT_PUBLIC_APP_NAME="L'Athanor"
 NEXT_PUBLIC_APP_DESCRIPTION="Une collection d'articles de philosophie contemporaine"
 ```
 
 #### 💬 Commentaires (Optionnel)
+
 ```bash
 DISABLE_COMMENT_RATELIMIT="true"  # Pour serverless
 UPSTASH_REDIS_REST_URL="https://xxx.upstash.io"  # Si Redis
 UPSTASH_REDIS_REST_TOKEN="votre-token-redis"
+```
+
+## ✅ Statut Déploiement (Août 2025)
+
+**🎉 SUCCÈS** : Build production Vercel réussi avec les dernières optimisations
+
+### Résolutions Appliquées
+
+- ✅ **TypeScript** : Erreurs `null` vs `undefined` résolues avec opérateur `??`
+- ✅ **Variables d'env** : DATABASE_URL configurée en production
+- ✅ **Pipeline build** : Variables d'environnement harmonisées avec dotenv-cli
+- ✅ **Migrations** : Système Prisma migrate standardisé
+- ✅ **Suppression CRUD** : Articles + Cloudinary synchronisés
+- ✅ **Précision sémantique** : `??` au lieu de `||` pour préserver chaînes vides
+- ✅ **Analyse statique** : TypeScript rapide (<2s) pour scripts Node.js
+
+### Derniers Logs Build Vercel
+
+```
+✓ Compiled successfully in 12.0s
+✓ Collecting page data
+✓ Generating static pages (111/111)
+✓ Finalizing page optimization
 ```
 
 ## 🚀 Déploiement Vercel
@@ -218,44 +274,76 @@ vercel --prod
 # Vérifier que le build passe
 npm run build
 
+# Tests TypeScript (analyse statique rapide)
+npm run typecheck           # App Next.js (<5s)
+npm run typecheck:scripts   # Scripts Node.js (<2s)
+
+# Tests de qualité
+npm run lint               # ESLint
+
 # Vérifier la génération des assets
 ls -la public/graph-billets.json
 ls -la public/search-index.json
+ls -la public/bibliography.json
+ls -la public/search-index.json
+ls -la public/citations-map.json
 ```
 
 ### 2. Test Base de Données
 
 ```bash
-# Vérifier la connexion
-npx prisma db push --preview-feature
-
-# Test des migrations
+# Vérifier le statut des migrations (OBLIGATOIRE)
 npx prisma migrate status
+
+# Vérifier la connexion avec variables d'env
+npm run db:migrate:status
+
+# Test du workflow de synchronisation (développement)
+npm run snapshot:restore   # Depuis snapshot existant
+npm run db:reset           # Reset complet + restore
+
+# Note : db push abandonné pour migrations robustes
 ```
 
-### 3. Tests Fonctionnels
+### 3. Tests Automatisés (Playwright)
 
-- [ ] **Accueil** : Page charge avec polices optimisées
-- [ ] **Recherche** : Index unifié billets + publications (`/recherche`)
-- [ ] **Publications** : PDF accessibles avec ISR (`/publications/[slug]`)
+```bash
+# Tests end-to-end automatisés
+npm test                    # Tous les tests
+npm run test:backlink      # Test spécifique backlinks avec logs
+npm run test:ui            # Interface Playwright
+
+# Tests avec capture de logs (debug)
+PLAYWRIGHT_WEB_SERVER=none npm run test:backlink --headed
+```
+
+### 4. Tests Fonctionnels Manuels
+
+- [ ] **Accueil** : Page charge avec polices optimisées (IBM Plex Serif + Inter)
+- [ ] **Recherche** : Index unifié billets + publications (`/search`)
+- [ ] **Publications** : PDF accessibles avec ISR 300s (`/publications/[slug]`)
 - [ ] **Billets** : Contenu MDX + backlinks (`/billets/[slug]`)
-- [ ] **Graphe** : SVG interactif avec survols (`/graphe`)
-- [ ] **Admin** : Upload Cloudinary + modération (`/admin`)
-- [ ] **Comments** : Système commentaires avec avatars optimisés
+- [ ] **Graphe** : SVG interactif avec survols + données filtrées
+- [ ] **Admin** : Upload Cloudinary + suppression synchronisée (`/admin`)
+- [ ] **Editor** : Backlink picker avec recherche billets (`/admin/editor`)
+- [ ] **Comments** : Système commentaires avec avatars next/image optimisés
 - [ ] **Performance** : Web Core Vitals (LCP < 2.5s, CLS < 0.1)
 - [ ] **Bibliographie** : Citations Zotero + composant `<Bibliography />`
+- [ ] **Migrations** : Système Prisma migrate (pas db push)
+- [ ] **TypeScript** : Analyse statique scripts (<2s) + app (<5s)
 
 ## ⚠️ Limitations Serverless
 
 ### Timeouts
 
 - **Vercel Hobby** : 10s par fonction
-- **Vercel Pro** : 60s par fonction  
+- **Vercel Pro** : 60s par fonction
 - **Build** : 45s maximum
 
 ### Scripts Build
 
 Les scripts peuvent échouer en serverless si :
+
 - **Bibliographie** : API Zotero lente ou inaccessible
 - **Graphe** : Trop de billets MDX à analyser (>100)
 - **Recherche** : Index trop volumineux (publications + billets)
