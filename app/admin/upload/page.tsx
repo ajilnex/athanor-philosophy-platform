@@ -23,10 +23,29 @@ export default function UploadPage() {
 
   // 🛡️ PROTECTION: Vérifier l'autorisation admin
   useEffect(() => {
-    if (status === 'loading') return // Attendre le chargement
+    // Ne rien faire tant que la session est en cours de chargement
+    if (status === 'loading') {
+      console.log('DEBUG PROD: Session status is loading...')
+      return
+    }
 
+    // Afficher l'état final de la session dans tous les cas
+    console.log('DEBUG PROD: Session status resolved.', {
+      status: status,
+      session: JSON.stringify(session, null, 2),
+    })
+
+    // Appliquer la logique de redirection
     if (!session || session.user?.role !== 'admin') {
-      router.push('/') // Rediriger vers la page d'accueil
+      console.error('DEBUG PROD: REDIRECTION! Conditions not met.', {
+        hasSession: !!session,
+        role: session?.user?.role,
+      })
+      // Utilise une alerte pour être sûr de voir l'état avant la redirection
+      alert('SESSION DEBUG:\nStatus: ' + status + '\nSession: ' + JSON.stringify(session))
+      router.push('/')
+    } else {
+      console.log('DEBUG PROD: Access GRANTED. Role is admin.')
     }
   }, [session, status, router])
 
