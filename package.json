@@ -51,6 +51,7 @@
     "zod": "^4.0.17"
   },
   "devDependencies": {
+    "@playwright/test": "^1.47.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/lunr": "^2.3.7",
     "@types/node": "^20",
