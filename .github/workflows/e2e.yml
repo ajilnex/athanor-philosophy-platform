@@ -24,6 +24,7 @@ jobs:
 
     env:
       BASE_URL: http://localhost:3000
+      NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
       ZOTERO_GROUP_ID: ${{ secrets.ZOTERO_GROUP_ID }}
       ZOTERO_API_KEY: ${{ secrets.ZOTERO_API_KEY }}
@@ -48,6 +49,9 @@ jobs:
 
       - name: Prepare DB schema (migrate deploy)
         run: npx prisma migrate deploy
+
+      - name: Seed admin user for E2E
+        run: node scripts/create-admin.js
 
       # Build step is handled by Playwright webServer via npm run test:e2e:start
 
