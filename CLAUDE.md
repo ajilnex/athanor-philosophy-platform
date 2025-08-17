@@ -1,10 +1,10 @@
 # Mémoire Externe pour Claude Code - Plateforme L'Athanor
 
-## ÉTAT ACTUEL - Système Zotero + E2E Modernisés ✅
+## ÉTAT ACTUEL - Pipeline E2E Complet + Écosystème Mature ✅
 
-**Dernières réalisations majeures** :
+**Dernière réalisation majeure** : **Tests E2E Production-Ready avec CI/CD Complet**
 
-### 📚 Modernisation Zotero Better BibTeX
+### 📚 **Système Zotero Better BibTeX (MATURE)**
 
 - ✅ **BBT Keys** : Clés Better BibTeX comme référence principale (`Boulnois2010` vs `boulnois-2010-connaissance-dieu`)
 - ✅ **Pagination API** : Support >100 entrées avec `Link: rel="next"` automatique
@@ -14,21 +14,23 @@
 - ✅ **Champs CSL** : Support complet éditeur (`author[]`, `editor[]`, `issued`)
 - ✅ **Admin références** : Page `/admin/references` avec tableau citations utilisées
 
-### ✏️ Éditeur Billets Intelligent
+### ✏️ **Éditeur Billets Intelligent (MATURE)**
 
 - ✅ **Titre automatique** : Détection depuis frontmatter `title:` ou H1 `#`
 - ✅ **Slug intelligent** : Normalisation accent automatique (`café` → `cafe`)
 - ✅ **Frontmatter preservation** : Conservation existant si présent
 - ✅ **UX améliorée** : Hints contextuels pour utilisateur
 
-### 🧪 Tests E2E Playwright Automatisés
+### 🎯 **Pipeline E2E Automatisé (CRITIQUE)**
 
-- ✅ **WebServer intégré** : Démarrage automatique serveur prod locale
-- ✅ **Script unifié** : `test:e2e:start` (build + start)
-- ✅ **CI simplifié** : Suppression étape build redondante GitHub Actions
-- ✅ **Config flexible** : `PLAYWRIGHT_WEB_SERVER=none` pour tests ciblés
+- ✅ **Infrastructure CI** : PostgreSQL service + prisma migrate deploy + admin seeding
+- ✅ **Build réaliste** : Playwright webServer avec `npm run build && start` (parité prod)
+- ✅ **Authentification stable** : `NEXTAUTH_URL` + admin test (`admin@athanor.com/admin123`)
+- ✅ **Robustesse** : Zotero 403 géré (fallback), timeouts CI (5min), isolement DB
+- ✅ **Artefacts debug** : Traces/vidéos automatiques, reports HTML exportés
+- ✅ **Workflow intelligent** : PR validation + workflow_dispatch manuel
 
-### 🏗️ Architecture Données Centralisée (précédent)
+### 🏗️ **Architecture Données Centralisée (STABLE)**
 
 - ✅ **Module centralisé** : `lib/articles.ts` comme source unique de vérité
 - ✅ **API propre** : Fonctions spécialisées sans abstraction qui fuit
@@ -67,11 +69,12 @@
 - `components/billets/BilletEditor.tsx` : UX améliorée + validation contextuelle
 - `components/billets/BilletEditorDynamic.tsx` : Types optionnels pour titre
 
-### Tests E2E Automatisés
+### Tests E2E Production-Ready
 
 - `package.json` : Script `test:e2e:start` pour démarrage automatique
-- `playwright.config.ts` : WebServer intégré + baseURL http://localhost:3000
-- `.github/workflows/e2e.yml` : Workflow simplifié sans étape build séparée
+- `playwright.config.ts` : WebServer intégré + timeout CI 5min + baseURL http://localhost:3000
+- `.github/workflows/e2e.yml` : PostgreSQL service + migrate deploy + admin seeding + secrets
+- `scripts/create-admin.js` : **NOUVEAU** Seeding admin test pour authentification CI
 
 ### Architecture Données (précédent)
 
@@ -122,14 +125,14 @@ npm run graph:svg           # SVG seul avec variables d'env
 npm run bibliography:build  # Bibliographie Zotero seule
 npm run search:build        # Index de recherche seul
 
-# Tests & Qualité
+# Tests & Qualité (E2E Production-Ready)
 npm test                    # Tests E2E Playwright (démarre serveur automatiquement)
+npm run test:ui             # Interface Playwright pour debugging interactif
 npm run test:e2e:start      # Build + Start (utilisé par Playwright webServer)
 npm run test:backlink       # Test ciblé backlinks (PLAYWRIGHT_WEB_SERVER=none)
+npx playwright show-trace   # Ouvrir traces/vidéos pour debugging
 npm run lint                # ESLint + code quality
 npm run typecheck           # TypeScript verification (app + scripts)
-npm run format              # Prettier formatting
-npm run format:check        # Vérifier format sans modifier
 
 # Bibliographie Zotero (NOUVEAU)
 npm run bibliography:build        # API Zotero → JSON avec BBT keys + pagination
@@ -303,6 +306,69 @@ enum Role {
 3. **Backlinks** : Format `[[slug-ou-titre]]` strict
 4. **Images** : Cloudinary via upload UI admin
 5. **Bibliographie** : Système Zotero avec pagination API + robustesse (conservation ancien JSON si échec)
+
+---
+
+## WORKFLOW DE DÉVELOPPEMENT ASSISTÉ IA avec E2E ✨
+
+### 🎯 **Bénéfices Pipeline E2E Complet**
+
+**Confiance Totale :**
+
+- ✅ **Parité Production** : Tests sur build réel (`npm run build && start`), pas serveur dev allégé
+- ✅ **Base de données réelle** : PostgreSQL + prisma migrate deploy + admin seeding
+- ✅ **Authentification stable** : `NEXTAUTH_URL` + admin test (`admin@athanor.com/admin123`)
+- ✅ **Isolement parfait** : DB éphémère, migrations propres → tests reproductibles
+
+**Feedback Loop Court :**
+
+- ✅ **Push → Validation automatique** : Build + DB + Auth + scénarios clés vérifiés
+- ✅ **Artefacts debug riches** : Traces/vidéos automatiques + reports HTML exportés
+- ✅ **Détection régression** : Bundling/SSR/DB vérifié même sur patch IA ambitieux
+
+### 🤖 **Développement Assisté IA Optimisé**
+
+**Workflow recommandé :**
+
+1. **IA propose modification** → Analyse code + suggestion changement
+2. **Push branche** → CI valide automatiquement (build + auth + DB + tests)
+3. **Si vert** → Confiance maximale, merge sécurisé
+4. **Si rouge** → Artefacts CI expliquent "quoi" a cassé → IA propose patch ciblé
+
+**Commandes développement E2E :**
+
+```bash
+# Tests locaux (développement)
+npm test                      # E2E headless complet
+npm run test:ui               # Interface Playwright (debugging interactif)
+npx playwright test path/to/test.spec.ts  # Test ciblé
+
+# Debug avancé
+npx playwright show-trace path/to/trace.zip  # Rejouer test avec timeline
+```
+
+**Gestion artefacts CI :**
+
+- **Échec CI** → Email avec liens "playwright-report" + "test-results"
+- **Traces/vidéos** → Ouvrir artifact GitHub pour voir exactement où ça bloque
+- **Reports HTML** → Vision d'ensemble des tests + détails erreurs
+
+### 🛠️ **Cas d'Usage Avancés**
+
+**Ajout fonctionnalité :**
+
+- Créer test pour comportement "à risque" (nouveau bouton, route protégée)
+- IA implémente feature → E2E valide automatiquement
+
+**Refactoring complexe :**
+
+- E2E garantit non-régression sur parcours critiques
+- IA peut être ambitieuse, CI sert de garde-fou
+
+**Debug production :**
+
+- Reproduire bug en test E2E local
+- IA analyse traces pour identifier cause racine
 
 ---
 
