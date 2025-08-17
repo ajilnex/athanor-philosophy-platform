@@ -22,6 +22,7 @@
     "search:build": "npx dotenv-cli -e .env.local -- node scripts/build-search-index.js",
     "snapshot:create": "npx dotenv-cli -e .env.production -- npx ts-node --esm scripts/create-snapshot.ts",
     "snapshot:restore": "npx dotenv-cli -e .env.local -- npx ts-node --esm scripts/restore-from-snapshot.ts",
+    "test:e2e:start": "npm run build && npm run start",
     "test:build": "npm run build && node scripts/check-build.js",
     "db:dev:start": "docker-compose up -d",
     "db:dev:stop": "docker-compose down",

@@ -30,8 +30,7 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
 
-      - name: Build (generates search index, graph, etc.)
-        run: npm run build
+      # Build step is handled by Playwright webServer via npm run test:e2e:start
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
