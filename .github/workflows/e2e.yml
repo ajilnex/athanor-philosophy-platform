@@ -10,10 +10,24 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: athanor_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd="pg_isready -U postgres -d athanor_test"
+          --health-interval=10s --health-timeout=5s --health-retries=5
+
     env:
-      NEXTAUTH_SECRET: test-secret
-      # BASE_URL used by Playwright config; points to webServer
       BASE_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      ZOTERO_GROUP_ID: ${{ secrets.ZOTERO_GROUP_ID }}
+      ZOTERO_API_KEY: ${{ secrets.ZOTERO_API_KEY }}
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/athanor_test
 
     steps:
       - name: Checkout
@@ -31,17 +45,15 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
 
+      - name: Prepare DB schema (migrate deploy)
+        run: npx prisma migrate deploy
+
       # Build step is handled by Playwright webServer via npm run test:e2e:start
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          ZOTERO_GROUP_ID: ${{ secrets.ZOTERO_GROUP_ID }}
-          ZOTERO_API_KEY: ${{ secrets.ZOTERO_API_KEY }}
         run: npx playwright test
 
       - name: Upload Playwright report
