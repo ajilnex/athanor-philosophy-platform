@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, IBM_Plex_Serif } from 'next/font/google'
-import localFont from 'next/font/local'
 import './globals.css'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
@@ -23,33 +22,6 @@ const ibmPlexSerif = IBM_Plex_Serif({
   display: 'swap',
 })
 
-// New font for Salle du Temps, loaded locally
-const iaWriterDuo = localFont({
-  src: [
-    {
-      path: '../../public/fonts/iAWriterDuoS-Regular.woff2',
-      weight: '400',
-      style: 'normal',
-    },
-    {
-      path: '../../public/fonts/iAWriterDuoS-Italic.woff2',
-      weight: '400',
-      style: 'italic',
-    },
-    {
-      path: '../../public/fonts/iAWriterDuoS-Bold.woff2',
-      weight: '700',
-      style: 'normal',
-    },
-    {
-      path: '../../public/fonts/iAWriterDuoS-BoldItalic.woff2',
-      weight: '700',
-      style: 'italic',
-    },
-  ],
-  variable: '--font-ia-writer',
-})
-
 export const metadata: Metadata = {
   title: "L'athanor — Plateforme philosophique",
   description: "L'athanor — Une collection d'articles de philosophie contemporaine",
@@ -65,7 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr">
       <body
-        className={`min-h-screen bg-background text-foreground ${inter.variable} ${ibmPlexSerif.variable} ${iaWriterDuo.variable} font-serif`}
+        className={`min-h-screen bg-background text-foreground ${inter.variable} ${ibmPlexSerif.variable} font-serif`}
       >
         <AppSessionProvider>
           <div className="flex flex-col min-h-screen">
