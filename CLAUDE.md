@@ -1,19 +1,39 @@
 # Mémoire Externe pour Claude Code - Plateforme L'Athanor
 
-## ÉTAT ACTUEL - Architecture de Données Centralisée ✅
+## ÉTAT ACTUEL - Système Zotero + E2E Modernisés ✅
 
-**Dernière réalisation majeure** : Refactorisation architecturale complète de la couche de données
+**Dernières réalisations majeures** :
 
-- ✅ **Module centralisé** : Création de `lib/articles.ts` comme source unique de vérité
+### 📚 Modernisation Zotero Better BibTeX
+
+- ✅ **BBT Keys** : Clés Better BibTeX comme référence principale (`Boulnois2010` vs `boulnois-2010-connaissance-dieu`)
+- ✅ **Pagination API** : Support >100 entrées avec `Link: rel="next"` automatique
+- ✅ **Migration automatique** : Script TypeScript one-shot pour migrer anciennes clés
+- ✅ **Validation intelligente** : Suggestions Levenshtein + ignore blocs code
+- ✅ **Robustesse** : Conservation ancien JSON si API Zotero indisponible
+- ✅ **Champs CSL** : Support complet éditeur (`author[]`, `editor[]`, `issued`)
+- ✅ **Admin références** : Page `/admin/references` avec tableau citations utilisées
+
+### ✏️ Éditeur Billets Intelligent
+
+- ✅ **Titre automatique** : Détection depuis frontmatter `title:` ou H1 `#`
+- ✅ **Slug intelligent** : Normalisation accent automatique (`café` → `cafe`)
+- ✅ **Frontmatter preservation** : Conservation existant si présent
+- ✅ **UX améliorée** : Hints contextuels pour utilisateur
+
+### 🧪 Tests E2E Playwright Automatisés
+
+- ✅ **WebServer intégré** : Démarrage automatique serveur prod locale
+- ✅ **Script unifié** : `test:e2e:start` (build + start)
+- ✅ **CI simplifié** : Suppression étape build redondante GitHub Actions
+- ✅ **Config flexible** : `PLAYWRIGHT_WEB_SERVER=none` pour tests ciblés
+
+### 🏗️ Architecture Données Centralisée (précédent)
+
+- ✅ **Module centralisé** : `lib/articles.ts` comme source unique de vérité
 - ✅ **API propre** : Fonctions spécialisées sans abstraction qui fuit
-  - `getPublishedArticles()` : Articles complets pour vues publiques
-  - `getPublishedArticlesSummary()` : Résumé optimisé pour API
-  - `getAllArticlesForAdmin()` : Accès complet administration
-  - `getPublishedArticleById()` : Requête unique optimisée
-- ✅ **Cohérence garantie** : Filtres `isPublished: true` centralisés et systématiques
-- ✅ **Maintenabilité** : Changement d'ORM = modification d'un seul fichier
-- ✅ **Performance préservée** : ISR maintenu, optimisations intactes (build 2000ms)
-- ✅ **Qualité architecturale** : Encapsulation parfaite, pas de couplage Prisma
+- ✅ **Cohérence garantie** : Filtres `isPublished: true` centralisés
+- ✅ **Performance préservée** : ISR avec revalidatePath pour synchronisation immédiate
 
 **Infrastructure précédente conservée** :
 
@@ -30,15 +50,33 @@
 - ✅ **Migration Cloudinary** : Fichiers automatiques entre environnements
 - ✅ **Tests Automatisés** : Playwright configuré pour capture logs + debug
 
-**Fichiers créés/modifiés récemment (session actuelle) :**
+**Fichiers créés/modifiés récemment :**
 
-- `lib/articles.ts` : **NOUVEAU** Module centralisé pour toutes les requêtes Article
-- `app/publications/page.tsx` : Migration vers `getPublishedArticles()`
-- `app/api/articles/route.ts` : Migration vers `getPublishedArticlesSummary()`
-- `app/admin/publications/page.tsx` : Migration vers `getAllArticlesForAdmin()`
-- `app/api/admin/articles/route.ts` : Migration vers `getAllArticlesForAdmin()`
-- `app/api/articles/[id]/download/route.ts` : Migration vers `getPublishedArticleById()`
-- `CLAUDE.md` : Documentation architecture centralisée + patterns d'accès aux données
+### Système Zotero BBT
+
+- `scripts/build-bibliography.js` : Pagination API + extraction BBT keys + champs CSL
+- `scripts/validate-citations.js` : Suggestions Levenshtein + ignore code blocks
+- `scripts/migrate-citation-keys.ts` : **NOUVEAU** Migration automatique legacyKey → bbtKey
+- `app/admin/references/page.tsx` : **NOUVEAU** Page admin références citées
+- `components/editor/CitationPicker.tsx` : Support BBT keys + recherche améliorée
+- `public/bibliography.json` : Données enrichies avec bbtKey + champs CSL
+
+### Éditeur Intelligent
+
+- `app/api/admin/billets/route.ts` : Détection titre/slug automatique + frontmatter
+- `components/billets/BilletEditor.tsx` : UX améliorée + validation contextuelle
+- `components/billets/BilletEditorDynamic.tsx` : Types optionnels pour titre
+
+### Tests E2E Automatisés
+
+- `package.json` : Script `test:e2e:start` pour démarrage automatique
+- `playwright.config.ts` : WebServer intégré + baseURL http://localhost:3000
+- `.github/workflows/e2e.yml` : Workflow simplifié sans étape build séparée
+
+### Architecture Données (précédent)
+
+- `lib/articles.ts` : Module centralisé pour toutes les requêtes Article
+- `app/admin/actions.ts` : revalidatePath pour synchronisation ISR immédiate
 
 ---
 
@@ -84,14 +122,18 @@ npm run graph:svg           # SVG seul avec variables d'env
 npm run bibliography:build  # Bibliographie Zotero seule
 npm run search:build        # Index de recherche seul
 
-# Tests & Qualité (NOUVEAU)
-npm test                    # Tests Jest + React Testing Library
-npm run test:watch          # Tests en mode watch
+# Tests & Qualité
+npm test                    # Tests E2E Playwright (démarre serveur automatiquement)
+npm run test:e2e:start      # Build + Start (utilisé par Playwright webServer)
+npm run test:backlink       # Test ciblé backlinks (PLAYWRIGHT_WEB_SERVER=none)
 npm run lint                # ESLint + code quality
-npm run typecheck           # TypeScript app Next.js (<5s)
-npm run typecheck:scripts   # TypeScript scripts Node.js (<2s)
+npm run typecheck           # TypeScript verification (app + scripts)
 npm run format              # Prettier formatting
 npm run format:check        # Vérifier format sans modifier
+
+# Bibliographie Zotero (NOUVEAU)
+npm run bibliography:build        # API Zotero → JSON avec BBT keys + pagination
+npm run bibliography:migrate-keys # Migration one-shot legacyKey → bbtKey
 
 # Git Hooks (automatiques)
 # Pre-commit : ESLint --fix + Prettier --write (lint-staged)
@@ -256,10 +298,11 @@ enum Role {
 
 ### 📝 Contenu
 
-1. **Billets** : MDX uniquement, frontmatter requis
-2. **Citations** : Clés Zotero valides obligatoires
+1. **Billets** : MDX, frontmatter flexible (auto-détection titre/slug si H1 présent)
+2. **Citations** : Clés BBT Better BibTeX prioritaires, validation avec suggestions
 3. **Backlinks** : Format `[[slug-ou-titre]]` strict
 4. **Images** : Cloudinary via upload UI admin
+5. **Bibliographie** : Système Zotero avec pagination API + robustesse (conservation ancien JSON si échec)
 
 ---
 
