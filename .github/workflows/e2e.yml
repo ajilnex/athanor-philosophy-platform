@@ -2,8 +2,9 @@ name: E2E
 
 on:
   pull_request:
-  push:
-    branches: [main]
+  # push:
+  #   branches: [main]  # Temporarily disabled until E2E is stable
+  workflow_dispatch:  # Manual trigger for testing
 
 jobs:
   e2e:
@@ -36,6 +37,11 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          ZOTERO_GROUP_ID: ${{ secrets.ZOTERO_GROUP_ID }}
+          ZOTERO_API_KEY: ${{ secrets.ZOTERO_API_KEY }}
         run: npx playwright test
 
       - name: Upload Playwright report

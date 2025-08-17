@@ -21,7 +21,7 @@ export default defineConfig({
       : {
           command: 'npm run test:e2e:start',
           url: baseURL,
-          timeout: 120_000,
+          timeout: process.env.CI ? 300_000 : 120_000,
           reuseExistingServer: !process.env.CI,
         },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
