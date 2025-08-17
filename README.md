@@ -104,8 +104,7 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
 5. **Initialisez la base de données**
 
    ```bash
-   npm run db:push    # Synchronise le schéma
-   npm run db:seed    # Ajoute des données de test (optionnel)
+   npm run db:migrate:dev    # Synchronise le schéma avec migrations
    ```
 
 6. **Lancez le serveur de développement**
@@ -127,9 +126,8 @@ philosophy-platform/
 │   ├── admin/             # Interface d'administration
 │   ├── billets/           # Pages des billets (MDX)
 │   ├── edition/           # Maison d'édition et auteurs
-│   ├── graphe/            # Visualisation graphique
 │   ├── publications/      # Pages des publications
-│   ├── recherche/         # Page de recherche
+│   ├── search/            # Page de recherche
 │   └── api/              # Routes API
 ├── components/            # Composants React réutilisables
 │   ├── graph/            # Composants de visualisation
@@ -208,13 +206,14 @@ La section "Billets" fonctionne sur un principe de "Git-as-a-CMS". Toute gestion
 
 ```bash
 # Tests unitaires et d'intégration
-npm test                  # Jest + React Testing Library
-npm run test:watch        # Mode watch pour développement
-npm run test:coverage     # Rapport de couverture
+npm run test:unit         # Jest + React Testing Library
+npm run test:unit:watch   # Mode watch pour développement
+npm run test:unit:coverage # Rapport de couverture
 
 # Tests E2E
-npm run test:e2e          # Tests Playwright
+npm run test              # Tests Playwright E2E
 npm run test:ui           # Interface Playwright
+npm run test:backlink     # Test spécifique backlinks
 
 # Qualité code
 npm run typecheck         # Vérification TypeScript
@@ -288,10 +287,19 @@ Les polices sont optimisées via next/font dans `app/layout.tsx` :
 
 ### Infrastructure Tests
 
-- **Jest + React Testing Library** - Tests unitaires et d'intégration avec mocks complets
+#### Tests Unitaires (Jest + React Testing Library)
+
 - **Configuration Jest** - Support Next.js, TypeScript, path mapping (@/\*)
 - **Mocks automatiques** - NextAuth, Prisma, Cloudinary, next/router, next/image
 - **Coverage** - Rapports de couverture de code pour composants critiques
+- **Scripts** : `npm run test:unit`, `npm run test:unit:watch`, `npm run test:unit:coverage`
+
+#### Tests E2E (Playwright)
+
+- **Tests Playwright** - Tests end-to-end avec webServer intégré
+- **CI/CD** - Infrastructure PostgreSQL automatique via GitHub Actions
+- **Configuration** - Timeout CI 300s, traces et vidéos sur échec
+- **Scripts** : `npm run test`, `npm run test:ui`, `npm run test:backlink`
 
 ### Git Hooks Automatiques
 

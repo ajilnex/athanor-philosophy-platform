@@ -318,12 +318,12 @@ npm run db:reset           # Reset complet + restore
 
 ```bash
 # Tests unitaires et d'intégration
-npm test                    # Jest + React Testing Library
-npm run test:watch         # Mode watch pour développement
-npm run test:coverage      # Rapport de couverture
+npm run test:unit          # Jest + React Testing Library
+npm run test:unit:watch    # Mode watch pour développement
+npm run test:unit:coverage # Rapport de couverture
 
 # Tests end-to-end
-npm run test:e2e           # Tests Playwright
+npm run test               # Tests Playwright E2E
 npm run test:backlink      # Test spécifique backlinks avec logs
 npm run test:ui            # Interface Playwright
 
@@ -357,8 +357,8 @@ npm run format:check       # Vérifier formatage Prettier
 
 #### Tests & Qualité Code
 
-- [ ] **Tests Jest** : Tests unitaires passent (npm test)
-- [ ] **Tests E2E** : Tests Playwright passent (npm run test:e2e)
+- [ ] **Tests Jest** : Tests unitaires passent (npm run test:unit)
+- [ ] **Tests E2E** : Tests Playwright passent (npm run test)
 - [ ] **Pre-commit Hooks** : ESLint --fix + Prettier --write automatiques
 - [ ] **Pre-push Hooks** : TypeScript check bloque si erreurs
 - [ ] **Code Quality** : ESLint 0 warnings + Prettier formatage uniforme
@@ -430,15 +430,15 @@ Si les scripts de build dépassent les timeouts :
 
 ```bash
 # Tests Jest
-npm test -- --verbose      # Mode débogage
-npm run test:coverage      # Vérifier couverture
+npm run test:unit -- --verbose      # Mode débogage
+npm run test:unit:coverage          # Vérifier couverture
 
 # Tests Playwright
-npm run test:e2e -- --headed  # Mode visuel
-npm run test:ui               # Interface debug
+npm run test -- --headed            # Mode visuel
+npm run test:ui                      # Interface debug
 
 # Nettoyer cache tests
-npm test -- --clearCache
+npm run test:unit -- --clearCache
 ```
 
 ### Git Hooks Issues
