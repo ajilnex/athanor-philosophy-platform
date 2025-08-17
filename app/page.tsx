@@ -3,11 +3,13 @@ import fs from 'fs'
 import path from 'path'
 import { getAllBillets } from '@/lib/billets'
 import { LatestActivityCard } from '@/components/home/LatestActivityCard'
+import { getPublishedClips } from '@/lib/presse-papier'
 import { InteractiveGraph } from '@/components/graph/InteractiveGraph'
 
 export default async function HomePage() {
   const allBillets = await getAllBillets()
   const latestBillet = allBillets.length > 0 ? allBillets[0] : null
+  const latestClips = await getPublishedClips(3)
 
   // Read graph stats for meta info
   let graphStats = { nodes: 0, edges: 0 }
@@ -70,6 +72,37 @@ export default async function HomePage() {
               <LatestActivityCard billet={latestBillet} />
             </div>
           )}
+
+          {/* Presse-papier */}
+          <div className="mt-10" data-graph-shield>
+            <div className="w-full max-w-lg mx-auto">
+              <h2 className="font-serif text-lg text-subtle mb-3 text-center">Presse-papier</h2>
+              <a
+                href="/presse-papier"
+                className="block p-4 transition-all duration-300 bg-background/95 backdrop-blur-sm rounded-lg border border-subtle/10"
+                data-graph-shield
+              >
+                {latestClips.length === 0 ? (
+                  <p className="text-sm text-subtle text-center">Aucun lien pour l'instant</p>
+                ) : (
+                  <div className="grid grid-cols-3 gap-3">
+                    {latestClips.map(c => (
+                      <div key={c.id} className="flex flex-col items-start">
+                        {c.image ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={c.image} alt="" className="w-full h-20 object-cover rounded" />
+                        ) : (
+                          <div className="w-full h-20 bg-gray-100 rounded" />
+                        )}
+                        <div className="mt-2 text-[11px] text-subtle line-clamp-2">{c.title}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="mt-3 text-right text-xs underline">Voir tout</div>
+              </a>
+            </div>
+          </div>
         </div>
       </main>
     </>

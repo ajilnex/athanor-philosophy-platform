@@ -230,7 +230,15 @@ function validateAllCitations() {
     return
   }
 
-  process.exit(1)
+  // En CI, faire échouer le build. En local, afficher un avertissement mais continuer.
+  if (process.env.CI) {
+    console.error('\n❌ Build échoué en raison de citations invalides.')
+    process.exit(1)
+  } else {
+    console.warn(
+      '\n⚠️ Des citations invalides ont été détectées. Le build local continue, mais cela échouera en CI/production.'
+    )
+  }
 }
 
 // Exécution si script appelé directement

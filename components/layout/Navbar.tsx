@@ -36,6 +36,7 @@ export function Navbar() {
         <nav className="hidden sm:flex items-center gap-2">
           <NavItem href="/billets">Billets</NavItem>
           <NavItem href="/publications">Publications</NavItem>
+          <NavItem href="/presse-papier">Presse-papier</NavItem>
           <NavItem href="/search">Recherche</NavItem>
           {session ? (
             <button
