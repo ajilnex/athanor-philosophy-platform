@@ -1,12 +1,20 @@
-import type { Metadata } from 'next'
-import { IBM_Plex_Serif, Inter } from 'next/font/google'
+import type { Metadata, Viewport } from 'next'
+import { Inter, IBM_Plex_Serif } from 'next/font/google'
+import localFont from 'next/font/local'
 import './globals.css'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import AppSessionProvider from '@/components/SessionProvider'
 import { Toaster } from 'react-hot-toast'
 
-// Optimisation des polices avec next/font
+// Original font setup
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-sans',
+  display: 'swap',
+})
+
 const ibmPlexSerif = IBM_Plex_Serif({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600'],
@@ -15,11 +23,31 @@ const ibmPlexSerif = IBM_Plex_Serif({
   display: 'swap',
 })
 
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-sans',
-  display: 'swap',
+// New font for Salle du Temps, loaded locally
+const iaWriterDuo = localFont({
+  src: [
+    {
+      path: '../../public/fonts/iAWriterDuoS-Regular.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/iAWriterDuoS-Italic.woff2',
+      weight: '400',
+      style: 'italic',
+    },
+    {
+      path: '../../public/fonts/iAWriterDuoS-Bold.woff2',
+      weight: '700',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/iAWriterDuoS-BoldItalic.woff2',
+      weight: '700',
+      style: 'italic',
+    },
+  ],
+  variable: '--font-ia-writer',
 })
 
 export const metadata: Metadata = {
@@ -27,11 +55,17 @@ export const metadata: Metadata = {
   description: "L'athanor — Une collection d'articles de philosophie contemporaine",
 }
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
       <body
-        className={`min-h-screen bg-background text-foreground ${inter.variable} ${ibmPlexSerif.variable}`}
+        className={`min-h-screen bg-background text-foreground ${inter.variable} ${ibmPlexSerif.variable} ${iaWriterDuo.variable} font-serif`}
       >
         <AppSessionProvider>
           <div className="flex flex-col min-h-screen">

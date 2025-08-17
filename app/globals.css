@@ -1,4 +1,4 @@
-/* Polices optimisées avec next/font - variables définies dans layout.tsx */
+/* Polices : iA Writer Duo pour le contenu, Inter pour l'interface */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -33,7 +33,8 @@
   h4,
   h5,
   h6 {
-    @apply font-serif;
+    font-family: 'iA Writer Duo', 'IBM Plex Mono', monospace;
+    font-weight: 600;
   }
 
   a {
@@ -42,6 +43,40 @@
 }
 
 @layer components {
+  /* Animations légères */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes slideDown {
+    from {
+      transform: translateY(-8px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  .fade-in {
+    animation: fadeIn 200ms ease-out both;
+  }
+  .slide-down {
+    animation: slideDown 220ms ease-out both;
+  }
+
+  /* Masquer scrollbar horizontale du carrousel (mobile) */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
   /* UI Verre - Utilitaire glass */
   .glass {
     @apply bg-background/35 backdrop-blur-md border border-white/10;

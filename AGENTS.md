@@ -2,11 +2,11 @@
 
 ## Project Structure & Module Organization
 
-- `app/`: Next.js App Router routes, layouts, and API under `app/api`; global CSS in `app/globals.css`.
+- `app/`: Next.js App Router routes, layouts, and API under `app/api`; global CSS in `app/globals.css`. Public page `/presse-papier` and admin `/admin/presse-papier`.
 - `components/`: Reusable React components (PascalCase), e.g., `components/GraphSVG.tsx`.
 - `lib/`: Utilities (kebab-case). Server-only files end with `.server.ts(x)`, e.g., `lib/pdf.server.ts`; path alias `@/*`.
 - `prisma/`: Prisma schema and migrations; uses `DATABASE_URL`.
-- `scripts/`: Build/maintenance scripts (search index, bibliography, citation map, graph).
+- `scripts/`: Build/maintenance scripts (search index, bibliography, citation map, graph). `validate-citations.js` fails in prod, warns in preview.
 - `public/`: Static assets and generated artifacts (e.g., `search-index.json`, `graph-billets.svg`).
 - `content/`, `data/`: MD/MDX content and auxiliary data.
 - `test/`: Fixtures for smoke checks (no unit test framework).
@@ -15,11 +15,12 @@
 
 - Setup: `nvm use` (Node 20) → `npm ci`.
 - Dev: `npm run dev` starts the Next.js dev server.
-- Build: `npm run build` generates Prisma client, prebuilds assets, then builds Next.js.
+- Build: `npm run build` generates Prisma client, prebuilds assets, then builds Next.js (no DB migrate in build).
 - Start: `npm start` serves the production build.
 - Lint: `npm run lint` (extends `next/core-web-vitals`).
 - Smoke tests: `npm run test:build` validates search index, bibliography, graph, and `.next` output.
 - Database (Docker): `npm run db:dev:start|db:dev:stop|db:dev:reset`; schema sync `npm run db:push`; inspect `npm run db:studio`.
+- Database (Docker): `npm run db:dev:start|db:dev:stop|db:dev:reset`; dev migrations `npm run db:migrate:dev`; prod `npm run db:migrate:deploy` (run out-of-band).
 
 ## Coding Style & Naming Conventions
 
@@ -29,6 +30,7 @@
 - Routes & slugs in `app/`: kebab-case, e.g., `app/a-propos/page.tsx`.
 - Utilities in `lib/`: kebab-case; server-only suffix `.server.ts(x)`.
 - ESLint: extends `next/core-web-vitals`; `react/no-unescaped-entities` disabled. Run `npm run lint` before PRs.
+- Husky: pre-commit (lint-staged); pre-push (typecheck + bibliography + citation validation).
 
 ## Testing Guidelines
 
@@ -42,6 +44,7 @@
 - Commits: Conventional messages (`feat:`, `fix:`, `chore:`). Add scope when helpful.
 - PRs: Clear description, linked issues, and screenshots/GIFs for UI changes. Note DB schema/migration impacts and update docs.
 - Pre-submit: `npm run lint` and `npm run test:build` must pass.
+- For DB schema changes, call out migration steps; never add migrate to the build.
 
 ## Security & Configuration Tips
 
