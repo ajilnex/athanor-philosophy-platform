@@ -36,6 +36,7 @@
     "test:unit:coverage": "jest --coverage",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "fonts:download": "bash scripts/download-ia-fonts.sh",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -80,6 +81,7 @@
     "swr": "^2.3.6",
     "tailwind-merge": "^2.2.0",
     "ts-node": "^10.9.2",
+    "use-debounce": "^10.0.5",
     "zod": "^4.0.17"
   },
   "devDependencies": {

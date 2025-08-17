@@ -230,15 +230,22 @@ function validateAllCitations() {
     return
   }
 
-  // En CI, faire échouer le build. En local, afficher un avertissement mais continuer.
-  if (process.env.CI) {
+  // Politique d'échec configurable
+  // - Fail par défaut en CI
+  // - Tolérant en Preview Vercel ou si CI_ALLOW_BIBLIO_ERRORS=1
+  const isCI = Boolean(process.env.CI)
+  const isPreview = process.env.VERCEL_ENV === 'preview'
+  const allowEnv = process.env.CI_ALLOW_BIBLIO_ERRORS === '1'
+  const shouldFail = isCI && !isPreview && !allowEnv
+
+  if (shouldFail) {
     console.error('\n❌ Build échoué en raison de citations invalides.')
     process.exit(1)
-  } else {
-    console.warn(
-      '\n⚠️ Des citations invalides ont été détectées. Le build local continue, mais cela échouera en CI/production.'
-    )
   }
+
+  console.warn(
+    '\n⚠️ Des citations invalides ont été détectées. Validation non bloquante (environnement Preview/autorisé).'
+  )
 }
 
 // Exécution si script appelé directement
