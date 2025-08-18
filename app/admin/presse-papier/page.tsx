@@ -35,6 +35,7 @@ export default async function AdminPressePapierPage() {
           'use server'
           await actionAddClip(formData)
         }}
+        method="post"
         className="card border-subtle p-4 sm:p-6 mb-8"
       >
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">

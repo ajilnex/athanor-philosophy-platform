@@ -263,7 +263,12 @@ export function BilletEditor({
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => setIsImmersive(true)}
+                  onClick={async () => {
+                    setIsImmersive(true)
+                    try {
+                      await document.documentElement.requestFullscreen?.()
+                    } catch {}
+                  }}
                   className="px-3 py-1.5 text-sm rounded bg-black/90 text-white hover:bg-black/80 transition flex items-center gap-2"
                   title="Entrer dans la Salle du Temps"
                 >
@@ -284,76 +289,24 @@ export function BilletEditor({
         )}
 
         {isImmersive && (
-          <div className="fixed top-4 right-4 z-10 flex items-center gap-2">
-            <button
-              onClick={async () => {
-                try {
-                  if (!document.fullscreenElement) {
-                    await immersiveRef.current?.requestFullscreen?.()
-                    setIsFullscreen(true)
-                  } else {
-                    await document.exitFullscreen()
-                    setIsFullscreen(false)
-                  }
-                } catch {}
-              }}
-              className="p-2 bg-black/10 hover:bg-black/20 rounded-full text-black transition"
-              title={isFullscreen ? 'Quitter le plein écran' : 'Plein écran'}
-            >
-              {isFullscreen ? (
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M9 14H5v4" />
-                  <path d="M15 14h4v4" />
-                  <path d="M15 10h4V6" />
-                  <path d="M9 10H5V6" />
-                </svg>
-              ) : (
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M15 3h6v6" />
-                  <path d="M9 21H3v-6" />
-                  <path d="M21 15v6h-6" />
-                  <path d="M3 9V3h6" />
-                </svg>
-              )}
-            </button>
-            <button
-              onClick={() => setIsImmersive(false)}
-              className="p-2 bg-black/10 hover:bg-black/20 rounded-full text-black transition"
-              title="Quitter la Salle du Temps (Échap)"
-            >
-              <ChevronsRight className="h-5 w-5" />
-            </button>
-          </div>
-        )}
-
-        {/* Exit Immersive Mode Button */}
-        {isImmersive && (
           <button
-            onClick={() => setIsImmersive(false)}
-            className="fixed top-4 right-4 z-10 p-2 bg-black/10 hover:bg-black/20 rounded-full text-black transition-colors"
-            title="Quitter la Salle du Temps (Échap)"
+            onClick={async () => {
+              try {
+                if (document.fullscreenElement) {
+                  await document.exitFullscreen()
+                }
+              } catch {}
+              setIsImmersive(false)
+            }}
+            className="fixed top-2 right-2 z-10 p-1 rounded bg-black/10 hover:bg-black/20 text-black transition"
+            title="Quitter (Échap)"
+            aria-label="Quitter la Salle du Temps"
           >
-            <ChevronsRight className="h-5 w-5" />
+            <X className="h-3 w-3" />
           </button>
         )}
+
+        {/* Exit Immersive Mode Button - minimal cross only */}
 
         {/* Content Area */}
         <div
