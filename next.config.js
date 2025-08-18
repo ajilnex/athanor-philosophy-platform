@@ -47,8 +47,8 @@ module.exports = withSentryConfig(
 
     // Suppresses source map uploading logs during build
     silent: true,
-    org: 'athanor-rp',
-    project: 'javascript-nextjs',
+    org: process.env.SENTRY_ORG || 'athanor-rp',
+    project: process.env.SENTRY_PROJECT || 'javascript-nextjs',
   },
   {
     // For all available options, see:

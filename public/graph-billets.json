@@ -9,14 +9,6 @@
       "y": -77.74912035803055
     },
     {
-      "id": "billet:2025-08-04-note-de-push",
-      "label": "« note de push »",
-      "url": "/billets/2025-08-04-note-de-push",
-      "degree": 0,
-      "x": 94.1155022839682,
-      "y": -153.43491203059486
-    },
-    {
       "id": "billet:2025-08-06-12-21-30",
       "label": "BnF – Département Recherche, Section Philosophie",
       "url": "/billets/2025-08-06-12-21-30",
@@ -26,7 +18,7 @@
     },
     {
       "id": "billet:2025-08-06-16-49-31",
-      "label": "2025-08-06-16-49-31",
+      "label": "Le Louxor, un cinéma aux neuf vies",
       "url": "/billets/2025-08-06-16-49-31",
       "degree": 0,
       "x": -68.28138240694159,
@@ -217,6 +209,22 @@
       "y": -121.13976912093825
     },
     {
+      "id": "billet:2025-08-17-billet-pour-surfer-avec-mes-vieux-tonton-sur-la-raison-pure",
+      "label": "Billet pour surfer avec mes vieux tonton sur la raison pure",
+      "url": "/billets/2025-08-17-billet-pour-surfer-avec-mes-vieux-tonton-sur-la-raison-pure",
+      "degree": 0,
+      "x": 79.98787581751753,
+      "y": -60.01616217487913
+    },
+    {
+      "id": "billet:2025-08-18-test-salle-du-temps",
+      "label": "Test de la Salle du Temps",
+      "url": "/billets/2025-08-18-test-salle-du-temps",
+      "degree": 0,
+      "x": -176.84461326279842,
+      "y": -33.55566658451678
+    },
+    {
       "id": "billet:gamma",
       "label": "gamma",
       "url": "/billets/gamma",
@@ -255,6 +263,14 @@
       "degree": 0,
       "x": -193.76330987244347,
       "y": -173.3660282387396
+    },
+    {
+      "id": "billet:la-distance-de-levenshtein-sans-douleur",
+      "label": "La distance de Levenshtein, sans douleur",
+      "url": "/billets/la-distance-de-levenshtein-sans-douleur",
+      "degree": 0,
+      "x": 179.7607887184927,
+      "y": 9.276790355797882
     }
   ],
   "edges": [
@@ -345,12 +361,12 @@
     }
   ],
   "metadata": {
-    "generatedAt": "2025-08-17T19:26:03.506Z",
-    "billetsCount": 30,
-    "nodesCount": 32,
+    "generatedAt": "2025-08-18T11:56:39.930Z",
+    "billetsCount": 32,
+    "nodesCount": 34,
     "stability": {
       "pivotsLocked": 8,
-      "newNodes": 0,
+      "newNodes": 3,
       "avgMovement": 0
     }
   }

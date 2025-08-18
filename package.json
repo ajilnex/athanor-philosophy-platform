@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npx prisma generate && npx dotenv-cli -e .env.local -- bash -c '(node scripts/build-bibliography.js && node scripts/validate-citations.js && node scripts/build-citation-map.js) & (node scripts/build-graph-billets.cjs && node scripts/render-graph-svg.cjs) & (node scripts/build-search-index.js); wait' && next build",
+    "build": "npx prisma generate && npx dotenv-cli -e .env.local -- bash scripts/build-orchestrator.sh && next build",
     "build:analyze": "ANALYZE=true npm run build",
     "start": "next start",
     "lint": "next lint",

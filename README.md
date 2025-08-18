@@ -93,7 +93,17 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
    ZOTERO_API_KEY="your-zotero-key"
    ```
 
-4. **Lancez PostgreSQL avec Docker**
+4. **Téléchargez les polices (iA Writer Duo)**
+
+   Pour éviter les erreurs de format de polices et améliorer les performances locales, téléchargez les polices iA Writer Duo en local:
+
+   ```bash
+   npm run fonts:download
+   ```
+
+   Note: certains fichiers `.woff2` placés manuellement dans `public/fonts/` peuvent en réalité contenir du HTML (téléchargés via l'UI GitHub). Si vous voyez « Unknown font format » au build, supprimez les fichiers corrompus de `public/fonts/` et utilisez les fichiers téléchargés dans `public/fonts/ia-writer/` (copiez-les si nécessaire vers `public/fonts/`).
+
+5. **Lancez PostgreSQL avec Docker**
 
    ```bash
    # Option 1: Docker command direct
@@ -103,19 +113,19 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
    npm run db:dev:start
    ```
 
-5. **Initialisez la base de données**
+6. **Initialisez la base de données**
 
    ```bash
    npm run db:migrate:dev   # Applique les migrations en local
    ```
 
-6. **Lancez le serveur de développement**
+7. **Lancez le serveur de développement**
 
    ```bash
    npm run dev
    ```
 
-7. **Ouvrez votre navigateur**
+8. **Ouvrez votre navigateur**
    ```
    http://localhost:3000
    ```
@@ -194,6 +204,7 @@ La section "Billets" fonctionne sur un principe de "Git-as-a-CMS". Toute gestion
 
 - `npm run build` - Build optimisé (bibliographie, validation citations, graphe, index, puis Next.js)
 - `npm run start` - Serveur de production
+- `npm run test:build` - Smoke test du build (valide index de recherche, biblio, graphe, sortie `.next`)
 
 #### Base de données
 
@@ -213,6 +224,11 @@ La section "Billets" fonctionne sur un principe de "Git-as-a-CMS". Toute gestion
 - `npm run graph:build` - Génère le graphe des billets
 - `npm run graph:svg` - Rend le SVG interactif
 - `npm run search:build` - Reconstruit l'index de recherche
+
+Notes index de recherche:
+
+- Les billets (.mdx) sont indexés hors base de données.
+- Les publications (PDF) sont indexées depuis la base via Prisma (champ `Article.filePath`). Ce champ doit pointer vers une URL HTTP(S) accessible (ex: Cloudinary). En local, si vous pointez vers une URL relative (`/uploads/…`), assurez-vous que l’URL complète construite avec `NEXTAUTH_URL` est joignable pendant le build — sinon seuls les billets seront indexés.
 
 #### Tests
 
@@ -267,6 +283,25 @@ Pour déployer en production :
    - `NEXTAUTH_URL` - URL de votre site
    - `NEXTAUTH_SECRET` - Clé secrète pour l'authentification
    - Voir `DEPLOY.md` pour la liste complète
+
+## Monitoring (Sentry)
+
+- Sentry capture les erreurs, performances et traces côté serveur/client, avec upload des sourcemaps pour des stacktraces lisibles.
+- Configuration déjà intégrée: `withSentryConfig` dans `next.config.js` et fichiers d'initialisation (client/server/edge) + `instrumentation.ts` + `app/global-error.tsx`.
+
+Étapes de configuration:
+
+- Ajoutez les variables d'env:
+  - `SENTRY_DSN` (ou `NEXT_PUBLIC_SENTRY_DSN`)
+  - `SENTRY_ENVIRONMENT` (ex: `production`, `preview`, `development`)
+  - En CI (Vercel): `SENTRY_AUTH_TOKEN` pour l'upload automatique des sourcemaps.
+- Déployez; vérifiez dans Sentry que les événements et releases apparaissent.
+
+Tester localement:
+
+- Définissez `SENTRY_DSN` et lancez un build/dev.
+- Provoquez une erreur (ex: bouton qui `throw new Error("Test Sentry")`) et vérifiez l'évènement dans Sentry.
+- Partagez l’Event ID avec l’équipe (ou avec l’agent) pour l’analyse ciblée.
 
 ## Personnalisation
 
@@ -345,6 +380,25 @@ Les polices sont optimisées via next/font dans `app/layout.tsx` :
 - Les balises `<Cite item="..." />` sont validées au build; en cas de faute, le build Preview émet un avertissement, la Prod échoue.
 - Pour montrer un “mauvais exemple” dans un billet sans faire échouer la validation, utilisez un bloc de code ou échappez les chevrons: `&lt;Cite item="MauvaiseCle" /&gt;`.
 
+Astuce migration de clés: si vous avez des anciennes citekeys, utilisez le script `npm run bibliography:migrate-keys` pour proposer des clés cohérentes à partir du contenu Zotero.
+
 ## Support
 
 Pour toute question ou problème, veuillez créer une issue dans le dépôt GitHub.
+
+## Dépannage
+
+- Polices iA Writer: « Unknown font format »
+  - Cause: fichiers `.woff2` corrompus (HTML GitHub enregistré en `.woff2`).
+  - Fix: `npm run fonts:download` afin de récupérer `public/fonts/ia-writer/*`. Supprimez les mauvais fichiers de `public/fonts/` et copiez les `.woff2` valides si votre configuration attend ces fichiers à la racine.
+
+- Sentry: avertissements « instrumentation file » et « global error handler »
+  - Option 1 (recommandé): compléter l’installation Sentry (ajouter `instrumentation.ts` et un `app/global-error.tsx`). Voir la doc: https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+  - Option 2 (local uniquement): supprimer les avertissements en définissant les variables d’env: `SENTRY_SUPPRESS_INSTRUMENTATION_FILE_WARNING=1` et `SENTRY_SUPPRESS_GLOBAL_ERROR_HANDLER_FILE_WARNING=1`.
+
+- Index recherche: publications non indexées et logs « fetch failed/timeout »
+  - Cause: le script d’extraction PDF tente de télécharger le PDF via HTTP(S). Une URL injoignable (ex: placeholder `https://example.com/...`) provoque un timeout.
+  - Fix: utilisez des URLs Cloudinary réelles ou mettez temporairement les publications hors index (les billets seront indexés quand même). Pour tests locaux, privilégiez une URL HTTP joignable.
+
+- Validation des citations: clés invalides (ex: `Blok1978` → `Block1978`)
+  - Fix: corrigez la clé dans le billet pour correspondre à la bibliographie générée (`public/bibliography.json`) puis relancez le build. En Preview, c’est un warning; en production, c’est bloquant.
