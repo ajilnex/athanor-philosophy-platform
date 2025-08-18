@@ -28,6 +28,7 @@ import CodeMirror from '@uiw/react-codemirror'
 import { markdown } from '@codemirror/lang-markdown'
 import { EditorView } from '@codemirror/view'
 import { useDebouncedCallback } from 'use-debounce'
+import { iaWriterDuo } from './immersive-font'
 
 // ... (interfaces BilletEditorProps, BilletData remain the same)
 interface BilletEditorProps {
@@ -76,6 +77,9 @@ export function BilletEditor({
   const [error, setError] = useState<string | null>(null)
 
   const editorRef = useRef<any>(null)
+  const immersiveRef = useRef<HTMLDivElement>(null)
+  const [dirty, setDirty] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
   // ... (previewHtml, generateSlug, handleTitleChange, insertTextAtCursor, etc. remain the same)
 
@@ -115,13 +119,17 @@ export function BilletEditor({
   }, [content, title, slug, mode, initialData, onSave, isImmersive, onClose, tags, excerpt])
 
   // Auto-save logic for immersive mode
-  const debouncedSave = useDebouncedCallback(handleSave, 30000) // 30 seconds
+  const debouncedSave = useDebouncedCallback(() => {
+    if (!dirty) return
+    if (!content.trim()) return
+    handleSave()
+  }, 30000)
 
   useEffect(() => {
     if (isImmersive) {
       debouncedSave()
     }
-  }, [content, isImmersive, debouncedSave])
+  }, [content, dirty, isImmersive, debouncedSave])
 
   // Handle immersive mode side effects
   useEffect(() => {
@@ -132,6 +140,7 @@ export function BilletEditor({
     }
 
     if (isImmersive) {
+      // Verrouille le scroll de la page sous-jacente et autorise le scroll de l'éditeur
       document.body.classList.add('salle-du-temps-active')
       window.addEventListener('keydown', handleKeyDown)
     } else {
@@ -200,11 +209,24 @@ export function BilletEditor({
   if (!isOpen) return null
 
   const mainContainerClasses = isImmersive
-    ? 'salle-du-temps fixed inset-0 bg-[#FAFAF8] z-50 font-ia-writer p-4 sm:p-8 md:p-12 lg:p-20'
+    ? 'salle-du-temps fixed inset-0 z-50 p-4 sm:p-8 md:p-12 lg:p-20'
     : 'fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4'
 
   return (
-    <div className={mainContainerClasses}>
+    <div
+      ref={immersiveRef}
+      className={
+        isImmersive ? `${mainContainerClasses} ${iaWriterDuo.className}` : mainContainerClasses
+      }
+      style={
+        isImmersive
+          ? {
+              backgroundColor: '#FAFAF8',
+              color: 'hsl(220, 15%, 20%)',
+            }
+          : undefined
+      }
+    >
       <div
         data-testid="billet-editor"
         className={
@@ -261,6 +283,67 @@ export function BilletEditor({
           </>
         )}
 
+        {isImmersive && (
+          <div className="fixed top-4 right-4 z-10 flex items-center gap-2">
+            <button
+              onClick={async () => {
+                try {
+                  if (!document.fullscreenElement) {
+                    await immersiveRef.current?.requestFullscreen?.()
+                    setIsFullscreen(true)
+                  } else {
+                    await document.exitFullscreen()
+                    setIsFullscreen(false)
+                  }
+                } catch {}
+              }}
+              className="p-2 bg-black/10 hover:bg-black/20 rounded-full text-black transition"
+              title={isFullscreen ? 'Quitter le plein écran' : 'Plein écran'}
+            >
+              {isFullscreen ? (
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M9 14H5v4" />
+                  <path d="M15 14h4v4" />
+                  <path d="M15 10h4V6" />
+                  <path d="M9 10H5V6" />
+                </svg>
+              ) : (
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M15 3h6v6" />
+                  <path d="M9 21H3v-6" />
+                  <path d="M21 15v6h-6" />
+                  <path d="M3 9V3h6" />
+                </svg>
+              )}
+            </button>
+            <button
+              onClick={() => setIsImmersive(false)}
+              className="p-2 bg-black/10 hover:bg-black/20 rounded-full text-black transition"
+              title="Quitter la Salle du Temps (Échap)"
+            >
+              <ChevronsRight className="h-5 w-5" />
+            </button>
+          </div>
+        )}
+
         {/* Exit Immersive Mode Button */}
         {isImmersive && (
           <button
@@ -285,7 +368,10 @@ export function BilletEditor({
             <CodeMirror
               ref={editorRef}
               value={content}
-              onChange={value => setContent(value)}
+              onChange={value => {
+                setContent(value)
+                setDirty(true)
+              }}
               basicSetup={{ lineNumbers: false, foldGutter: false, closeBrackets: false }}
               extensions={extensions}
               placeholder={isImmersive ? '...' : '# Votre billet en Markdown...'}

@@ -77,8 +77,7 @@ export default async function HomePage() {
           <div className="mt-10" data-graph-shield>
             <div className="w-full max-w-lg mx-auto">
               <h2 className="font-serif text-lg text-subtle mb-3 text-center">Presse-papier</h2>
-              <a
-                href="/presse-papier"
+              <div
                 className="block p-4 transition-all duration-300 bg-background/95 backdrop-blur-sm rounded-lg border border-subtle/10"
                 data-graph-shield
               >
@@ -87,14 +86,13 @@ export default async function HomePage() {
                 ) : (
                   <>
                     {/* Mobile: carrousel horizontal */}
-                    <div
-                      className="sm:hidden -mx-2 px-2 overflow-x-auto no-scrollbar flex gap-3 snap-x snap-mandatory"
-                      data-graph-shield
-                    >
+                    <div className="sm:hidden -mx-2 px-2 overflow-x-auto no-scrollbar flex gap-3 snap-x snap-mandatory">
                       {latestClips.map(c => (
                         <a
                           key={c.id}
-                          href="/presse-papier"
+                          href={c.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="min-w-[68%] snap-start"
                           aria-label={c.title}
                         >
@@ -107,6 +105,9 @@ export default async function HomePage() {
                             )}
                             <div className="p-2">
                               <div className="text-[11px] text-subtle line-clamp-2">{c.title}</div>
+                              <div className="mt-1 text-[10px] text-subtle/80 truncate">
+                                {c.siteName || new URL(c.url).hostname}
+                              </div>
                             </div>
                           </div>
                         </a>
@@ -114,9 +115,15 @@ export default async function HomePage() {
                     </div>
 
                     {/* ≥ sm: grille compacte */}
-                    <div className="hidden sm:grid grid-cols-3 gap-3" data-graph-shield>
+                    <div className="hidden sm:grid grid-cols-3 gap-3">
                       {latestClips.map(c => (
-                        <div key={c.id} className="flex flex-col items-start">
+                        <a
+                          key={c.id}
+                          href={c.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex flex-col items-start hover:opacity-90 transition"
+                        >
                           {c.image ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
@@ -128,13 +135,18 @@ export default async function HomePage() {
                             <div className="w-full h-20 bg-gray-100 rounded" />
                           )}
                           <div className="mt-2 text-[11px] text-subtle line-clamp-2">{c.title}</div>
-                        </div>
+                          <div className="text-[10px] text-subtle/80 truncate">
+                            {c.siteName || new URL(c.url).hostname}
+                          </div>
+                        </a>
                       ))}
                     </div>
                   </>
                 )}
-                <div className="mt-3 text-right text-xs underline">Voir tout</div>
-              </a>
+                <div className="mt-3 text-right text-xs underline">
+                  <a href="/presse-papier">Voir tout</a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
