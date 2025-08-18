@@ -40,6 +40,11 @@ npm run build
 ⚠️ **Serverless** : Timeout Vercel 45s build, surveillez les scripts lourds
 🏗️ **TypeScript** : Analyse statique rapide avec `npm run typecheck:scripts`
 
+💡 Bonnes pratiques build
+
+- Ne pas exécuter `prisma migrate deploy` pendant le build. Appliquez les migrations en amont (manuellement ou via job dédié), puis lancez le build.
+- En Preview Vercel (`VERCEL_ENV=preview`), la validation des citations est tolérante (warnings). En production, elle est stricte (échec si fautes).
+
 ## 🗄️ Configuration Base de Données
 
 ### PostgreSQL (Production)
@@ -73,6 +78,13 @@ npx prisma migrate status
 
 # Note : db push abandonné au profit du système de migrations robuste
 ```
+
+##### En cas d'historique bloqué (P3009)
+
+- Si Vercel signale: `migrate found failed migrations ...` (P3009), corrigez l'historique:
+  - Option A (Prisma): `prisma migrate resolve --applied <id_migration>` (en pointant vers la prod via `.env.production` avec `DATABASE_URL` et `DIRECT_DATABASE_URL`).
+  - Option B (SQL direct via Neon): marquer la migration comme appliquée dans `_prisma_migrations` (voir docs Prisma). Faites une sauvegarde avant toute opération.
+  - Relancez ensuite `prisma migrate deploy` hors build, puis un build normal.
 
 #### Workflow de Synchronisation Prod → Dev (Nouveau)
 
@@ -155,6 +167,20 @@ NEXTAUTH_SECRET="votre-secret-nextauth-genere"
 ```bash
 DATABASE_URL="postgresql://username:password@host:port/database"
 DIRECT_DATABASE_URL="postgresql://username:password@direct-host:port/database"  # Optionnel
+```
+
+Notes Neon (ou équivalent):
+
+- Si l'accès est restreint par IP, autoriser les IP de build Vercel, ou assouplir temporairement (0.0.0.0/0) côté dev.
+- Évitez toute opération de migration dans le step build pour prévenir les erreurs réseau (P1001) et d'historique (P3009).
+
+#### 📚 Validation citations
+
+```bash
+# Preview tolérante (n'échoue pas sur fautes de citations)
+VERCEL_ENV=preview
+# Optionnel pour CI custom
+CI_ALLOW_BIBLIO_ERRORS=1
 ```
 
 #### 🔐 Sécurité API

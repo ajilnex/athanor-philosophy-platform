@@ -85,19 +85,53 @@ export default async function HomePage() {
                 {latestClips.length === 0 ? (
                   <p className="text-sm text-subtle text-center">Aucun lien pour l'instant</p>
                 ) : (
-                  <div className="grid grid-cols-3 gap-3">
-                    {latestClips.map(c => (
-                      <div key={c.id} className="flex flex-col items-start">
-                        {c.image ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={c.image} alt="" className="w-full h-20 object-cover rounded" />
-                        ) : (
-                          <div className="w-full h-20 bg-gray-100 rounded" />
-                        )}
-                        <div className="mt-2 text-[11px] text-subtle line-clamp-2">{c.title}</div>
-                      </div>
-                    ))}
-                  </div>
+                  <>
+                    {/* Mobile: carrousel horizontal */}
+                    <div
+                      className="sm:hidden -mx-2 px-2 overflow-x-auto no-scrollbar flex gap-3 snap-x snap-mandatory"
+                      data-graph-shield
+                    >
+                      {latestClips.map(c => (
+                        <a
+                          key={c.id}
+                          href="/presse-papier"
+                          className="min-w-[68%] snap-start"
+                          aria-label={c.title}
+                        >
+                          <div className="rounded-lg overflow-hidden border border-subtle/40 bg-background/80 backdrop-blur-sm">
+                            {c.image ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={c.image} alt="" className="w-full h-24 object-cover" />
+                            ) : (
+                              <div className="w-full h-24 bg-gray-100" />
+                            )}
+                            <div className="p-2">
+                              <div className="text-[11px] text-subtle line-clamp-2">{c.title}</div>
+                            </div>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+
+                    {/* ≥ sm: grille compacte */}
+                    <div className="hidden sm:grid grid-cols-3 gap-3" data-graph-shield>
+                      {latestClips.map(c => (
+                        <div key={c.id} className="flex flex-col items-start">
+                          {c.image ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={c.image}
+                              alt=""
+                              className="w-full h-20 object-cover rounded"
+                            />
+                          ) : (
+                            <div className="w-full h-20 bg-gray-100 rounded" />
+                          )}
+                          <div className="mt-2 text-[11px] text-subtle line-clamp-2">{c.title}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}
                 <div className="mt-3 text-right text-xs underline">Voir tout</div>
               </a>

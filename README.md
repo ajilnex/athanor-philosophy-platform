@@ -6,6 +6,7 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
 
 - ✨ **Interface moderne** - Design académique optimisé avec next/font
 - 📚 **Publications PDF** - Gestion intégrée avec Cloudinary
+- 📰 **Presse‑papier** - Liens lus par l'équipe, avec aperçus OpenGraph
 - 📝 **Billets MDX** - Système Git-as-CMS avec backlinks automatiques
 - 🕰️ **Graphe interactif** - Visualisation des connexions entre billets
 - 🔍 **Recherche unifiée** - Index statique avec snippets contextuels
@@ -56,7 +57,8 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
 2. **Installez les dépendances**
 
    ```bash
-   npm install
+   nvm use
+   npm ci
    ```
 
 3. **Configurez l'environnement**
@@ -104,8 +106,7 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
 5. **Initialisez la base de données**
 
    ```bash
-   npm run db:push    # Synchronise le schéma
-   npm run db:seed    # Ajoute des données de test (optionnel)
+   npm run db:migrate:dev   # Applique les migrations en local
    ```
 
 6. **Lancez le serveur de développement**
@@ -129,6 +130,7 @@ philosophy-platform/
 │   ├── edition/           # Maison d'édition et auteurs
 │   ├── graphe/            # Visualisation graphique
 │   ├── publications/      # Pages des publications
+│   ├── presse-papier/     # Page publique Presse‑papier
 │   ├── recherche/         # Page de recherche
 │   └── api/              # Routes API
 ├── components/            # Composants React réutilisables
@@ -139,6 +141,8 @@ philosophy-platform/
 ├── content/              # Contenu MDX
 │   └── billets/          # Billets au format MDX
 ├── lib/                  # Utilitaires et configuration
+│   ├── presse-papier.ts  # Accès DB Presse‑papier (Prisma)
+│   └── link-preview.server.ts # Récupération métadonnées OpenGraph
 ├── prisma/               # Schéma et migrations de base de données
 ├── scripts/              # Scripts de build et utilitaires
 └── public/               # Fichiers statiques
@@ -170,6 +174,12 @@ La section "Billets" fonctionne sur un principe de "Git-as-a-CMS". Toute gestion
   git push
   ```
 
+### Presse‑papier (Liens avec aperçus)
+
+- Accès admin: `/admin/presse-papier`
+- Ajouter un lien (URL + note) → les métadonnées (titre, image, site) sont récupérées automatiquement si disponibles (OpenGraph/Twitter)
+- Page publique: `/presse-papier` (+ aperçu des 3 derniers liens sur la page d’accueil)
+
 ## Développement
 
 ### Scripts disponibles
@@ -182,14 +192,14 @@ La section "Billets" fonctionne sur un principe de "Git-as-a-CMS". Toute gestion
 
 #### Build & Production
 
-- `npm run build` - Build optimisé avec pipeline parallélisé
+- `npm run build` - Build optimisé (bibliographie, validation citations, graphe, index, puis Next.js)
 - `npm run start` - Serveur de production
 
 #### Base de données
 
 - `npm run db:dev:start` - Lance PostgreSQL Docker
 - `npm run db:migrate:dev` - Migrations développement
-- `npm run db:migrate:deploy` - Migrations production
+- `npm run db:migrate:deploy` - Migrations production (à exécuter hors build CI)
 - `npm run db:studio` - Interface Prisma Studio
 
 #### Synchronisation & Snapshots
@@ -223,8 +233,9 @@ npm run format            # Formatage Prettier
 npm run format:check      # Vérifier format sans modifier
 
 # Git hooks (automatiques)
-# git commit -> ESLint --fix + Prettier --write
-# git push -> npm run typecheck (bloque si erreurs)
+# pre-commit -> ESLint --fix + Prettier --write (lint-staged)
+# pre-push   -> typecheck + build bibliographie + validation citations
+# Note: en Preview Vercel, la validation des citations est tolérante (warning). En prod, elle est stricte.
 ```
 
 ### Ajout d'articles
@@ -296,9 +307,8 @@ Les polices sont optimisées via next/font dans `app/layout.tsx` :
 ### Git Hooks Automatiques
 
 - **Pre-commit** - ESLint --fix + Prettier --write via lint-staged
-- **Pre-push** - Vérification TypeScript obligatoire (bloque si erreurs)
-- **Performance** - Traitement uniquement des fichiers modifiés
-- **Workflow** - Qualité code garantie automatiquement
+- **Pre-push** - TypeScript + bibliographie + validation des citations (bloque si erreurs locales)
+- **Preview vs Prod** - Tolérant en Preview Vercel (warnings), strict en prod (échec si fautes)
 
 ### Configuration Prettier
 
@@ -326,9 +336,14 @@ Les polices sont optimisées via next/font dans `app/layout.tsx` :
    - Commande unifiée `npm run db:reset` pour reset complet
 
 2. **Migrations Base de Données**
-   - Système Prisma migrate (pas db push)
+   - Système Prisma migrate (pas de `db push` en prod)
    - Variables d'environnement harmonisées avec dotenv-cli
-   - Séparation dev/prod avec commandes dédiées
+   - Séparation dev/prod avec commandes dédiées; ne pas exécuter de migrations pendant le build
+
+## Citations & Bibliographie
+
+- Les balises `<Cite item="..." />` sont validées au build; en cas de faute, le build Preview émet un avertissement, la Prod échoue.
+- Pour montrer un “mauvais exemple” dans un billet sans faire échouer la validation, utilisez un bloc de code ou échappez les chevrons: `&lt;Cite item="MauvaiseCle" /&gt;`.
 
 ## Support
 

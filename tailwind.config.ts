@@ -21,8 +21,9 @@ const config: Config = {
         black: '#000000',
       },
       fontFamily: {
-        serif: ['var(--font-serif)', 'Georgia', 'serif'],
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-serif)', 'serif'],
+        'ia-writer': ['var(--font-ia-writer)', 'serif'],
       },
       backgroundImage: {
         'aurore-gradient':
