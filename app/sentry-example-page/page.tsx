@@ -1,21 +1,5 @@
 import React from 'react'
-
-function TriggerErrorButton() {
-  'use client'
-
-  return (
-    <button
-      className="btn btn-secondary"
-      onClick={() => {
-        // Intentionally call an undefined function to trigger a client error
-        // @ts-ignore
-        myUndefinedFunction()
-      }}
-    >
-      Provoquer une erreur JS
-    </button>
-  )
-}
+import { TriggerErrorButton } from './trigger-error-button'
 
 export default function SentryExamplePage() {
   return (
