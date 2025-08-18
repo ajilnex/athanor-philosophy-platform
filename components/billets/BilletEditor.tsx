@@ -81,6 +81,30 @@ export function BilletEditor({
   const [dirty, setDirty] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
 
+  // Helpers d'insertion dans l'éditeur
+  const insertAtCursor = useCallback((snippet: string) => {
+    const view: EditorView | undefined = editorRef.current?.view
+    if (!view) {
+      setContent(prev => (prev ? `${prev}\n\n${snippet}` : snippet))
+      setDirty(true)
+      return
+    }
+    const { from, to } = view.state.selection.main
+    view.dispatch({ changes: { from, to, insert: snippet } })
+    setContent(view.state.doc.toString())
+    setDirty(true)
+    // Re-focus editor after modal actions
+    setTimeout(() => view.focus(), 0)
+  }, [])
+
+  const getSelectedText = useCallback(() => {
+    const view: EditorView | undefined = editorRef.current?.view
+    if (!view) return ''
+    const { from, to } = view.state.selection.main
+    if (from === to) return ''
+    return view.state.sliceDoc(from, to)
+  }, [])
+
   // ... (previewHtml, generateSlug, handleTitleChange, insertTextAtCursor, etc. remain the same)
 
   const handleSave = useCallback(async () => {
@@ -250,7 +274,7 @@ export function BilletEditor({
             {/* Toolbar */}
             <div className="flex items-center justify-between p-4 border-b bg-gray-50">
               <div className="flex items-center gap-2">
-                {/* Exemple: quelques actions usuelles (placeholder minimal) */}
+                {/* Actions éditeur */}
                 <button
                   type="button"
                   onClick={() => setShowImageUpload(true)}
@@ -258,6 +282,25 @@ export function BilletEditor({
                   title="Insérer une image"
                 >
                   <ImageIcon className="h-4 w-4 inline mr-1" /> Image
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCitationPicker(true)}
+                  className="px-3 py-1.5 text-sm border border-subtle/50 rounded hover:bg-muted transition"
+                  title="Citer avec Zotero"
+                >
+                  <GraduationCap className="h-4 w-4 inline mr-1" /> Citer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedTextForBacklink(getSelectedText())
+                    setShowBacklinkPicker(true)
+                  }}
+                  className="px-3 py-1.5 text-sm border border-subtle/50 rounded hover:bg-muted transition"
+                  title="Insérer un backlink"
+                >
+                  <Link2 className="h-4 w-4 inline mr-1" /> Backlink
                 </button>
               </div>
               <div className="flex items-center gap-2">
@@ -333,8 +376,55 @@ export function BilletEditor({
           </div>
         </div>
 
-        {/* Modals (only render if not in immersive mode) */}
-        {!isImmersive && <>{/* ... All modals like ImageUpload, CitationPicker, etc. ... */}</>}
+        {/* Modals (non immersif) */}
+        {!isImmersive && (
+          <>
+            {/* Image Upload Modal */}
+            {showImageUpload && (
+              <div className="absolute inset-0 bg-black/25 flex items-center justify-center p-8">
+                <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg relative">
+                  <button
+                    onClick={() => setShowImageUpload(false)}
+                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                    aria-label="Fermer"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                  <h3 className="text-lg font-medium mb-4">Ajouter une image</h3>
+                  <ImageUpload
+                    onImageUploaded={(_url, md) => {
+                      insertAtCursor(md)
+                      setShowImageUpload(false)
+                    }}
+                    autoInsert={false}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Citation Picker */}
+            <CitationPicker
+              isOpen={showCitationPicker}
+              onClose={() => setShowCitationPicker(false)}
+              onCitationSelect={key => {
+                insertAtCursor(`<Cite item="${key}" />`)
+                setShowCitationPicker(false)
+              }}
+            />
+
+            {/* Backlink Picker */}
+            <BacklinkPicker
+              isOpen={showBacklinkPicker}
+              onClose={() => setShowBacklinkPicker(false)}
+              onSelect={(slug, alias) => {
+                const text = alias ? `[[${slug}|${alias}]]` : `[[${slug}]]`
+                insertAtCursor(text)
+                setShowBacklinkPicker(false)
+              }}
+              selectedText={selectedTextForBacklink}
+            />
+          </>
+        )}
       </div>
     </div>
   )
