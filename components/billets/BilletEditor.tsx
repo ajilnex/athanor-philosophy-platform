@@ -260,7 +260,7 @@ export function BilletEditor({
   if (!isOpen) return null
 
   const mainContainerClasses = isImmersive
-    ? 'salle-du-temps fixed inset-0 z-50 p-4 sm:p-8 md:p-12 lg:p-20'
+    ? 'salle-du-temps fixed inset-0 z-[70] p-4 sm:p-8 md:p-12 lg:p-20'
     : 'fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4'
 
   return (
@@ -385,11 +385,11 @@ export function BilletEditor({
               } catch {}
               setIsImmersive(false)
             }}
-            className="fixed top-2 right-2 z-10 p-1 rounded bg-black/10 hover:bg-black/20 text-black transition"
+            className="fixed top-4 right-4 z-[80] p-2 rounded bg-black/10 hover:bg-black/20 text-black transition shadow"
             title="Quitter (Échap)"
             aria-label="Quitter la Salle du Temps"
           >
-            <X className="h-3 w-3" />
+            <X className="h-5 w-5" />
           </button>
         )}
 
@@ -398,14 +398,14 @@ export function BilletEditor({
         {/* Content Area */}
         <div
           className={
-            isImmersive ? 'h-full w-full max-w-3xl mx-auto flex-1' : 'flex-1 overflow-hidden flex'
+            isImmersive ? 'h-full w-full max-w-4xl mx-auto flex-1' : 'flex-1 overflow-hidden flex'
           }
         >
           <div className={isImmersive ? 'h-full w-full' : 'flex-1 p-6 overflow-y-auto'}>
             {!isImmersive && <>{/* Meta Fields */}</>}
 
             {/* CodeMirror Editor */}
-            <div className={isImmersive ? 'h-full w-full relative' : 'relative'}>
+            <div className={isImmersive ? 'h-full w-full relative' : 'relative min-h-[60vh]'}>
               <CodeMirror
                 ref={editorRef}
                 value={content}
@@ -416,7 +416,9 @@ export function BilletEditor({
                 basicSetup={{ lineNumbers: false, foldGutter: false, closeBrackets: false }}
                 extensions={extensions}
                 placeholder={isImmersive ? '...' : ''}
-                className={isImmersive ? 'h-full w-full bg-transparent' : ''}
+                className={isImmersive ? 'h-full w-full bg-transparent' : 'w-full'}
+                height={isImmersive ? '100%' : '70vh'}
+                width={'100%'}
               />
 
               {/* Mini‑tuto (mode normal, vide) */}
