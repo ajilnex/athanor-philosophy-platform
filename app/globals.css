@@ -40,6 +40,11 @@
   a {
     @apply hover:underline;
   }
+
+  /* Mode Salle du Temps - verrouillage scroll body */
+  .salle-du-temps-active {
+    overflow: hidden;
+  }
 }
 
 @layer components {

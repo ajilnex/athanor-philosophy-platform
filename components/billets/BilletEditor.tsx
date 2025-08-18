@@ -163,7 +163,35 @@ export function BilletEditor({
     ]
 
     if (isImmersive) {
-      // Placeholder for future typewriter scrolling extension
+      // Typewriter-like centering and smoother scroll padding in immersive mode
+      baseExtensions.push(
+        EditorView.theme({
+          '.cm-scroller': {
+            scrollPaddingTop: '50vh',
+            scrollPaddingBottom: '50vh',
+          },
+        })
+      )
+
+      baseExtensions.push(
+        EditorView.updateListener.of(update => {
+          if (!editorRef.current?.view) return
+          const view: EditorView = editorRef.current.view
+          if (update.selectionSet || update.focusChanged) {
+            const head = view.state.selection.main.head
+            const rect = view.coordsAtPos(head)
+            if (rect) {
+              const scroller = view.scrollDOM
+              const middle = scroller.clientHeight / 2
+              const target = rect.top + scroller.scrollTop - middle
+              // Seuillage léger pour éviter micro-ajustements permanents
+              if (Math.abs(scroller.scrollTop - target) > 8) {
+                scroller.scrollTo({ top: target, behavior: 'smooth' })
+              }
+            }
+          }
+        })
+      )
     }
 
     return baseExtensions
@@ -199,7 +227,36 @@ export function BilletEditor({
 
             {/* Toolbar */}
             <div className="flex items-center justify-between p-4 border-b bg-gray-50">
-              {/* ... Toolbar buttons ... */}
+              <div className="flex items-center gap-2">
+                {/* Exemple: quelques actions usuelles (placeholder minimal) */}
+                <button
+                  type="button"
+                  onClick={() => setShowImageUpload(true)}
+                  className="px-3 py-1.5 text-sm border border-subtle/50 rounded hover:bg-muted transition"
+                  title="Insérer une image"
+                >
+                  <ImageIcon className="h-4 w-4 inline mr-1" /> Image
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsImmersive(true)}
+                  className="px-3 py-1.5 text-sm rounded bg-black/90 text-white hover:bg-black/80 transition flex items-center gap-2"
+                  title="Entrer dans la Salle du Temps"
+                >
+                  <Clock className="h-4 w-4" /> Salle du Temps
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  className="px-3 py-1.5 text-sm rounded bg-foreground text-background hover:bg-foreground/90 transition flex items-center gap-2"
+                  disabled={isSaving}
+                  title="Enregistrer"
+                >
+                  <Save className="h-4 w-4" /> {isSaving ? 'Sauvegarde…' : 'Enregistrer'}
+                </button>
+              </div>
             </div>
           </>
         )}
