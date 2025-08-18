@@ -75,6 +75,7 @@ export function BilletEditor({
   const [isImmersive, setIsImmersive] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [previewHtml, setPreviewHtml] = useState<string>('')
 
   const editorRef = useRef<any>(null)
   const immersiveRef = useRef<HTMLDivElement>(null)
@@ -154,6 +155,32 @@ export function BilletEditor({
       debouncedSave()
     }
   }, [content, dirty, isImmersive, debouncedSave])
+
+  // Generate HTML preview from Markdown (simple, non-MDX)
+  useEffect(() => {
+    if (!showPreview) return
+    const compile = async () => {
+      try {
+        // Preprocess custom syntax: backlinks [[slug|alias]] and <Cite item="key" />
+        let md = content || ''
+        md = md.replace(
+          /\[\[([^\]|]+)\|([^\]]+)\]\]/g,
+          (_m, slug, alias) => `[${alias}](/billets/${slug})`
+        )
+        md = md.replace(/\[\[([^\]]+)\]\]/g, (_m, slug) => `[${slug}](/billets/${slug})`)
+        md = md.replace(
+          /<Cite\s+[^>]*item=["']([^"']+)["'][^>]*\/?>(?:<\/Cite>)?/gi,
+          (_m, key) => `[*${key}*]`
+        )
+
+        const file = await remark().use(html).process(md)
+        setPreviewHtml(String(file))
+      } catch (e) {
+        setPreviewHtml('<p class="text-red-600">Erreur de prévisualisation.</p>')
+      }
+    }
+    compile()
+  }, [content, showPreview])
 
   // Handle immersive mode side effects
   useEffect(() => {
@@ -306,6 +333,23 @@ export function BilletEditor({
               <div className="flex items-center gap-2">
                 <button
                   type="button"
+                  onClick={() => setShowPreview(p => !p)}
+                  className={`px-3 py-1.5 text-sm rounded border transition ${
+                    showPreview
+                      ? 'bg-foreground text-background border-foreground'
+                      : 'border-subtle/50 hover:bg-muted'
+                  }`}
+                  title="Basculer l'aperçu"
+                >
+                  {showPreview ? (
+                    <EyeOff className="h-4 w-4 inline mr-1" />
+                  ) : (
+                    <Eye className="h-4 w-4 inline mr-1" />
+                  )}{' '}
+                  Aperçu
+                </button>
+                <button
+                  type="button"
                   onClick={async () => {
                     setIsImmersive(true)
                     try {
@@ -361,18 +405,55 @@ export function BilletEditor({
             {!isImmersive && <>{/* Meta Fields */}</>}
 
             {/* CodeMirror Editor */}
-            <CodeMirror
-              ref={editorRef}
-              value={content}
-              onChange={value => {
-                setContent(value)
-                setDirty(true)
-              }}
-              basicSetup={{ lineNumbers: false, foldGutter: false, closeBrackets: false }}
-              extensions={extensions}
-              placeholder={isImmersive ? '...' : '# Votre billet en Markdown...'}
-              className={isImmersive ? 'h-full w-full bg-transparent' : ''}
-            />
+            <div className={isImmersive ? 'h-full w-full relative' : 'relative'}>
+              <CodeMirror
+                ref={editorRef}
+                value={content}
+                onChange={value => {
+                  setContent(value)
+                  setDirty(true)
+                }}
+                basicSetup={{ lineNumbers: false, foldGutter: false, closeBrackets: false }}
+                extensions={extensions}
+                placeholder={isImmersive ? '...' : ''}
+                className={isImmersive ? 'h-full w-full bg-transparent' : ''}
+              />
+
+              {/* Mini‑tuto (mode normal, vide) */}
+              {!isImmersive && !showPreview && !content.trim() && (
+                <div className="pointer-events-none absolute inset-0 p-6 text-left text-subtle/70">
+                  <div className="max-w-2xl">
+                    <p className="mb-3 text-sm">Conseils rapides:</p>
+                    <ul className="text-sm space-y-1">
+                      <li>
+                        • Titre: <code># Mon titre</code>
+                      </li>
+                      <li>
+                        • Gras/Italique: <code>**important**</code>, <code>*nuancé*</code>
+                      </li>
+                      <li>
+                        • Liste: <code>- item</code>, ou <code>1. item</code>
+                      </li>
+                      <li>
+                        • Lien: <code>[texte](https://exemple.org)</code>
+                      </li>
+                      <li>
+                        • Backlink: <code>[[slug]]</code> ou <code>[[slug|Alias]]</code>
+                      </li>
+                      <li>
+                        • Citation Zotero: bouton “Citer” (insère{' '}
+                        <code>&lt;Cite item="clé" /&gt;</code>)
+                      </li>
+                      <li>
+                        • Image: bouton “Image” (insère <code>![alt](url)</code>)
+                      </li>
+                      <li>• Aperçu: bouton “Aperçu” pour voir le rendu</li>
+                    </ul>
+                    <p className="mt-3 text-xs">Commencez à taper pour cacher cette aide…</p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -423,6 +504,17 @@ export function BilletEditor({
               }}
               selectedText={selectedTextForBacklink}
             />
+
+            {/* Preview Panel */}
+            {showPreview && (
+              <div className="p-4 prose prose-sm max-w-none bg-white border-t">
+                {previewHtml ? (
+                  <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+                ) : (
+                  <div className="text-subtle italic">Prévisualisation vide…</div>
+                )}
+              </div>
+            )}
           </>
         )}
       </div>
