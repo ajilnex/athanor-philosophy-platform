@@ -5,6 +5,9 @@ export const metadata = {
   description: "Articles lus par l'équipe — liens et aperçus",
 }
 
+// Ensure fresh data online (ISR): page is regenerated periodically
+export const revalidate = 60
+
 export default async function PressePapierPage() {
   const clips = await getPublishedClips()
   return (
