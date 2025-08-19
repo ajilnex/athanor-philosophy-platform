@@ -79,6 +79,7 @@ export function BilletEditor({
   const [previewHtml, setPreviewHtml] = useState<string>('')
   const [showExitButton, setShowExitButton] = useState(false)
   const hideExitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const didStartImmersiveRef = useRef(false)
 
   const editorRef = useRef<any>(null)
   const immersiveRef = useRef<HTMLDivElement>(null)
@@ -171,7 +172,8 @@ export function BilletEditor({
 
   // Handle immersive mode side effects
   useEffect(() => {
-    if (startImmersive) {
+    if (startImmersive && !didStartImmersiveRef.current) {
+      didStartImmersiveRef.current = true
       setIsImmersive(true)
     }
     const handleKeyDown = (e: KeyboardEvent) => {
