@@ -189,11 +189,26 @@ export function BilletEditor({
       }
     }
 
+    // Handler d'activité, initialisé quand immersif
+    let activityHandler: ((ev: Event) => void) | null = null
+
     if (isImmersive) {
       // Cacher le header et verrouiller le scroll
       document.body.classList.add('salle-du-temps-active')
       const navbar = document.querySelector('nav')
       if (navbar) navbar.style.display = 'none'
+
+      // Afficher la croix brièvement sur interaction (PC & mobile)
+      activityHandler = () => {
+        setShowExitButton(true)
+        if (hideExitTimerRef.current) clearTimeout(hideExitTimerRef.current)
+        hideExitTimerRef.current = setTimeout(() => setShowExitButton(false), 1800)
+      }
+      window.addEventListener('mousemove', activityHandler, { passive: true })
+      window.addEventListener('mousedown', activityHandler, { passive: true })
+      window.addEventListener('touchstart', activityHandler, { passive: true })
+      // Montrer la croix un court instant à l'entrée en mode immersif
+      activityHandler()
 
       window.addEventListener('keydown', handleKeyDown, true)
     } else {
@@ -208,6 +223,16 @@ export function BilletEditor({
       const navbar = document.querySelector('nav')
       if (navbar) navbar.style.display = ''
       window.removeEventListener('keydown', handleKeyDown, true)
+      // cleanup listeners & timer
+      if (activityHandler) {
+        window.removeEventListener('mousemove', activityHandler, true)
+        window.removeEventListener('mousedown', activityHandler, true)
+        window.removeEventListener('touchstart', activityHandler, true)
+      }
+      if (hideExitTimerRef.current) {
+        clearTimeout(hideExitTimerRef.current)
+        hideExitTimerRef.current = null
+      }
     }
   }, [isImmersive, startImmersive])
 
@@ -454,8 +479,15 @@ export function BilletEditor({
               className="fixed z-[90]"
               style={{ top: '20px', right: '20px', width: '24px', height: '24px' }}
               onMouseEnter={() => setShowExitButton(true)}
-              onMouseLeave={() => setShowExitButton(false)}
-              onTouchStart={() => setShowExitButton(true)}
+              onMouseLeave={() => {
+                if (hideExitTimerRef.current) clearTimeout(hideExitTimerRef.current)
+                hideExitTimerRef.current = setTimeout(() => setShowExitButton(false), 1500)
+              }}
+              onTouchStart={() => {
+                setShowExitButton(true)
+                if (hideExitTimerRef.current) clearTimeout(hideExitTimerRef.current)
+                hideExitTimerRef.current = setTimeout(() => setShowExitButton(false), 2000)
+              }}
             >
               <button
                 onClick={async () => {
@@ -467,7 +499,10 @@ export function BilletEditor({
                   setIsImmersive(false)
                 }}
                 onFocus={() => setShowExitButton(true)}
-                onBlur={() => setShowExitButton(false)}
+                onBlur={() => {
+                  if (hideExitTimerRef.current) clearTimeout(hideExitTimerRef.current)
+                  hideExitTimerRef.current = setTimeout(() => setShowExitButton(false), 1500)
+                }}
                 className={`absolute top-0 right-0 flex items-center justify-center bg-black/5 hover:bg-black/10 rounded-full transition-all duration-300 ${showExitButton ? 'opacity-100' : 'opacity-0'}`}
                 style={{ width: '40px', height: '40px' }}
                 title="Quitter (Échap)"
