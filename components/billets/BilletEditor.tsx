@@ -351,7 +351,7 @@ export function BilletEditor({
   if (!isOpen) return null
 
   const mainContainerClasses = isImmersive
-    ? 'salle-du-temps fixed inset-0 z-[100] bg-[#FAFAF8]'
+    ? 'salle-du-temps fixed inset-0 z-[1000] bg-[#FAFAF8]'
     : 'fixed inset-0 bg-black/50 backdrop-blur-sm z-[1000] flex items-start justify-center p-4 pt-16 sm:pt-20'
 
   return (
@@ -362,6 +362,7 @@ export function BilletEditor({
           ? `${mainContainerClasses} ${iaWriterDuo.className} salle-du-temps-container`
           : mainContainerClasses
       }
+      data-graph-shield
       style={
         isImmersive
           ? {
