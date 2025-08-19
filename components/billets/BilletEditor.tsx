@@ -63,7 +63,7 @@ export function BilletEditor({
 }: BilletEditorProps) {
   const [title, setTitle] = useState(initialData?.title || '')
   const [slug, setSlug] = useState(initialData?.slug || '')
-  const [tags] = useState<string[]>([])
+  const [tags, setTags] = useState<string[]>([])
   const [excerpt] = useState<string>('')
   const [content, setContent] = useState(initialData?.content || '')
   const [showImageUpload, setShowImageUpload] = useState(false)
@@ -116,16 +116,15 @@ export function BilletEditor({
       setError('Ajoutez un Titre, un frontmatter (--- title: ... ---) ou un H1 (# Titre)')
       return
     }
-    if (mode === 'create' && title.trim() && !slug.trim()) {
-      setError('Le slug est obligatoire si un titre est saisi')
-      return
-    }
+    // Ne pas exiger le slug en mode création :
+    // l'API calcule le slug à partir du titre/frontmatter/H1.
 
     setIsSaving(true)
     setError(null)
     try {
       await onSave({
-        slug: mode === 'create' ? (title.trim() ? slug : undefined) : initialData?.slug,
+        slug:
+          mode === 'create' ? (slug && slug.trim() ? slug.trim() : undefined) : initialData?.slug,
         title: title.trim() || undefined,
         content: content.trim(),
         tags: tags,
@@ -326,7 +325,7 @@ export function BilletEditor({
 
   const mainContainerClasses = isImmersive
     ? 'salle-du-temps fixed inset-0 z-[100] bg-[#FAFAF8]'
-    : 'fixed inset-0 bg-black/50 backdrop-blur-sm z-[80] flex items-center justify-center p-4'
+    : 'fixed inset-0 bg-black/50 backdrop-blur-sm z-[1000] flex items-start justify-center p-4 pt-16 sm:pt-20'
 
   return (
     <div
@@ -480,7 +479,38 @@ export function BilletEditor({
         {/* Content Area */}
         <div className={isImmersive ? 'h-full w-full flex-1' : 'flex-1 overflow-hidden flex'}>
           <div className={isImmersive ? 'h-full w-full' : 'flex-1 p-6 overflow-y-auto'}>
-            {!isImmersive && <>{/* Meta Fields */}</>}
+            {!isImmersive && (
+              <div className="mb-4 space-y-3">
+                <div>
+                  <label className="block text-xs text-subtle mb-1">Titre</label>
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
+                    placeholder="Titre du billet (facultatif si H1 en tête du contenu)"
+                    className="input-field"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-subtle mb-1">Tags (facultatif)</label>
+                  <input
+                    type="text"
+                    value={tags.join(', ')}
+                    onChange={e =>
+                      setTags(
+                        e.target.value
+                          .split(',')
+                          .map(t => t.trim())
+                          .filter(Boolean)
+                      )
+                    }
+                    placeholder="philosophie, logique, esthétique"
+                    className="input-field"
+                  />
+                  <p className="mt-1 text-[11px] text-subtle">Séparez les tags par des virgules</p>
+                </div>
+              </div>
+            )}
 
             {/* CodeMirror Editor */}
             <div className={isImmersive ? 'h-full w-full' : 'relative min-h-[60vh]'}>
