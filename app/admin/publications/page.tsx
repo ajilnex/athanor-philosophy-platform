@@ -43,12 +43,7 @@ export default async function AdminPublicationsPage() {
               Gérez toutes vos publications: voir et supprimer.
             </p>
           </div>
-          <Link
-            href="/admin/upload"
-            className="text-foreground hover:text-subtle transition-colors font-light underline text-sm sm:text-base"
-          >
-            Ajouter une Publication
-          </Link>
+          {/* Ajout déplacé vers la page Publications publique pour cohérence UX */}
         </div>
       </div>
 
@@ -60,12 +55,7 @@ export default async function AdminPublicationsPage() {
           <p className="text-sm sm:text-base text-subtle mb-6 font-light">
             Commencez par ajouter votre première publication.
           </p>
-          <Link
-            href="/admin/upload"
-            className="text-foreground hover:text-subtle transition-colors font-light underline text-sm sm:text-base"
-          >
-            Ajouter une Publication
-          </Link>
+          {/* Ajout déplacé vers la page Publications publique */}
         </div>
       ) : (
         <div className="card border-subtle">
@@ -85,9 +75,7 @@ export default async function AdminPublicationsPage() {
                   <th className="text-left py-3 sm:py-4 px-1 sm:px-2 font-light text-foreground text-xs sm:text-sm hidden lg:table-cell">
                     Date
                   </th>
-                  <th className="text-right py-3 sm:py-4 px-1 sm:px-2 font-light text-foreground text-xs sm:text-sm">
-                    Actions
-                  </th>
+                  {/* Actions de suppression/scellement retirées ici; voir page d'administration de scellement */}
                 </tr>
               </thead>
               <tbody className="divide-y divide-subtle">
@@ -114,9 +102,7 @@ export default async function AdminPublicationsPage() {
                     <td className="py-3 sm:py-4 px-1 sm:px-2 text-subtle text-xs sm:text-sm font-light hidden lg:table-cell">
                       {new Date(publication.createdAt).toLocaleDateString('fr-FR')}
                     </td>
-                    <td className="py-3 sm:py-4 px-1 sm:px-2">
-                      <AdminArticleActions article={publication} />
-                    </td>
+                    {/* Actions retirées */}
                   </tr>
                 ))}
               </tbody>

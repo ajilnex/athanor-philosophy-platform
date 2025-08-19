@@ -1,4 +1,7 @@
 import { getPublishedClips } from '@/lib/presse-papier'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { actionAddClipPublic } from './actions'
 
 export const metadata = {
   title: 'Presse-papier',
@@ -9,11 +12,48 @@ export const metadata = {
 export const revalidate = 60
 
 export default async function PressePapierPage() {
+  const session = await getServerSession(authOptions)
   const clips = await getPublishedClips()
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
       <h1 className="text-3xl font-light mb-6">Presse-papier</h1>
       <p className="text-subtle font-light mb-8">Sélection d'articles lus récemment.</p>
+
+      {(session?.user as any)?.role === 'ADMIN' && (
+        <form
+          action={async (formData: FormData) => {
+            'use server'
+            await actionAddClipPublic(formData)
+          }}
+          method="post"
+          className="card border-subtle p-4 sm:p-6 mb-8"
+        >
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
+            <div className="flex-1">
+              <label className="block text-xs text-subtle mb-1">URL</label>
+              <input
+                name="url"
+                type="url"
+                required
+                placeholder="https://exemple.com/article"
+                className="w-full input"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-xs text-subtle mb-1">Note (optionnelle)</label>
+              <input
+                name="note"
+                type="text"
+                placeholder="Pourquoi c'est intéressant"
+                className="w-full input"
+              />
+            </div>
+            <button className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background hover:opacity-90 transition rounded">
+              Ajouter
+            </button>
+          </div>
+        </form>
+      )}
 
       {clips.length === 0 ? (
         <div className="card border-subtle text-center py-12">Aucun lien pour l'instant.</div>
