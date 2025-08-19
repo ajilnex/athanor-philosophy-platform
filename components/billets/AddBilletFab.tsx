@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { BilletEditorDynamic as BilletEditor } from './BilletEditorDynamic'
+import { Hourglass } from 'lucide-react'
 
 export function AddBilletFab() {
   const [open, setOpen] = useState(false)
@@ -24,11 +25,11 @@ export function AddBilletFab() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full border-2 border-foreground bg-background text-foreground shadow hover:bg-foreground hover:text-background transition-colors duration-200 font-serif text-2xl leading-none"
-        aria-label="Nouveau billet (Salle du Temps)"
-        title="Nouveau billet"
+        className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full border-2 border-foreground bg-background text-foreground shadow hover:bg-foreground hover:text-background transition-colors duration-200"
+        aria-label="Salle du Temps — Nouveau billet"
+        title="Salle du Temps — Nouveau billet"
       >
-        +
+        <Hourglass className="w-5 h-5 mx-auto" />
       </button>
       {open && (
         <BilletEditor
