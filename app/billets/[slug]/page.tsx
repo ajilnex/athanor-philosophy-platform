@@ -99,10 +99,12 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
             <div className="flex items-center space-x-2">
               <Calendar className="h-4 w-4" />
               <span>
-                {new Date(billet.date).toLocaleDateString('fr-FR', {
+                {new Date(billet.date).toLocaleString('fr-FR', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
                 })}
               </span>
             </div>

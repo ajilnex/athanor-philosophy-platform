@@ -8,6 +8,7 @@ const CONTENT_DIR = path.join(process.cwd(), 'content', 'billets')
 export interface Billet {
   slug: string
   title: string
+  // ISO datetime string (up to seconds)
   date: string
   tags: string[]
   content: string
@@ -23,28 +24,41 @@ function isMdxFile(filename: string): boolean {
   return filename.toLowerCase().endsWith('.mdx')
 }
 
-function dateFrom(front: any, slug: string): string {
-  // Priorité : date de première publication (published, created, puis date)
-  const dateFields = ['published', 'created', 'date']
+function dateFrom(front: any, slug: string, mtime?: Date): string {
+  // 1) Frontmatter (priorité): publishedAt/published/created/date
+  const dateFields = ['publishedAt', 'published', 'created', 'date']
   for (const field of dateFields) {
-    if (front?.[field]) {
-      const frontDate = new Date(front[field])
-      if (!isNaN(frontDate.getTime())) {
-        return frontDate.toISOString().split('T')[0]
+    const raw = front?.[field]
+    if (raw) {
+      const parsed = new Date(raw)
+      if (!isNaN(parsed.getTime())) {
+        // Si frontmatter est date-only (YYYY-MM-DD), compléter avec mtime si dispo
+        if (typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw) && mtime) {
+          const y = parsed.getUTCFullYear()
+          const mo = parsed.getUTCMonth()
+          const d = parsed.getUTCDate()
+          return new Date(
+            Date.UTC(y, mo, d, mtime.getUTCHours(), mtime.getUTCMinutes(), mtime.getUTCSeconds())
+          ).toISOString()
+        }
+        return parsed.toISOString()
       }
     }
   }
 
-  // Ensuite le slug (format YYYY-MM-DD)
-  if (/^\d{4}-\d{2}-\d{2}/.test(slug)) {
-    const slugDate = new Date(slug.slice(0, 10))
-    if (!isNaN(slugDate.getTime())) {
-      return slugDate.toISOString().split('T')[0]
-    }
+  // 2) Slug avec horodatage (YYYY-MM-DD[-HH-MM[-SS]])
+  const m = slug.match(/^(\d{4})-(\d{2})-(\d{2})(?:-(\d{2})-(\d{2})(?:-(\d{2}))?)?/)
+  if (m) {
+    const [_, yy, mm, dd, hh = '00', mi = '00', ss = '00'] = m
+    const dt = new Date(
+      Date.UTC(Number(yy), Number(mm) - 1, Number(dd), Number(hh), Number(mi), Number(ss))
+    )
+    if (!isNaN(dt.getTime())) return dt.toISOString()
   }
 
-  // Fallback : aujourd'hui
-  return new Date().toISOString().split('T')[0]
+  // 3) Fallback: utiliser mtime si dispo, sinon maintenant
+  if (mtime && !isNaN(mtime.getTime())) return mtime.toISOString()
+  return new Date().toISOString()
 }
 
 async function fsAll(): Promise<Billet[]> {
@@ -54,19 +68,23 @@ async function fsAll(): Promise<Billet[]> {
     const items: Billet[] = []
     for (const file of files) {
       const slug = slugFromFilename(file)
-      const raw = await fs.readFile(path.join(CONTENT_DIR, file), 'utf8')
+      const fullPath = path.join(CONTENT_DIR, file)
+      const [raw, stat] = await Promise.all([
+        fs.readFile(fullPath, 'utf8'),
+        fs.stat(fullPath).catch(() => null as any),
+      ])
       const { data, content } = matter(raw)
       items.push({
         slug,
         title: (data?.title as string) || slug,
-        date: dateFrom(data, slug),
+        date: dateFrom(data, slug, stat?.mtime),
         tags: Array.isArray(data?.tags) ? (data.tags as string[]) : [],
         content, // brut pour la liste
         excerpt: (data?.excerpt as string) || undefined,
         isMdx: isMdxFile(file),
       })
     }
-    items.sort((a, b) => (a.date < b.date ? 1 : -1))
+    items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     return items
   } catch (e) {
     console.error('FS fallback failed:', e)
@@ -124,13 +142,16 @@ export async function getBilletBySlug(slug: string) {
   // Billets = 100% statiques, toujours depuis le filesystem (uniquement .mdx)
   try {
     const filePath = path.join(CONTENT_DIR, `${slug}.mdx`)
-    const raw = await fs.readFile(filePath, 'utf8')
+    const [raw, stat] = await Promise.all([
+      fs.readFile(filePath, 'utf8'),
+      fs.stat(filePath).catch(() => null as any),
+    ])
     const { data, content } = matter(raw)
     const contentWithBacklinks = await transformBacklinks(content)
     return {
       slug,
       title: (data?.title as string) || slug,
-      date: dateFrom(data, slug),
+      date: dateFrom(data, slug, stat?.mtime),
       tags: Array.isArray(data?.tags) ? (data.tags as string[]) : [],
       content: contentWithBacklinks,
       excerpt: (data?.excerpt as string) || undefined,

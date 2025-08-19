@@ -33,7 +33,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Déterminer titre/slug depuis le contenu si non fournis
-    const today = new Date().toISOString().split('T')[0]
+    // Horodatage à la minute près (ISO) pour un tri précis intrajournalier
+    const nowISO = new Date().toISOString()
 
     const normalizeSlug = (s: string) =>
       s
@@ -64,11 +65,30 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Déterminer titre effectif
-    const effectiveTitle: string | undefined = (title && title.trim()) || fmTitle || h1Title
+    // Déterminer titre effectif, avec fallback sur les premiers mots du contenu
+    let effectiveTitle: string | undefined = (title && title.trim()) || fmTitle || h1Title
+    if (!effectiveTitle) {
+      // Extraire un titre depuis le corps: premières ~8 mots
+      const plain = String(content || '')
+        // enlever code fences et HTML tags simples
+        .replace(/```[\s\S]*?```/g, ' ')
+        .replace(/<[^>]+>/g, ' ')
+        // liens markdown -> texte
+        .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+        // titres markdown
+        .replace(/^#+\s+/gm, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+
+      const words = plain.split(' ').filter(Boolean)
+      if (words.length > 0) {
+        const head = words.slice(0, 8).join(' ')
+        effectiveTitle = head + (words.length > 8 ? '…' : '')
+      }
+    }
     if (!effectiveTitle) {
       return NextResponse.json(
-        { error: 'Titre manquant. Ajoutez un frontmatter (title) ou un H1 au début.' },
+        { error: 'Titre manquant et contenu vide: impossible de déduire un titre.' },
         { status: 400 }
       )
     }
@@ -94,7 +114,7 @@ export async function POST(request: NextRequest) {
       // Construire un frontmatter minimal à partir du H1 (ou titre fourni)
       mdxContent = generateBilletContent(
         effectiveTitle as string,
-        today,
+        nowISO,
         Array.isArray(tags) ? tags : [],
         excerpt,
         content

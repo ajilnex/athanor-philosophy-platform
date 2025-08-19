@@ -43,6 +43,7 @@ interface BilletEditorProps {
     excerpt?: string
   }
   onSave: (data: BilletData) => Promise<void>
+  startImmersive?: boolean
 }
 
 interface BilletData {
@@ -60,6 +61,7 @@ export function BilletEditor({
   userRole,
   initialData,
   onSave,
+  startImmersive = false,
 }: BilletEditorProps) {
   const [title, setTitle] = useState(initialData?.title || '')
   const [slug, setSlug] = useState(initialData?.slug || '')
@@ -168,6 +170,9 @@ export function BilletEditor({
 
   // Handle immersive mode side effects
   useEffect(() => {
+    if (startImmersive) {
+      setIsImmersive(true)
+    }
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault()
@@ -204,7 +209,7 @@ export function BilletEditor({
       if (navbar) navbar.style.display = ''
       window.removeEventListener('keydown', handleKeyDown, true)
     }
-  }, [isImmersive])
+  }, [isImmersive, startImmersive])
 
   const extensions = useMemo(() => {
     const baseExtensions = [

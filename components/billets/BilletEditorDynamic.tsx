@@ -38,6 +38,7 @@ interface BilletEditorProps {
     excerpt?: string
   }
   onSave: (data: BilletData) => Promise<void>
+  startImmersive?: boolean
 }
 
 export function BilletEditorDynamic(props: BilletEditorProps) {

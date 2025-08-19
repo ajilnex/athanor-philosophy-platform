@@ -5,11 +5,15 @@ import { getAllBillets } from '@/lib/billets'
 import { LatestActivityCard } from '@/components/home/LatestActivityCard'
 import { getPublishedClips } from '@/lib/presse-papier'
 import { InteractiveGraph } from '@/components/graph/InteractiveGraph'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { AddBilletFab } from '@/components/billets/AddBilletFab'
 
 // Refresh home periodically so recent press clips appear online without a full redeploy
 export const revalidate = 60
 
 export default async function HomePage() {
+  const session = await getServerSession(authOptions)
   const allBillets = await getAllBillets()
   const latestBillet = allBillets.length > 0 ? allBillets[0] : null
   const latestClips = await getPublishedClips(3)
@@ -153,6 +157,8 @@ export default async function HomePage() {
             </div>
           </div>
         </div>
+        {/* Admin FAB: Nouveau billet direct en Salle du Temps */}
+        {(session?.user as any)?.role === 'ADMIN' && <AddBilletFab />}
       </main>
     </>
   )

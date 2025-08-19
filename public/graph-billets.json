@@ -225,6 +225,14 @@
       "y": -33.55566658451678
     },
     {
+      "id": "billet:2025-08-19-test-salle-du-temps-v2",
+      "label": "Test Salle du Temps v2",
+      "url": "/billets/2025-08-19-test-salle-du-temps-v2",
+      "degree": 0,
+      "x": -88.27612906871164,
+      "y": -244.55536190532433
+    },
+    {
       "id": "billet:gamma",
       "label": "gamma",
       "url": "/billets/gamma",
@@ -257,6 +265,14 @@
       "y": -259.9783471735029
     },
     {
+      "id": "billet:essai",
+      "label": "essai",
+      "url": "/billets/essai",
+      "degree": 0,
+      "x": 94.918963948975,
+      "y": -31.470466835641048
+    },
+    {
       "id": "billet:l-idee-de-monde-chez-kant-comme-horizon-regulateur",
       "label": "L’Idée de monde chez Kant comme horizon régulateur",
       "url": "/billets/l-idee-de-monde-chez-kant-comme-horizon-regulateur",
@@ -271,6 +287,14 @@
       "degree": 0,
       "x": 179.7607887184927,
       "y": 9.276790355797882
+    },
+    {
+      "id": "billet:nous-voici",
+      "label": "nous voici",
+      "url": "/billets/nous-voici",
+      "degree": 0,
+      "x": 93.09603431852548,
+      "y": -36.51203081401974
     }
   ],
   "edges": [
@@ -361,9 +385,9 @@
     }
   ],
   "metadata": {
-    "generatedAt": "2025-08-18T11:56:39.930Z",
-    "billetsCount": 32,
-    "nodesCount": 34,
+    "generatedAt": "2025-08-19T11:48:04.602Z",
+    "billetsCount": 35,
+    "nodesCount": 37,
     "stability": {
       "pivotsLocked": 8,
       "newNodes": 3,

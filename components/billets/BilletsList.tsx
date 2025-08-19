@@ -59,10 +59,12 @@ export function BilletsList({ initialBillets }: BilletsListProps) {
                 <div className="flex items-center space-x-1">
                   <Calendar className="h-4 w-4" />
                   <span>
-                    {new Date(billet.date).toLocaleDateString('fr-FR', {
+                    {new Date(billet.date).toLocaleString('fr-FR', {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
                     })}
                   </span>
                 </div>
