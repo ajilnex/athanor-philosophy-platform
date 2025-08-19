@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { FileText, User, Calendar, Tag, Download } from 'lucide-react'
 import { getPublishedArticles } from '@/lib/articles'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
 
 // Publication type definition
 type Publication = {
@@ -26,6 +28,7 @@ function formatFileSize(bytes: number): string {
 export const revalidate = 300
 
 export default async function PublicationsPage() {
+  const session = await getServerSession(authOptions)
   const publications = await getPublishedArticles()
 
   return (
@@ -36,6 +39,17 @@ export default async function PublicationsPage() {
           Articles et documents publiés, couvrant une large gamme de sujets philosophiques.
         </p>
       </div>
+
+      {(session?.user as any)?.role === 'ADMIN' && (
+        <div className="mb-6">
+          <Link
+            href="/admin/upload"
+            className="inline-flex items-center gap-2 px-4 py-2 border border-foreground hover:bg-foreground hover:text-background transition-colors text-sm"
+          >
+            <FileText className="h-4 w-4" /> Nouvelle publication
+          </Link>
+        </div>
+      )}
 
       {publications.length === 0 ? (
         <div className="text-center py-12">

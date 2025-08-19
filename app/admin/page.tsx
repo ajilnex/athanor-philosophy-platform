@@ -137,65 +137,26 @@ async function AdminNormalPage() {
 
       {/* Quick Actions */}
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Ajout déplacé dans les pages publiques (Publications / Home) */}
+
         <Link
-          href="/admin/upload"
+          href="/admin/seal"
           className="card border-subtle hover:border-foreground transition-colors group"
         >
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 flex items-center justify-center">
-              <Plus className="h-5 w-5 text-foreground" />
+              <Lock className="h-5 w-5 text-foreground" />
             </div>
             <div>
-              <h3 className="font-light text-foreground">Ajouter une Publication</h3>
-              <p className="text-sm text-subtle font-light">Uploader un nouveau PDF</p>
+              <h3 className="font-light text-foreground">Sceller contenu</h3>
+              <p className="text-sm text-subtle font-light">Billets et publications</p>
             </div>
           </div>
         </Link>
 
-        <Link
-          href="/admin/publications"
-          className="card border-subtle hover:border-foreground transition-colors group"
-        >
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 flex items-center justify-center">
-              <FileText className="h-5 w-5 text-foreground" />
-            </div>
-            <div>
-              <h3 className="font-light text-foreground">Gérer les Publications</h3>
-              <p className="text-sm text-subtle font-light">Sceller et supprimer</p>
-            </div>
-          </div>
-        </Link>
+        {/* Gestion des billets: scellement regroupé, édition pilotée dans le site */}
 
-        <Link
-          href="/admin/billets"
-          className="card border-subtle hover:border-foreground transition-colors group"
-        >
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 flex items-center justify-center">
-              <Edit3 className="h-5 w-5 text-foreground" />
-            </div>
-            <div>
-              <h3 className="font-light text-foreground">Gérer les Billets</h3>
-              <p className="text-sm text-subtle font-light">Sceller et organiser</p>
-            </div>
-          </div>
-        </Link>
-
-        <Link
-          href="/admin/tina"
-          className="card border-subtle hover:border-foreground transition-colors group"
-        >
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 flex items-center justify-center">
-              <Edit3 className="h-5 w-5 text-foreground" />
-            </div>
-            <div>
-              <h3 className="font-light text-foreground">Éditer les Billets</h3>
-              <p className="text-sm text-subtle font-light">Interface d'écriture TinaCMS</p>
-            </div>
-          </div>
-        </Link>
+        {/* Éditer les billets retiré: pilotage depuis l'intérieur du site */}
 
         <Link
           href="/admin/presse-papier"
@@ -207,7 +168,7 @@ async function AdminNormalPage() {
             </div>
             <div>
               <h3 className="font-light text-foreground">Presse-papier</h3>
-              <p className="text-sm text-subtle font-light">Ajouter des liens lus</p>
+              <p className="text-sm text-subtle font-light">Lister et modérer</p>
             </div>
           </div>
         </Link>

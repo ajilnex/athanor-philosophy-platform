@@ -30,39 +30,7 @@ export default async function AdminPressePapierPage() {
         </p>
       </div>
 
-      <form
-        action={async (formData: FormData) => {
-          'use server'
-          await actionAddClip(formData)
-        }}
-        method="post"
-        className="card border-subtle p-4 sm:p-6 mb-8"
-      >
-        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
-          <div className="flex-1">
-            <label className="block text-xs text-subtle mb-1">URL</label>
-            <input
-              name="url"
-              type="url"
-              required
-              placeholder="https://exemple.com/article"
-              className="w-full input"
-            />
-          </div>
-          <div className="flex-1">
-            <label className="block text-xs text-subtle mb-1">Note (optionnelle)</label>
-            <input
-              name="note"
-              type="text"
-              placeholder="Pourquoi c'est intéressant"
-              className="w-full input"
-            />
-          </div>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background hover:opacity-90 transition rounded">
-            <Plus className="h-4 w-4" /> Ajouter
-          </button>
-        </div>
-      </form>
+      {/* Ajout de lien déplacé vers la page publique Presse-papier */}
 
       {clips.length === 0 ? (
         <div className="card border-subtle text-center py-12">

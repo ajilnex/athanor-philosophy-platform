@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Calendar, Tag, Lock } from 'lucide-react'
+import { ArrowLeft, Calendar, Tag, Lock, Download } from 'lucide-react'
 import { getBilletBySlug, getBilletSlugs } from '@/lib/billets'
 import { compileMDX } from '@/lib/mdx'
 import { EditBilletButton } from '@/components/billets/EditBilletButton'
@@ -85,14 +85,22 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
         <div className="mb-6">
           <div className="flex items-start justify-between mb-4">
             <h1 className="text-2xl sm:text-3xl font-light text-foreground">{billet.title}</h1>
-            <EditBilletButton
-              slug={slug}
-              title={billet.title}
-              content={billet.content}
-              tags={billet.tags}
-              excerpt={billet.excerpt}
-              className="ml-4 flex-shrink-0"
-            />
+            <div className="ml-4 flex-shrink-0 flex items-center gap-2">
+              <a
+                href={`/api/billets/${slug}/download`}
+                className="text-subtle hover:text-foreground underline text-sm"
+              >
+                <Download className="inline h-4 w-4 mr-1" /> Télécharger .md
+              </a>
+              <EditBilletButton
+                slug={slug}
+                title={billet.title}
+                content={billet.content}
+                tags={billet.tags}
+                excerpt={billet.excerpt}
+                className="flex-shrink-0"
+              />
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-subtle mb-4">

@@ -4,7 +4,7 @@ on:
   pull_request:
   # push:
   #   branches: [main]  # Temporarily disabled until E2E is stable
-  workflow_dispatch:  # Manual trigger for testing
+  workflow_dispatch: # Manual trigger for testing
 
 jobs:
   e2e:
