@@ -45,6 +45,110 @@
   /* Mode Salle du Temps - verrouillage scroll body */
   .salle-du-temps-active {
     overflow: hidden;
+    /* iA Writer-like plain cream background, no gradients */
+    background-color: #fafaf8 !important;
+    background-image: none !important;
+  }
+
+  /* Cacher totalement la navbar en mode Salle du Temps */
+  .salle-du-temps-active header {
+    display: none !important;
+  }
+
+  /* Animations pour la Salle du Temps */
+  @keyframes salleEnter {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes salleExit {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+  }
+
+  /* Force le fond crème uniforme dans CodeMirror en mode immersif */
+  .salle-du-temps-container .cm-editor,
+  .salle-du-temps-container .cm-scroller,
+  .salle-du-temps-container .cm-content,
+  .salle-du-temps-container .cm-gutters,
+  .salle-du-temps-container .cm-activeLine,
+  .salle-du-temps-container .cm-activeLineGutter {
+    background-color: #fafaf8 !important;
+  }
+
+  /* Suppression de toute bordure ou ligne dans la Salle du Temps */
+  .salle-du-temps-container .cm-editor {
+    outline: none !important;
+    border: none !important;
+  }
+
+  /* Cursor clignotement régulier (pas de saut) */
+  .salle-du-temps-container .cm-cursor {
+    border-left-color: #333 !important;
+    border-left-width: 2px !important;
+    animation: cursorBlink 1s steps(2, start) infinite;
+  }
+
+  @keyframes cursorBlink {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  /* Transition douce sur le texte lors du scroll */
+  .salle-du-temps-container .cm-line {
+    transition: opacity 0.15s ease;
+  }
+
+  /* Salle du Temps - immersion totale */
+  .salle-editor .cm-editor {
+    height: 100% !important;
+    background-color: #fafaf8 !important;
+  }
+
+  .salle-editor .cm-scroller {
+    align-items: center !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .salle-editor .cm-content {
+    padding-top: 50vh !important;
+    padding-bottom: 50vh !important;
+  }
+
+  /* Masquer tous les éléments d'interface en mode immersif */
+  .salle-du-temps-container .cm-selectionBackground,
+  .salle-du-temps-container .cm-activeLine,
+  .salle-du-temps-container .cm-activeLineGutter {
+    background-color: transparent !important;
+  }
+
+  /* Sélection de texte subtile */
+  .salle-du-temps-container ::selection {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  .salle-du-temps-container ::-moz-selection {
+    background-color: rgba(0, 0, 0, 0.08);
   }
 }
 

@@ -27,7 +27,6 @@ import { BacklinkPicker } from '@/components/editor/BacklinkPicker'
 import CodeMirror from '@uiw/react-codemirror'
 import { markdown } from '@codemirror/lang-markdown'
 import { EditorView } from '@codemirror/view'
-import { useDebouncedCallback } from 'use-debounce'
 import { iaWriterDuo } from './immersive-font'
 
 // ... (interfaces BilletEditorProps, BilletData remain the same)
@@ -76,24 +75,21 @@ export function BilletEditor({
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [previewHtml, setPreviewHtml] = useState<string>('')
+  const [showExitButton, setShowExitButton] = useState(false)
 
   const editorRef = useRef<any>(null)
   const immersiveRef = useRef<HTMLDivElement>(null)
-  const [dirty, setDirty] = useState(false)
-  const [isFullscreen, setIsFullscreen] = useState(false)
 
   // Helpers d'insertion dans l'éditeur
   const insertAtCursor = useCallback((snippet: string) => {
     const view: EditorView | undefined = editorRef.current?.view
     if (!view) {
       setContent(prev => (prev ? `${prev}\n\n${snippet}` : snippet))
-      setDirty(true)
       return
     }
     const { from, to } = view.state.selection.main
     view.dispatch({ changes: { from, to, insert: snippet } })
     setContent(view.state.doc.toString())
-    setDirty(true)
     // Re-focus editor after modal actions
     setTimeout(() => view.focus(), 0)
   }, [])
@@ -143,18 +139,7 @@ export function BilletEditor({
     }
   }, [content, title, slug, mode, initialData, onSave, isImmersive, onClose, tags, excerpt])
 
-  // Auto-save logic for immersive mode
-  const debouncedSave = useDebouncedCallback(() => {
-    if (!dirty) return
-    if (!content.trim()) return
-    handleSave()
-  }, 30000)
-
-  useEffect(() => {
-    if (isImmersive) {
-      debouncedSave()
-    }
-  }, [content, dirty, isImmersive, debouncedSave])
+  // Pas de sauvegarde auto en mode immersif (Git as CMS)
 
   // Generate HTML preview from Markdown (simple, non-MDX)
   useEffect(() => {
@@ -186,21 +171,39 @@ export function BilletEditor({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setIsImmersive(false)
+        e.preventDefault()
+        e.stopPropagation()
+        // Sortir du fullscreen si actif
+        if (document.fullscreenElement) {
+          document
+            .exitFullscreen()
+            .catch(() => {})
+            .finally(() => setIsImmersive(false))
+        } else {
+          setIsImmersive(false)
+        }
       }
     }
 
     if (isImmersive) {
-      // Verrouille le scroll de la page sous-jacente et autorise le scroll de l'éditeur
+      // Cacher le header et verrouiller le scroll
       document.body.classList.add('salle-du-temps-active')
-      window.addEventListener('keydown', handleKeyDown)
+      const navbar = document.querySelector('nav')
+      if (navbar) navbar.style.display = 'none'
+
+      window.addEventListener('keydown', handleKeyDown, true)
     } else {
+      // Restaurer le header
       document.body.classList.remove('salle-du-temps-active')
+      const navbar = document.querySelector('nav')
+      if (navbar) navbar.style.display = ''
     }
 
     return () => {
       document.body.classList.remove('salle-du-temps-active')
-      window.removeEventListener('keydown', handleKeyDown)
+      const navbar = document.querySelector('nav')
+      if (navbar) navbar.style.display = ''
+      window.removeEventListener('keydown', handleKeyDown, true)
     }
   }, [isImmersive])
 
@@ -210,15 +213,41 @@ export function BilletEditor({
       EditorView.lineWrapping,
       EditorView.theme({
         '&': {
-          fontSize: '16px',
-          backgroundColor: 'transparent',
+          fontSize: isImmersive ? '18px' : '15px',
+          backgroundColor: isImmersive ? '#FAFAF8' : 'white',
         },
         '.cm-content': {
-          padding: '2rem',
-          caretColor: '#000',
+          padding: isImmersive ? '3rem 4rem' : '2rem',
+          caretColor: '#333',
+          backgroundColor: isImmersive ? '#FAFAF8' : 'white',
+          minHeight: isImmersive ? '100vh' : 'auto',
+          maxWidth: isImmersive ? '72ch' : 'none',
+          margin: isImmersive ? '0 auto' : '0',
         },
-        '.cm-focused': { outline: 'none' },
-        '.cm-cursor, .cm-dropCursor': { borderLeftColor: '#000' },
+        '.cm-focused': {
+          outline: 'none',
+          backgroundColor: isImmersive ? '#FAFAF8' : 'white',
+        },
+        '.cm-cursor, .cm-dropCursor': {
+          borderLeftColor: '#333',
+          borderLeftWidth: '2px',
+        },
+        '.cm-editor': {
+          backgroundColor: isImmersive ? '#FAFAF8' : 'white',
+        },
+        '.cm-scroller': {
+          backgroundColor: isImmersive ? '#FAFAF8' : 'white',
+          fontFamily: isImmersive ? 'var(--font-ia-writer)' : 'inherit',
+          width: isImmersive ? '100vw' : 'auto',
+        },
+        '.cm-gutters': {
+          backgroundColor: isImmersive ? '#FAFAF8' : 'white',
+          border: 'none',
+        },
+        '.cm-line': {
+          paddingLeft: '0',
+          paddingRight: '0',
+        },
       }),
     ]
 
@@ -226,9 +255,38 @@ export function BilletEditor({
       // Typewriter-like centering and smoother scroll padding in immersive mode
       baseExtensions.push(
         EditorView.theme({
+          '&': {
+            backgroundColor: '#FAFAF8',
+            height: '100%',
+          },
+          '.cm-editor': {
+            backgroundColor: '#FAFAF8',
+            border: 'none',
+            height: '100%',
+          },
+          '.cm-editor.cm-focused': {
+            backgroundColor: '#FAFAF8',
+          },
           '.cm-scroller': {
-            scrollPaddingTop: '50vh',
-            scrollPaddingBottom: '50vh',
+            backgroundColor: '#FAFAF8',
+            scrollPaddingTop: '50%',
+            scrollPaddingBottom: '50%',
+            lineHeight: '1.8',
+          },
+          '.cm-content': {
+            backgroundColor: '#FAFAF8',
+            padding: '50vh 15% 50vh 15%',
+            minHeight: '100vh',
+          },
+          '@media (max-width: 768px)': {
+            '.cm-content': {
+              padding: '50vh 5% 50vh 5%',
+            },
+          },
+          // Cacher la scrollbar pour plus d'immersion
+          '.cm-scroller::-webkit-scrollbar': {
+            width: '0px',
+            background: 'transparent',
           },
         })
       )
@@ -237,17 +295,24 @@ export function BilletEditor({
         EditorView.updateListener.of(update => {
           if (!editorRef.current?.view) return
           const view: EditorView = editorRef.current.view
-          if (update.selectionSet || update.focusChanged) {
+
+          // Typewriter scrolling : garder le curseur au centre vertical
+          if (update.selectionSet || update.docChanged) {
             const head = view.state.selection.main.head
-            const rect = view.coordsAtPos(head)
-            if (rect) {
+            const coords = view.coordsAtPos(head)
+
+            if (coords) {
               const scroller = view.scrollDOM
-              const middle = scroller.clientHeight / 2
-              const target = rect.top + scroller.scrollTop - middle
-              // Seuillage léger pour éviter micro-ajustements permanents
-              if (Math.abs(scroller.scrollTop - target) > 8) {
-                scroller.scrollTo({ top: target, behavior: 'smooth' })
-              }
+              const scrollerRect = scroller.getBoundingClientRect()
+              const targetY = scrollerRect.height / 2
+              const currentY = coords.top - scrollerRect.top
+
+              // Scroll pour centrer le curseur
+              const scrollTop = scroller.scrollTop + (currentY - targetY)
+              scroller.scrollTo({
+                top: scrollTop,
+                behavior: 'instant', // Pas de smooth pour un vrai feeling machine à écrire
+              })
             }
           }
         })
@@ -260,20 +325,23 @@ export function BilletEditor({
   if (!isOpen) return null
 
   const mainContainerClasses = isImmersive
-    ? 'salle-du-temps fixed inset-0 z-[70] p-4 sm:p-8 md:p-12 lg:p-20'
+    ? 'salle-du-temps fixed inset-0 z-[100] bg-[#FAFAF8]'
     : 'fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4'
 
   return (
     <div
       ref={immersiveRef}
       className={
-        isImmersive ? `${mainContainerClasses} ${iaWriterDuo.className}` : mainContainerClasses
+        isImmersive
+          ? `${mainContainerClasses} ${iaWriterDuo.className} salle-du-temps-container`
+          : mainContainerClasses
       }
       style={
         isImmersive
           ? {
               backgroundColor: '#FAFAF8',
-              color: 'hsl(220, 15%, 20%)',
+              color: '#333',
+              animation: 'salleEnter 0.3s ease-out',
             }
           : undefined
       }
@@ -282,7 +350,7 @@ export function BilletEditor({
         data-testid="billet-editor"
         className={
           isImmersive
-            ? 'w-full h-full flex flex-col'
+            ? 'w-full h-full flex flex-col bg-[#FAFAF8]'
             : 'bg-white rounded-lg shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col'
         }
       >
@@ -376,47 +444,62 @@ export function BilletEditor({
         )}
 
         {isImmersive && (
-          <button
-            onClick={async () => {
-              try {
-                if (document.fullscreenElement) {
-                  await document.exitFullscreen()
-                }
-              } catch {}
-              setIsImmersive(false)
-            }}
-            className="fixed top-4 right-4 z-[80] p-2 rounded bg-black/10 hover:bg-black/20 text-black transition shadow"
-            title="Quitter (Échap)"
-            aria-label="Quitter la Salle du Temps"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <>
+            {/* Zone de détection pour la croix - position fixe, taille px pour rester constante */}
+            <div
+              className="fixed z-[90]"
+              style={{ top: '20px', right: '20px', width: '24px', height: '24px' }}
+              onMouseEnter={() => setShowExitButton(true)}
+              onMouseLeave={() => setShowExitButton(false)}
+              onTouchStart={() => setShowExitButton(true)}
+            >
+              <button
+                onClick={async () => {
+                  try {
+                    if (document.fullscreenElement) {
+                      await document.exitFullscreen()
+                    }
+                  } catch {}
+                  setIsImmersive(false)
+                }}
+                onFocus={() => setShowExitButton(true)}
+                onBlur={() => setShowExitButton(false)}
+                className={`absolute top-0 right-0 flex items-center justify-center bg-black/5 hover:bg-black/10 rounded-full transition-all duration-300 ${showExitButton ? 'opacity-100' : 'opacity-0'}`}
+                style={{ width: '40px', height: '40px' }}
+                title="Quitter (Échap)"
+                aria-label="Quitter la Salle du Temps"
+              >
+                <X className="text-black/60" style={{ width: '20px', height: '20px' }} />
+              </button>
+            </div>
+          </>
         )}
 
         {/* Exit Immersive Mode Button - minimal cross only */}
 
         {/* Content Area */}
-        <div
-          className={
-            isImmersive ? 'h-full w-full max-w-4xl mx-auto flex-1' : 'flex-1 overflow-hidden flex'
-          }
-        >
+        <div className={isImmersive ? 'h-full w-full flex-1' : 'flex-1 overflow-hidden flex'}>
           <div className={isImmersive ? 'h-full w-full' : 'flex-1 p-6 overflow-y-auto'}>
             {!isImmersive && <>{/* Meta Fields */}</>}
 
             {/* CodeMirror Editor */}
-            <div className={isImmersive ? 'h-full w-full relative' : 'relative min-h-[60vh]'}>
+            <div className={isImmersive ? 'h-full w-full' : 'relative min-h-[60vh]'}>
               <CodeMirror
                 ref={editorRef}
                 value={content}
                 onChange={value => {
                   setContent(value)
-                  setDirty(true)
                 }}
-                basicSetup={{ lineNumbers: false, foldGutter: false, closeBrackets: false }}
+                basicSetup={{
+                  lineNumbers: false,
+                  foldGutter: false,
+                  closeBrackets: false,
+                  highlightActiveLine: false,
+                  highlightActiveLineGutter: false,
+                }}
                 extensions={extensions}
-                placeholder={isImmersive ? '...' : ''}
-                className={isImmersive ? 'h-full w-full bg-transparent' : 'w-full'}
+                placeholder={''}
+                className={isImmersive ? 'h-full w-full salle-editor' : 'w-full'}
                 height={isImmersive ? '100%' : '70vh'}
                 width={'100%'}
               />
