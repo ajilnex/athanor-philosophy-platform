@@ -78,6 +78,7 @@ export function BilletEditor({
   const [error, setError] = useState<string | null>(null)
   const [previewHtml, setPreviewHtml] = useState<string>('')
   const [showExitButton, setShowExitButton] = useState(false)
+  const hideExitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const editorRef = useRef<any>(null)
   const immersiveRef = useRef<HTMLDivElement>(null)
@@ -189,9 +190,6 @@ export function BilletEditor({
       }
     }
 
-    // Handler d'activité, initialisé quand immersif
-    let activityHandler: ((ev: Event) => void) | null = null
-
     if (isImmersive) {
       // Cacher le header et verrouiller le scroll
       document.body.classList.add('salle-du-temps-active')
@@ -199,16 +197,16 @@ export function BilletEditor({
       if (navbar) navbar.style.display = 'none'
 
       // Afficher la croix brièvement sur interaction (PC & mobile)
-      activityHandler = () => {
+      const showExitTemporarily = () => {
         setShowExitButton(true)
         if (hideExitTimerRef.current) clearTimeout(hideExitTimerRef.current)
         hideExitTimerRef.current = setTimeout(() => setShowExitButton(false), 1800)
       }
-      window.addEventListener('mousemove', activityHandler, { passive: true })
-      window.addEventListener('mousedown', activityHandler, { passive: true })
-      window.addEventListener('touchstart', activityHandler, { passive: true })
+      window.addEventListener('mousemove', showExitTemporarily, { passive: true })
+      window.addEventListener('mousedown', showExitTemporarily, { passive: true })
+      window.addEventListener('touchstart', showExitTemporarily, { passive: true })
       // Montrer la croix un court instant à l'entrée en mode immersif
-      activityHandler()
+      showExitTemporarily()
 
       window.addEventListener('keydown', handleKeyDown, true)
     } else {
@@ -224,11 +222,10 @@ export function BilletEditor({
       if (navbar) navbar.style.display = ''
       window.removeEventListener('keydown', handleKeyDown, true)
       // cleanup listeners & timer
-      if (activityHandler) {
-        window.removeEventListener('mousemove', activityHandler, true)
-        window.removeEventListener('mousedown', activityHandler, true)
-        window.removeEventListener('touchstart', activityHandler, true)
-      }
+      const showExitTemporarily = () => {}
+      window.removeEventListener('mousemove', showExitTemporarily)
+      window.removeEventListener('mousedown', showExitTemporarily)
+      window.removeEventListener('touchstart', showExitTemporarily)
       if (hideExitTimerRef.current) {
         clearTimeout(hideExitTimerRef.current)
         hideExitTimerRef.current = null
