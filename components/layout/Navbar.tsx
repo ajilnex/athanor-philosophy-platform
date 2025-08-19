@@ -43,8 +43,18 @@ export function Navbar() {
     }
   }, [open])
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (open) {
+      document.body.classList.add('overflow-hidden')
+    } else {
+      document.body.classList.remove('overflow-hidden')
+    }
+    return () => document.body.classList.remove('overflow-hidden')
+  }, [open])
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-subtle/30 bg-background/80 backdrop-blur-lg">
+    <header className="sticky top-0 z-50 w-full border-b border-subtle/30 bg-background sm:bg-background/80 sm:backdrop-blur-lg">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 h-14 flex items-center justify-between">
         {/* Brand -> Home */}
         <Link href="/" className="font-serif text-xl tracking-tight hover:opacity-80 font-medium">
@@ -78,6 +88,8 @@ export function Navbar() {
         <div className="sm:hidden">
           <button
             aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+            aria-expanded={open}
+            aria-controls="mobile-nav"
             onClick={() => setOpen(o => !o)}
             className="p-2 rounded-md border border-subtle/40 hover:bg-muted"
           >
@@ -89,9 +101,10 @@ export function Navbar() {
       {/* Mobile Drawer */}
       {open && (
         <div
+          id="mobile-nav"
           role="dialog"
           aria-modal="true"
-          className="sm:hidden fixed inset-0 z-[60] bg-background/95 backdrop-blur-md border-t border-subtle fade-in"
+          className="sm:hidden fixed inset-0 z-[70] bg-background border-t border-subtle fade-in"
         >
           <div className="max-w-5xl mx-auto px-4 py-4 slide-down">
             <div className="flex items-center justify-between h-12">
@@ -105,7 +118,7 @@ export function Navbar() {
               <button
                 aria-label="Fermer"
                 onClick={() => setOpen(false)}
-                className="p-2 rounded-md border border-subtle/40 active:scale-95 transition"
+                className="p-2 rounded-md border border-subtle/40 active:scale-95 transition bg-muted"
               >
                 <X className="h-5 w-5" />
               </button>

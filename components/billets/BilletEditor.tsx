@@ -326,7 +326,7 @@ export function BilletEditor({
 
   const mainContainerClasses = isImmersive
     ? 'salle-du-temps fixed inset-0 z-[100] bg-[#FAFAF8]'
-    : 'fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4'
+    : 'fixed inset-0 bg-black/50 backdrop-blur-sm z-[80] flex items-center justify-center p-4'
 
   return (
     <div
@@ -366,9 +366,9 @@ export function BilletEditor({
               </button>
             </div>
 
-            {/* Toolbar */}
-            <div className="flex items-center justify-between p-4 border-b bg-gray-50">
-              <div className="flex items-center gap-2">
+            {/* Toolbar (mobile-friendly) */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4 border-b bg-gray-50">
+              <div className="flex flex-wrap items-center gap-2 overflow-x-auto">
                 {/* Actions éditeur */}
                 <button
                   type="button"
@@ -398,7 +398,7 @@ export function BilletEditor({
                   <Link2 className="h-4 w-4 inline mr-1" /> Backlink
                 </button>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <button
                   type="button"
                   onClick={() => setShowPreview(p => !p)}
@@ -432,7 +432,7 @@ export function BilletEditor({
                 <button
                   type="button"
                   onClick={handleSave}
-                  className="px-3 py-1.5 text-sm rounded bg-foreground text-background hover:bg-foreground/90 transition flex items-center gap-2"
+                  className="px-3 py-2 text-sm rounded bg-foreground text-background hover:bg-foreground/90 transition flex items-center gap-2 w-full sm:w-auto"
                   disabled={isSaving}
                   title="Enregistrer"
                 >
