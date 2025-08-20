@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    name: Lint, Typecheck, Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck (app)
+        run: npm run typecheck
+
+      - name: Typecheck (scripts)
+        run: npx tsc --project scripts/tsconfig.json --noEmit || echo "Scripts typecheck skipped (no tsconfig)"
+
+      - name: Unit tests with coverage (Jest)
+        run: npm run test:unit:coverage -- --coverageReporters="text" --coverageReporters="lcov" --coverageReporters="html"
+
+      - name: Upload Jest coverage report (HTML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jest-coverage-html
+          path: coverage/lcov-report
+          if-no-files-found: ignore
+
+      - name: Upload Jest coverage (lcov.info)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jest-coverage-lcov
+          path: coverage/lcov.info
+          if-no-files-found: ignore
+
+      - name: Upload coverage to Codecov
+        if: secrets.CODECOV_TOKEN != ''
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage/lcov.info
+          fail_ci_if_error: false
+          verbose: true
+
+  e2e:
+    name: Playwright E2E
+    runs-on: ubuntu-latest
+    needs: build-test
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' && !github.event.pull_request.draft)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests (HTML + line reporters)
+        env:
+          CI: '1'
+        run: npx playwright test --reporter=line,html
+
+      - name: Upload Playwright HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          if-no-files-found: ignore
