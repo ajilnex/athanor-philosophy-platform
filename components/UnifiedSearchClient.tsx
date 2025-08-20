@@ -6,7 +6,6 @@ import { useSearchParams } from 'next/navigation'
 import { Search, FileText, Calendar, Tag, BookOpen } from 'lucide-react'
 import * as lunr from 'lunr'
 import { makeSnippet } from '@/lib/search-utils'
-import { MiniGraph } from '@/components/graph/MiniGraph'
 
 interface SearchDocument {
   id: string
@@ -131,8 +130,8 @@ export function UnifiedSearchClient() {
         </p>
       </div>
 
-      {/* Search Bar with Mini Graph */}
-      <div className="mb-8 flex flex-col lg:flex-row gap-6">
+      {/* Search Bar */}
+      <div className="mb-8">
         <div className="flex-1">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -152,19 +151,6 @@ export function UnifiedSearchClient() {
               }}
             />
           </div>
-        </div>
-
-        {/* Mini Graph - shows context for top search result */}
-        <div className="lg:w-80">
-          <MiniGraph
-            centerNodeId={
-              searchResults.length > 0 && searchResults[0].type === 'billet'
-                ? searchResults[0].id
-                : undefined
-            }
-            maxNodes={5}
-            className="h-full"
-          />
         </div>
       </div>
 

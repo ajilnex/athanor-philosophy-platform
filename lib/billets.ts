@@ -24,6 +24,10 @@ function isMdxFile(filename: string): boolean {
   return filename.toLowerCase().endsWith('.mdx')
 }
 
+function isMdFile(filename: string): boolean {
+  return filename.toLowerCase().endsWith('.md')
+}
+
 function dateFrom(front: any, slug: string, mtime?: Date): string {
   // 1) Frontmatter (priorité): publishedAt/published/created/date
   const dateFields = ['publishedAt', 'published', 'created', 'date']
@@ -64,7 +68,9 @@ function dateFrom(front: any, slug: string, mtime?: Date): string {
 async function fsAll(): Promise<Billet[]> {
   try {
     const entries = await fs.readdir(CONTENT_DIR)
-    const files = entries.filter(f => f.toLowerCase().endsWith('.mdx'))
+    const files = entries.filter(
+      f => f.toLowerCase().endsWith('.mdx') || f.toLowerCase().endsWith('.md')
+    )
     const items: Billet[] = []
     for (const file of files) {
       const slug = slugFromFilename(file)
@@ -141,11 +147,24 @@ export async function getAllBillets(): Promise<Billet[]> {
 export async function getBilletBySlug(slug: string) {
   // Billets = 100% statiques, toujours depuis le filesystem (uniquement .mdx)
   try {
-    const filePath = path.join(CONTENT_DIR, `${slug}.mdx`)
-    const [raw, stat] = await Promise.all([
-      fs.readFile(filePath, 'utf8'),
-      fs.stat(filePath).catch(() => null as any),
-    ])
+    // Try .mdx first, then fallback to .md
+    const mdxPath = path.join(CONTENT_DIR, `${slug}.mdx`)
+    const mdPath = path.join(CONTENT_DIR, `${slug}.md`)
+    let filePath = mdxPath
+    let raw: string
+    let stat: any
+    try {
+      ;[raw, stat] = await Promise.all([
+        fs.readFile(mdxPath, 'utf8'),
+        fs.stat(mdxPath).catch(() => null as any),
+      ])
+    } catch {
+      ;[raw, stat] = await Promise.all([
+        fs.readFile(mdPath, 'utf8'),
+        fs.stat(mdPath).catch(() => null as any),
+      ])
+      filePath = mdPath
+    }
     const { data, content } = matter(raw)
     const contentWithBacklinks = await transformBacklinks(content)
     return {
@@ -155,7 +174,7 @@ export async function getBilletBySlug(slug: string) {
       tags: Array.isArray(data?.tags) ? (data.tags as string[]) : [],
       content: contentWithBacklinks,
       excerpt: (data?.excerpt as string) || undefined,
-      isMdx: true,
+      isMdx: filePath.toLowerCase().endsWith('.mdx'),
     }
   } catch (e) {
     console.error(`Error: No billet found for slug ${slug}.mdx`)
@@ -168,7 +187,9 @@ export async function getBilletSlugs(): Promise<string[]> {
   // Note: La vérification du trash se fait uniquement au niveau des pages individuelles
   try {
     const entries = await fs.readdir(CONTENT_DIR)
-    return entries.filter(f => f.toLowerCase().endsWith('.mdx')).map(slugFromFilename)
+    return entries
+      .filter(f => f.toLowerCase().endsWith('.mdx') || f.toLowerCase().endsWith('.md'))
+      .map(slugFromFilename)
   } catch (e) {
     console.error('Error reading billet slugs from FS:', e)
     return []

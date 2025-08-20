@@ -40,19 +40,22 @@ export default async function HomePage() {
   return (
     <>
       {/* Couche 1: Le Graphe en Arrière-Plan - Constellation intégrée */}
-      <div className="fixed inset-0 z-0">
-        <InteractiveGraph className="w-full h-full" />
+      <div className="fixed inset-0 z-0 overflow-hidden">
+        <InteractiveGraph className="w-full h-full" interactive={false} />
       </div>
 
       {/* Couche 2: Le Contenu au Premier Plan */}
-      <main className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 sm:px-6">
+      <main
+        className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 sm:px-6"
+        data-graph-shield
+      >
         <div className="max-w-4xl w-full">
           <h1 className="text-3xl sm:text-4xl font-light tracking-tight text-foreground mb-8 py-4 px-6 animate-fadeIn">
             L'athanor
           </h1>
 
           {/* Barre de recherche (compacte et centrée) */}
-          <div className="w-full max-w-lg mx-auto mt-6 mb-8">
+          <div className="w-full max-w-lg mx-auto mt-6 mb-8" data-graph-shield>
             <form action="/search" method="GET" className="relative">
               <input
                 type="search"
@@ -65,7 +68,7 @@ export default async function HomePage() {
           </div>
 
           {/* Maison d'édition */}
-          <div className="my-12 text-center">
+          <div className="my-12 text-center" data-graph-shield>
             <Link
               href="/edition"
               className="inline-flex items-center px-6 py-3 bg-slate-900/90 hover:bg-slate-800/95 rounded-lg text-slate-50 transition-all duration-200 font-light border border-slate-700/30 backdrop-blur-sm"
@@ -76,7 +79,7 @@ export default async function HomePage() {
 
           {/* Activité récente */}
           {latestBillet && (
-            <div className="mt-16">
+            <div className="mt-16" data-graph-shield>
               <LatestActivityCard billet={latestBillet} />
             </div>
           )}

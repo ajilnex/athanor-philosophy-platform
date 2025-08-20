@@ -69,7 +69,7 @@ export function Navbar() {
         <nav className="hidden sm:flex items-center gap-2">
           <NavItem href="/billets">Billets</NavItem>
           <NavItem href="/publications">Publications</NavItem>
-          <NavItem href="/presse-papier">Presse-papier</NavItem>
+          <NavItem href="/constellation">Constellation</NavItem>
           <NavItem href="/search">Recherche</NavItem>
           {session ? (
             <button
@@ -144,11 +144,11 @@ export function Navbar() {
                 Publications
               </Link>
               <Link
-                href="/presse-papier"
+                href="/constellation"
                 onClick={() => setOpen(false)}
                 className="px-3 py-2 text-base rounded hover:bg-muted transition"
               >
-                Presse‑papier
+                Constellation
               </Link>
               <Link
                 href="/search"

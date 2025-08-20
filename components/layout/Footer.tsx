@@ -3,11 +3,11 @@
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 
-export function Footer() {
+export function Footer({ className = '' }: { className?: string }) {
   const { data: session } = useSession()
 
   return (
-    <footer className="bg-background border-t border-subtle mt-16 relative z-20">
+    <footer className={`bg-background border-t border-subtle mt-16 relative z-20 ${className}`}>
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="text-center">
           <p className="text-subtle text-sm font-light">

@@ -7,7 +7,6 @@ import { EditBilletButton } from '@/components/billets/EditBilletButton'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { MiniGraph } from '@/components/graph/MiniGraph'
 import { CommentSection } from '@/components/comments/CommentSection'
 import { isFileInTrash } from '@/lib/github.server'
 
@@ -139,12 +138,7 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
       {/* Section commentaires */}
       <CommentSection targetType="billet" targetId={slug} title={billet.title} />
 
-      {/* Ligne de pensée */}
-      <section className="mt-16 pt-8 border-t border-subtle/20">
-        <div className="w-full max-w-4xl mx-auto h-40">
-          <MiniGraph centerNodeId={`billet:${slug}`} maxNodes={5} />
-        </div>
-      </section>
+      {/* Ligne de pensée supprimée (MiniGraph retiré) */}
 
       {/* Navigation */}
       <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-subtle">

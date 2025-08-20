@@ -4,11 +4,21 @@ import { useEffect, useState, useRef } from 'react'
 
 interface InteractiveGraphProps {
   className?: string
+  showControls?: boolean
+  interactive?: boolean // when false: decorative background only
 }
 
-export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
+export function InteractiveGraph({
+  className = '',
+  showControls = false,
+  interactive = true,
+}: InteractiveGraphProps) {
   const [svgContent, setSvgContent] = useState<string>('')
   const containerRef = useRef<HTMLDivElement>(null)
+  const overlaySvgRef = useRef<SVGSVGElement | null>(null)
+  const overlayContainerRef = useRef<HTMLDivElement | null>(null)
+  const [enabled, setEnabled] = useState(true)
+  const [scale, setScale] = useState(1)
 
   useEffect(() => {
     async function loadSVG() {
@@ -28,6 +38,7 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
 
   useEffect(() => {
     if (!svgContent || !containerRef.current) return
+    if (!interactive) return // decorative-only: skip overlay creation entirely
 
     const container = containerRef.current
     const svgElement = container.querySelector('svg')
@@ -48,18 +59,20 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
     })
 
     // Créer le portal overlay avec positionnement exact
-    const containerRect = container.getBoundingClientRect()
     const overlayContainer = document.createElement('div')
     overlayContainer.style.cssText = `
-      position: fixed;
-      left: ${containerRect.left}px;
-      top: ${containerRect.top}px;
-      width: ${containerRect.width}px;
-      height: ${containerRect.height}px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
       z-index: 40;
-      pointer-events: none;
+      pointer-events: auto;
     `
-    document.body.appendChild(overlayContainer)
+    // Clip overlay to the graph container (respects overflow-hidden on parents)
+    container.style.position = container.style.position || 'relative'
+    container.appendChild(overlayContainer)
+    overlayContainerRef.current = overlayContainer
 
     const overlayElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
     overlayElement.setAttribute('viewBox', '0 0 1440 820')
@@ -67,20 +80,13 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
     overlayElement.style.cssText = `
       width: 100%;
       height: 100%;
-      pointer-events: none;
+      pointer-events: auto;
+      transform-origin: center center;
     `
+    overlaySvgRef.current = overlayElement as unknown as SVGSVGElement
 
     // Ajuster la position lors du redimensionnement
-    const updateOverlayPosition = () => {
-      const newRect = container.getBoundingClientRect()
-      overlayContainer.style.left = newRect.left + 'px'
-      overlayContainer.style.top = newRect.top + 'px'
-      overlayContainer.style.width = newRect.width + 'px'
-      overlayContainer.style.height = newRect.height + 'px'
-    }
-
-    window.addEventListener('resize', updateOverlayPosition)
-    window.addEventListener('scroll', updateOverlayPosition)
+    // No need to reposition: overlay is absolutely positioned within container
 
     // Définitions de filtres
     overlayElement.innerHTML = `
@@ -116,7 +122,7 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
       const hitArea = document.createElementNS('http://www.w3.org/2000/svg', 'g')
       hitArea.innerHTML = `
         <a href="${href}" style="pointer-events: auto;">
-          <circle cx="${cx}" cy="${cy}" r="${r + 5}" 
+          <circle cx="${cx}" cy="${cy}" r="${r + 10}" 
                   fill="transparent" 
                   stroke="none" 
                   data-id="${nodeId}"
@@ -135,34 +141,19 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
 
     // Helper pour vérifier si on est au-dessus d'une zone shield
     function isOverShield(clientX: number, clientY: number): boolean {
-      // Désactive l'overlay ET le SVG de fond pour jeter un coup d'œil en dessous
-      const prevOverlay = overlayElement.style.pointerEvents
-      const prevBackground = container.style.pointerEvents
-      const backgroundSvg = container.querySelector('svg')
-      const prevBackgroundSvg = backgroundSvg?.style.pointerEvents
+      // Stratégie robuste: tester l'appartenance (x,y) aux rectangles
+      // de tous les éléments marqués [data-graph-shield] visibles.
+      const shields = Array.from(
+        document.querySelectorAll<HTMLElement>('[data-graph-shield]')
+      ).filter(el => el.offsetParent !== null || getComputedStyle(el).position === 'fixed')
 
-      overlayElement.style.pointerEvents = 'none'
-      container.style.pointerEvents = 'none'
-      if (backgroundSvg) backgroundSvg.style.pointerEvents = 'none'
-
-      const below = document.elementFromPoint(clientX, clientY)
-
-      overlayElement.style.pointerEvents = prevOverlay
-      container.style.pointerEvents = prevBackground
-      if (backgroundSvg && prevBackgroundSvg !== undefined) {
-        backgroundSvg.style.pointerEvents = prevBackgroundSvg
+      for (const el of shields) {
+        const r = el.getBoundingClientRect()
+        if (clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom) {
+          return true
+        }
       }
-
-      const hasShield = !!below && !!(below as HTMLElement).closest('[data-graph-shield]')
-      console.log('Shield check:', {
-        clientX,
-        clientY,
-        below: below?.tagName,
-        className: (below as HTMLElement)?.className,
-        hasShield,
-      })
-
-      return hasShield
+      return false
     }
 
     function createClone(nodeId: string) {
@@ -188,6 +179,8 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
       const textX = originalText?.getAttribute('x') || cx
       const textY = originalText?.getAttribute('y') || cy
       const fontSize = originalText?.getAttribute('font-size') || '12'
+      const fontSizeNum = parseFloat(fontSize || '12')
+      const cloneFontSize = String(isNaN(fontSizeNum) ? 14 : Math.min(fontSizeNum + 3, 24))
       const fontFamily = originalText?.getAttribute('font-family') || 'IBM Plex Serif, serif'
       const textContent = originalText?.textContent || ''
 
@@ -202,7 +195,7 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
             originalText
               ? `
           <text x="${textX}" y="${textY}" 
-                text-anchor="middle" font-size="${fontSize}" 
+                text-anchor="middle" font-size="${cloneFontSize}" 
                 font-family="${fontFamily}" fill="hsl(220, 15%, 20%)"
                 paint-order="stroke" stroke="hsl(220, 10%, 98%)" stroke-width="3px"
                 style="text-decoration: none;">
@@ -238,6 +231,7 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
             edgeClone.setAttribute('stroke', 'hsl(220, 90%, 55%)')
             edgeClone.setAttribute('stroke-width', '1')
             edgeClone.setAttribute('opacity', '0.4')
+            edgeClone.setAttribute('pointer-events', 'none')
 
             edgesGroup.appendChild(edgeClone)
           }
@@ -269,6 +263,7 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
 
     // Délégation d'événements sur l'overlay
     function handleMouseOver(e: Event) {
+      if (!enabled) return
       const me = e as MouseEvent
       console.log('MouseOver triggered:', { target: (e.target as Element)?.tagName })
 
@@ -329,6 +324,7 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
     let armedNode: string | null = null
 
     function handleTouch(e: Event) {
+      if (!enabled) return
       const te = e as TouchEvent
       const touch = te.changedTouches[0]
       if (isOverShield(touch.clientX, touch.clientY)) return // idem sur mobile
@@ -347,7 +343,8 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
 
       if (armedNode === nodeId) {
         // Deuxième tap - naviguer
-        window.location.href = link.href
+        const href = link.getAttribute('href') || (link as any).href?.baseVal || ''
+        if (href) window.location.assign(href)
       } else {
         // Premier tap - révéler
         if (activeNode) removeClone(activeNode)
@@ -369,7 +366,8 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
         if (target.classList.contains('hit-area')) {
           const link = target.closest('a') as HTMLAnchorElement
           if (link) {
-            window.location.href = link.href
+            const href = link.getAttribute('href') || (link as any).href?.baseVal || ''
+            if (href) window.location.assign(href)
           }
         }
       }
@@ -382,18 +380,39 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
     overlayElement.addEventListener('focusout', handleBlur)
     overlayElement.addEventListener('touchend', handleTouch)
     overlayElement.addEventListener('keypress', handleKeyPress)
+    overlayElement.addEventListener('click', e => {
+      const target = e.target as Element
+      const link = target.closest('a') as HTMLAnchorElement | SVGAElement | null
+      if (link) {
+        e.preventDefault()
+        const href = link.getAttribute('href') || (link as any).href?.baseVal || ''
+        if (href) window.location.assign(href)
+      }
+    })
 
     return () => {
       // Nettoyage du portal
       if (overlayContainer.parentNode) {
-        document.body.removeChild(overlayContainer)
+        overlayContainer.parentNode.removeChild(overlayContainer)
       }
-      window.removeEventListener('resize', updateOverlayPosition)
-      window.removeEventListener('scroll', updateOverlayPosition)
       if (timeoutId) clearTimeout(timeoutId)
       if (tapTimeout) clearTimeout(tapTimeout)
+      overlaySvgRef.current = null
+      overlayContainerRef.current = null
     }
-  }, [svgContent])
+  }, [svgContent, enabled, interactive])
+
+  // Apply scale to both background and overlay
+  useEffect(() => {
+    if (containerRef.current) {
+      const bg = containerRef.current
+      bg.style.transformOrigin = 'center center'
+      bg.style.transform = `scale(${scale})`
+    }
+    if (overlaySvgRef.current) {
+      overlaySvgRef.current.style.transform = `scale(${scale})`
+    }
+  }, [scale])
 
   if (!svgContent) {
     return (
@@ -412,6 +431,41 @@ export function InteractiveGraph({ className = '' }: InteractiveGraphProps) {
         style={{ pointerEvents: 'none' }}
         dangerouslySetInnerHTML={{ __html: svgContent }}
       />
+      {showControls && (
+        <div
+          className="absolute top-3 right-3 z-50 flex gap-2 bg-background/70 backdrop-blur-md border border-subtle/30 rounded-md p-1"
+          style={{ pointerEvents: 'auto' }}
+        >
+          <button
+            title="Zoom -"
+            onClick={() => setScale(s => Math.max(0.5, Math.round((s - 0.1) * 10) / 10))}
+            className="px-2 py-1 text-sm border border-subtle/30 rounded hover:bg-muted"
+          >
+            −
+          </button>
+          <button
+            title="Zoom +"
+            onClick={() => setScale(s => Math.min(2, Math.round((s + 0.1) * 10) / 10))}
+            className="px-2 py-1 text-sm border border-subtle/30 rounded hover:bg-muted"
+          >
+            +
+          </button>
+          <button
+            title="Réinitialiser"
+            onClick={() => setScale(1)}
+            className="px-2 py-1 text-sm border border-subtle/30 rounded hover:bg-muted"
+          >
+            Reset
+          </button>
+          <button
+            title={enabled ? 'Désactiver interactions' : 'Activer interactions'}
+            onClick={() => setEnabled(e => !e)}
+            className="px-2 py-1 text-sm border border-subtle/30 rounded hover:bg-muted"
+          >
+            {enabled ? 'Pause' : 'Play'}
+          </button>
+        </div>
+      )}
       {/* Calque B sera créé via portal dans useEffect */}
     </div>
   )

@@ -88,7 +88,9 @@ export async function compileMDX(content: string, isMdx: boolean = true) {
         </BibliographyProvider>
       )
     } catch (error) {
-      console.error('MDX compilation error:', error)
+      // In server components, console.error surfaces as an overlay in dev.
+      // Use warn to avoid interrupting DX; we still fall back to Markdown.
+      console.warn('MDX compilation error, falling back to Markdown:', error)
       // Fallback vers Markdown simple en cas d'erreur
       const processed = await remark().use(html, { sanitize: false }).process(content)
       return (

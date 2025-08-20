@@ -3,10 +3,14 @@
 /**
  * Smoke Test pour vérifier l'intégrité du build
  * Contrôle que les fichiers essentiels ont été générés correctement
+ * Inclut un read-lock pour attendre la fin d'un build en cours.
  */
 
 const fs = require('fs')
 const path = require('path')
+
+const LOCK_FILE = path.join(process.cwd(), '.buildlock', 'lock')
+const MAX_WAIT_SECONDS = 60
 
 // Fichiers critiques à vérifier
 const CRITICAL_FILES = [
@@ -36,6 +40,24 @@ const CRITICAL_FILES = [
     isDirectory: true,
   },
 ]
+
+async function waitForLockRelease() {
+  const startTime = Date.now()
+  while (fs.existsSync(LOCK_FILE)) {
+    const elapsedTime = (Date.now() - startTime) / 1000
+    if (elapsedTime > MAX_WAIT_SECONDS) {
+      console.error(
+        `❌ Timeout: Le fichier de lock (.buildlock/lock) est présent depuis plus de ${MAX_WAIT_SECONDS} secondes.`
+      )
+      console.error(
+        '   Un autre processus de build est peut-être bloqué. Supprimez le dossier .buildlock manuellement si vous êtes sûr.'
+      )
+      process.exit(1)
+    }
+    console.log(`⏳ Un build est en cours... Attente de la libération du lock (.buildlock/lock).`)
+    await new Promise(resolve => setTimeout(resolve, 5000)) // Attendre 5 secondes
+  }
+}
 
 function checkFile(fileConfig) {
   const fullPath = path.join(process.cwd(), fileConfig.path)
@@ -72,7 +94,9 @@ function checkFile(fileConfig) {
   }
 }
 
-function runSmokeTest() {
+async function runSmokeTest() {
+  await waitForLockRelease()
+
   console.log('🚀 Smoke Test du Build Athanor')
   console.log('=====================================\n')
 

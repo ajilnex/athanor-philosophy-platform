@@ -37,14 +37,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr">
       <body
-        className={`min-h-screen bg-background text-foreground ${inter.variable} ${ibmPlexSerif.variable} font-serif`}
+        className={`min-h-screen flex flex-col bg-background text-foreground ${inter.variable} ${ibmPlexSerif.variable} font-serif`}
       >
         <AppSessionProvider>
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <main className="flex-grow pt-14">{children}</main>
-            <Footer />
-          </div>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer className="mt-auto" />
           <Toaster
             position="top-right"
             toastOptions={{
