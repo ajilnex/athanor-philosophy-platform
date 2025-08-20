@@ -33,63 +33,39 @@ export function BilletsList({ initialBillets }: BilletsListProps) {
   }
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      {billets.map(billet => (
-        <article key={billet.slug} className="card border-subtle">
-          <div className="flex flex-col space-y-4">
-            <div>
-              <div className="mb-2">
-                <h2 className="text-lg sm:text-xl font-light text-foreground">
-                  <Link
-                    href={`/billets/${billet.slug}`}
-                    className="hover:text-subtle transition-colors"
-                  >
-                    {billet.title}
-                  </Link>
-                </h2>
-              </div>
+    <div className="space-y-4">
+      {billets.map((billet, index) => (
+        <article
+          key={billet.slug}
+          className="group py-6 border-b border-subtle/20 last:border-0 animate-fadeIn"
+          style={{ animationDelay: `${index * 50}ms` }}
+        >
+          <div className="space-y-3">
+            <h2 className="text-lg sm:text-xl font-light text-foreground group-hover:text-accent transition-colors duration-300">
+              <Link href={`/billets/${billet.slug}`}>{billet.title}</Link>
+            </h2>
 
-              {billet.excerpt && (
-                <p className="text-sm sm:text-base text-subtle mb-4 leading-relaxed font-light">
-                  {billet.excerpt}
-                </p>
-              )}
+            {billet.excerpt && (
+              <p className="text-sm sm:text-base text-subtle leading-relaxed font-light line-clamp-2">
+                {billet.excerpt}
+              </p>
+            )}
 
-              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-subtle mb-4">
-                <div className="flex items-center space-x-1">
-                  <Calendar className="h-4 w-4" />
-                  <span>
-                    {new Date(billet.date).toLocaleString('fr-FR', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </span>
-                </div>
-              </div>
+            <div className="flex items-center justify-between">
+              <time className="text-xs sm:text-sm text-subtle/80" dateTime={billet.date}>
+                {new Date(billet.date).toLocaleString('fr-FR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </time>
 
-              {billet.tags && billet.tags.length > 0 && (
-                <div className="flex items-center space-x-2">
-                  <Tag className="h-4 w-4 text-subtle" />
-                  <div className="flex flex-wrap gap-2">
-                    {billet.tags.map(tag => (
-                      <span key={tag} className="px-2 py-1 text-xs bg-gray-100 text-foreground">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center justify-start">
               <Link
                 href={`/billets/${billet.slug}`}
-                className="text-foreground hover:text-subtle transition-colors font-light underline text-sm sm:text-base"
+                className="text-sm text-accent hover:underline underline-offset-4 transition-all duration-200"
+                aria-label={`Lire ${billet.title}`}
               >
-                Lire →
+                Lire
               </Link>
             </div>
           </div>

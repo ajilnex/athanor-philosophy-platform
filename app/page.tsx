@@ -47,7 +47,7 @@ export default async function HomePage() {
       {/* Couche 2: Le Contenu au Premier Plan */}
       <main className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 sm:px-6">
         <div className="max-w-4xl w-full">
-          <h1 className="text-3xl sm:text-4xl font-light tracking-tight text-foreground mb-8 py-4 px-6">
+          <h1 className="text-3xl sm:text-4xl font-light tracking-tight text-foreground mb-8 py-4 px-6 animate-fadeIn">
             L'athanor
           </h1>
 
@@ -59,6 +59,7 @@ export default async function HomePage() {
                 name="q"
                 placeholder="Rechercher..."
                 className="search-input w-full p-3 pl-4 pr-10 text-base bg-background/70 backdrop-blur-md"
+                aria-label="Rechercher dans le site"
               />
             </form>
           </div>
@@ -106,7 +107,12 @@ export default async function HomePage() {
                           <div className="rounded-lg overflow-hidden border border-subtle/40 bg-background/80 backdrop-blur-sm">
                             {c.image ? (
                               // eslint-disable-next-line @next/next/no-img-element
-                              <img src={c.image} alt="" className="w-full h-24 object-cover" />
+                              <img
+                                src={c.image}
+                                alt=""
+                                className="w-full h-24 object-cover"
+                                loading="lazy"
+                              />
                             ) : (
                               <div className="w-full h-24 bg-gray-100" />
                             )}
@@ -137,6 +143,7 @@ export default async function HomePage() {
                               src={c.image}
                               alt=""
                               className="w-full h-20 object-cover rounded"
+                              loading="lazy"
                             />
                           ) : (
                             <div className="w-full h-20 bg-gray-100 rounded" />

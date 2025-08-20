@@ -12,7 +12,11 @@ function NavItem({ href, children }: { href: string; children: React.ReactNode }
   return (
     <Link
       href={href}
-      className={`px-3 py-2 text-sm font-light hover:text-subtle transition-colors ${active ? 'underline underline-offset-4' : ''}`}
+      className={`px-3 py-2 text-sm font-light transition-all duration-200 ${
+        active
+          ? 'text-foreground underline underline-offset-4 decoration-1'
+          : 'text-subtle hover:text-foreground'
+      }`}
     >
       {children}
     </Link>
