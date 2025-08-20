@@ -1,22 +1,12 @@
-// Next.js App Router instrumentation file for Sentry.
+// Next.js App Router instrumentation file.
 // Loaded by Next.js during server and client startup.
 
-import * as Sentry from '@sentry/nextjs'
-
 export async function register() {
-  // Determine runtime and load the appropriate Sentry config.
-  if (process.env.NEXT_RUNTIME === 'nodejs') {
-    await import('./sentry.server.config')
-  } else if (process.env.NEXT_RUNTIME === 'edge') {
-    await import('./sentry.edge.config')
-  } else {
-    await import('./sentry.client.config')
-  }
+  // No instrumentation needed after Sentry removal
 }
 
-// Capture errors from nested React Server Components
-// See: https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/#errors-from-nested-react-server-components
+// Handle errors from nested React Server Components
 export function onRequestError(err: unknown) {
-  // Fallback to standard exception capture to avoid type mismatch
-  Sentry.captureException(err)
+  // Log error to console (Sentry removed)
+  console.error('Request error:', err)
 }
