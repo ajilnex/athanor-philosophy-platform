@@ -2,6 +2,7 @@ import { getPublishedClips } from '@/lib/presse-papier'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { actionAddClipPublic } from './actions'
+import Image from 'next/image'
 
 export const metadata = {
   title: 'Presse-papier',
@@ -25,7 +26,6 @@ export default async function PressePapierPage() {
             'use server'
             await actionAddClipPublic(formData)
           }}
-          method="post"
           className="card border-subtle p-4 sm:p-6 mb-8"
         >
           <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
@@ -63,8 +63,15 @@ export default async function PressePapierPage() {
             <a key={c.id} href={c.url} target="_blank" className="block group" data-graph-shield>
               <div className="rounded-lg overflow-hidden border border-subtle/40 bg-background/80 backdrop-blur-sm">
                 {c.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={c.image} alt="" className="w-full h-40 object-cover" />
+                  <Image
+                    src={c.image}
+                    alt={c.title || 'Image de prévisualisation'}
+                    width={400}
+                    height={160}
+                    className="w-full h-40 object-cover"
+                    loading="lazy"
+                    unoptimized={!c.image.includes('res.cloudinary.com')}
+                  />
                 ) : (
                   <div className="w-full h-40 bg-gray-100" />
                 )}

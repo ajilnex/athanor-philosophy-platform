@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import fs from 'fs'
 import path from 'path'
 import { getAllBillets } from '@/lib/billets'
@@ -109,12 +110,14 @@ export default async function HomePage() {
                         >
                           <div className="rounded-lg overflow-hidden border border-subtle/40 bg-background/80 backdrop-blur-sm">
                             {c.image ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img
+                              <Image
                                 src={c.image}
-                                alt=""
+                                alt={c.title || 'Image de prévisualisation'}
+                                width={280}
+                                height={96}
                                 className="w-full h-24 object-cover"
                                 loading="lazy"
+                                unoptimized={!c.image.includes('res.cloudinary.com')}
                               />
                             ) : (
                               <div className="w-full h-24 bg-gray-100" />
@@ -141,12 +144,14 @@ export default async function HomePage() {
                           className="flex flex-col items-start hover:opacity-90 transition"
                         >
                           {c.image ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
+                            <Image
                               src={c.image}
-                              alt=""
+                              alt={c.title || 'Image de prévisualisation'}
+                              width={200}
+                              height={80}
                               className="w-full h-20 object-cover rounded"
                               loading="lazy"
+                              unoptimized={!c.image.includes('res.cloudinary.com')}
                             />
                           ) : (
                             <div className="w-full h-20 bg-gray-100 rounded" />

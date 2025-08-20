@@ -33,6 +33,17 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      // Presse-papier: allow common domains for link previews
+      {
+        protocol: 'https',
+        hostname: '**', // Allow all HTTPS domains for link previews
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '**',
+        pathname: '/**',
+      },
     ],
   },
 }
