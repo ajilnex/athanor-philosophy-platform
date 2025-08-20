@@ -35,7 +35,7 @@ export function Cite({ item, className = '' }: CiteProps) {
     <span className={`inline-block ${className}`}>
       <sup>
         <a
-          href={`#ref-${item}`}
+          href={`/refs/${item}`}
           className="text-accent hover:text-accent/70 no-underline font-medium"
           title={shortCitation}
         >

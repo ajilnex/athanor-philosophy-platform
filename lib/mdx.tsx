@@ -79,11 +79,12 @@ export async function compileMDX(content: string, isMdx: boolean = true) {
         useMDXComponents: () => mdxComponents,
       })
 
-      // Rendu avec BibliographyProvider wrapper
+      // Rendu avec BibliographyProvider wrapper + Bibliography automatique en fin de billet
       return (
         <BibliographyProvider>
           <div className="prose prose-sm sm:prose max-w-none">
             <MDXContent />
+            <Bibliography />
           </div>
         </BibliographyProvider>
       )
@@ -94,20 +95,26 @@ export async function compileMDX(content: string, isMdx: boolean = true) {
       // Fallback vers Markdown simple en cas d'erreur
       const processed = await remark().use(html, { sanitize: false }).process(content)
       return (
+        <BibliographyProvider>
+          <div
+            className="prose prose-sm sm:prose max-w-none"
+            dangerouslySetInnerHTML={{ __html: processed.toString() }}
+          />
+          <Bibliography />
+        </BibliographyProvider>
+      )
+    }
+  } else {
+    // Contenu MD simple - traitement via remark (Bibliography incluse si <Cite> est utilisé via MDX; sinon vide)
+    const processed = await remark().use(html, { sanitize: false }).process(content)
+    return (
+      <BibliographyProvider>
         <div
           className="prose prose-sm sm:prose max-w-none"
           dangerouslySetInnerHTML={{ __html: processed.toString() }}
         />
-      )
-    }
-  } else {
-    // Contenu MD simple - traitement via remark
-    const processed = await remark().use(html, { sanitize: false }).process(content)
-    return (
-      <div
-        className="prose prose-sm sm:prose max-w-none"
-        dangerouslySetInnerHTML={{ __html: processed.toString() }}
-      />
+        <Bibliography />
+      </BibliographyProvider>
     )
   }
 }

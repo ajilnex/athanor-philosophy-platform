@@ -2,6 +2,6 @@
 
 This file is deprecated. Please refer to the canonical document:
 
-- AGENTS: `./AGENTS.md` — Repository Guidelines & Collaboration Protocol
+- Canonical: `./AGENTS.md` — Repository Guidelines & Collaboration Protocol
 
 Keeping a single source of truth avoids drift between files.
