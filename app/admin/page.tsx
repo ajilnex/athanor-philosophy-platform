@@ -159,21 +159,6 @@ async function AdminNormalPage() {
         {/* Éditer les billets retiré: pilotage depuis l'intérieur du site */}
 
         <Link
-          href="/admin/presse-papier"
-          className="card border-subtle hover:border-foreground transition-colors group"
-        >
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 flex items-center justify-center">
-              <FileText className="h-5 w-5 text-foreground" />
-            </div>
-            <div>
-              <h3 className="font-light text-foreground">Presse-papier</h3>
-              <p className="text-sm text-subtle font-light">Lister et modérer</p>
-            </div>
-          </div>
-        </Link>
-
-        <Link
           href="/admin/users"
           className="card border-subtle hover:border-foreground transition-colors group"
         >

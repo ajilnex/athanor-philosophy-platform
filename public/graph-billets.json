@@ -172,7 +172,7 @@
       "id": "billet:editer-un-billet-et-citer-avec-zotero-guide-complet",
       "label": "Éditer un billet et citer avec Zotero — Guide complet",
       "url": "/billets/editer-un-billet-et-citer-avec-zotero-guide-complet",
-      "degree": 2,
+      "degree": 3,
       "x": -26.646463150654707,
       "y": 258.6309455605821
     },
@@ -207,6 +207,14 @@
       "degree": 0,
       "x": 179.7607887184927,
       "y": 9.276790355797882
+    },
+    {
+      "id": "billet:test",
+      "label": "Test",
+      "url": "/billets/test",
+      "degree": 1,
+      "x": -241.67038248553962,
+      "y": -95.8927850742327
     }
   ],
   "edges": [
@@ -284,12 +292,17 @@
       "id": "billet:editer-un-billet-et-citer-avec-zotero-guide-complet→billet:slug",
       "source": "billet:editer-un-billet-et-citer-avec-zotero-guide-complet",
       "target": "billet:slug"
+    },
+    {
+      "id": "billet:test→billet:editer-un-billet-et-citer-avec-zotero-guide-complet",
+      "source": "billet:test",
+      "target": "billet:editer-un-billet-et-citer-avec-zotero-guide-complet"
     }
   ],
   "metadata": {
-    "generatedAt": "2025-08-20T17:25:31.727Z",
-    "billetsCount": 24,
-    "nodesCount": 26,
+    "generatedAt": "2025-08-20T21:31:19.422Z",
+    "billetsCount": 25,
+    "nodesCount": 27,
     "stability": {
       "pivotsLocked": 8,
       "newNodes": 0,
