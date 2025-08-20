@@ -24,16 +24,13 @@ const customJestConfig = {
     '!**/.next/**',
   ],
   moduleNameMapper: {
-    // Alias pour les chemins absolus
-    '^@/components/(.*)$': '<rootDir>/components/$1',
-    '^@/app/(.*)$': '<rootDir>/app/$1',
-    '^@/lib/(.*)$': '<rootDir>/lib/$1',
-    '^@/types/(.*)$': '<rootDir>/types/$1',
+    // Alias pour les chemins absolus (pattern unifié)
+    '^@/(.*)$': '<rootDir>/$1',
     // Gérer les imports CSS/SCSS
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
   testMatch: ['**/__tests__/**/*.(js|jsx|ts|tsx)', '**/*.(test|spec).(js|jsx|ts|tsx)'],
-  transformIgnorePatterns: ['/node_modules/(?!(jose|openid-client|next-auth)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(jose|openid-client|next-auth|@next|@sentry)/)'],
 }
 
 // Exporter la configuration avec Next.js

@@ -100,52 +100,46 @@
   
   <!-- Edges -->
   <g class="edges">
-    <line x1="628.5596266117691" y1="317.95278781826937" x2="915.2288055294417" y2="377.84571544321835" 
-                    stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
+    <line x1="497.2370010625607" y1="207.3813474202545" x2="830.878140924355" y2="242.015098884142" 
+                    stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.1"
                     class="edge" data-source="billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani" data-target="billet:2025-08-06-peirce-sellars"/>
-<line x1="628.5596266117691" y1="317.95278781826937" x2="828.9501849841619" y2="504.06379892724584" 
+<line x1="497.2370010625607" y1="207.3813474202545" x2="585.2111251156612" y2="430.87979221780097" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
                     class="edge" data-source="billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani" data-target="billet:2025-08-10-iri-berkleid-sublime-bacteriologique"/>
-<line x1="464.4770639967115" y1="452.968586125374" x2="565.0188860722104" y2="553.710484010269" 
-                    stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
+<line x1="387.2847732106949" y1="336.2021437316084" x2="375.1060932476101" y2="406.6763845388658" 
+                    stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.1"
                     class="edge" data-source="billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide" data-target="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet"/>
-<line x1="464.4770639967115" y1="452.968586125374" x2="628.5596266117691" y2="317.95278781826937" 
-                    stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
+<line x1="387.2847732106949" y1="336.2021437316084" x2="497.2370010625607" y2="207.3813474202545" 
+                    stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.1"
                     class="edge" data-source="billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide" data-target="billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani"/>
-<line x1="464.4770639967115" y1="452.968586125374" x2="828.9501849841619" y2="504.06379892724584" 
+<line x1="387.2847732106949" y1="336.2021437316084" x2="585.2111251156612" y2="430.87979221780097" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
                     class="edge" data-source="billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide" data-target="billet:2025-08-10-iri-berkleid-sublime-bacteriologique"/>
-<line x1="828.9501849841619" y1="504.06379892724584" x2="565.0188860722104" y2="553.710484010269" 
+<line x1="585.2111251156612" y1="430.87979221780097" x2="375.1060932476101" y2="406.6763845388658" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
                     class="edge" data-source="billet:2025-08-10-iri-berkleid-sublime-bacteriologique" data-target="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet"/>
-<line x1="828.9501849841619" y1="504.06379892724584" x2="915.2288055294417" y2="377.84571544321835" 
+<line x1="585.2111251156612" y1="430.87979221780097" x2="830.878140924355" y2="242.015098884142" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
                     class="edge" data-source="billet:2025-08-10-iri-berkleid-sublime-bacteriologique" data-target="billet:2025-08-06-peirce-sellars"/>
-<line x1="1019.775945135085" y1="435.74751578520636" x2="1064.7455492742233" y2="593.7055272641813" 
+<line x1="1064.8939067523902" y1="211.53505910313834" x2="930.0985567485953" y2="358.178228240692" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
                     class="edge" data-source="billet:2025-08-15-theta" data-target="billet:alpha"/>
-<line x1="1019.775945135085" y1="435.74751578520636" x2="950.8539153912408" y2="549.4379304343861" 
+<line x1="1064.8939067523902" y1="211.53505910313834" x2="926.1064349808099" y2="283.6294525522833" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
                     class="edge" data-source="billet:2025-08-15-theta" data-target="billet:beta"/>
-<line x1="1266.052723019361" y1="598.2965772627892" x2="1064.7455492742233" y2="593.7055272641813" 
-                    stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
-                    class="edge" data-source="billet:2025-08-16-je-suis-au-cafe" data-target="billet:alpha"/>
-<line x1="173.94727698063878" y1="303.25130493510994" x2="564.6984729069129" y2="141.73199999999997" 
-                    stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.1"
-                    class="edge" data-source="billet:2025-08-16-test-wikilink" data-target="billet:bibliographie-collective"/>
-<line x1="1064.7455492742233" y1="593.7055272641813" x2="950.8539153912408" y2="549.4379304343861" 
+<line x1="930.0985567485953" y1="358.178228240692" x2="926.1064349808099" y2="283.6294525522833" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.8" opacity="0.15"
                     class="edge" data-source="billet:alpha" data-target="billet:beta"/>
-<line x1="1064.7455492742233" y1="593.7055272641813" x2="930.8038125840245" y2="678.268" 
+<line x1="930.0985567485953" y1="358.178228240692" x2="1032.145877670549" y2="398.7040737295757" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
                     class="edge" data-source="billet:alpha" data-target="billet:gamma"/>
-<line x1="950.8539153912408" y1="549.4379304343861" x2="930.8038125840245" y2="678.268" 
+<line x1="926.1064349808099" y1="283.6294525522833" x2="1032.145877670549" y2="398.7040737295757" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1.6" opacity="0.15"
                     class="edge" data-source="billet:beta" data-target="billet:gamma"/>
-<line x1="511.64067689523586" y1="289.7418154973641" x2="933.2582311600303" y2="258.98891201218635" 
+<line x1="530.1050440871181" y1="500.62055251860744" x2="639.1826671653374" y2="141.7319999999999" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.1"
                     class="edge" data-source="billet:editer-un-billet-et-citer-avec-zotero-guide-complet" data-target="billet:slug-du-billet"/>
-<line x1="511.64067689523586" y1="289.7418154973641" x2="252.16223466489942" y2="599.6740029678531" 
+<line x1="530.1050440871181" y1="500.62055251860744" x2="601.7849205009452" y2="678.268" 
                     stroke="hsl(220, 10%, 60%)" stroke-width="1" opacity="0.1"
                     class="edge" data-source="billet:editer-un-billet-et-citer-avec-zotero-guide-complet" data-target="billet:slug"/>
   </g>
@@ -156,22 +150,22 @@
                 <g class="node-group tier-2" data-degree="2" data-id="billet:2025-08-06-peirce-sellars">
                   <title>BNF, rayon philosophie — Peirce &amp; les Sellars (étagère, fragments) (2 connexions)</title>
                   <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="915.2288055294417" cy="377.84571544321835" r="21" 
+                  <circle cx="830.878140924355" cy="242.015098884142" r="21" 
                           fill="transparent" class="node-hit" 
                           data-id="billet:2025-08-06-peirce-sellars" tabindex="0"
                           aria-label="BNF, rayon philosophie — Peirce &amp; les Sellars (étagère, fragments)"/>
-                  <circle cx="915.2288055294417" cy="377.84571544321835" r="12" 
+                  <circle cx="830.878140924355" cy="242.015098884142" r="12" 
                           fill="hsl(220, 15%, 20%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="915.2288055294417" cy="377.84571544321835" r="6" 
+                  <circle cx="830.878140924355" cy="242.015098884142" r="6" 
                            fill="hsl(220, 15%, 20%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="915.2288055294417" y="399.84571544321835" 
+                  <text x="830.878140924355" y="264.015098884142" 
                     text-anchor="middle" 
                     font-size="10" 
                     font-family="IBM Plex Serif, serif" 
@@ -189,22 +183,22 @@
                 <g class="node-group tier-2" data-degree="2" data-id="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet">
                   <title>Résume la procédure de publication d&#39;un billet (2 connexions)</title>
                   <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="565.0188860722104" cy="553.710484010269" r="21" 
+                  <circle cx="375.1060932476101" cy="406.6763845388658" r="21" 
                           fill="transparent" class="node-hit" 
                           data-id="billet:2025-08-06-resume-la-procedure-de-publication-dun-billet" tabindex="0"
                           aria-label="Résume la procédure de publication d&#39;un billet"/>
-                  <circle cx="565.0188860722104" cy="553.710484010269" r="12" 
+                  <circle cx="375.1060932476101" cy="406.6763845388658" r="12" 
                           fill="hsl(220, 15%, 20%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="565.0188860722104" cy="553.710484010269" r="6" 
+                  <circle cx="375.1060932476101" cy="406.6763845388658" r="6" 
                            fill="hsl(220, 15%, 20%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="565.0188860722104" y="575.710484010269" 
+                  <text x="375.1060932476101" y="428.6763845388658" 
                     text-anchor="middle" 
                     font-size="10" 
                     font-family="IBM Plex Serif, serif" 
@@ -219,33 +213,34 @@
                 </g>
               </a>
 <a href="/billets/2025-08-10-18-56-32-intelligence-and-spirit-negarestani" class="graph-link" data-node-id="billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani">
-                <g class="node-group tier-1" data-degree="3" data-id="billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani">
+                <g class="node-group tier-2" data-degree="3" data-id="billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani">
                   <title>Notes sur *Intelligence and Spirit* (Reza Negarestani) — continuité, apprentissage, esprit collectif (3 connexions)</title>
                   <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="628.5596266117691" cy="317.95278781826937" r="23" 
+                  <circle cx="497.2370010625607" cy="207.3813474202545" r="21" 
                           fill="transparent" class="node-hit" 
                           data-id="billet:2025-08-10-18-56-32-intelligence-and-spirit-negarestani" tabindex="0"
                           aria-label="Notes sur *Intelligence and Spirit* (Reza Negarestani) — continuité, apprentissage, esprit collectif"/>
-                  <circle cx="628.5596266117691" cy="317.95278781826937" r="14" 
-                          fill="hsl(220, 90%, 55%)" 
+                  <circle cx="497.2370010625607" cy="207.3813474202545" r="12" 
+                          fill="hsl(220, 15%, 20%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="628.5596266117691" cy="317.95278781826937" r="8" 
-                           fill="hsl(220, 90%, 55%)" 
+                  <circle cx="497.2370010625607" cy="207.3813474202545" r="6" 
+                           fill="hsl(220, 15%, 20%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="628.5596266117691" y="345.95278781826937" 
+                  <text x="497.2370010625607" y="229.3813474202545" 
                     text-anchor="middle" 
-                    font-size="12" 
+                    font-size="10" 
                     font-family="IBM Plex Serif, serif" 
                     fill="hsl(220, 15%, 20%)"
-                    class="node-label node-label-t1"
+                    class="node-label node-label-t2"
                     paint-order="stroke" 
                     stroke="hsl(220, 10%, 98%)" 
-                    stroke-width="4px">
+                    stroke-width="3px"
+                    opacity="0">
                     Notes sur *Intelligence …
                   </text>
                 </g>
@@ -254,22 +249,22 @@
                 <g class="node-group tier-1" data-degree="4" data-id="billet:2025-08-10-iri-berkleid-sublime-bacteriologique">
                   <title>2025-08-10-iri-berkleid-sublime-bacteriologique (4 connexions)</title>
                   <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="828.9501849841619" cy="504.06379892724584" r="23" 
+                  <circle cx="585.2111251156612" cy="430.87979221780097" r="23" 
                           fill="transparent" class="node-hit" 
                           data-id="billet:2025-08-10-iri-berkleid-sublime-bacteriologique" tabindex="0"
                           aria-label="2025-08-10-iri-berkleid-sublime-bacteriologique"/>
-                  <circle cx="828.9501849841619" cy="504.06379892724584" r="14" 
+                  <circle cx="585.2111251156612" cy="430.87979221780097" r="14" 
                           fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="828.9501849841619" cy="504.06379892724584" r="8" 
+                  <circle cx="585.2111251156612" cy="430.87979221780097" r="8" 
                            fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="828.9501849841619" y="532.0637989272459" 
+                  <text x="585.2111251156612" y="458.87979221780097" 
                     text-anchor="middle" 
                     font-size="12" 
                     font-family="IBM Plex Serif, serif" 
@@ -283,33 +278,34 @@
                 </g>
               </a>
 <a href="/billets/2025-08-10-19-13-04-termd-a-termux-github-vercel-guide" class="graph-link" data-node-id="billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide">
-                <g class="node-group tier-1" data-degree="3" data-id="billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide">
+                <g class="node-group tier-2" data-degree="3" data-id="billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide">
                   <title>Publier un billet avec termd → Termux → GitHub → Vercel (procédure compacte) (3 connexions)</title>
                   <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="464.4770639967115" cy="452.968586125374" r="23" 
+                  <circle cx="387.2847732106949" cy="336.2021437316084" r="21" 
                           fill="transparent" class="node-hit" 
                           data-id="billet:2025-08-10-19-13-04-termd-a-termux-github-vercel-guide" tabindex="0"
                           aria-label="Publier un billet avec termd → Termux → GitHub → Vercel (procédure compacte)"/>
-                  <circle cx="464.4770639967115" cy="452.968586125374" r="14" 
-                          fill="hsl(220, 90%, 55%)" 
+                  <circle cx="387.2847732106949" cy="336.2021437316084" r="12" 
+                          fill="hsl(220, 15%, 20%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="464.4770639967115" cy="452.968586125374" r="8" 
-                           fill="hsl(220, 90%, 55%)" 
+                  <circle cx="387.2847732106949" cy="336.2021437316084" r="6" 
+                           fill="hsl(220, 15%, 20%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="464.4770639967115" y="480.968586125374" 
+                  <text x="387.2847732106949" y="358.2021437316084" 
                     text-anchor="middle" 
-                    font-size="12" 
+                    font-size="10" 
                     font-family="IBM Plex Serif, serif" 
                     fill="hsl(220, 15%, 20%)"
-                    class="node-label node-label-t1"
+                    class="node-label node-label-t2"
                     paint-order="stroke" 
                     stroke="hsl(220, 10%, 98%)" 
-                    stroke-width="4px">
+                    stroke-width="3px"
+                    opacity="0">
                     Publier un billet avec t…
                   </text>
                 </g>
@@ -318,22 +314,22 @@
                 <g class="node-group tier-2" data-degree="2" data-id="billet:2025-08-15-theta">
                   <title>theta (2 connexions)</title>
                   <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="1019.775945135085" cy="435.74751578520636" r="21" 
+                  <circle cx="1064.8939067523902" cy="211.53505910313834" r="21" 
                           fill="transparent" class="node-hit" 
                           data-id="billet:2025-08-15-theta" tabindex="0"
                           aria-label="theta"/>
-                  <circle cx="1019.775945135085" cy="435.74751578520636" r="12" 
+                  <circle cx="1064.8939067523902" cy="211.53505910313834" r="12" 
                           fill="hsl(220, 15%, 20%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="1019.775945135085" cy="435.74751578520636" r="6" 
+                  <circle cx="1064.8939067523902" cy="211.53505910313834" r="6" 
                            fill="hsl(220, 15%, 20%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="1019.775945135085" y="457.74751578520636" 
+                  <text x="1064.8939067523902" y="233.53505910313834" 
                     text-anchor="middle" 
                     font-size="10" 
                     font-family="IBM Plex Serif, serif" 
@@ -348,25 +344,25 @@
                 </g>
               </a>
 <a href="/billets/alpha" class="graph-link" data-node-id="billet:alpha">
-                <g class="node-group tier-1" data-degree="5" data-id="billet:alpha">
-                  <title>alpha (5 connexions)</title>
+                <g class="node-group tier-1" data-degree="4" data-id="billet:alpha">
+                  <title>alpha (4 connexions)</title>
                   <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="1064.7455492742233" cy="593.7055272641813" r="23" 
+                  <circle cx="930.0985567485953" cy="358.178228240692" r="23" 
                           fill="transparent" class="node-hit" 
                           data-id="billet:alpha" tabindex="0"
                           aria-label="alpha"/>
-                  <circle cx="1064.7455492742233" cy="593.7055272641813" r="14" 
+                  <circle cx="930.0985567485953" cy="358.178228240692" r="14" 
                           fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="1064.7455492742233" cy="593.7055272641813" r="8" 
+                  <circle cx="930.0985567485953" cy="358.178228240692" r="8" 
                            fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="1064.7455492742233" y="621.7055272641813" 
+                  <text x="930.0985567485953" y="386.178228240692" 
                     text-anchor="middle" 
                     font-size="12" 
                     font-family="IBM Plex Serif, serif" 
@@ -383,22 +379,22 @@
                 <g class="node-group tier-1" data-degree="4" data-id="billet:beta">
                   <title>beta (4 connexions)</title>
                   <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="950.8539153912408" cy="549.4379304343861" r="23" 
+                  <circle cx="926.1064349808099" cy="283.6294525522833" r="23" 
                           fill="transparent" class="node-hit" 
                           data-id="billet:beta" tabindex="0"
                           aria-label="beta"/>
-                  <circle cx="950.8539153912408" cy="549.4379304343861" r="14" 
+                  <circle cx="926.1064349808099" cy="283.6294525522833" r="14" 
                           fill="hsl(220, 90%, 55%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="950.8539153912408" cy="549.4379304343861" r="8" 
+                  <circle cx="926.1064349808099" cy="283.6294525522833" r="8" 
                            fill="hsl(220, 90%, 55%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="950.8539153912408" y="577.4379304343861" 
+                  <text x="926.1064349808099" y="311.6294525522833" 
                     text-anchor="middle" 
                     font-size="12" 
                     font-family="IBM Plex Serif, serif" 
@@ -411,125 +407,26 @@
                   </text>
                 </g>
               </a>
-<a href="/billets/2025-08-16-je-suis-au-cafe" class="graph-link" data-node-id="billet:2025-08-16-je-suis-au-cafe">
-                <g class="node-group tier-2" data-degree="1" data-id="billet:2025-08-16-je-suis-au-cafe">
-                  <title>je suis au café (1 connexions)</title>
-                  <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="1266.052723019361" cy="598.2965772627892" r="21" 
-                          fill="transparent" class="node-hit" 
-                          data-id="billet:2025-08-16-je-suis-au-cafe" tabindex="0"
-                          aria-label="je suis au café"/>
-                  <circle cx="1266.052723019361" cy="598.2965772627892" r="12" 
-                          fill="hsl(220, 15%, 20%)" 
-                          class="node-halo" 
-                          opacity="0" 
-                          filter="url(#glow)"/>
-                  <circle cx="1266.052723019361" cy="598.2965772627892" r="6" 
-                           fill="hsl(220, 15%, 20%)" 
-                           filter="url(#shadow)" 
-                           stroke="hsl(220, 10%, 98%)" 
-                           stroke-width="1.5"
-                           class="node-main"/>
-                  <text x="1266.052723019361" y="620.2965772627892" 
-                    text-anchor="middle" 
-                    font-size="10" 
-                    font-family="IBM Plex Serif, serif" 
-                    fill="hsl(220, 15%, 20%)"
-                    class="node-label node-label-t2"
-                    paint-order="stroke" 
-                    stroke="hsl(220, 10%, 98%)" 
-                    stroke-width="3px"
-                    opacity="0">
-                    je suis au café
-                  </text>
-                </g>
-              </a>
-<a href="/billets/2025-08-16-test-wikilink" class="graph-link" data-node-id="billet:2025-08-16-test-wikilink">
-                <g class="node-group tier-2" data-degree="1" data-id="billet:2025-08-16-test-wikilink">
-                  <title>test wikilink (1 connexions)</title>
-                  <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="173.94727698063878" cy="303.25130493510994" r="21" 
-                          fill="transparent" class="node-hit" 
-                          data-id="billet:2025-08-16-test-wikilink" tabindex="0"
-                          aria-label="test wikilink"/>
-                  <circle cx="173.94727698063878" cy="303.25130493510994" r="12" 
-                          fill="hsl(220, 15%, 20%)" 
-                          class="node-halo" 
-                          opacity="0" 
-                          filter="url(#glow)"/>
-                  <circle cx="173.94727698063878" cy="303.25130493510994" r="6" 
-                           fill="hsl(220, 15%, 20%)" 
-                           filter="url(#shadow)" 
-                           stroke="hsl(220, 10%, 98%)" 
-                           stroke-width="1.5"
-                           class="node-main"/>
-                  <text x="173.94727698063878" y="325.25130493510994" 
-                    text-anchor="middle" 
-                    font-size="10" 
-                    font-family="IBM Plex Serif, serif" 
-                    fill="hsl(220, 15%, 20%)"
-                    class="node-label node-label-t2"
-                    paint-order="stroke" 
-                    stroke="hsl(220, 10%, 98%)" 
-                    stroke-width="3px"
-                    opacity="0">
-                    test wikilink
-                  </text>
-                </g>
-              </a>
-<a href="/billets/bibliographie-collective" class="graph-link" data-node-id="billet:bibliographie-collective">
-                <g class="node-group tier-2" data-degree="1" data-id="billet:bibliographie-collective">
-                  <title>bibliographie-collective (1 connexions)</title>
-                  <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="564.6984729069129" cy="141.73199999999997" r="21" 
-                          fill="transparent" class="node-hit" 
-                          data-id="billet:bibliographie-collective" tabindex="0"
-                          aria-label="bibliographie-collective"/>
-                  <circle cx="564.6984729069129" cy="141.73199999999997" r="12" 
-                          fill="hsl(220, 15%, 20%)" 
-                          class="node-halo" 
-                          opacity="0" 
-                          filter="url(#glow)"/>
-                  <circle cx="564.6984729069129" cy="141.73199999999997" r="6" 
-                           fill="hsl(220, 15%, 20%)" 
-                           filter="url(#shadow)" 
-                           stroke="hsl(220, 10%, 98%)" 
-                           stroke-width="1.5"
-                           class="node-main"/>
-                  <text x="564.6984729069129" y="163.73199999999997" 
-                    text-anchor="middle" 
-                    font-size="10" 
-                    font-family="IBM Plex Serif, serif" 
-                    fill="hsl(220, 15%, 20%)"
-                    class="node-label node-label-t2"
-                    paint-order="stroke" 
-                    stroke="hsl(220, 10%, 98%)" 
-                    stroke-width="3px"
-                    opacity="0">
-                    bibliographie-collective
-                  </text>
-                </g>
-              </a>
 <a href="/billets/gamma" class="graph-link" data-node-id="billet:gamma">
                 <g class="node-group tier-2" data-degree="2" data-id="billet:gamma">
                   <title>gamma (2 connexions)</title>
                   <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="930.8038125840245" cy="678.268" r="21" 
+                  <circle cx="1032.145877670549" cy="398.7040737295757" r="21" 
                           fill="transparent" class="node-hit" 
                           data-id="billet:gamma" tabindex="0"
                           aria-label="gamma"/>
-                  <circle cx="930.8038125840245" cy="678.268" r="12" 
+                  <circle cx="1032.145877670549" cy="398.7040737295757" r="12" 
                           fill="hsl(220, 15%, 20%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="930.8038125840245" cy="678.268" r="6" 
+                  <circle cx="1032.145877670549" cy="398.7040737295757" r="6" 
                            fill="hsl(220, 15%, 20%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="930.8038125840245" y="700.268" 
+                  <text x="1032.145877670549" y="420.7040737295757" 
                     text-anchor="middle" 
                     font-size="10" 
                     font-family="IBM Plex Serif, serif" 
@@ -547,22 +444,22 @@
                 <g class="node-group tier-2" data-degree="2" data-id="billet:editer-un-billet-et-citer-avec-zotero-guide-complet">
                   <title>Éditer un billet et citer avec Zotero — Guide complet (2 connexions)</title>
                   <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="511.64067689523586" cy="289.7418154973641" r="21" 
+                  <circle cx="530.1050440871181" cy="500.62055251860744" r="21" 
                           fill="transparent" class="node-hit" 
                           data-id="billet:editer-un-billet-et-citer-avec-zotero-guide-complet" tabindex="0"
                           aria-label="Éditer un billet et citer avec Zotero — Guide complet"/>
-                  <circle cx="511.64067689523586" cy="289.7418154973641" r="12" 
+                  <circle cx="530.1050440871181" cy="500.62055251860744" r="12" 
                           fill="hsl(220, 15%, 20%)" 
                           class="node-halo" 
                           opacity="0" 
                           filter="url(#glow)"/>
-                  <circle cx="511.64067689523586" cy="289.7418154973641" r="6" 
+                  <circle cx="530.1050440871181" cy="500.62055251860744" r="6" 
                            fill="hsl(220, 15%, 20%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="511.64067689523586" y="311.7418154973641" 
+                  <text x="530.1050440871181" y="522.6205525186074" 
                     text-anchor="middle" 
                     font-size="10" 
                     font-family="IBM Plex Serif, serif" 
@@ -576,72 +473,26 @@
                   </text>
                 </g>
               </a>
-<a href="/billets/slug-du-billet" class="graph-link" data-node-id="billet:slug-du-billet">
-                <g class="node-group tier-2" data-degree="1" data-id="billet:slug-du-billet">
-                  <title>slug-du-billet (1 connexions)</title>
-                  <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="933.2582311600303" cy="258.98891201218635" r="21" 
-                          fill="transparent" class="node-hit" 
-                          data-id="billet:slug-du-billet" tabindex="0"
-                          aria-label="slug-du-billet"/>
-                  <circle cx="933.2582311600303" cy="258.98891201218635" r="12" 
-                          fill="hsl(220, 15%, 20%)" 
-                          class="node-halo" 
-                          opacity="0" 
-                          filter="url(#glow)"/>
-                  <circle cx="933.2582311600303" cy="258.98891201218635" r="6" 
-                           fill="hsl(220, 15%, 20%)" 
+<g class="node-group-static tier-3" data-id="billet:slug-du-billet">
+                <title>slug-du-billet</title>
+                <circle cx="639.1826671653374" cy="141.7319999999999" r="4" 
+                           fill="hsl(220, 10%, 60%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="933.2582311600303" y="280.98891201218635" 
-                    text-anchor="middle" 
-                    font-size="10" 
-                    font-family="IBM Plex Serif, serif" 
-                    fill="hsl(220, 15%, 20%)"
-                    class="node-label node-label-t2"
-                    paint-order="stroke" 
-                    stroke="hsl(220, 10%, 98%)" 
-                    stroke-width="3px"
-                    opacity="0">
-                    slug-du-billet
-                  </text>
-                </g>
-              </a>
-<a href="/billets/slug" class="graph-link" data-node-id="billet:slug">
-                <g class="node-group tier-2" data-degree="1" data-id="billet:slug">
-                  <title>slug (1 connexions)</title>
-                  <!-- Zone de hit pour deux-calques système -->
-                  <circle cx="252.16223466489942" cy="599.6740029678531" r="21" 
-                          fill="transparent" class="node-hit" 
-                          data-id="billet:slug" tabindex="0"
-                          aria-label="slug"/>
-                  <circle cx="252.16223466489942" cy="599.6740029678531" r="12" 
-                          fill="hsl(220, 15%, 20%)" 
-                          class="node-halo" 
-                          opacity="0" 
-                          filter="url(#glow)"/>
-                  <circle cx="252.16223466489942" cy="599.6740029678531" r="6" 
-                           fill="hsl(220, 15%, 20%)" 
+                <!-- T3: pas de label -->
+              </g>
+<g class="node-group-static tier-3" data-id="billet:slug">
+                <title>slug</title>
+                <circle cx="601.7849205009452" cy="678.268" r="4" 
+                           fill="hsl(220, 10%, 60%)" 
                            filter="url(#shadow)" 
                            stroke="hsl(220, 10%, 98%)" 
                            stroke-width="1.5"
                            class="node-main"/>
-                  <text x="252.16223466489942" y="621.6740029678531" 
-                    text-anchor="middle" 
-                    font-size="10" 
-                    font-family="IBM Plex Serif, serif" 
-                    fill="hsl(220, 15%, 20%)"
-                    class="node-label node-label-t2"
-                    paint-order="stroke" 
-                    stroke="hsl(220, 10%, 98%)" 
-                    stroke-width="3px"
-                    opacity="0">
-                    slug
-                  </text>
-                </g>
-              </a>
+                <!-- T3: pas de label -->
+              </g>
   </g>
   
 </svg>

@@ -57,14 +57,6 @@
       "y": -79.79537167367565
     },
     {
-      "id": "billet:2025-08-07-nouveau-billet",
-      "label": "Petit essai de billet",
-      "url": "/billets/2025-08-07-nouveau-billet",
-      "degree": 0,
-      "x": -80.19278209694313,
-      "y": 59.74209319694279
-    },
-    {
       "id": "billet:2025-08-08-15-26-22",
       "label": "Coupure de Dedekind et argument a priori de Peirce",
       "url": "/billets/2025-08-08-15-26-22",
@@ -95,14 +87,6 @@
       "degree": 3,
       "x": -91.94292250936019,
       "y": -39.32555149565975
-    },
-    {
-      "id": "billet:2025-08-11-check",
-      "label": "check",
-      "url": "/billets/2025-08-11-check",
-      "degree": 0,
-      "x": 180.40334699428178,
-      "y": 187.22882361768114
     },
     {
       "id": "billet:2025-08-11-la-coupure-signifiante-du-continuum-reel-a-l-eclosion-du-signe",
@@ -156,7 +140,7 @@
       "id": "billet:alpha",
       "label": "alpha",
       "url": "/billets/alpha",
-      "degree": 5,
+      "degree": 4,
       "x": 99.32044820329828,
       "y": -150.11811539150077
     },
@@ -169,76 +153,20 @@
       "y": 150.46300669808826
     },
     {
-      "id": "billet:2025-08-16-alp",
-      "label": "alp",
-      "url": "/billets/2025-08-16-alp",
-      "degree": 0,
-      "x": -13.3502851366365,
-      "y": -179.50423361795816
-    },
-    {
-      "id": "billet:2025-08-16-je-suis-au-cafe",
-      "label": "je suis au café",
-      "url": "/billets/2025-08-16-je-suis-au-cafe",
-      "degree": 1,
-      "x": -66.36940244000536,
-      "y": -74.80041724319865
-    },
-    {
-      "id": "billet:2025-08-16-nouveau",
-      "label": "nouveau",
-      "url": "/billets/2025-08-16-nouveau",
-      "degree": 0,
-      "x": -178.5341008044069,
-      "y": 189.01210239019585
-    },
-    {
-      "id": "billet:2025-08-16-test-wikilink",
-      "label": "test wikilink",
-      "url": "/billets/2025-08-16-test-wikilink",
-      "degree": 1,
-      "x": -255.86034950715677,
-      "y": 46.211270812168586
-    },
-    {
-      "id": "billet:bibliographie-collective",
-      "label": "bibliographie-collective",
-      "url": "/billets/bibliographie-collective",
-      "degree": 1,
-      "x": 133.1358566928,
-      "y": -121.13976912093825
-    },
-    {
-      "id": "billet:2025-08-17-billet-pour-surfer-avec-mes-vieux-tonton-sur-la-raison-pure",
-      "label": "Billet pour surfer avec mes vieux tonton sur la raison pure",
-      "url": "/billets/2025-08-17-billet-pour-surfer-avec-mes-vieux-tonton-sur-la-raison-pure",
-      "degree": 0,
-      "x": 79.98787581751753,
-      "y": -60.01616217487913
-    },
-    {
-      "id": "billet:2025-08-18-test-salle-du-temps",
-      "label": "Test de la Salle du Temps",
-      "url": "/billets/2025-08-18-test-salle-du-temps",
-      "degree": 0,
-      "x": -176.84461326279842,
-      "y": -33.55566658451678
-    },
-    {
-      "id": "billet:2025-08-19-test-salle-du-temps-v2",
-      "label": "Test Salle du Temps v2",
-      "url": "/billets/2025-08-19-test-salle-du-temps-v2",
-      "degree": 0,
-      "x": -88.27612906871164,
-      "y": -244.55536190532433
-    },
-    {
       "id": "billet:gamma",
       "label": "gamma",
       "url": "/billets/gamma",
       "degree": 2,
       "x": 179.94614051025437,
       "y": -4.4030120898979455
+    },
+    {
+      "id": "billet:bibliographie-collective",
+      "label": "Bibliographie collective d'Athanor",
+      "url": "/billets/bibliographie-collective",
+      "degree": 0,
+      "x": 133.1358566928,
+      "y": -121.13976912093825
     },
     {
       "id": "billet:editer-un-billet-et-citer-avec-zotero-guide-complet",
@@ -265,14 +193,6 @@
       "y": -259.9783471735029
     },
     {
-      "id": "billet:essai",
-      "label": "essai",
-      "url": "/billets/essai",
-      "degree": 0,
-      "x": 94.918963948975,
-      "y": -31.470466835641048
-    },
-    {
       "id": "billet:l-idee-de-monde-chez-kant-comme-horizon-regulateur",
       "label": "L’Idée de monde chez Kant comme horizon régulateur",
       "url": "/billets/l-idee-de-monde-chez-kant-comme-horizon-regulateur",
@@ -287,14 +207,6 @@
       "degree": 0,
       "x": 179.7607887184927,
       "y": 9.276790355797882
-    },
-    {
-      "id": "billet:nous-voici",
-      "label": "nous voici",
-      "url": "/billets/nous-voici",
-      "degree": 0,
-      "x": 93.09603431852548,
-      "y": -36.51203081401974
     }
   ],
   "edges": [
@@ -344,16 +256,6 @@
       "target": "billet:beta"
     },
     {
-      "id": "billet:2025-08-16-je-suis-au-cafe→billet:alpha",
-      "source": "billet:2025-08-16-je-suis-au-cafe",
-      "target": "billet:alpha"
-    },
-    {
-      "id": "billet:2025-08-16-test-wikilink→billet:bibliographie-collective",
-      "source": "billet:2025-08-16-test-wikilink",
-      "target": "billet:bibliographie-collective"
-    },
-    {
       "id": "billet:alpha→billet:beta",
       "source": "billet:alpha",
       "target": "billet:beta"
@@ -385,9 +287,9 @@
     }
   ],
   "metadata": {
-    "generatedAt": "2025-08-19T13:02:54.973Z",
-    "billetsCount": 35,
-    "nodesCount": 37,
+    "generatedAt": "2025-08-20T14:32:26.594Z",
+    "billetsCount": 24,
+    "nodesCount": 26,
     "stability": {
       "pivotsLocked": 8,
       "newNodes": 0,
