@@ -1,4 +1,69 @@
 import pdf from 'pdf-parse'
+import { validatePdfUrl, PDF_SECURITY_LIMITS } from '@/lib/security/pdf-url-validator'
+
+// Helper function for secure fetching to avoid code duplication
+async function secureFetch(url: string): Promise<Buffer> {
+  const validation = validatePdfUrl(url)
+  if (!validation.isValid) {
+    console.error(`[SECURITY] PDF URL validation failed for ${url}: ${validation.error}`)
+    throw new Error('Invalid or disallowed PDF URL')
+  }
+
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), PDF_SECURITY_LIMITS.DOWNLOAD_TIMEOUT)
+
+    const response = await fetch(url, {
+      signal: controller.signal,
+      // @ts-ignore - `follow` is a Node.js-specific extension to limit redirects
+      follow: PDF_SECURITY_LIMITS.MAX_REDIRECTS,
+    })
+
+    clearTimeout(timeoutId)
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch PDF with status: ${response.statusText}`)
+    }
+
+    const contentLength = response.headers.get('content-length')
+    if (contentLength && parseInt(contentLength, 10) > PDF_SECURITY_LIMITS.MAX_FILE_SIZE) {
+      throw new Error(
+        `PDF file size exceeds the limit of ${PDF_SECURITY_LIMITS.MAX_FILE_SIZE / 1024 / 1024}MB`
+      )
+    }
+
+    const contentType = response.headers.get('content-type')
+    if (!contentType?.includes('application/pdf')) {
+      throw new Error('Response is not a PDF file based on Content-Type header')
+    }
+
+    const chunks: Uint8Array[] = []
+    let totalSize = 0
+    const reader = response.body?.getReader()
+    if (!reader) throw new Error('Cannot read response body')
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      totalSize += value.length
+      if (totalSize > PDF_SECURITY_LIMITS.MAX_FILE_SIZE) {
+        reader.cancel()
+        throw new Error(`PDF file exceeds maximum size during download`)
+      }
+      chunks.push(value)
+    }
+
+    return Buffer.concat(chunks)
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.error(`[SECURITY] PDF download timeout for ${url}`)
+      throw new Error('PDF download timed out')
+    }
+    console.error(`Error during secure fetch for ${url}:`, error)
+    throw error
+  }
+}
 
 /**
  * Extrait le contenu textuel d'un fichier PDF à partir de son URL.
@@ -7,12 +72,8 @@ import pdf from 'pdf-parse'
  */
 export async function extractTextFromPdfUrl(pdfUrl: string): Promise<string> {
   try {
-    const response = await fetch(pdfUrl)
-    if (!response.ok) {
-      throw new Error(`Failed to fetch PDF: ${response.statusText}`)
-    }
-    const buffer = await response.arrayBuffer()
-    const data = await pdf(Buffer.from(buffer))
+    const buffer = await secureFetch(pdfUrl)
+    const data = await pdf(buffer)
     return data.text
   } catch (error) {
     console.error(`Error processing PDF from URL ${pdfUrl}:`, error)
@@ -63,12 +124,8 @@ export interface PdfPage {
  */
 export async function extractPagesFromPdfUrl(pdfUrl: string): Promise<PdfPage[]> {
   try {
-    const response = await fetch(pdfUrl)
-    if (!response.ok) {
-      throw new Error(`Failed to fetch PDF: ${response.statusText}`)
-    }
-    const buffer = await response.arrayBuffer()
-    const data = await pdf(Buffer.from(buffer))
+    const buffer = await secureFetch(pdfUrl)
+    const data = await pdf(buffer)
 
     // HEURISTIQUE: Divise le texte en pages basé sur les marqueurs typiques
     // Ceci est une approximation car pdf-parse ne donne pas accès au contenu par page
@@ -77,18 +134,22 @@ export async function extractPagesFromPdfUrl(pdfUrl: string): Promise<PdfPage[]>
 
     // Stratégie simple: diviser le texte par taille approximative
     const textLength = fullText.length
-    const averagePageLength = Math.ceil(textLength / numPages)
+    const averagePageLength = numPages > 0 ? Math.ceil(textLength / numPages) : textLength
 
     const pages: PdfPage[] = []
-    for (let i = 0; i < numPages; i++) {
-      const startIndex = i * averagePageLength
-      const endIndex = Math.min((i + 1) * averagePageLength, textLength)
-      const pageText = fullText.slice(startIndex, endIndex)
+    if (numPages > 0) {
+      for (let i = 0; i < numPages; i++) {
+        const startIndex = i * averagePageLength
+        const endIndex = Math.min((i + 1) * averagePageLength, textLength)
+        const pageText = fullText.slice(startIndex, endIndex)
 
-      pages.push({
-        pageNumber: i + 1,
-        text: cleanPdfText(pageText),
-      })
+        pages.push({
+          pageNumber: i + 1,
+          text: cleanPdfText(pageText),
+        })
+      }
+    } else {
+      pages.push({ pageNumber: 1, text: cleanPdfText(fullText) })
     }
 
     return pages
@@ -155,7 +216,7 @@ export function cleanPdfText(rawText: string): string {
       .replace(/\r\n/g, '\n')
       .replace(/\n{3,}/g, '\n\n')
       // Supprime les caractères spéciaux problématiques
-      .replace(/[^\w\sàâäéèêëïîôöùûüÿç.,;:!?'"()[\]{}@#$%^&*+=<>|~`-]/gi, ' ')
+      .replace(/[^\w\sàâäéèêëïîôöùûüÿç.,;:!?'"()[\\\]{}@#$%^&*+=<>|~`-]/gi, ' ')
       // Normalise les espaces multiples
       .replace(/\s{2,}/g, ' ')
       .trim()
