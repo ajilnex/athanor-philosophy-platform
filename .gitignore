@@ -45,3 +45,11 @@ next-env.d.ts
 # uploads
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+# Build artifacts
+/public/bibliography.json
+/public/citations-map.json
+/public/graph-billets.json
+/public/graph-billets.svg
+/public/graph-positions.json
+/public/search-index.json
