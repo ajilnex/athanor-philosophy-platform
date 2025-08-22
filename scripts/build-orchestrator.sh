@@ -66,11 +66,11 @@ node scripts/build-citation-map.js
 echo "✅ Group A complete. Proceeding with parallel tasks."
 
 # Groups B and C: Run in parallel, fail if any fails
-echo "🔗 Group B: Graph JSON + SVG (parallel)"
-node scripts/build-graph-billets.cjs &
-PID_GRAPH=$!
-node scripts/render-graph-svg.cjs &
-PID_SVG=$!
+echo "🔗 Group B: Graph JSON + SVG (now sequential to fix race condition)"
+(
+  node scripts/build-graph-billets.cjs && node scripts/render-graph-svg.cjs
+) &
+PID_GRAPH_GROUP=$!
 
 echo "🔍 Group C: Search index (parallel)"
 node scripts/build-search-index.js &
@@ -78,7 +78,7 @@ PID_SEARCH=$!
 
 ret=0
 
-for pid in $PID_GRAPH $PID_SVG $PID_SEARCH; do
+for pid in $PID_GRAPH_GROUP $PID_SEARCH; do
   if ! wait "$pid"; then
     ret=1
   fi
