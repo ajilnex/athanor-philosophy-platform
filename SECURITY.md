@@ -4,38 +4,21 @@ Documentation des considérations de sécurité critiques pour la plateforme phi
 
 ## 🚨 Risques Identifiés et Mesures Recommandées
 
-### 1. SSRF/DoS - API `/api/find-in-pdf`
+### 1. SSRF/DoS - API `/api/find-in-pdf` (Résolu)
 
-**Risque** : L'endpoint `/api/find-in-pdf` télécharge des PDF depuis des URLs arbitraires, exposant à des attaques SSRF (Server-Side Request Forgery) et DoS.
+**Description du Risque** : Historiquement, l'endpoint `/api/find-in-pdf` était exposé à des attaques SSRF (Server-Side Request Forgery), car il pouvait télécharger des PDF depuis des URLs arbitraires.
 
-**Vecteurs d'attaque** :
+**Mesures Implémentées** :
+Pour contrer ce risque, une validation stricte des URLs est maintenant en place. Le serveur maintient une **liste blanche (allowlist) d'hôtes autorisés** et refuse toute requête vers un domaine non approuvé.
 
-- Requêtes vers services internes (`localhost`, `127.0.0.1`, réseau privé)
-- Téléchargement de fichiers volumineux causant épuisement mémoire/disque
-- Liens vers services lents causant timeout/blocage de threads
+- **Validation de protocole** : Seul le protocole `https:` est autorisé.
+- **Validation d'hôte** : Le nom d'hôte de l'URL doit appartenir à la liste blanche définie dans la variable d'environnement `PDF_ALLOWED_HOSTS`.
+- **Limites de ressources** : Des timeouts et des limites de taille de fichier sont également en place pour prévenir les attaques DoS.
 
-**Mesures recommandées** :
-
-```javascript
-// Allowlist d'hôtes autorisés
-const ALLOWED_HOSTS = ['res.cloudinary.com', 'cdn.example.com']
-
-// Validation stricte de l'URL
-const url = new URL(urlParam)
-if (url.protocol !== 'https:' || !ALLOWED_HOSTS.includes(url.hostname)) {
-  throw new Error('URL non autorisée')
-}
-
-// Limites strictes
-const MAX_PDF_SIZE = 50 * 1024 * 1024 // 50MB
-const DOWNLOAD_TIMEOUT = 30000 // 30s
-const REQUEST_TIMEOUT = 10000 // 10s pour processing
-```
-
-**Variables d'environnement suggérées** :
+**Configuration via variables d'environnement** :
 
 ```bash
-PDF_ALLOWED_HOSTS="res.cloudinary.com,cdn.yoursite.com"
+PDF_ALLOWED_HOSTS="res.cloudinary.com,autre-domaine-approuve.com"
 PDF_MAX_SIZE="52428800"  # 50MB
 PDF_TIMEOUT="30000"      # 30s
 ```
@@ -231,12 +214,11 @@ const nextConfig = {
 
 **⚡ Actions immédiates recommandées** :
 
-1. Implémenter allowlist pour `/api/find-in-pdf`
-2. Configurer Upstash Redis pour rate limiting en production
-3. Activer 2FA sur compte GitHub OAuth
-4. Vérifier configuration `remotePatterns` images
-5. Monitorer performance build parallélisé
-6. Mettre en place monitoring des tentatives SSRF
+1. Configurer Upstash Redis pour rate limiting en production
+2. Activer 2FA sur compte GitHub OAuth
+3. Vérifier configuration `remotePatterns` images
+4. Monitorer performance build parallélisé
+5. Mettre en place monitoring des tentatives SSRF
 
 **🔗 Références** :
 

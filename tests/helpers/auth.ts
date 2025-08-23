@@ -3,6 +3,9 @@ import { Page, expect } from '@playwright/test'
 export async function loginAsAdmin(page: Page) {
   console.log('🔐 Attempting admin login...')
 
+  const email = process.env.ADMIN_EMAIL || 'admin@athanor.com'
+  const password = process.env.ADMIN_PASSWORD || 'admin123'
+
   // Aller sur la page de connexion
   await page.goto('/auth/signin', { waitUntil: 'networkidle' })
 
@@ -20,8 +23,8 @@ export async function loginAsAdmin(page: Page) {
   await expect(passwordField).toBeVisible({ timeout: 5000 })
 
   // Remplir le formulaire de connexion
-  await emailField.fill('admin@athanor.com')
-  await passwordField.fill('admin123')
+  await emailField.fill(email)
+  await passwordField.fill(password)
 
   console.log('📝 Form filled, submitting...')
 
