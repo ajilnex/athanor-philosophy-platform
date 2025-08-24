@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -14,6 +14,8 @@ import {
   X,
   FileText,
   Hash,
+  Clock,
+  Sparkles,
 } from 'lucide-react'
 import { remark } from 'remark'
 import html from 'remark-html'
@@ -24,6 +26,7 @@ import toast from 'react-hot-toast'
 import { ImageUpload } from '@/components/billets/ImageUpload'
 import { CitationPicker } from './CitationPicker'
 import { BacklinkPicker } from './BacklinkPicker'
+import { iaWriterDuo } from '@/components/billets/immersive-font'
 
 interface EditorPageProps {
   mode: 'create' | 'edit'
@@ -40,6 +43,7 @@ interface EditorPageProps {
 export function EditorPage({ mode, userRole, initialData }: EditorPageProps) {
   const router = useRouter()
   const editorRef = useRef<any>(null)
+  const immersiveRef = useRef<HTMLDivElement>(null)
 
   // État principal
   const [title, setTitle] = useState(initialData?.title || '')
@@ -52,12 +56,42 @@ export function EditorPage({ mode, userRole, initialData }: EditorPageProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [previewHtml, setPreviewHtml] = useState<string>('')
+  const [isImmersive, setIsImmersive] = useState(false)
+  const [showExitButton, setShowExitButton] = useState(false)
+  const hideExitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Modals
   const [showImageUpload, setShowImageUpload] = useState(false)
   const [showCitationPicker, setShowCitationPicker] = useState(false)
   const [showBacklinkPicker, setShowBacklinkPicker] = useState(false)
   const [selectedTextForBacklink, setSelectedTextForBacklink] = useState('')
+
+  // Placeholder tutoriel MD
+  const markdownTutorial = `# Bienvenue dans l'éditeur
+
+Écrivez votre billet ici en Markdown...
+
+## Syntaxe de base
+
+- **Gras** : **texte important**
+- *Italique* : *texte nuancé*
+- Liste : utilisez - ou * au début de ligne
+- Lien : [texte du lien](https://exemple.org)
+
+## Fonctionnalités spéciales
+
+- Backlink vers un autre billet : [[slug-du-billet]]
+- Backlink avec alias : [[slug|Texte affiché]]
+- Citation Zotero : <Cite item="CléBiblio" />
+
+## Images
+
+Utilisez le bouton "Insérer une image" dans la barre latérale
+ou écrivez directement : ![description](url-de-image)
+
+---
+
+Commencez à écrire pour faire disparaître ce guide...`
 
   // Insertion dans l'éditeur
   const insertAtCursor = useCallback((snippet: string) => {
@@ -121,13 +155,17 @@ export function EditorPage({ mode, userRole, initialData }: EditorPageProps) {
 
       if (result.type === 'pull_request') {
         toast.success(`Contribution créée ! PR: ${result.pullRequest.html_url}`, { duration: 8000 })
+        router.push('/billets')
       } else {
-        toast.success('Billet sauvegardé avec succès')
+        // Pour les admins, afficher le message et rediriger vers la liste
+        toast.success(
+          mode === 'create'
+            ? 'Billet créé ! Il apparaîtra dans quelques minutes après le déploiement.'
+            : 'Billet modifié ! Les changements seront visibles dans quelques minutes.',
+          { duration: 6000 }
+        )
+        router.push('/billets')
       }
-
-      // Redirection après sauvegarde
-      const redirectSlug = result.slug || initialData?.slug
-      router.push(`/billets/${redirectSlug}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la sauvegarde')
       toast.error(err instanceof Error ? err.message : 'Erreur lors de la sauvegarde')
@@ -162,51 +200,259 @@ export function EditorPage({ mode, userRole, initialData }: EditorPageProps) {
     compile()
   }, [content, showPreview])
 
-  // Extensions CodeMirror - SANS centrage du curseur
-  const extensions = [
-    markdown(),
-    EditorView.lineWrapping,
-    EditorView.theme({
-      '&': {
-        fontSize: '16px',
-        height: '100%',
-      },
-      '.cm-content': {
-        padding: '2rem 3rem',
-        caretColor: 'hsl(220 15% 20%)',
-        minHeight: '100%',
-        fontFamily:
-          'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
-        lineHeight: '1.7',
-      },
-      '.cm-focused': {
-        outline: 'none',
-      },
-      '.cm-cursor, .cm-dropCursor': {
-        borderLeftColor: 'hsl(220 15% 20%)',
-        borderLeftWidth: '2px',
-      },
-      '.cm-editor': {
-        height: '100%',
-      },
-      '.cm-scroller': {
-        height: '100%',
-        fontFamily: 'inherit',
-      },
-      '.cm-gutters': {
-        backgroundColor: 'transparent',
-        border: 'none',
-      },
-      '.cm-line': {
-        paddingLeft: '0',
-        paddingRight: '0',
-      },
-      '.cm-selectionBackground': {
-        backgroundColor: 'hsl(220 90% 55% / 0.15)',
-      },
-    }),
-  ]
+  // Gestion du mode immersif Salle du Temps
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isImmersive) {
+        e.preventDefault()
+        e.stopPropagation()
+        if (document.fullscreenElement) {
+          document
+            .exitFullscreen()
+            .catch(() => {})
+            .finally(() => setIsImmersive(false))
+        } else {
+          setIsImmersive(false)
+        }
+      }
+    }
 
+    if (isImmersive) {
+      document.body.classList.add('salle-du-temps-active')
+      const navbar = document.querySelector('nav')
+      if (navbar) navbar.style.display = 'none'
+
+      const showExitTemporarily = () => {
+        setShowExitButton(true)
+        if (hideExitTimerRef.current) clearTimeout(hideExitTimerRef.current)
+        hideExitTimerRef.current = setTimeout(() => setShowExitButton(false), 1800)
+      }
+
+      window.addEventListener('mousemove', showExitTemporarily, { passive: true })
+      window.addEventListener('mousedown', showExitTemporarily, { passive: true })
+      window.addEventListener('touchstart', showExitTemporarily, { passive: true })
+      showExitTemporarily()
+      window.addEventListener('keydown', handleKeyDown, true)
+    } else {
+      document.body.classList.remove('salle-du-temps-active')
+      const navbar = document.querySelector('nav')
+      if (navbar) navbar.style.display = ''
+    }
+
+    return () => {
+      document.body.classList.remove('salle-du-temps-active')
+      const navbar = document.querySelector('nav')
+      if (navbar) navbar.style.display = ''
+      window.removeEventListener('keydown', handleKeyDown, true)
+      if (hideExitTimerRef.current) {
+        clearTimeout(hideExitTimerRef.current)
+        hideExitTimerRef.current = null
+      }
+    }
+  }, [isImmersive])
+
+  // Extensions CodeMirror
+  const extensions = useMemo(() => {
+    const baseExtensions = [
+      markdown(),
+      EditorView.lineWrapping,
+      EditorView.theme({
+        '&': {
+          fontSize: isImmersive ? '18px' : '16px',
+          height: '100%',
+          backgroundColor: isImmersive ? '#FAFAF8' : 'transparent',
+        },
+        '.cm-content': {
+          padding: isImmersive ? '3rem 4rem' : '2rem 3rem',
+          caretColor: isImmersive ? '#333' : 'hsl(220 15% 20%)',
+          backgroundColor: isImmersive ? '#FAFAF8' : 'transparent',
+          minHeight: isImmersive ? '100vh' : '100%',
+          maxWidth: isImmersive ? '72ch' : 'none',
+          margin: isImmersive ? '0 auto' : '0',
+          fontFamily: isImmersive
+            ? 'var(--font-ia-writer)'
+            : 'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
+          lineHeight: isImmersive ? '1.8' : '1.7',
+        },
+        '.cm-focused': {
+          outline: 'none',
+          backgroundColor: isImmersive ? '#FAFAF8' : 'transparent',
+        },
+        '.cm-cursor, .cm-dropCursor': {
+          borderLeftColor: isImmersive ? '#333' : 'hsl(220 15% 20%)',
+          borderLeftWidth: '2px',
+        },
+        '.cm-editor': {
+          height: '100%',
+          backgroundColor: isImmersive ? '#FAFAF8' : 'transparent',
+        },
+        '.cm-scroller': {
+          height: '100%',
+          backgroundColor: isImmersive ? '#FAFAF8' : 'transparent',
+          fontFamily: isImmersive ? 'var(--font-ia-writer)' : 'inherit',
+          width: isImmersive ? '100vw' : 'auto',
+        },
+        '.cm-gutters': {
+          backgroundColor: isImmersive ? '#FAFAF8' : 'transparent',
+          border: 'none',
+        },
+        '.cm-line': {
+          paddingLeft: '0',
+          paddingRight: '0',
+        },
+        '.cm-selectionBackground': {
+          backgroundColor: isImmersive ? 'rgba(0, 0, 0, 0.08)' : 'hsl(220 90% 55% / 0.15)',
+        },
+        '.cm-placeholder': {
+          color: 'hsl(var(--subtle) / 0.5)',
+          fontStyle: 'italic',
+        },
+      }),
+    ]
+
+    if (isImmersive) {
+      // Mode immersif avec centrage du curseur
+      baseExtensions.push(
+        EditorView.theme({
+          '&': {
+            backgroundColor: '#FAFAF8',
+            height: '100%',
+          },
+          '.cm-editor': {
+            backgroundColor: '#FAFAF8',
+            border: 'none',
+            height: '100%',
+          },
+          '.cm-editor.cm-focused': {
+            backgroundColor: '#FAFAF8',
+          },
+          '.cm-scroller': {
+            backgroundColor: '#FAFAF8',
+            scrollPaddingTop: '50%',
+            scrollPaddingBottom: '50%',
+            lineHeight: '1.8',
+          },
+          '.cm-content': {
+            backgroundColor: '#FAFAF8',
+            padding: '50vh 15% 50vh 15%',
+            minHeight: '100vh',
+          },
+          '@media (max-width: 768px)': {
+            '.cm-content': {
+              padding: '50vh 5% 50vh 5%',
+            },
+          },
+          '.cm-scroller::-webkit-scrollbar': {
+            width: '0px',
+            background: 'transparent',
+          },
+        })
+      )
+
+      // Typewriter scrolling pour mode immersif
+      baseExtensions.push(
+        EditorView.updateListener.of(update => {
+          if (!editorRef.current?.view) return
+          const view: EditorView = editorRef.current.view
+
+          if (update.selectionSet || update.docChanged) {
+            const head = view.state.selection.main.head
+            const coords = view.coordsAtPos(head)
+
+            if (coords) {
+              const scroller = view.scrollDOM
+              const scrollerRect = scroller.getBoundingClientRect()
+              const targetY = scrollerRect.height / 2
+              const currentY = coords.top - scrollerRect.top
+
+              const scrollTop = scroller.scrollTop + (currentY - targetY)
+              scroller.scrollTo({
+                top: scrollTop,
+                behavior: 'instant',
+              })
+            }
+          }
+        })
+      )
+    }
+
+    return baseExtensions
+  }, [isImmersive])
+
+  // Rendu du mode immersif
+  if (isImmersive) {
+    return (
+      <div
+        ref={immersiveRef}
+        className={`salle-du-temps fixed inset-0 z-[1000] bg-[#FAFAF8] ${iaWriterDuo.className} salle-du-temps-container`}
+        data-graph-shield
+        style={{
+          backgroundColor: '#FAFAF8',
+          color: '#333',
+          animation: 'salleEnter 0.3s ease-out',
+        }}
+      >
+        <div className="w-full h-full flex flex-col bg-[#FAFAF8]">
+          {/* Bouton de sortie */}
+          <div
+            className="fixed z-[90]"
+            style={{ top: '20px', right: '20px', width: '44px', height: '44px' }}
+            onMouseEnter={() => setShowExitButton(true)}
+            onMouseLeave={() => {
+              if (hideExitTimerRef.current) clearTimeout(hideExitTimerRef.current)
+              hideExitTimerRef.current = setTimeout(() => setShowExitButton(false), 1500)
+            }}
+            onTouchStart={() => {
+              setShowExitButton(true)
+              if (hideExitTimerRef.current) clearTimeout(hideExitTimerRef.current)
+              hideExitTimerRef.current = setTimeout(() => setShowExitButton(false), 2000)
+            }}
+          >
+            <button
+              onClick={async () => {
+                try {
+                  if (document.fullscreenElement) {
+                    await document.exitFullscreen()
+                  }
+                } catch {}
+                setIsImmersive(false)
+              }}
+              className={`absolute top-0 right-0 flex items-center justify-center bg-black/5 hover:bg-black/10 rounded-full transition-all duration-300 ${
+                showExitButton ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{ width: '40px', height: '40px' }}
+              title="Quitter (Échap)"
+              aria-label="Quitter la Salle du Temps"
+            >
+              <X className="text-black/60" style={{ width: '20px', height: '20px' }} />
+            </button>
+          </div>
+
+          {/* Éditeur immersif */}
+          <div className="h-full w-full">
+            <CodeMirror
+              ref={editorRef}
+              value={content}
+              onChange={value => setContent(value)}
+              basicSetup={{
+                lineNumbers: false,
+                foldGutter: false,
+                closeBrackets: false,
+                highlightActiveLine: false,
+                highlightActiveLineGutter: false,
+              }}
+              extensions={extensions}
+              placeholder=""
+              className="h-full w-full salle-editor"
+              height="100%"
+            />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Rendu normal (non immersif)
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header fixe */}
@@ -245,6 +491,21 @@ export function EditorPage({ mode, userRole, initialData }: EditorPageProps) {
                   <Eye className="h-4 w-4 mr-2" />
                 )}
                 {showPreview ? 'Éditer' : 'Aperçu'}
+              </button>
+
+              {/* Salle du Temps */}
+              <button
+                type="button"
+                onClick={async () => {
+                  setIsImmersive(true)
+                  try {
+                    await document.documentElement.requestFullscreen?.()
+                  } catch {}
+                }}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 transition-all"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Salle du Temps
               </button>
 
               {/* Sauvegarder */}
@@ -386,7 +647,7 @@ export function EditorPage({ mode, userRole, initialData }: EditorPageProps) {
                   highlightActiveLineGutter: false,
                 }}
                 extensions={extensions}
-                placeholder="Commencez à écrire votre billet..."
+                placeholder={content ? '' : markdownTutorial}
                 className="h-full"
                 height="100%"
               />
