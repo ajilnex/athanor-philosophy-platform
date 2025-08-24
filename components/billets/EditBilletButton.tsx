@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { Edit3, Trash2 } from 'lucide-react'
-import { BilletEditorDynamic as BilletEditor } from './BilletEditorDynamic'
+import Link from 'next/link'
 import toast from 'react-hot-toast'
 
 interface EditBilletButtonProps {
@@ -13,20 +13,11 @@ interface EditBilletButtonProps {
   tags: string[]
   excerpt?: string
   className?: string
-  onDelete?: (slug: string) => void // Callback pour suppression instantanée
+  onDelete?: (slug: string) => void
 }
 
-export function EditBilletButton({
-  slug,
-  title,
-  content,
-  tags,
-  excerpt,
-  className = '',
-  onDelete,
-}: EditBilletButtonProps) {
+export function EditBilletButton({ slug, title, className = '', onDelete }: EditBilletButtonProps) {
   const { data: session, status } = useSession()
-  const [showEditor, setShowEditor] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
   // Seuls les utilisateurs avec rôle USER ou ADMIN peuvent contribuer
@@ -37,38 +28,6 @@ export function EditBilletButton({
   if (userRole === 'VISITOR') return null
 
   const isAdmin = userRole === 'ADMIN'
-
-  const handleUpdateBillet = async (data: any) => {
-    try {
-      const response = await fetch(`/api/admin/billets/${slug}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Erreur lors de la mise à jour')
-      }
-
-      const result = await response.json()
-
-      if (result.type === 'pull_request') {
-        // Pour les contributions, afficher un message différent
-        toast.success(`${result.message}\nVotre Pull Request: ${result.pullRequest.html_url}`, {
-          duration: 8000,
-        })
-      } else {
-        // Pour les admins, recharger la page
-        window.location.reload()
-      }
-    } catch (error) {
-      console.error('Erreur mise à jour:', error)
-      throw error
-    }
-  }
 
   const handleDeleteBillet = async () => {
     if (
@@ -109,47 +68,29 @@ export function EditBilletButton({
       console.error('Erreur suppression API:', error)
       toast.error('Erreur lors de la suppression définitive')
       setIsDeleting(false)
-
-      // En cas d'erreur, on pourrait restaurer l'élément (rollback UX)
-      // Mais pour la philosophie du site, on garde la suppression visuelle
-      // car l'admin a pris la décision de supprimer
     }
   }
 
   return (
-    <>
-      <div className={`inline-flex gap-2 ${className}`}>
-        <button onClick={() => setShowEditor(true)} className="btn btn-secondary text-xs">
-          <Edit3 className="h-4 w-4" />
-          <span>{isAdmin ? 'Éditer' : 'Proposer modification'}</span>
+    <div className={`inline-flex gap-2 ${className}`}>
+      <Link
+        href={`/billets/${slug}/editer`}
+        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs bg-white border border-subtle/30 text-foreground rounded-lg hover:bg-muted transition-all"
+      >
+        <Edit3 className="h-4 w-4" />
+        <span>{isAdmin ? 'Éditer' : 'Proposer modification'}</span>
+      </Link>
+
+      {isAdmin && (
+        <button
+          onClick={handleDeleteBillet}
+          disabled={isDeleting}
+          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs bg-destructive text-white rounded-lg hover:bg-destructive/90 transition-all disabled:opacity-50"
+        >
+          <Trash2 className="h-4 w-4" />
+          <span>{isDeleting ? 'Suppression...' : 'Supprimer'}</span>
         </button>
-
-        {isAdmin && (
-          <button
-            onClick={handleDeleteBillet}
-            disabled={isDeleting}
-            className="btn btn-danger text-xs"
-          >
-            <Trash2 className="h-4 w-4" />
-            <span>{isDeleting ? 'Suppression...' : 'Supprimer'}</span>
-          </button>
-        )}
-      </div>
-
-      <BilletEditor
-        isOpen={showEditor}
-        onClose={() => setShowEditor(false)}
-        mode="edit"
-        userRole={(session.user as any).role}
-        initialData={{
-          slug,
-          title,
-          content,
-          tags,
-          excerpt,
-        }}
-        onSave={handleUpdateBillet}
-      />
-    </>
+      )}
+    </div>
   )
 }
