@@ -78,17 +78,37 @@
     opacity: 0.6;
   }
 
-  /* Mode Salle du Temps - verrouillage scroll body */
+  /* Mode Salle du Temps - verrouillage scroll body + plein écran total */
   .salle-du-temps-active {
     overflow: hidden;
     /* iA Writer-like plain cream background, no gradients */
     background-color: #fafaf8 !important;
     background-image: none !important;
+    /* Force le plein écran même si requestFullscreen échoue */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999 !important;
   }
 
-  /* Cacher totalement la navbar en mode Salle du Temps */
-  .salle-du-temps-active header {
+  /* Cacher totalement la navbar et tous les éléments d'interface en mode Salle du Temps */
+  .salle-du-temps-active header,
+  .salle-du-temps-active nav,
+  .salle-du-temps-active aside,
+  .salle-du-temps-active footer {
     display: none !important;
+  }
+
+  /* Masquer la barre de défilement des navigateurs en mode Salle du Temps */
+  .salle-du-temps-active::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .salle-du-temps-active {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
   }
 
   /* Animations pour la Salle du Temps */

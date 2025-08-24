@@ -3,7 +3,11 @@ import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { EditorPageDynamic as EditorPage } from '@/components/editor/EditorPageDynamic'
 
-export default async function NouveauBilletPage() {
+export default async function NouveauBilletPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ immersive?: string }>
+}) {
   const session = await getServerSession(authOptions)
 
   // Seuls les admins peuvent créer des billets
@@ -11,5 +15,9 @@ export default async function NouveauBilletPage() {
     redirect('/auth/signin')
   }
 
-  return <EditorPage mode="create" userRole="ADMIN" />
+  // Détecter si on doit démarrer en mode immersif
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
+  const startImmersive = resolvedSearchParams?.immersive === 'true'
+
+  return <EditorPage mode="create" userRole="ADMIN" startImmersive={startImmersive} />
 }

@@ -9,6 +9,7 @@ import {
   LogOut,
   Edit3,
   Users,
+  Clock,
 } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth/next'
@@ -169,6 +170,21 @@ async function AdminNormalPage() {
             <div>
               <h3 className="font-light text-foreground">Gestion des Utilisateurs</h3>
               <p className="text-sm text-subtle font-light">Rôles et permissions</p>
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/brouillons"
+          className="card border-subtle hover:border-foreground transition-colors group"
+        >
+          <div className="flex items-center space-x-4">
+            <div className="w-10 h-10 flex items-center justify-center">
+              <Clock className="h-5 w-5 text-foreground" />
+            </div>
+            <div>
+              <h3 className="font-light text-foreground">Brouillons</h3>
+              <p className="text-sm text-subtle font-light">Billets en cours d'écriture</p>
             </div>
           </div>
         </Link>

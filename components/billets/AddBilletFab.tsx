@@ -1,46 +1,24 @@
 'use client'
 
-import { useState } from 'react'
-import { BilletEditorDynamic as BilletEditor } from './BilletEditorDynamic'
+import { useRouter } from 'next/navigation'
 import { Hourglass } from 'lucide-react'
 
 export function AddBilletFab() {
-  const [open, setOpen] = useState(false)
+  const router = useRouter()
 
-  const handleCreate = async (data: any) => {
-    const res = await fetch('/api/admin/billets', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    })
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}) as any)
-      throw new Error(err?.error || 'Erreur lors de la création')
-    }
-    // Recharge pour voir le nouveau billet
-    window.location.href = '/billets'
+  const handleClick = () => {
+    // Rediriger vers le nouvel éditeur avec le mode immersif activé
+    router.push('/billets/nouveau?immersive=true')
   }
 
   return (
-    <>
-      <button
-        onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full border-2 border-foreground bg-background text-foreground shadow hover:bg-foreground hover:text-background transition-colors duration-200"
-        aria-label="Salle du Temps — Nouveau billet"
-        title="Salle du Temps — Nouveau billet"
-      >
-        <Hourglass className="w-5 h-5 mx-auto" />
-      </button>
-      {open && (
-        <BilletEditor
-          isOpen={open}
-          onClose={() => setOpen(false)}
-          mode="create"
-          userRole="ADMIN"
-          onSave={handleCreate}
-          startImmersive
-        />
-      )}
-    </>
+    <button
+      onClick={handleClick}
+      className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-purple-600 to-violet-500 text-white shadow-lg hover:from-purple-700 hover:to-violet-600 transition-all transform hover:scale-105"
+      aria-label="Salle du Temps — Nouveau billet"
+      title="Salle du Temps — Nouveau billet"
+    >
+      <Hourglass className="w-6 h-6 mx-auto" />
+    </button>
   )
 }
