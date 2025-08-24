@@ -197,7 +197,7 @@ Commencez à écrire pour faire disparaître ce guide...`
     } finally {
       setIsAutoSaving(false)
     }
-  }, [content, title, tags, excerpt, initialData?.slug])
+  }, [content, title, tags, excerpt, initialData?.slug, isAutoSaving])
 
   // Publier le billet (sauvegarde finale sur GitHub)
   const handlePublish = useCallback(async () => {
@@ -409,7 +409,7 @@ Commencez à écrire pour faire disparaître ce guide...`
         hideExitTimerRef.current = null
       }
     }
-  }, [isImmersive, exitImmersiveMode, handlePublish])
+  }, [isImmersive, exitImmersiveMode, handlePublish, autoSaveDraft, content])
 
   // Extensions CodeMirror
   const extensions = useMemo(() => {

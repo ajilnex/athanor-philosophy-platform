@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
-export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ slug: string }> }) {
   try {
     // Vérification authentification admin
     const session = await getServerSession(authOptions)
@@ -12,6 +12,7 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
       return NextResponse.json({ error: 'Authentification admin requise' }, { status: 401 })
     }
 
+    const params = await context.params
     const draft = await prisma.draft.findUnique({
       where: { slug: params.slug },
       include: {
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { slug: string } }) {
+export async function DELETE(request: NextRequest, context: { params: Promise<{ slug: string }> }) {
   try {
     // Vérification authentification admin
     const session = await getServerSession(authOptions)
@@ -44,6 +45,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { slug:
       return NextResponse.json({ error: 'Authentification admin requise' }, { status: 401 })
     }
 
+    const params = await context.params
     await prisma.draft.delete({
       where: { slug: params.slug },
     })
