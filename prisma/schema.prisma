@@ -139,3 +139,99 @@ model Draft {
   @@index([userId, updatedAt])
 }
 
+// ============================================
+// Archive de conversations (FEU HUMAIN)
+// ============================================
+
+model ConversationArchive {
+  id               String                    @id @default(cuid())
+  title            String
+  slug             String                    @unique
+  description      String?
+  threadType       String?
+  participantCount Int                       @default(0)
+  messageCount     Int                       @default(0)
+  startDate        DateTime?
+  endDate          DateTime?
+  metadata         Json?
+  isPublic         Boolean                   @default(false)
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+
+  participants     ConversationParticipant[]
+  messages         ConversationMessage[]
+}
+
+model ConversationParticipant {
+  id             String                @id @default(cuid())
+  archiveId      String
+  name           String
+  messageCount   Int                   @default(0)
+  firstMessageAt DateTime?
+  lastMessageAt  DateTime?
+  metadata       Json?
+
+  archive        ConversationArchive   @relation(fields: [archiveId], references: [id], onDelete: Cascade)
+  messages       ConversationMessage[]
+  reactions      ConversationReaction[]
+}
+
+model ConversationMessage {
+  id             String                @id @default(cuid())
+  archiveId      String
+  participantId  String?
+  senderName     String
+  content        String?
+  timestamp      BigInt
+  timestampDate  DateTime
+  messageType    String?               @default("text")
+  metadata       Json?
+  createdAt      DateTime              @default(now())
+
+  archive        ConversationArchive   @relation(fields: [archiveId], references: [id], onDelete: Cascade)
+  participant    ConversationParticipant? @relation(fields: [participantId], references: [id], onDelete: SetNull)
+  media          ConversationMedia[]
+  reactions      ConversationReaction[]
+
+  @@index([archiveId, timestamp])
+  @@index([participantId])
+  @@index([timestamp])
+}
+
+model ConversationMedia {
+  id                String              @id @default(cuid())
+  messageId         String
+  type              String              // 'photo' | 'video' | 'audio' | 'file'
+  originalUri       String
+  cloudinaryUrl     String?
+  cloudinaryPublicId String?
+  thumbnailUrl      String?
+  fileName          String?
+  fileSize          Int?
+  mimeType          String?
+  width             Int?
+  height            Int?
+  duration          Int?               // Pour vidéos/audio en secondes
+  metadata          Json?
+  createdAt         DateTime            @default(now())
+
+  message           ConversationMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@index([type])
+}
+
+model ConversationReaction {
+  id            String                   @id @default(cuid())
+  messageId     String
+  participantId String?
+  actorName     String
+  reaction      String
+  timestamp     BigInt?
+  createdAt     DateTime                 @default(now())
+
+  message       ConversationMessage      @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  participant   ConversationParticipant? @relation(fields: [participantId], references: [id], onDelete: SetNull)
+
+  @@index([messageId])
+}
