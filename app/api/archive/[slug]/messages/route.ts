@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/archive/[slug]/messages?page=1&limit=50&search=...&filter=...
-export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
+export async function GET(request: Request, { params }: { params: { slug: string } }) {
   try {
     const slug = params.slug
     const { searchParams } = new URL(request.url)
