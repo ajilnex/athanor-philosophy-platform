@@ -10,6 +10,7 @@ import {
   Edit3,
   Users,
   Clock,
+  Flame,
 } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth/next'
@@ -200,6 +201,21 @@ async function AdminNormalPage() {
             <div>
               <h3 className="font-light text-foreground">Paramètres</h3>
               <p className="text-sm text-subtle font-light">Configuration du site</p>
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/feu-humain"
+          className="card border-subtle hover:border-orange-600 transition-colors group"
+        >
+          <div className="flex items-center space-x-4">
+            <div className="w-10 h-10 flex items-center justify-center">
+              <Flame className="h-5 w-5 text-orange-500" />
+            </div>
+            <div>
+              <h3 className="font-light text-foreground">Archive FEU HUMAIN</h3>
+              <p className="text-sm text-subtle font-light">Conversation légendaire</p>
             </div>
           </div>
         </Link>
