@@ -27,6 +27,7 @@ import { ImageUpload } from '@/components/billets/ImageUpload'
 import { CitationPicker } from './CitationPicker'
 import { BacklinkPicker } from './BacklinkPicker'
 import { iaWriterDuo } from '@/components/billets/immersive-font'
+import { AutoSaveIndicator } from './AutoSaveIndicator'
 
 interface EditorPageProps {
   mode: 'create' | 'edit'
@@ -39,12 +40,14 @@ interface EditorPageProps {
     excerpt?: string
   }
   startImmersive?: boolean
+  draftSlug?: string
 }
 
 export function EditorPage({
   mode,
   userRole,
   initialData,
+  draftSlug,
   startImmersive = false,
 }: EditorPageProps) {
   const router = useRouter()
@@ -75,6 +78,35 @@ export function EditorPage({
   const [showCitationPicker, setShowCitationPicker] = useState(false)
   const [showBacklinkPicker, setShowBacklinkPicker] = useState(false)
   const [selectedTextForBacklink, setSelectedTextForBacklink] = useState('')
+  const [isDraftLoading, setIsDraftLoading] = useState(false)
+
+  // Charger le brouillon si draftSlug est fourni
+  useEffect(() => {
+    if (!draftSlug) return
+
+    const loadDraft = async () => {
+      setIsDraftLoading(true)
+      try {
+        const response = await fetch(`/api/drafts/${draftSlug}`)
+        if (response.ok) {
+          const data = await response.json()
+          if (data.draft) {
+            setTitle(data.draft.title || '')
+            setContent(data.draft.content || '')
+            setTags(data.draft.tags || [])
+            toast.success('Brouillon chargé')
+          }
+        }
+      } catch (error) {
+        console.error('Erreur chargement brouillon:', error)
+        toast.error('Impossible de charger le brouillon')
+      } finally {
+        setIsDraftLoading(false)
+      }
+    }
+
+    loadDraft()
+  }, [draftSlug])
 
   // Placeholder tutoriel MD
   const markdownTutorial = `# Bienvenue dans l'éditeur
@@ -170,7 +202,7 @@ Commencez à écrire pour faire disparaître ce guide...`
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '')
 
-    const slug = initialData?.slug || normalizeSlug(effectiveTitle)
+    const slug = draftSlug || initialData?.slug || normalizeSlug(effectiveTitle)
 
     setIsAutoSaving(true)
 
@@ -197,7 +229,7 @@ Commencez à écrire pour faire disparaître ce guide...`
     } finally {
       setIsAutoSaving(false)
     }
-  }, [content, title, tags, excerpt, initialData?.slug, isAutoSaving])
+  }, [content, title, tags, excerpt, initialData?.slug, draftSlug, isAutoSaving])
 
   // Publier le billet (sauvegarde finale sur GitHub)
   const handlePublish = useCallback(async () => {
@@ -350,19 +382,29 @@ Commencez à écrire pour faire disparaître ce guide...`
       }
     }
 
-    // Auto-sauvegarde toutes les 30 secondes
+    // Auto-sauvegarde avec debounce intelligent
+    // Sauvegarde 5 secondes après le dernier changement
+    // Ou toutes les 30 secondes si l'utilisateur continue à écrire
     const scheduleAutoSave = () => {
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current)
       }
 
+      // Debounce de 5 secondes après le dernier changement
       autoSaveTimerRef.current = setTimeout(() => {
-        autoSaveDraft()
-        scheduleAutoSave() // Programmer la prochaine sauvegarde
-      }, 30000) // 30 secondes
+        if (content.trim() && !isImmersive) {
+          autoSaveDraft()
+        }
+        // Programmer la prochaine sauvegarde automatique dans 30 secondes
+        autoSaveTimerRef.current = setTimeout(() => {
+          if (content.trim() && !isImmersive) {
+            autoSaveDraft()
+          }
+        }, 30000) // 30 secondes
+      }, 5000) // 5 secondes de debounce
     }
 
-    // Démarrer l'auto-sauvegarde quand le contenu change
+    // Déclencher l'auto-sauvegarde sur les changements de contenu
     if (content.trim() && !isImmersive) {
       scheduleAutoSave()
     }
@@ -596,15 +638,13 @@ Commencez à écrire pour faire disparaître ce guide...`
                 {isSaving ? 'Publication...' : 'Publier'}
               </button>
               <div className="h-4 w-px" style={{ backgroundColor: 'rgba(0, 0, 0, 0.15)' }}></div>
-              <span
-                className="text-xs"
-                style={{
-                  color: '#888',
-                  fontFamily: 'var(--font-ia-writer), "iA Writer Duo", serif',
-                }}
-              >
-                {lastSaved ? `Sauvegardé ${lastSaved.toLocaleTimeString()}` : 'Auto-sauvegarde'}
-              </span>
+              <div className="text-xs" style={{ color: '#888' }}>
+                <AutoSaveIndicator
+                  isAutoSaving={isAutoSaving}
+                  lastSaved={lastSaved}
+                  error={null} // Pas d'erreur affichée en mode immersif
+                />
+              </div>
             </div>
           </div>
 
@@ -632,6 +672,18 @@ Commencez à écrire pour faire disparaître ce guide...`
               autoFocus
             />
           </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Afficher un loader pendant le chargement du brouillon
+  if (isDraftLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+          <p className="text-subtle">Chargement du brouillon...</p>
         </div>
       </div>
     )
@@ -786,17 +838,16 @@ Commencez à écrire pour faire disparaître ce guide...`
 
             {/* Statut sauvegarde */}
             <div className="space-y-2">
-              {lastSaved && (
-                <div className="p-2 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-xs text-green-700">
-                    {isAutoSaving
-                      ? 'Sauvegarde en cours...'
-                      : `Sauvegardé à ${lastSaved.toLocaleTimeString()}`}
-                  </p>
-                </div>
-              )}
+              {/* Indicateur d'auto-sauvegarde amélioré */}
+              <div className="px-3 py-2 bg-background border border-subtle/20 rounded-lg">
+                <AutoSaveIndicator
+                  isAutoSaving={isAutoSaving}
+                  lastSaved={lastSaved}
+                  error={error}
+                />
+              </div>
 
-              {/* Message d'erreur */}
+              {/* Message d'erreur détaillé */}
               {error && (
                 <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
                   <p className="text-sm text-destructive">{error}</p>
