@@ -2,10 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/archive/[slug]/messages?page=1&limit=50&search=...&filter=...
-export async function GET(request: Request, { params }: { params: { slug: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
-    const slug = params.slug
-    const { searchParams } = new URL(request.url)
+    // Await the params since they're now a Promise in Next.js 15
+    const { slug } = await params
+
+    // Use Next.js method for searchParams
+    const { searchParams } = request.nextUrl
     const page = parseInt(searchParams.get('page') || '1')
     const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100) // Max 100 par page
     const search = searchParams.get('search') || ''

@@ -4,13 +4,16 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 
 // GET /api/archive/[slug] - Récupérer les infos de l'archive
-export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
+    // Await the params since they're now a Promise in Next.js 15
+    const { slug } = await params
+
     // Vérifier l'authentification pour les archives privées
     const session = await getServerSession(authOptions)
 
     const archive = await prisma.conversationArchive.findUnique({
-      where: { slug: params.slug },
+      where: { slug: slug },
       include: {
         participants: {
           select: {
