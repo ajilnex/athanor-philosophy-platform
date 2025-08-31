@@ -17,6 +17,8 @@ import {
   Search,
   Filter,
   Loader2,
+  Upload,
+  Plus,
 } from 'lucide-react'
 
 interface Archive {
@@ -251,13 +253,21 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
         <div className="absolute inset-0 bg-gradient-to-r from-orange-900/20 via-red-900/20 to-yellow-900/20 animate-pulse"></div>
         <div className="relative z-10 p-8">
           {/* Navigation */}
-          <div className="max-w-6xl mx-auto mb-6">
+          <div className="max-w-6xl mx-auto mb-6 flex justify-between items-center">
             <Link
               href="/admin"
               className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition"
             >
               <ArrowLeft className="w-4 h-4" />
               Retour à l'admin
+            </Link>
+
+            <Link
+              href="/admin/feu-humain/import"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-500 transition"
+            >
+              <Upload className="w-4 h-4" />
+              Importer des messages
             </Link>
           </div>
 

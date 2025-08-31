@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npx prisma generate && npx prisma db push && npx tsx scripts/import-feu-humain.ts && bash scripts/build-orchestrator.sh && next build",
+    "build": "npx prisma generate && npx prisma db push && bash scripts/build-orchestrator.sh && next build",
     "build:analyze": "ANALYZE=true npm run build",
     "start": "next start",
     "lint": "next lint",
