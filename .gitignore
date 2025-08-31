@@ -53,3 +53,7 @@ next-env.d.ts
 /public/graph-billets.svg
 /public/graph-positions.json
 /public/search-index.json
+
+# FEU HUMAIN - Protéger les données privées et fichiers volumineux
+/public/FEU HUMAIN/*
+!/public/FEU HUMAIN/.gitkeep
