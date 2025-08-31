@@ -70,11 +70,11 @@ export async function GET(
           break
       }
 
-      // Créer un Blob à partir du buffer
-      const blob = new Blob([file], { type: contentType })
+      // Convertir le Buffer en Uint8Array pour une compatibilité parfaite
+      const uint8Array = new Uint8Array(file)
 
       // Retourner le fichier avec les bons headers
-      return new Response(blob, {
+      return new Response(uint8Array, {
         headers: {
           'Content-Type': contentType,
           'Cache-Control': 'public, max-age=31536000, immutable',
