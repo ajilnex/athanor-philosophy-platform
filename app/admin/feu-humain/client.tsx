@@ -106,11 +106,17 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
       try {
         // Charger les infos de l'archive
         const archiveRes = await fetch(`/api/archive/${archiveSlug}`)
-        if (!archiveRes.ok) throw new Error('Archive non trouvée')
+        if (!archiveRes.ok) {
+          // L'archive n'existe pas encore, c'est normal pour un premier import
+          console.log('Archive non trouvée, première utilisation')
+          setLoading(false)
+          return // Arrêter ici, pas de messages à charger
+        }
+
         const archiveData = await archiveRes.json()
         setArchive(archiveData)
 
-        // Charger les messages initiaux
+        // Charger les messages initiaux seulement si l'archive existe
         const messagesRes = await fetch(`/api/archive/${archiveSlug}/messages?page=1&limit=50`)
         const messagesData = await messagesRes.json()
         setMessages(messagesData.messages)
@@ -233,14 +239,29 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-500 text-xl mb-4">Archive non trouvée</p>
-          <Link
-            href="/admin"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Retour à l'admin
-          </Link>
+          <Flame className="w-16 h-16 text-orange-500/50 mx-auto mb-4" />
+          <p className="text-red-500 text-xl mb-4">Archive FEU HUMAIN non trouvée</p>
+          <p className="text-gray-400 mb-6">
+            L'archive n'a pas encore été créée. Importez votre premier fichier pour commencer.
+          </p>
+
+          <div className="flex flex-col gap-3 items-center">
+            <Link
+              href="/admin/feu-humain/import"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-500 transition"
+            >
+              <Plus className="w-5 h-5" />
+              Créer l'archive et importer
+            </Link>
+
+            <Link
+              href="/admin"
+              className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Retour à l'admin
+            </Link>
+          </div>
         </div>
       </div>
     )
