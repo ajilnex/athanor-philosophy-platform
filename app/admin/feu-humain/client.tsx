@@ -251,7 +251,8 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
             <button
               onClick={() => {
                 console.log('Navigation vers import...')
-                router.push('/admin/feu-humain/import')
+                // Utiliser window.location pour une navigation garantie
+                window.location.href = '/admin/feu-humain/import'
               }}
               className="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-500 transition cursor-pointer"
             >
@@ -260,7 +261,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
             </button>
 
             <button
-              onClick={() => router.push('/admin')}
+              onClick={() => (window.location.href = '/admin')}
               className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
