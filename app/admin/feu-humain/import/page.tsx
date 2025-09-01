@@ -126,7 +126,14 @@ export default function FeuHumainImportPage() {
   }
 
   const handleImport = async () => {
-    if (!selectedFile || !stats) return
+    console.log('handleImport called')
+    console.log('selectedFile:', selectedFile)
+    console.log('stats:', stats)
+
+    if (!selectedFile || !stats) {
+      console.error('Missing file or stats')
+      return
+    }
 
     setIsImporting(true)
     setError('')
@@ -139,18 +146,29 @@ export default function FeuHumainImportPage() {
       formData.append('mode', 'import')
       formData.append('importMode', importMode)
 
-      // Créer un EventSource pour suivre le progrès
+      console.log('Sending import request...')
+
       const response = await fetch('/api/admin/feu-humain/import', {
         method: 'POST',
         body: formData,
       })
 
+      console.log('Response status:', response.status)
+
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || "Erreur lors de l'import")
+        const errorText = await response.text()
+        console.error('Import failed:', errorText)
+        let errorData
+        try {
+          errorData = JSON.parse(errorText)
+        } catch {
+          errorData = { error: errorText }
+        }
+        throw new Error(errorData.error || "Erreur lors de l'import")
       }
 
       const result = await response.json()
+      console.log('Import result:', result)
 
       setSuccess(`Import réussi ! ${result.importedMessages} messages importés.`)
 
@@ -159,6 +177,7 @@ export default function FeuHumainImportPage() {
         router.push('/admin/feu-humain')
       }, 2000)
     } catch (err) {
+      console.error('Import error:', err)
       setError(err instanceof Error ? err.message : "Erreur lors de l'import")
     } finally {
       setIsImporting(false)
@@ -198,6 +217,24 @@ export default function FeuHumainImportPage() {
 
         {/* Zone d'upload */}
         <div className="bg-gray-900/50 backdrop-blur-sm rounded-lg p-6 border border-gray-800 mb-6">
+          {!selectedFile && (
+            <div className="mb-4 p-4 bg-blue-900/20 border border-blue-600/30 rounded-lg">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-blue-400 mt-0.5" />
+                <div className="text-sm text-gray-300">
+                  <p className="font-medium text-blue-400 mb-1">
+                    Pour créer l'archive FEU HUMAIN :
+                  </p>
+                  <ol className="list-decimal list-inside space-y-1 text-gray-400">
+                    <li>Cliquez sur la zone ci-dessous pour sélectionner votre fichier JSON</li>
+                    <li>Le système analysera automatiquement le fichier</li>
+                    <li>Un bouton d'import apparaîtra avec les statistiques</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center hover:border-orange-500/50 transition">
             <input
               type="file"
@@ -340,7 +377,7 @@ export default function FeuHumainImportPage() {
         )}
 
         {/* Boutons d'action */}
-        {stats && stats.newMessages > 0 && (
+        {stats && stats.newMessages > 0 ? (
           <div className="flex justify-end gap-4">
             <button
               onClick={() => router.push('/admin/feu-humain')}
@@ -370,7 +407,23 @@ export default function FeuHumainImportPage() {
               )}
             </button>
           </div>
-        )}
+        ) : !selectedFile ? (
+          <div className="text-center py-8 border-t border-gray-800">
+            <Flame className="w-12 h-12 text-orange-500/30 mx-auto mb-4" />
+            <p className="text-gray-400 mb-2">Aucun fichier sélectionné</p>
+            <p className="text-sm text-gray-500">
+              Sélectionnez votre fichier message_1.json pour commencer l'import
+            </p>
+          </div>
+        ) : stats && stats.newMessages === 0 ? (
+          <div className="text-center py-8 border-t border-gray-800">
+            <CheckCircle className="w-12 h-12 text-green-500/30 mx-auto mb-4" />
+            <p className="text-gray-400 mb-2">Tous les messages sont déjà importés</p>
+            <p className="text-sm text-gray-500">
+              Aucun nouveau message à importer dans ce fichier
+            </p>
+          </div>
+        ) : null}
 
         {/* Note d'information */}
         <div className="mt-8 p-4 bg-blue-900/20 border border-blue-600/30 rounded-lg">

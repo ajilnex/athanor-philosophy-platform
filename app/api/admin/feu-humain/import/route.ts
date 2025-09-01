@@ -4,8 +4,9 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 // Configuration pour accepter des fichiers volumineux
-export const maxDuration = 60 // 60 secondes
+export const maxDuration = 300 // 5 minutes au lieu de 60 secondes
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs' // Utiliser Node.js runtime pour plus de stabilité
 
 interface MessengerMessage {
   sender_name: string
@@ -30,10 +31,16 @@ interface MessengerExport {
 }
 
 export async function POST(request: NextRequest) {
+  console.log('\n========== FEU HUMAIN IMPORT API ==========')
+  console.log('Request received at:', new Date().toISOString())
+
   try {
     // Vérifier l'authentification admin
     const session = await getServerSession(authOptions)
+    console.log('Session user:', session?.user)
+
     if (!session || (session.user as any).role !== 'ADMIN') {
+      console.error('Authentication failed - not admin')
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
@@ -42,13 +49,24 @@ export async function POST(request: NextRequest) {
     const mode = formData.get('mode') as string
     const importMode = formData.get('importMode') as string
 
+    console.log('Request details:')
+    console.log('- Mode:', mode)
+    console.log('- Import Mode:', importMode)
+    console.log('- File name:', file?.name)
+    console.log('- File size:', file?.size, 'bytes')
+
     if (!file) {
+      console.error('No file provided')
       return NextResponse.json({ error: 'Aucun fichier fourni' }, { status: 400 })
     }
 
     // Parser le fichier JSON
+    console.log('Parsing JSON file...')
     const text = await file.text()
     const data: MessengerExport = JSON.parse(text)
+    console.log('JSON parsed successfully')
+    console.log('- Messages count:', data.messages?.length)
+    console.log('- Participants:', data.participants?.length)
 
     // Mode analyse : retourner les statistiques sans importer
     if (mode === 'analyze') {
