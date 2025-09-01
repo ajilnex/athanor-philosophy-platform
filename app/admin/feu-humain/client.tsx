@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   Flame,
   Clock,
@@ -67,6 +68,7 @@ interface FeuHumainClientProps {
 }
 
 export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
+  const router = useRouter()
   const [archive, setArchive] = useState<Archive | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(true)
@@ -246,21 +248,24 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
           </p>
 
           <div className="flex flex-col gap-3 items-center">
-            <Link
-              href="/admin/feu-humain/import"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-500 transition"
+            <button
+              onClick={() => {
+                console.log('Navigation vers import...')
+                router.push('/admin/feu-humain/import')
+              }}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-500 transition cursor-pointer"
             >
               <Plus className="w-5 h-5" />
               Créer l'archive et importer
-            </Link>
+            </button>
 
-            <Link
-              href="/admin"
-              className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition"
+            <button
+              onClick={() => router.push('/admin')}
+              className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
               Retour à l'admin
-            </Link>
+            </button>
           </div>
         </div>
       </div>
