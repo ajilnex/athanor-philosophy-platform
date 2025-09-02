@@ -104,6 +104,7 @@
     "dotenv-cli": "^10.0.0",
     "eslint": "^8",
     "eslint-config-next": "^15.4.6",
+    "formdata-node": "^6.0.3",
     "glob": "^11.0.3",
     "husky": "^9.1.7",
     "identity-obj-proxy": "^3.0.0",
