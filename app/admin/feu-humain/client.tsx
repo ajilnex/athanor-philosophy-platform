@@ -190,29 +190,45 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
     }
   }, [page, hasMore, loadingMore, filterType, debouncedSearch, archiveSlug])
 
+  // Refs pour l'état de l'infinite scroll
+  const loadingMoreRefState = useRef(loadingMore)
+  const hasMoreRefState = useRef(hasMore)
+
+  useEffect(() => {
+    loadingMoreRefState.current = loadingMore
+  }, [loadingMore])
+
+  useEffect(() => {
+    hasMoreRefState.current = hasMore
+  }, [hasMore])
+
   // Observer pour l'infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+        const target = entries[0]
+        if (target.isIntersecting && hasMoreRefState.current && !loadingMoreRefState.current) {
           loadMore()
         }
       },
-      { threshold: 0.1 }
+      {
+        threshold: 0.1,
+        rootMargin: '100px', // Charger un peu avant d'arriver en bas
+      }
     )
 
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current)
+    const currentTarget = loadMoreRef.current
+    if (currentTarget) {
+      observer.observe(currentTarget)
     }
-
-    observerRef.current = observer
 
     return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect()
+      if (currentTarget) {
+        observer.unobserve(currentTarget)
       }
+      observer.disconnect()
     }
-  }, [hasMore, loadMore, loadingMore])
+  }, [loadMore]) // Seul loadMore est une dépendance (car stable via useCallback)
 
   // Formater la date
   const formatDate = (dateStr: string) => {

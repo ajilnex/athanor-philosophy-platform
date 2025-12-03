@@ -37,8 +37,86 @@ interface MessengerExport {
   thread_path?: string
 }
 
+// Table de conversion pour corriger le double encodage UTF-8
+const ENCODING_FIXES: Record<string, string> = {
+  // Lettres accentuées minuscules
+  'Ã©': 'é',
+  'Ã¨': 'è',
+  'Ã ': 'à',
+  'Ã¢': 'â',
+  'Ã§': 'ç',
+  'Ã´': 'ô',
+  'Ã®': 'î',
+  'Ã¯': 'ï',
+  'Ã«': 'ë',
+  'Ã¹': 'ù',
+  'Ã»': 'û',
+  'Ã¼': 'ü',
+  'Ã¶': 'ö',
+  'Ã±': 'ñ',
+
+  // Lettres accentuées majuscules
+  'Ã€': 'À',
+  'Ã‰': 'É',
+  ÃŠ: 'Ê',
+  'Ã‹': 'Ë',
+  ÃŒ: 'Ì',
+  ÃŽ: 'Î',
+  'Ã\u2019': 'Ò',
+  'Ã"': 'Ô',
+  'Ã–': 'Ö',
+  'Ã™': 'Ù',
+  Ãš: 'Ú',
+  'Ã›': 'Û',
+  Ãœ: 'Ü',
+  'Ã‡': 'Ç',
+
+  // Ligatures et symboles
+  'Å"': 'œ',
+  "Å'": 'Œ',
+  'Ã¦': 'æ',
+  'Ã†': 'Æ',
+  'â€™': "'",
+  'â€˜': "'",
+  'â€œ': '"',
+  'â€': '"',
+  'â€"': '—',
+  'â€¦': '...',
+  'â€¢': '•',
+  'â„¢': '™',
+  'Â©': '©',
+  'Â®': '®',
+  'â€°': '‰',
+  'â€¹': '‹',
+  'â€º': '›',
+  'Â«': '«',
+  'Â»': '»',
+  'Â ': ' ',
+  'Ã—': '×',
+  'Ã·': '÷',
+  'Â°': '°',
+  'â‚¬': '€',
+  'Â£': '£',
+  'Â¥': '¥',
+  'Â§': '§',
+  'Â¶': '¶',
+  'nÂ°': 'n°',
+}
+
+function cleanString(str: string | null | undefined): string | null | undefined {
+  if (!str) return str
+  let cleaned = str
+  for (const [bad, good] of Object.entries(ENCODING_FIXES)) {
+    const regex = new RegExp(bad.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')
+    cleaned = cleaned.replace(regex, good)
+  }
+  // Fix double spaces
+  cleaned = cleaned.replace(/\s{2,}/g, ' ')
+  return cleaned.trim()
+}
+
 class FeuHumainImporter {
-  private batchSize = 10 // Réduit drastiquement pour éviter les timeouts transactionnels
+  private batchSize = 5 // Réduit encore plus pour la prod (latence réseau)
   private uploadToCloudinary = true // Activé pour la production
 
   async import(jsonPath: string): Promise<void> {
@@ -176,12 +254,14 @@ class FeuHumainImporter {
         async tx => {
           for (const msg of batch) {
             // Créer le message
+            const content = cleanString(msg.content)
+            const senderName = cleanString(msg.sender_name) || 'Inconnu'
             const message = await tx.conversationMessage.create({
               data: {
                 archiveId,
                 participantId: participantsMap.get(msg.sender_name) || null,
-                senderName: msg.sender_name,
-                content: msg.content || null,
+                senderName: senderName,
+                content: content || null,
                 timestamp: msg.timestamp_ms,
                 timestampDate: new Date(msg.timestamp_ms),
                 messageType: msg.type || 'text',
@@ -217,8 +297,8 @@ class FeuHumainImporter {
                   data: {
                     messageId: message.id,
                     participantId: participantsMap.get(reaction.actor) || null,
-                    actorName: reaction.actor,
-                    reaction: reaction.reaction,
+                    actorName: cleanString(reaction.actor) || 'Inconnu',
+                    reaction: cleanString(reaction.reaction) || '❤️',
                   },
                 })
               }
@@ -226,8 +306,8 @@ class FeuHumainImporter {
           }
         },
         {
-          maxWait: 10000,
-          timeout: 30000,
+          maxWait: 20000,
+          timeout: 120000,
         }
       )
 
