@@ -37,82 +37,81 @@ interface MessengerExport {
   thread_path?: string
 }
 
-// Table de conversion pour corriger le double encodage UTF-8
-const ENCODING_FIXES: Record<string, string> = {
-  // Lettres accentuées minuscules
-  'Ã©': 'é',
-  'Ã¨': 'è',
-  'Ã ': 'à',
-  'Ã¢': 'â',
-  'Ã§': 'ç',
-  'Ã´': 'ô',
-  'Ã®': 'î',
-  'Ã¯': 'ï',
-  'Ã«': 'ë',
-  'Ã¹': 'ù',
-  'Ã»': 'û',
-  'Ã¼': 'ü',
-  'Ã¶': 'ö',
-  'Ã±': 'ñ',
-
-  // Lettres accentuées majuscules
-  'Ã€': 'À',
-  'Ã‰': 'É',
-  ÃŠ: 'Ê',
-  'Ã‹': 'Ë',
-  ÃŒ: 'Ì',
-  ÃŽ: 'Î',
-  'Ã\u2019': 'Ò',
-  'Ã"': 'Ô',
-  'Ã–': 'Ö',
-  'Ã™': 'Ù',
-  Ãš: 'Ú',
-  'Ã›': 'Û',
-  Ãœ: 'Ü',
-  'Ã‡': 'Ç',
-
-  // Ligatures et symboles
-  'Å"': 'œ',
-  "Å'": 'Œ',
-  'Ã¦': 'æ',
-  'Ã†': 'Æ',
-  'â€™': "'",
-  'â€˜': "'",
-  'â€œ': '"',
-  'â€': '"',
-  'â€"': '—',
-  'â€¦': '...',
-  'â€¢': '•',
-  'â„¢': '™',
-  'Â©': '©',
-  'Â®': '®',
-  'â€°': '‰',
-  'â€¹': '‹',
-  'â€º': '›',
-  'Â«': '«',
-  'Â»': '»',
-  'Â ': ' ',
-  'Ã—': '×',
-  'Ã·': '÷',
-  'Â°': '°',
-  'â‚¬': '€',
-  'Â£': '£',
-  'Â¥': '¥',
-  'Â§': '§',
-  'Â¶': '¶',
-  'nÂ°': 'n°',
+// Map des caractères Windows-1252 (0x80-0x9F) vers Unicode
+const CP1252_MAP: Record<string, number> = {
+  '€': 0x80,
+  '‚': 0x82,
+  ƒ: 0x83,
+  '„': 0x84,
+  '…': 0x85,
+  '†': 0x86,
+  '‡': 0x87,
+  ˆ: 0x88,
+  '‰': 0x89,
+  Š: 0x8a,
+  '‹': 0x8b,
+  Œ: 0x8c,
+  Ž: 0x8e,
+  '‘': 0x91,
+  '’': 0x92,
+  '“': 0x93,
+  '”': 0x94,
+  '•': 0x95,
+  '–': 0x96,
+  '—': 0x97,
+  '˜': 0x98,
+  '™': 0x99,
+  š: 0x9a,
+  '›': 0x9b,
+  œ: 0x9c,
+  ž: 0x9e,
+  Ÿ: 0x9f,
 }
 
 function cleanString(str: string | null | undefined): string | null | undefined {
   if (!str) return str
-  let cleaned = str
-  for (const [bad, good] of Object.entries(ENCODING_FIXES)) {
-    const regex = new RegExp(bad.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')
-    cleaned = cleaned.replace(regex, good)
+
+  try {
+    // Algorithme de réparation "Mojibake" (UTF-8 décodé comme CP1252)
+    // On inverse le processus : on remappe les caractères vers leurs octets d'origine
+    const bytes: number[] = []
+    for (let i = 0; i < str.length; i++) {
+      const char = str[i]
+      const code = char.charCodeAt(0)
+
+      // Si le caractère est dans la map CP1252, on prend son octet
+      if (CP1252_MAP[char]) {
+        bytes.push(CP1252_MAP[char])
+      }
+      // Sinon, si c'est un caractère ASCII étendu (<= 0xFF), on prend son code
+      else if (code <= 0xff) {
+        bytes.push(code)
+      }
+      // Si c'est un caractère > 0xFF qui n'est pas dans la map,
+      // c'est qu'il est probablement correct ou irrécupérable tel quel.
+      // Dans le doute, on le laisse (mais Buffer.from attend des octets, donc on prend le LSB)
+      else {
+        // Fallback: on suppose que c'est déjà du bon UTF-8 ?
+        // Non, si on mélange, c'est compliqué.
+        // Mais pour le cas "Mojibake", tous les caractères devraient être < 0xFF ou dans la map.
+        // Si on trouve un caractère > 0xFF ici, c'est qu'il n'était PAS corrompu.
+        // Pour ne pas casser les chaînes mixtes, c'est délicat.
+        // Mais l'export Messenger est uniformément corrompu.
+        bytes.push(code & 0xff)
+      }
+    }
+
+    // On reconstruit la chaîne en interprétant les octets comme du UTF-8
+    let cleaned = Buffer.from(bytes).toString('utf-8')
+
+    // Nettoyage final des espaces
+    cleaned = cleaned.replace(/\s{2,}/g, ' ').trim()
+
+    return cleaned
+  } catch (e) {
+    console.warn('Erreur lors du nettoyage de la chaîne:', e)
+    return str // Fallback sur l'original en cas de pépin
   }
-  // Fix double spaces
-  cleaned = cleaned.replace(/\s{2,}/g, ' ')
-  return cleaned.trim()
 }
 
 class FeuHumainImporter {

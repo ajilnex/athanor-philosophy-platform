@@ -39,6 +39,8 @@
     "fonts:download": "bash scripts/download-ia-fonts.sh",
     "analyze:feu-humain": "tsx scripts/analyze-feu-humain.ts",
     "import:feu-humain": "npx dotenv-cli -e .env.local -- tsx scripts/import-feu-humain.ts",
+    "import:feu-humain:clean": "tsx scripts/clean-feu-humain.ts",
+    "clean:feu-humain": "node scripts/clean-messenger-export.js",
     "prepare": "husky"
   },
   "lint-staged": {
