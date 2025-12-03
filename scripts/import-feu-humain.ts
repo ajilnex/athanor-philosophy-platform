@@ -38,8 +38,8 @@ interface MessengerExport {
 }
 
 class FeuHumainImporter {
-  private batchSize = 100 // Traiter par lots pour éviter les timeouts
-  private uploadToCloudinary = false // À activer après tests locaux
+  private batchSize = 10 // Réduit drastiquement pour éviter les timeouts transactionnels
+  private uploadToCloudinary = true // Activé pour la production
 
   async import(jsonPath: string): Promise<void> {
     console.log('🔥 Import FEU HUMAIN dans PostgreSQL')
@@ -172,58 +172,64 @@ class FeuHumainImporter {
     for (let i = 0; i < sortedMessages.length; i += this.batchSize) {
       const batch = sortedMessages.slice(i, i + this.batchSize)
 
-      await prisma.$transaction(async tx => {
-        for (const msg of batch) {
-          // Créer le message
-          const message = await tx.conversationMessage.create({
-            data: {
-              archiveId,
-              participantId: participantsMap.get(msg.sender_name) || null,
-              senderName: msg.sender_name,
-              content: msg.content || null,
-              timestamp: msg.timestamp_ms,
-              timestampDate: new Date(msg.timestamp_ms),
-              messageType: msg.type || 'text',
-              metadata: {
-                originalType: msg.type,
-              },
-            },
-          })
-
-          // Ajouter les médias
-          if (msg.photos && msg.photos.length > 0) {
-            for (const photo of msg.photos) {
-              await this.createMedia(tx, message.id, 'photo', photo.uri)
-            }
-          }
-
-          if (msg.videos && msg.videos.length > 0) {
-            for (const video of msg.videos) {
-              await this.createMedia(tx, message.id, 'video', video.uri, video.thumbnail?.uri)
-            }
-          }
-
-          if (msg.audio_files && msg.audio_files.length > 0) {
-            for (const audio of msg.audio_files) {
-              await this.createMedia(tx, message.id, 'audio', audio.uri)
-            }
-          }
-
-          // Ajouter les réactions
-          if (msg.reactions && msg.reactions.length > 0) {
-            for (const reaction of msg.reactions) {
-              await tx.conversationReaction.create({
-                data: {
-                  messageId: message.id,
-                  participantId: participantsMap.get(reaction.actor) || null,
-                  actorName: reaction.actor,
-                  reaction: reaction.reaction,
+      await prisma.$transaction(
+        async tx => {
+          for (const msg of batch) {
+            // Créer le message
+            const message = await tx.conversationMessage.create({
+              data: {
+                archiveId,
+                participantId: participantsMap.get(msg.sender_name) || null,
+                senderName: msg.sender_name,
+                content: msg.content || null,
+                timestamp: msg.timestamp_ms,
+                timestampDate: new Date(msg.timestamp_ms),
+                messageType: msg.type || 'text',
+                metadata: {
+                  originalType: msg.type,
                 },
-              })
+              },
+            })
+
+            // Ajouter les médias
+            if (msg.photos && msg.photos.length > 0) {
+              for (const photo of msg.photos) {
+                await this.createMedia(tx, message.id, 'photo', photo.uri)
+              }
+            }
+
+            if (msg.videos && msg.videos.length > 0) {
+              for (const video of msg.videos) {
+                await this.createMedia(tx, message.id, 'video', video.uri, video.thumbnail?.uri)
+              }
+            }
+
+            if (msg.audio_files && msg.audio_files.length > 0) {
+              for (const audio of msg.audio_files) {
+                await this.createMedia(tx, message.id, 'audio', audio.uri)
+              }
+            }
+
+            // Ajouter les réactions
+            if (msg.reactions && msg.reactions.length > 0) {
+              for (const reaction of msg.reactions) {
+                await tx.conversationReaction.create({
+                  data: {
+                    messageId: message.id,
+                    participantId: participantsMap.get(reaction.actor) || null,
+                    actorName: reaction.actor,
+                    reaction: reaction.reaction,
+                  },
+                })
+              }
             }
           }
+        },
+        {
+          maxWait: 10000,
+          timeout: 30000,
         }
-      })
+      )
 
       imported += batch.length
       console.log(
@@ -239,7 +245,27 @@ class FeuHumainImporter {
     originalUri: string,
     thumbnailUri?: string
   ) {
-    const fileName = path.basename(originalUri)
+    // Nettoyer le chemin de l'URI pour qu'il soit relatif à `public/FEU HUMAIN`
+    // Nettoyer le chemin de l'URI
+    let cleanUri = originalUri
+
+    // Si c'est une URI absolue locale (commence par /Users/...), on essaie de garder la partie relative
+    if (cleanUri.includes('/FEU HUMAIN/')) {
+      cleanUri = cleanUri.substring(cleanUri.indexOf('/FEU HUMAIN/'))
+    } else {
+      // Fallback: chercher les dossiers connus
+      const mediaFolders = ['photos/', 'videos/', 'audio_files/', 'audio/', 'gifs/', 'files/']
+      for (const folder of mediaFolders) {
+        const index = originalUri.indexOf(folder)
+        if (index !== -1) {
+          // On ajoute le préfixe si manquant
+          cleanUri = '/FEU HUMAIN/' + originalUri.substring(index)
+          break
+        }
+      }
+    }
+
+    const fileName = path.basename(cleanUri)
 
     let cloudinaryUrl = null
     let cloudinaryPublicId = null
@@ -248,7 +274,9 @@ class FeuHumainImporter {
     // Upload vers Cloudinary (désactivé par défaut pour les tests)
     if (this.uploadToCloudinary) {
       try {
-        const localPath = path.join('./public/FEU HUMAIN', originalUri)
+        // Construction du chemin absolu correct
+        // cleanUri commence par /FEU HUMAIN/...
+        const localPath = path.join(process.cwd(), 'public', cleanUri)
 
         // Vérifier si le fichier existe localement
         await fs.access(localPath)
@@ -289,7 +317,7 @@ class FeuHumainImporter {
       data: {
         messageId,
         type,
-        originalUri,
+        originalUri: cleanUri, // Utiliser l'URI nettoyée
         cloudinaryUrl,
         cloudinaryPublicId,
         thumbnailUrl,
