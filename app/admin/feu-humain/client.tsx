@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import {
   Flame,
@@ -551,10 +552,12 @@ function MessageBubble({
                   onClick={() => onMediaClick(photo)}
                   className="relative group/photo cursor-pointer overflow-hidden rounded-lg bg-gray-800 aspect-square"
                 >
-                  <img
+                  <Image
                     src={photo.thumb || photo.url}
-                    alt=""
-                    className="w-full h-full object-cover group-hover/photo:scale-110 transition duration-300"
+                    alt={photo.name || 'Photo'}
+                    fill
+                    className="object-cover group-hover/photo:scale-110 transition duration-300"
+                    sizes="(max-width: 768px) 50vw, 33vw"
                   />
                   <div className="absolute inset-0 bg-black/0 group-hover/photo:bg-black/30 transition flex items-center justify-center">
                     <Maximize2 className="w-6 h-6 text-white opacity-0 group-hover/photo:opacity-100 transition" />
