@@ -477,7 +477,11 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
 
         {/* Loader pour infinite scroll */}
         {hasMore && !loading && (
-          <div ref={loadMoreRef} className="text-center py-8">
+          <div
+            ref={loadMoreRef}
+            className="text-center py-8 cursor-pointer hover:opacity-80 transition"
+            onClick={() => !loadingMore && loadMore()}
+          >
             {loadingMore ? (
               <Loader2 className="w-8 h-8 text-orange-500 animate-spin mx-auto" />
             ) : (
