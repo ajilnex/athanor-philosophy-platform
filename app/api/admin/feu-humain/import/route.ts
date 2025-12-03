@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { cleanString } from '@/scripts/encoding-utils'
 
 // Configuration pour accepter des fichiers volumineux
 export const maxDuration = 300 // 5 minutes au lieu de 60 secondes
@@ -190,10 +191,11 @@ async function importData(data: MessengerExport, importMode: string) {
     const allParticipantNames = new Set(data.messages.map(m => m.sender_name))
     for (const name of allParticipantNames) {
       if (!participantsMap.has(name)) {
+        const cleanedName = cleanString(name) || 'Inconnu'
         const participant = await prisma.conversationParticipant.create({
           data: {
             archiveId: archive.id,
-            name,
+            name: cleanedName,
             messageCount: 0,
           },
         })
@@ -225,13 +227,17 @@ async function importData(data: MessengerExport, importMode: string) {
         for (const msg of batch) {
           const participantId = participantsMap.get(msg.sender_name)
 
+          // Nettoyer l'encodage avant d'insérer dans la DB
+          const cleanedContent = cleanString(msg.content)
+          const cleanedSenderName = cleanString(msg.sender_name) || 'Inconnu'
+
           // Créer le message
           const message = await tx.conversationMessage.create({
             data: {
               archiveId: archive.id,
               participantId: participantId || null,
-              senderName: msg.sender_name,
-              content: msg.content || null,
+              senderName: cleanedSenderName,
+              content: cleanedContent || null,
               timestamp: msg.timestamp_ms,
               timestampDate: new Date(msg.timestamp_ms),
               messageType: msg.type || 'text',
@@ -312,8 +318,8 @@ async function importData(data: MessengerExport, importMode: string) {
               data: msg.reactions.map(reaction => ({
                 messageId: message.id,
                 participantId: participantsMap.get(reaction.actor) || null,
-                actorName: reaction.actor,
-                reaction: reaction.reaction,
+                actorName: cleanString(reaction.actor) || 'Inconnu',
+                reaction: cleanString(reaction.reaction) || '❤️',
               })),
             })
           }

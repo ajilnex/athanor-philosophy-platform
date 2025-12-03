@@ -66,6 +66,71 @@ const CP1252_MAP: Record<string, number> = {
   œ: 0x9c,
   ž: 0x9e,
   Ÿ: 0x9f,
+  // Ajout des caractères accentués majuscules et autres symboles courants en CP1252
+  À: 0xc0,
+  Á: 0xc1,
+  Â: 0xc2,
+  Ã: 0xc3,
+  Ä: 0xc4,
+  Å: 0xc5,
+  Æ: 0xc6,
+  Ç: 0xc7,
+  È: 0xc8,
+  É: 0xc9,
+  Ê: 0xca,
+  Ë: 0xcb,
+  Ì: 0xcc,
+  Í: 0xcd,
+  Î: 0xce,
+  Ï: 0xcf,
+  Ð: 0xd0,
+  Ñ: 0xd1,
+  Ò: 0xd2,
+  Ó: 0xd3,
+  Ô: 0xd4,
+  Õ: 0xd5,
+  Ö: 0xd6,
+  '×': 0xd7,
+  Ø: 0xd8,
+  Ù: 0xd9,
+  Ú: 0xda,
+  Û: 0xdb,
+  Ü: 0xdc,
+  Ý: 0xdd,
+  Þ: 0xde,
+  ß: 0xdf,
+  à: 0xe0,
+  á: 0xe1,
+  â: 0xe2,
+  ã: 0xe3,
+  ä: 0xe4,
+  å: 0xe5,
+  æ: 0xe6,
+  ç: 0xe7,
+  è: 0xe8,
+  é: 0xe9,
+  ê: 0xea,
+  ë: 0xeb,
+  ì: 0xec,
+  í: 0xed,
+  î: 0xee,
+  ï: 0xef,
+  ð: 0xf0,
+  ñ: 0xf1,
+  ò: 0xf2,
+  ó: 0xf3,
+  ô: 0xf4,
+  õ: 0xf5,
+  ö: 0xf6,
+  '÷': 0xf7,
+  ø: 0xf8,
+  ù: 0xf9,
+  ú: 0xfa,
+  û: 0xfb,
+  ü: 0xfc,
+  ý: 0xfd,
+  þ: 0xfe,
+  ÿ: 0xff,
 }
 
 function cleanString(str: string | null | undefined): string | null | undefined {
@@ -83,26 +148,45 @@ function cleanString(str: string | null | undefined): string | null | undefined 
       if (CP1252_MAP[char]) {
         bytes.push(CP1252_MAP[char])
       }
-      // Sinon, si c'est un caractère ASCII étendu (<= 0xFF), on prend son code
-      else if (code <= 0xff) {
+      // Si c'est un caractère ASCII (0x00-0x7F), on le garde tel quel
+      else if (code >= 0x00 && code <= 0x7f) {
         bytes.push(code)
       }
-      // Si c'est un caractère > 0xFF qui n'est pas dans la map,
-      // c'est qu'il est probablement correct ou irrécupérable tel quel.
-      // Dans le doute, on le laisse (mais Buffer.from attend des octets, donc on prend le LSB)
+      // Si c'est un caractère UTF-8 multi-octets (comme les emojis ou certains symboles),
+      // on le laisse tel quel et on le gère comme une séquence UTF-8 valide.
+      // Pour cela, on doit le ré-encoder en UTF-8 pour obtenir ses octets.
       else {
-        // Fallback: on suppose que c'est déjà du bon UTF-8 ?
-        // Non, si on mélange, c'est compliqué.
-        // Mais pour le cas "Mojibake", tous les caractères devraient être < 0xFF ou dans la map.
-        // Si on trouve un caractère > 0xFF ici, c'est qu'il n'était PAS corrompu.
-        // Pour ne pas casser les chaînes mixtes, c'est délicat.
-        // Mais l'export Messenger est uniformément corrompu.
-        bytes.push(code & 0xff)
+        const utf8Bytes = Buffer.from(char, 'utf8')
+        for (const byte of utf8Bytes) {
+          bytes.push(byte)
+        }
       }
     }
 
     // On reconstruit la chaîne en interprétant les octets comme du UTF-8
     let cleaned = Buffer.from(bytes).toString('utf-8')
+
+    // SMART CHECK: Si le résultat contient le caractère de remplacement (),
+    // c'est que notre tentative de réparation a créé une séquence invalide.
+    // Cela signifie probablement que la chaîne d'origine était DÉJÀ correcte (ex: "à").
+    // Dans ce cas, on garde l'original.
+    if (cleaned.includes('\uFFFD')) {
+      // Si la réparation a échoué (caractère de remplacement), on essaie de décoder directement
+      // la chaîne d'origine comme si elle était déjà en UTF-8.
+      // Cela couvre les cas où la chaîne n'était pas corrompue ou était un mélange.
+      try {
+        const originalAsUtf8 = Buffer.from(str, 'latin1').toString('utf8')
+        if (!originalAsUtf8.includes('\uFFFD')) {
+          cleaned = originalAsUtf8
+        } else {
+          // Si même le décodage latin1 -> utf8 échoue, on garde l'original
+          cleaned = str
+        }
+      } catch (e) {
+        console.warn('Erreur lors de la tentative de décodage latin1 -> utf8:', e)
+        cleaned = str // Fallback ultime
+      }
+    }
 
     // Nettoyage final des espaces
     cleaned = cleaned.replace(/\s{2,}/g, ' ').trim()
@@ -161,6 +245,16 @@ class FeuHumainImporter {
     const timestamps = data.messages.map(m => m.timestamp_ms)
     const startDate = new Date(Math.min(...timestamps))
     const endDate = new Date(Math.max(...timestamps))
+
+    // Supprimer l'archive existante si elle existe (pour repartir de zéro)
+    try {
+      await prisma.conversationArchive.delete({
+        where: { slug: 'feu-humain' },
+      })
+      console.log('🗑️  Ancienne archive supprimée')
+    } catch (e) {
+      // Ignorer si n'existe pas
+    }
 
     return await prisma.conversationArchive.create({
       data: {
@@ -435,4 +529,4 @@ if (require.main === module) {
   main()
 }
 
-export { FeuHumainImporter }
+export { FeuHumainImporter, cleanString }
