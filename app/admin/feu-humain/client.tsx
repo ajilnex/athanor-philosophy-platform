@@ -5,23 +5,24 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import {
-  Flame,
-  Clock,
-  User,
-  ImageIcon,
-  Film,
-  Music,
-  MessageCircle,
-  ChevronDown,
-  Maximize2,
-  X,
-  ArrowLeft,
   Search,
   Filter,
   Loader2,
-  Upload,
-  Plus,
+  ArrowLeft,
+  ImageIcon,
+  Film,
+  Music,
+  Maximize2,
+  X,
+  MoreHorizontal,
+  Download,
+  Share2,
+  Info,
+  Terminal,
 } from 'lucide-react'
+import { GlassDashboard } from './components/GlassDashboard'
+import { TimelineSidebar } from './components/TimelineSidebar'
+import { StatsPanel } from './components/StatsPanel'
 
 interface Archive {
   id: string
@@ -107,19 +108,15 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
   useEffect(() => {
     const loadArchiveData = async () => {
       try {
-        // Charger les infos de l'archive
         const archiveRes = await fetch(`/api/archive/${archiveSlug}`)
         if (!archiveRes.ok) {
-          // L'archive n'existe pas encore, c'est normal pour un premier import
-          console.log('Archive non trouvée, première utilisation')
           setLoading(false)
-          return // Arrêter ici, pas de messages à charger
+          return
         }
 
         const archiveData = await archiveRes.json()
         setArchive(archiveData)
 
-        // Charger les messages initiaux seulement si l'archive existe
         const messagesRes = await fetch(`/api/archive/${archiveSlug}/messages?page=1&limit=50`)
         const messagesData = await messagesRes.json()
         setMessages(messagesData.messages)
@@ -214,7 +211,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
       },
       {
         threshold: 0.1,
-        rootMargin: '100px', // Charger un peu avant d'arriver en bas
+        rootMargin: '200px',
       }
     )
 
@@ -229,14 +226,13 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
       }
       observer.disconnect()
     }
-  }, [loadMore]) // Seul loadMore est une dépendance (car stable via useCallback)
+  }, [loadMore])
 
-  // Formater la date
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
     return date.toLocaleDateString('fr-FR', {
       day: 'numeric',
-      month: 'long',
+      month: 'short',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
@@ -246,9 +242,9 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
   if (loading && !archive) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <Flame className="w-16 h-16 text-orange-500 animate-pulse mx-auto mb-4" />
-          <p className="text-white text-xl font-light">Chargement de l'archive...</p>
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-2 border-[#00f0ff] border-t-transparent rounded-full animate-spin" />
+          <p className="font-mono text-[#00f0ff] text-xs animate-pulse">INITIALIZING SYSTEM...</p>
         </div>
       </div>
     )
@@ -256,365 +252,256 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
 
   if (!archive) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <Flame className="w-16 h-16 text-orange-500/50 mx-auto mb-4" />
-          <p className="text-red-500 text-xl mb-4">Archive FEU HUMAIN non trouvée</p>
-          <p className="text-gray-400 mb-6">
-            L'archive n'a pas encore été créée. Importez votre premier fichier pour commencer.
-          </p>
-
-          <div className="flex flex-col gap-3 items-center">
-            <button
-              onClick={() => {
-                console.log('Navigation vers import...')
-                // Utiliser window.location pour une navigation garantie
-                window.location.href = '/admin/feu-humain/import'
-              }}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-500 transition cursor-pointer"
-            >
-              <Plus className="w-5 h-5" />
-              Créer l'archive et importer
-            </button>
-
-            <button
-              onClick={() => (window.location.href = '/admin')}
-              className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition cursor-pointer"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Retour à l'admin
-            </button>
-          </div>
+      <div className="min-h-screen bg-black flex items-center justify-center text-white">
+        <div className="text-center space-y-4">
+          <p className="text-xl font-light text-white/50">ARCHIVE NOT FOUND</p>
+          <Link
+            href="/admin/feu-humain/import"
+            className="inline-block px-6 py-2 border border-[#00f0ff] text-[#00f0ff] hover:bg-[#00f0ff]/10 transition font-mono text-sm"
+          >
+            INITIATE IMPORT SEQUENCE
+          </Link>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white">
-      {/* Header épique */}
-      <header className="relative overflow-hidden bg-black border-b border-orange-900/30">
-        <div className="absolute inset-0 bg-gradient-to-r from-orange-900/20 via-red-900/20 to-yellow-900/20 animate-pulse"></div>
-        <div className="relative z-10 p-8">
-          {/* Navigation */}
-          <div className="max-w-6xl mx-auto mb-6 flex justify-between items-center">
-            <Link
-              href="/admin"
-              className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Retour à l'admin
-            </Link>
-
-            <Link
-              href="/admin/feu-humain/import"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-500 transition"
-            >
-              <Upload className="w-4 h-4" />
-              Importer des messages
-            </Link>
-          </div>
-
-          {/* Titre */}
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-4">
-              <Flame className="w-12 h-12 text-orange-500 animate-pulse" />
-              <h1 className="text-4xl md:text-6xl font-light mx-4 bg-gradient-to-r from-orange-400 via-red-500 to-yellow-400 bg-clip-text text-transparent">
-                {archive.title}
-              </h1>
-              <Flame className="w-12 h-12 text-orange-500 animate-pulse" />
+    <GlassDashboard>
+      {/* Header */}
+      <header className="h-16 glass-header flex items-center justify-between px-6 z-50 shrink-0">
+        <div className="flex items-center gap-6">
+          <Link
+            href="/admin"
+            className="p-2 -ml-2 text-white/50 hover:text-[#00f0ff] transition rounded-full hover:bg-white/5"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <div>
+            <h1 className="text-lg font-mono tracking-wider text-white flex items-center gap-2">
+              <Terminal className="w-4 h-4 text-[#00f0ff]" />
+              {archive.title.toUpperCase()}
+            </h1>
+            <div className="flex items-center gap-2 text-[10px] font-mono text-[#00f0ff]/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00f0ff] animate-pulse" />
+              SYSTEM ONLINE
             </div>
-            {archive.description && (
-              <p className="text-gray-400 text-lg font-light">{archive.description}</p>
-            )}
-
-            {/* Bouton afficher/masquer stats */}
-            <button
-              onClick={() => setShowStats(!showStats)}
-              className="mt-4 text-sm text-gray-500 hover:text-gray-300 transition"
-            >
-              {showStats ? 'Masquer' : 'Afficher'} les statistiques
-            </button>
-
-            {/* Statistiques */}
-            {showStats && (
-              <div className="flex flex-wrap justify-center gap-6 mt-6 animate-fadeIn">
-                <div className="text-center">
-                  <div className="text-2xl font-light text-orange-400">
-                    {archive.stats.totalMessages.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-500">Messages</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-light text-orange-400">
-                    {archive.stats.participantCount}
-                  </div>
-                  <div className="text-sm text-gray-500">Participants</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-light text-orange-400">
-                    {archive.stats.photos.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-500">Photos</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-light text-orange-400">
-                    {archive.stats.videos.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-500">Vidéos</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-light text-orange-400">
-                    {archive.stats.reactions.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-500">Réactions</div>
-                </div>
-              </div>
-            )}
-
-            {/* Période */}
-            {archive.stats.startDate && archive.stats.endDate && (
-              <div className="mt-4 text-sm text-gray-500">
-                Du {formatDate(archive.stats.startDate)} au {formatDate(archive.stats.endDate)}
-              </div>
-            )}
           </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {/* Search Bar */}
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f0ff]/50" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              placeholder="SEARCH_DATABASE..."
+              className="w-full bg-black/40 border border-[rgba(255,255,255,0.1)] rounded-sm pl-8 pr-4 py-1.5 text-xs font-mono text-[#00f0ff] placeholder-[#00f0ff]/30 focus:outline-none focus:border-[#00f0ff]/50 transition"
+            />
+          </div>
+
+          <div className="h-6 w-px bg-white/10" />
+
+          {/* Filters */}
+          <div className="flex gap-2">
+            <FilterButton
+              active={filterType === 'all'}
+              onClick={() => setFilterType('all')}
+              label="ALL"
+            />
+            <FilterButton
+              active={filterType === 'photos'}
+              onClick={() => setFilterType('photos')}
+              label="IMG"
+              icon={<ImageIcon className="w-3 h-3" />}
+            />
+            <FilterButton
+              active={filterType === 'videos'}
+              onClick={() => setFilterType('videos')}
+              label="VID"
+              icon={<Film className="w-3 h-3" />}
+            />
+          </div>
+
+          <div className="h-6 w-px bg-white/10" />
+
+          <button
+            onClick={() => setShowStats(!showStats)}
+            className={`p-2 transition rounded hover:bg-white/5 ${showStats ? 'text-[#00f0ff]' : 'text-white/50'}`}
+          >
+            <Info className="w-4 h-4" />
+          </button>
         </div>
       </header>
 
-      {/* Filtres et recherche */}
-      <div className="sticky top-0 z-20 bg-black/90 backdrop-blur-md border-b border-gray-800 p-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-wrap gap-4 items-center">
-            {/* Barre de recherche */}
-            <div className="flex-1 min-w-[300px] relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
-              <input
-                type="text"
-                placeholder="Rechercher dans la conversation..."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition"
-              />
+      {/* Main Layout */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Timeline Sidebar */}
+        <TimelineSidebar className="shrink-0 z-40 hidden md:flex" />
+
+        {/* Message Stream */}
+        <main className="flex-1 overflow-y-auto relative scroll-smooth" id="message-stream">
+          <div className="max-w-4xl mx-auto px-4 py-8 min-h-full">
+            <div className="space-y-1">
+              {messages.map((message, index) => {
+                const prevMessage = messages[index - 1]
+                const showHeader =
+                  !prevMessage ||
+                  prevMessage.sender !== message.sender ||
+                  new Date(message.date).getTime() - new Date(prevMessage.date).getTime() > 3600000
+
+                return (
+                  <MessageItem
+                    key={message.id}
+                    message={message}
+                    showHeader={showHeader}
+                    formatDate={formatDate}
+                    onMediaClick={setSelectedMedia}
+                  />
+                )
+              })}
             </div>
 
-            {/* Filtres */}
-            <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-gray-500" />
-              <button
-                onClick={() => setFilterType('all')}
-                className={`px-4 py-2 rounded-lg font-light transition ${
-                  filterType === 'all'
-                    ? 'bg-orange-600 text-white'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                }`}
-              >
-                Tout
-              </button>
-              <button
-                onClick={() => setFilterType('text')}
-                className={`px-4 py-2 rounded-lg font-light transition ${
-                  filterType === 'text'
-                    ? 'bg-orange-600 text-white'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                }`}
-              >
-                <MessageCircle className="w-4 h-4 inline mr-1" />
-                Texte
-              </button>
-              <button
-                onClick={() => setFilterType('photos')}
-                className={`px-4 py-2 rounded-lg font-light transition ${
-                  filterType === 'photos'
-                    ? 'bg-orange-600 text-white'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                }`}
-              >
-                <ImageIcon className="w-4 h-4 inline mr-1" />
-                Photos
-              </button>
-              <button
-                onClick={() => setFilterType('videos')}
-                className={`px-4 py-2 rounded-lg font-light transition ${
-                  filterType === 'videos'
-                    ? 'bg-orange-600 text-white'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                }`}
-              >
-                <Film className="w-4 h-4 inline mr-1" />
-                Vidéos
-              </button>
+            {/* Loading State */}
+            {hasMore && (
+              <div ref={loadMoreRef} className="py-12 flex justify-center">
+                {loadingMore && (
+                  <div className="flex items-center gap-2 text-[#00f0ff] font-mono text-xs">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    LOADING_DATA_CHUNKS...
+                  </div>
+                )}
+              </div>
+            )}
+
+            {!hasMore && messages.length > 0 && (
+              <div className="py-20 text-center">
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-[#00f0ff]/20 to-transparent mb-4" />
+                <p className="text-xs font-mono text-[#00f0ff]/40">END OF ARCHIVE</p>
+              </div>
+            )}
+          </div>
+        </main>
+
+        {/* Stats Panel (Overlay or Sidebar) */}
+        {showStats && (
+          <div className="w-80 shrink-0 border-l border-[rgba(255,255,255,0.08)] bg-[rgba(5,5,5,0.4)] backdrop-blur-sm p-6 hidden lg:block animate-slideInRight">
+            <StatsPanel stats={archive.stats} />
+
+            <div className="mt-8">
+              <h3 className="text-xs font-mono text-[#00f0ff] uppercase tracking-widest mb-4 border-b border-[rgba(255,255,255,0.1)] pb-2">
+                Archive Metadata
+              </h3>
+              <p className="text-xs text-white/60 leading-relaxed font-mono">
+                {archive.description || 'No description available for this archive sequence.'}
+              </p>
             </div>
           </div>
-
-          {/* Résultats de recherche */}
-          {searchTerm && (
-            <div className="mt-2 text-sm text-gray-500">
-              {messages.length} résultat(s) trouvé(s)
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
-      {/* Timeline des messages */}
-      <div className="max-w-4xl mx-auto p-4 md:p-8">
-        {loading ? (
-          <div className="flex justify-center py-8">
-            <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+      {/* Media Modal */}
+      {selectedMedia && <MediaModal media={selectedMedia} onClose={() => setSelectedMedia(null)} />}
+    </GlassDashboard>
+  )
+}
+
+function FilterButton({ active, onClick, label, icon }: any) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-2 px-3 py-1 rounded-sm text-[10px] font-mono transition border ${
+        active
+          ? 'bg-[#00f0ff]/10 border-[#00f0ff] text-[#00f0ff]'
+          : 'bg-transparent border-transparent text-white/40 hover:text-white hover:bg-white/5'
+      }`}
+    >
+      {icon}
+      {label}
+    </button>
+  )
+}
+
+function MessageItem({ message, showHeader, formatDate, onMediaClick }: any) {
+  const isMe = message.sender === 'Aubin Robert'
+
+  return (
+    <div className={`group animate-fadeIn ${showHeader ? 'mt-6' : 'mt-0.5'}`}>
+      {showHeader && (
+        <div className="flex items-baseline gap-3 mb-1 px-4 opacity-70 group-hover:opacity-100 transition-opacity">
+          <span
+            className={`text-xs font-mono font-bold ${isMe ? 'text-[#00f0ff]' : 'text-[#ff003c]'}`}
+          >
+            {isMe ? '>>' : '<<'} {message.sender.toUpperCase()}
+          </span>
+          <span className="text-[10px] font-mono text-white/30">{formatDate(message.date)}</span>
+        </div>
+      )}
+
+      <div
+        className={`message-block px-4 py-1 hover:bg-white/5 ${showHeader ? 'border-l-2 border-white/10' : 'border-l-2 border-transparent ml-[2px]'}`}
+      >
+        {/* Text Content */}
+        {message.content && (
+          <div className="message-content text-white/80 font-light leading-relaxed max-w-3xl">
+            {message.content}
           </div>
-        ) : (
-          <div className="space-y-4">
-            {messages.map(message => (
-              <MessageBubble
-                key={message.id}
-                message={message}
-                formatDate={formatDate}
-                onMediaClick={setSelectedMedia}
-              />
+        )}
+
+        {/* Media Grid */}
+        {message.media.length > 0 && (
+          <div
+            className={`grid gap-2 mt-3 ${
+              message.media.length === 1
+                ? 'grid-cols-1 max-w-sm'
+                : message.media.length === 2
+                  ? 'grid-cols-2 max-w-md'
+                  : 'grid-cols-3 max-w-xl'
+            }`}
+          >
+            {message.media.map((media: any) => (
+              <div
+                key={media.id}
+                onClick={() => onMediaClick(media)}
+                className="media-grid-item aspect-square bg-black/40 cursor-pointer group/media"
+              >
+                {media.type === 'photo' ? (
+                  <>
+                    <Image
+                      src={media.thumb || media.url}
+                      alt="Media"
+                      fill
+                      className="object-cover opacity-80 group-hover/media:opacity-100 transition-opacity"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                    <div className="absolute inset-0 bg-[#00f0ff]/10 opacity-0 group-hover/media:opacity-100 transition-opacity" />
+                  </>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center border border-white/10 group-hover/media:border-[#00f0ff]/50 transition-colors">
+                    {media.type === 'video' ? (
+                      <Film className="w-8 h-8 text-white/30 group-hover/media:text-[#00f0ff]" />
+                    ) : (
+                      <Music className="w-8 h-8 text-white/30 group-hover/media:text-[#00f0ff]" />
+                    )}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         )}
 
-        {/* Loader pour infinite scroll */}
-        {hasMore && !loading && (
-          <div
-            ref={loadMoreRef}
-            className="text-center py-8 cursor-pointer hover:opacity-80 transition"
-            onClick={() => !loadingMore && loadMore()}
-          >
-            {loadingMore ? (
-              <Loader2 className="w-8 h-8 text-orange-500 animate-spin mx-auto" />
-            ) : (
-              <>
-                <ChevronDown className="w-8 h-8 text-gray-500 animate-bounce mx-auto" />
-                <p className="text-gray-500 mt-2 font-light">Chargement de plus de messages...</p>
-              </>
-            )}
-          </div>
-        )}
-
-        {/* Message de fin */}
-        {!hasMore && messages.length > 0 && (
-          <div className="text-center py-12">
-            <Flame className="w-12 h-12 text-orange-500/50 mx-auto mb-4" />
-            <p className="text-gray-500 font-light">Fin de l'archive</p>
-          </div>
-        )}
-      </div>
-
-      {/* Modal pour média plein écran */}
-      {selectedMedia && <MediaModal media={selectedMedia} onClose={() => setSelectedMedia(null)} />}
-    </div>
-  )
-}
-
-// Composant pour afficher un message
-function MessageBubble({
-  message,
-  formatDate,
-  onMediaClick,
-}: {
-  message: Message
-  formatDate: (date: string) => string
-  onMediaClick: (media: any) => void
-}) {
-  return (
-    <div className="group relative">
-      {/* Ligne de temps */}
-      <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-orange-600/20 to-transparent"></div>
-
-      {/* Point sur la timeline */}
-      <div className="absolute left-7 top-6 w-3 h-3 bg-orange-500 rounded-full ring-4 ring-black"></div>
-
-      {/* Contenu du message */}
-      <div className="ml-16 bg-gray-900/50 backdrop-blur-sm rounded-lg p-4 border border-gray-800 hover:border-orange-600/50 transition">
-        {/* Header du message */}
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <User className="w-4 h-4 text-orange-400" />
-            <span className="font-light text-orange-400">{message.sender}</span>
-          </div>
-          <div className="flex items-center gap-1 text-xs text-gray-500">
-            <Clock className="w-3 h-3" />
-            <span>{formatDate(message.date)}</span>
-          </div>
-        </div>
-
-        {/* Contenu texte */}
-        {message.content && (
-          <p className="text-gray-100 mb-3 whitespace-pre-wrap font-light">{message.content}</p>
-        )}
-
-        {/* Photos */}
-        {message.media.filter(m => m.type === 'photo').length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
-            {message.media
-              .filter(m => m.type === 'photo')
-              .map(photo => (
-                <div
-                  key={photo.id}
-                  onClick={() => onMediaClick(photo)}
-                  className="relative group/photo cursor-pointer overflow-hidden rounded-lg bg-gray-800 aspect-square"
-                >
-                  <Image
-                    src={photo.thumb || photo.url}
-                    alt={photo.name || 'Photo'}
-                    fill
-                    className="object-cover group-hover/photo:scale-110 transition duration-300"
-                    sizes="(max-width: 768px) 50vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover/photo:bg-black/30 transition flex items-center justify-center">
-                    <Maximize2 className="w-6 h-6 text-white opacity-0 group-hover/photo:opacity-100 transition" />
-                  </div>
-                </div>
-              ))}
-          </div>
-        )}
-
-        {/* Vidéos */}
-        {message.media.filter(m => m.type === 'video').length > 0 && (
-          <div className="grid grid-cols-2 gap-2 mb-3">
-            {message.media
-              .filter(m => m.type === 'video')
-              .map(video => (
-                <div
-                  key={video.id}
-                  className="relative group/video cursor-pointer overflow-hidden rounded-lg bg-gray-800 p-8 hover:bg-gray-700 transition"
-                  onClick={() => onMediaClick(video)}
-                >
-                  <Film className="w-8 h-8 text-gray-600 mx-auto" />
-                  <p className="text-xs text-gray-500 mt-2 text-center font-light">
-                    {video.name || 'Vidéo'}
-                  </p>
-                </div>
-              ))}
-          </div>
-        )}
-
-        {/* Audio */}
-        {message.media.filter(m => m.type === 'audio').length > 0 && (
-          <div className="flex gap-2 mb-3">
-            {message.media
-              .filter(m => m.type === 'audio')
-              .map(audio => (
-                <div
-                  key={audio.id}
-                  className="flex items-center gap-2 bg-gray-800 rounded-lg px-3 py-2 cursor-pointer hover:bg-gray-700 transition"
-                  onClick={() => onMediaClick(audio)}
-                >
-                  <Music className="w-4 h-4 text-orange-400" />
-                  <span className="text-sm font-light">{audio.name || 'Audio'}</span>
-                </div>
-              ))}
-          </div>
-        )}
-
-        {/* Réactions */}
+        {/* Reactions */}
         {message.reactions.length > 0 && (
-          <div className="flex gap-1 mt-2">
-            {message.reactions.map((reaction, idx) => (
-              <span key={idx} className="text-lg" title={reaction.actor}>
-                {reaction.reaction}
+          <div className="flex gap-2 mt-2">
+            {message.reactions.map((r: any, i: number) => (
+              <span
+                key={i}
+                className="text-[10px] bg-white/5 px-1.5 py-0.5 rounded text-white/50"
+                title={r.actor}
+              >
+                {r.reaction}
               </span>
             ))}
           </div>
@@ -624,28 +511,43 @@ function MessageBubble({
   )
 }
 
-// Modal pour afficher les médias en plein écran
-function MediaModal({ media, onClose }: { media: any; onClose: () => void }) {
+function MediaModal({ media, onClose }: any) {
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 animate-fadeIn"
       onClick={onClose}
     >
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 p-2 bg-gray-900 rounded-full hover:bg-gray-800 transition"
+        className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full transition group"
       >
-        <X className="w-6 h-6" />
+        <X className="w-6 h-6 text-white/50 group-hover:text-[#00f0ff]" />
       </button>
 
-      <div className="max-w-6xl max-h-[90vh] overflow-auto" onClick={e => e.stopPropagation()}>
-        {media.type === 'photo' && (
-          <img src={media.url} alt="" className="max-w-full h-auto rounded-lg" />
-        )}
-        {media.type === 'video' && (
-          <video src={media.url} controls className="max-w-full h-auto rounded-lg" />
-        )}
-        {media.type === 'audio' && <audio src={media.url} controls className="w-full" />}
+      <div
+        className="max-w-7xl max-h-[90vh] w-full flex items-center justify-center"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="relative border border-[#00f0ff]/20 bg-black/50 p-1 shadow-[0_0_50px_rgba(0,240,255,0.1)]">
+          {/* Tech Corners */}
+          <div className="absolute -top-1 -left-1 w-4 h-4 border-t border-l border-[#00f0ff]" />
+          <div className="absolute -top-1 -right-1 w-4 h-4 border-t border-r border-[#00f0ff]" />
+          <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b border-l border-[#00f0ff]" />
+          <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b border-r border-[#00f0ff]" />
+
+          {media.type === 'photo' && (
+            <img src={media.url} alt="" className="max-h-[85vh] max-w-full" />
+          )}
+          {media.type === 'video' && (
+            <video src={media.url} controls autoPlay className="max-h-[85vh] max-w-full" />
+          )}
+          {media.type === 'audio' && (
+            <div className="bg-white/5 p-12 w-full max-w-md flex flex-col items-center gap-6">
+              <Music className="w-16 h-16 text-[#00f0ff]" />
+              <audio src={media.url} controls className="w-full" />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

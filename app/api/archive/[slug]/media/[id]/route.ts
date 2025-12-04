@@ -35,8 +35,18 @@ export async function GET(
     }
 
     // Construire le chemin vers le fichier local
-    const basePath = path.join(process.cwd(), 'public', 'FEU HUMAIN')
-    const filePath = path.join(basePath, media.originalUri)
+    // Note: media.originalUri contient déjà souvent "/FEU HUMAIN/..."
+    const publicDir = path.join(process.cwd(), 'public')
+    let filePath: string
+
+    if (media.originalUri.startsWith('/FEU HUMAIN/')) {
+      filePath = path.join(publicDir, media.originalUri)
+    } else if (media.originalUri.startsWith('FEU HUMAIN/')) {
+      filePath = path.join(publicDir, media.originalUri)
+    } else {
+      // Fallback pour les anciens imports ou formats différents
+      filePath = path.join(publicDir, 'FEU HUMAIN', media.originalUri)
+    }
 
     try {
       // Lire le fichier
