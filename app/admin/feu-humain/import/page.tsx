@@ -8,7 +8,7 @@ import {
   ArrowLeft,
   Upload,
   FileJson,
-  Flame,
+  Terminal,
   AlertCircle,
   CheckCircle,
   Info,
@@ -18,7 +18,9 @@ import {
   Clock,
   MessageCircle,
   Users,
+  Loader2,
 } from 'lucide-react'
+import { GlassDashboard } from '../components/GlassDashboard'
 
 interface ImportStats {
   existingArchive: boolean
@@ -41,7 +43,6 @@ export default function FeuHumainImportPage() {
   const [stats, setStats] = useState<ImportStats | null>(null)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const [importProgress, setImportProgress] = useState(0)
   const [importMode, setImportMode] = useState<'new' | 'update'>('new')
 
   // Protection admin
@@ -55,7 +56,10 @@ export default function FeuHumainImportPage() {
   if (status === 'loading') {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <Flame className="w-16 h-16 text-orange-500 animate-pulse" />
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-2 border-[#00f0ff] border-t-transparent rounded-full animate-spin" />
+          <p className="font-mono text-[#00f0ff] text-xs animate-pulse">INITIALIZING SYSTEM...</p>
+        </div>
       </div>
     )
   }
@@ -69,13 +73,12 @@ export default function FeuHumainImportPage() {
     if (!file) return
 
     if (file.type !== 'application/json') {
-      setError('Veuillez sélectionner un fichier JSON')
+      setError('INVALID_FILE_FORMAT: JSON_REQUIRED')
       return
     }
 
     if (file.size > 100 * 1024 * 1024) {
-      // 100MB max
-      setError('Le fichier est trop volumineux (max 100MB)')
+      setError('FILE_SIZE_EXCEEDED: MAX_100MB')
       return
     }
 
@@ -84,7 +87,6 @@ export default function FeuHumainImportPage() {
     setSuccess('')
     setStats(null)
 
-    // Analyser le fichier
     await analyzeFile(file)
   }
 
@@ -94,7 +96,6 @@ export default function FeuHumainImportPage() {
       const text = await file.text()
       const data = JSON.parse(text)
 
-      // Envoyer pour analyse
       const formData = new FormData()
       formData.append('file', file)
       formData.append('mode', 'analyze')
@@ -106,39 +107,30 @@ export default function FeuHumainImportPage() {
 
       if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.error || "Erreur lors de l'analyse")
+        throw new Error(error.error || 'ANALYSIS_FAILED')
       }
 
       const result = await response.json()
       setStats(result)
 
-      // Déterminer le mode automatiquement
       if (result.existingArchive) {
         setImportMode('update')
       } else {
         setImportMode('new')
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur lors de l'analyse du fichier")
+      setError(err instanceof Error ? err.message : 'ANALYSIS_ERROR')
     } finally {
       setIsAnalyzing(false)
     }
   }
 
   const handleImport = async () => {
-    console.log('handleImport called')
-    console.log('selectedFile:', selectedFile)
-    console.log('stats:', stats)
-
-    if (!selectedFile || !stats) {
-      console.error('Missing file or stats')
-      return
-    }
+    if (!selectedFile || !stats) return
 
     setIsImporting(true)
     setError('')
     setSuccess('')
-    setImportProgress(0)
 
     try {
       const formData = new FormData()
@@ -146,39 +138,30 @@ export default function FeuHumainImportPage() {
       formData.append('mode', 'import')
       formData.append('importMode', importMode)
 
-      console.log('Sending import request...')
-
       const response = await fetch('/api/admin/feu-humain/import', {
         method: 'POST',
         body: formData,
       })
 
-      console.log('Response status:', response.status)
-
       if (!response.ok) {
         const errorText = await response.text()
-        console.error('Import failed:', errorText)
         let errorData
         try {
           errorData = JSON.parse(errorText)
         } catch {
           errorData = { error: errorText }
         }
-        throw new Error(errorData.error || "Erreur lors de l'import")
+        throw new Error(errorData.error || 'IMPORT_FAILED')
       }
 
       const result = await response.json()
-      console.log('Import result:', result)
+      setSuccess(`IMPORT_SUCCESS: ${result.importedMessages} MESSAGES_PROCESSED`)
 
-      setSuccess(`Import réussi ! ${result.importedMessages} messages importés.`)
-
-      // Rediriger vers la vue de l'archive après 2 secondes
       setTimeout(() => {
         router.push('/admin/feu-humain')
       }, 2000)
     } catch (err) {
-      console.error('Import error:', err)
-      setError(err instanceof Error ? err.message : "Erreur lors de l'import")
+      setError(err instanceof Error ? err.message : 'IMPORT_ERROR')
     } finally {
       setIsImporting(false)
     }
@@ -187,55 +170,62 @@ export default function FeuHumainImportPage() {
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('fr-FR', {
       day: 'numeric',
-      month: 'long',
+      month: 'short',
       year: 'numeric',
     })
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <GlassDashboard>
+      <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-12">
           <Link
             href="/admin/feu-humain"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition mb-6"
+            className="inline-flex items-center gap-2 text-white/50 hover:text-[#00f0ff] transition mb-8 font-mono text-xs"
           >
             <ArrowLeft className="w-4 h-4" />
-            Retour à l'archive
+            RETURN_TO_ARCHIVE
           </Link>
 
-          <div className="flex items-center gap-3 mb-4">
-            <Flame className="w-10 h-10 text-orange-500" />
-            <h1 className="text-3xl font-light">Import FEU HUMAIN</h1>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 bg-[#00f0ff]/10 rounded-lg border border-[#00f0ff]/20">
+              <Terminal className="w-8 h-8 text-[#00f0ff]" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-mono tracking-wider text-white">SYSTEM IMPORT</h1>
+              <p className="text-xs font-mono text-[#00f0ff]/60 mt-1">
+                SECURE_DATA_INGESTION_PROTOCOL
+              </p>
+            </div>
           </div>
-
-          <p className="text-gray-400">
-            Importez ou mettez à jour l'archive depuis un export Messenger
-          </p>
         </div>
 
-        {/* Zone d'upload */}
-        <div className="bg-gray-900/50 backdrop-blur-sm rounded-lg p-6 border border-gray-800 mb-6">
+        {/* Upload Zone */}
+        <div className="glass-panel p-8 rounded-lg mb-8 relative group">
+          {/* Tech Corners */}
+          <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[#00f0ff]/50" />
+          <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#00f0ff]/50" />
+          <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-[#00f0ff]/50" />
+          <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-[#00f0ff]/50" />
+
           {!selectedFile && (
-            <div className="mb-4 p-4 bg-blue-900/20 border border-blue-600/30 rounded-lg">
+            <div className="mb-6 p-4 bg-[#00f0ff]/5 border border-[#00f0ff]/10 rounded">
               <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-400 mt-0.5" />
-                <div className="text-sm text-gray-300">
-                  <p className="font-medium text-blue-400 mb-1">
-                    Pour créer l'archive FEU HUMAIN :
-                  </p>
-                  <ol className="list-decimal list-inside space-y-1 text-gray-400">
-                    <li>Cliquez sur la zone ci-dessous pour sélectionner votre fichier JSON</li>
-                    <li>Le système analysera automatiquement le fichier</li>
-                    <li>Un bouton d'import apparaîtra avec les statistiques</li>
+                <Info className="w-5 h-5 text-[#00f0ff] mt-0.5" />
+                <div className="text-xs font-mono text-white/70 space-y-2">
+                  <p className="text-[#00f0ff]">INSTRUCTION_SET:</p>
+                  <ol className="list-decimal list-inside space-y-1 opacity-80">
+                    <li>SELECT_SOURCE_FILE (JSON)</li>
+                    <li>WAIT_FOR_ANALYSIS</li>
+                    <li>EXECUTE_IMPORT_SEQUENCE</li>
                   </ol>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center hover:border-orange-500/50 transition">
+          <div className="border border-dashed border-white/10 rounded bg-black/20 p-12 text-center hover:border-[#00f0ff]/50 transition group-hover:bg-[#00f0ff]/5">
             <input
               type="file"
               accept=".json"
@@ -244,31 +234,29 @@ export default function FeuHumainImportPage() {
               id="file-upload"
               disabled={isAnalyzing || isImporting}
             />
-            <label htmlFor="file-upload" className="cursor-pointer">
+            <label htmlFor="file-upload" className="cursor-pointer block w-full h-full">
               {selectedFile ? (
                 <div className="space-y-4">
-                  <FileJson className="w-16 h-16 text-orange-500 mx-auto" />
+                  <FileJson className="w-12 h-12 text-[#00f0ff] mx-auto animate-pulse" />
                   <div>
-                    <p className="text-xl font-light">{selectedFile.name}</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-lg font-mono text-white">{selectedFile.name}</p>
+                    <p className="text-xs font-mono text-white/40">
                       {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                     </p>
                   </div>
                   {isAnalyzing && (
-                    <div className="flex items-center justify-center gap-2 text-orange-400">
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Analyse en cours...</span>
+                    <div className="flex items-center justify-center gap-2 text-[#00f0ff] font-mono text-xs">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>ANALYZING_DATA_STRUCTURE...</span>
                     </div>
                   )}
                 </div>
               ) : (
                 <div>
-                  <Upload className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                  <p className="text-xl font-light mb-2">
-                    Cliquez pour sélectionner un fichier JSON
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Export Messenger (message_1.json) - Max 100MB
+                  <Upload className="w-12 h-12 text-white/20 mx-auto mb-4 group-hover:text-[#00f0ff] transition-colors" />
+                  <p className="text-sm font-mono text-white/60 mb-2">CLICK_TO_UPLOAD</p>
+                  <p className="text-[10px] font-mono text-white/30">
+                    ACCEPTED_FORMAT: JSON (MAX 100MB)
                   </p>
                 </div>
               )}
@@ -276,174 +264,115 @@ export default function FeuHumainImportPage() {
           </div>
         </div>
 
-        {/* Statistiques d'analyse */}
+        {/* Analysis Stats */}
         {stats && (
-          <div className="bg-gray-900/50 backdrop-blur-sm rounded-lg p-6 border border-gray-800 mb-6">
-            <h2 className="text-xl font-light mb-4 flex items-center gap-2">
-              <Database className="w-5 h-5 text-orange-500" />
-              Analyse du fichier
+          <div className="glass-panel p-6 rounded-lg mb-8 animate-fadeIn">
+            <h2 className="text-sm font-mono text-[#00f0ff] mb-6 flex items-center gap-2 border-b border-white/5 pb-2">
+              <Database className="w-4 h-4" />
+              DATA_ANALYSIS_REPORT
             </h2>
 
-            {/* Mode d'import */}
-            <div className="mb-4 p-4 bg-gray-800/50 rounded-lg">
-              {stats.existingArchive ? (
-                <div className="flex items-start gap-3">
-                  <Info className="w-5 h-5 text-blue-400 mt-0.5" />
-                  <div>
-                    <p className="text-blue-400 font-medium">Archive existante détectée</p>
-                    <p className="text-sm text-gray-400 mt-1">
-                      L'archive FEU HUMAIN existe déjà. Les nouveaux messages seront ajoutés et les
-                      doublons seront automatiquement ignorés.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-start gap-3">
-                  <Plus className="w-5 h-5 text-green-400 mt-0.5" />
-                  <div>
-                    <p className="text-green-400 font-medium">Nouvelle archive</p>
-                    <p className="text-sm text-gray-400 mt-1">
-                      L'archive FEU HUMAIN sera créée avec tous les messages du fichier.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Statistiques */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-gray-800/50 rounded-lg p-4">
-                <MessageCircle className="w-5 h-5 text-orange-400 mb-2" />
-                <div className="text-2xl font-light">
-                  {stats.totalMessagesInFile.toLocaleString()}
-                </div>
-                <div className="text-xs text-gray-500">Messages total</div>
-              </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <StatCard
+                label="TOTAL_MESSAGES"
+                value={stats.totalMessagesInFile}
+                icon={MessageCircle}
+              />
 
               {stats.existingArchive && (
                 <>
-                  <div className="bg-gray-800/50 rounded-lg p-4">
-                    <CheckCircle className="w-5 h-5 text-gray-400 mb-2" />
-                    <div className="text-2xl font-light">
-                      {stats.existingMessages.toLocaleString()}
-                    </div>
-                    <div className="text-xs text-gray-500">Déjà importés</div>
-                  </div>
-
-                  <div className="bg-gray-800/50 rounded-lg p-4">
-                    <Plus className="w-5 h-5 text-green-400 mb-2" />
-                    <div className="text-2xl font-light text-green-400">
-                      {stats.newMessages.toLocaleString()}
-                    </div>
-                    <div className="text-xs text-gray-500">Nouveaux</div>
-                  </div>
+                  <StatCard
+                    label="EXISTING_RECORDS"
+                    value={stats.existingMessages}
+                    icon={CheckCircle}
+                    color="text-white/40"
+                  />
+                  <StatCard
+                    label="NEW_RECORDS"
+                    value={stats.newMessages}
+                    icon={Plus}
+                    color="text-[#00f0ff]"
+                  />
                 </>
               )}
 
-              <div className="bg-gray-800/50 rounded-lg p-4">
-                <Users className="w-5 h-5 text-orange-400 mb-2" />
-                <div className="text-2xl font-light">{stats.participants}</div>
-                <div className="text-xs text-gray-500">Participants</div>
-              </div>
+              <StatCard label="PARTICIPANTS" value={stats.participants} icon={Users} />
             </div>
 
-            {/* Période */}
-            <div className="mt-4 flex items-center gap-2 text-sm text-gray-400">
-              <Clock className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-xs font-mono text-white/40 bg-white/5 p-2 rounded">
+              <Clock className="w-3 h-3" />
               <span>
-                Du {formatDate(stats.dateRange.start)} au {formatDate(stats.dateRange.end)}
+                TIMEFRAME: {formatDate(stats.dateRange.start)} - {formatDate(stats.dateRange.end)}
               </span>
             </div>
           </div>
         )}
 
-        {/* Messages d'erreur/succès */}
+        {/* Status Messages */}
         {error && (
-          <div className="bg-red-900/20 border border-red-600 rounded-lg p-4 mb-6">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-400 mt-0.5" />
-              <p className="text-red-400">{error}</p>
-            </div>
+          <div className="bg-red-500/10 border border-red-500/50 rounded p-4 mb-6 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />
+            <p className="text-red-500 font-mono text-sm">{error}</p>
           </div>
         )}
 
         {success && (
-          <div className="bg-green-900/20 border border-green-600 rounded-lg p-4 mb-6">
-            <div className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-400 mt-0.5" />
-              <p className="text-green-400">{success}</p>
-            </div>
+          <div className="bg-[#00f0ff]/10 border border-[#00f0ff]/50 rounded p-4 mb-6 flex items-start gap-3">
+            <CheckCircle className="w-5 h-5 text-[#00f0ff] mt-0.5" />
+            <p className="text-[#00f0ff] font-mono text-sm">{success}</p>
           </div>
         )}
 
-        {/* Boutons d'action */}
+        {/* Actions */}
         {stats && stats.newMessages > 0 ? (
           <div className="flex justify-end gap-4">
             <button
               onClick={() => router.push('/admin/feu-humain')}
-              className="px-6 py-3 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition"
+              className="px-6 py-2 border border-white/10 text-white/60 hover:text-white hover:bg-white/5 transition font-mono text-xs rounded-sm"
             >
-              Annuler
+              ABORT
             </button>
             <button
               onClick={handleImport}
               disabled={isImporting}
-              className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-500 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6 py-2 bg-[#00f0ff]/10 border border-[#00f0ff] text-[#00f0ff] hover:bg-[#00f0ff]/20 transition font-mono text-xs rounded-sm flex items-center gap-2 disabled:opacity-50"
             >
               {isImporting ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Import en cours...</span>
+                  <RefreshCw className="w-3 h-3 animate-spin" />
+                  PROCESSING...
                 </>
               ) : (
                 <>
-                  <Database className="w-4 h-4" />
-                  <span>
-                    {stats.existingArchive
-                      ? `Importer ${stats.newMessages} nouveaux messages`
-                      : "Créer l'archive et importer"}
-                  </span>
+                  <Database className="w-3 h-3" />
+                  EXECUTE_IMPORT
                 </>
               )}
             </button>
           </div>
         ) : !selectedFile ? (
-          <div className="text-center py-8 border-t border-gray-800">
-            <Flame className="w-12 h-12 text-orange-500/30 mx-auto mb-4" />
-            <p className="text-gray-400 mb-2">Aucun fichier sélectionné</p>
-            <p className="text-sm text-gray-500">
-              Sélectionnez votre fichier message_1.json pour commencer l'import
-            </p>
+          <div className="text-center py-8 border-t border-white/5">
+            <p className="text-xs font-mono text-white/30 animate-pulse">WAITING_FOR_INPUT...</p>
           </div>
         ) : stats && stats.newMessages === 0 ? (
-          <div className="text-center py-8 border-t border-gray-800">
-            <CheckCircle className="w-12 h-12 text-green-500/30 mx-auto mb-4" />
-            <p className="text-gray-400 mb-2">Tous les messages sont déjà importés</p>
-            <p className="text-sm text-gray-500">
-              Aucun nouveau message à importer dans ce fichier
-            </p>
+          <div className="text-center py-8 border-t border-white/5">
+            <CheckCircle className="w-8 h-8 text-[#00f0ff]/30 mx-auto mb-4" />
+            <p className="text-xs font-mono text-white/50">SYSTEM_UP_TO_DATE</p>
           </div>
         ) : null}
-
-        {/* Note d'information */}
-        <div className="mt-8 p-4 bg-blue-900/20 border border-blue-600/30 rounded-lg">
-          <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-400 mt-0.5" />
-            <div className="text-sm text-gray-400">
-              <p className="mb-2">
-                <strong className="text-blue-400">Import incrémental :</strong> Vous pouvez importer
-                plusieurs exports successifs. Le système détecte automatiquement les messages déjà
-                présents et n'importe que les nouveaux.
-              </p>
-              <p>
-                <strong className="text-blue-400">Médias :</strong> Les références aux médias sont
-                conservées. Pour l'instant, les fichiers doivent être placés manuellement dans le
-                dossier public/FEU HUMAIN/.
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
+    </GlassDashboard>
+  )
+}
+
+function StatCard({ label, value, icon: Icon, color = 'text-white' }: any) {
+  return (
+    <div className="bg-white/5 border border-white/5 p-4 rounded hover:border-[#00f0ff]/30 transition group">
+      <Icon
+        className={`w-4 h-4 mb-2 ${color} opacity-50 group-hover:opacity-100 transition-opacity`}
+      />
+      <div className={`text-xl font-light ${color} font-mono`}>{value.toLocaleString()}</div>
+      <div className="text-[10px] text-white/30 font-mono mt-1">{label}</div>
     </div>
   )
 }
