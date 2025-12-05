@@ -31,9 +31,9 @@ export interface LayoutConfig {
 const DEFAULT_LAYOUT: LayoutConfig = {
     width: 800,
     height: 600,
-    chargeStrength: -150,
-    linkDistance: 60,
-    collisionMultiplier: 2,
+    chargeStrength: -800,
+    linkDistance: 180,
+    collisionMultiplier: 6,
     iterations: 300,
 }
 

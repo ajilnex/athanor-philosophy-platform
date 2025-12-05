@@ -1,4 +1,4 @@
-import { GraphCanvas } from '@/components/graph/GraphCanvas'
+import { GraphCanvas } from '@/components/graph/GraphCanvas.d3'
 
 export default function GraphPage() {
   return (

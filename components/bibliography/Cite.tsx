@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useBibliography } from './BibliographyProvider'
 import { findEntry, formatShortCitation } from '@/lib/bibliography'
 
@@ -10,7 +10,19 @@ interface CiteProps {
 }
 
 export function Cite({ item, className = '' }: CiteProps) {
-  const { bibliography, addCitation, isLoading } = useBibliography()
+  const { bibliography, addCitation, getCitationNumber, isLoading } = useBibliography()
+  const [citationNumber, setCitationNumber] = useState<number | null>(null)
+
+  // Register citation in useEffect to avoid setState during render
+  useEffect(() => {
+    if (!isLoading && bibliography.length > 0) {
+      const entry = findEntry(bibliography, item)
+      if (entry) {
+        const num = addCitation(item)
+        setCitationNumber(num)
+      }
+    }
+  }, [item, isLoading, bibliography, addCitation])
 
   if (isLoading) {
     return <span className="text-subtle">[...]</span>
@@ -27,9 +39,8 @@ export function Cite({ item, className = '' }: CiteProps) {
     )
   }
 
-  // Ajouter la citation et obtenir son numéro
-  const citationNumber = addCitation(item)
   const shortCitation = formatShortCitation(entry)
+  const displayNumber = citationNumber ?? getCitationNumber?.(item) ?? '...'
 
   return (
     <span className={`inline-block ${className}`}>
@@ -39,7 +50,7 @@ export function Cite({ item, className = '' }: CiteProps) {
           className="text-accent hover:text-accent/70 no-underline font-medium"
           title={shortCitation}
         >
-          [{citationNumber}]
+          [{displayNumber}]
         </a>
       </sup>
     </span>

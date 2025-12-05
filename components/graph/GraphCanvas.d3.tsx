@@ -1,13 +1,13 @@
 'use client'
 
 /**
- * GraphCanvas - Main knowledge graph visualization component
- * Uses Canvas 2D for performance, d3-force for layout
+ * GraphCanvas - Fullscreen knowledge graph visualization
+ * Overhaul: Screen-space text rendering for sharpness + Fit View logic
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { GraphNode, GraphEdge, GraphData, GraphConfig, DEFAULT_CONFIG } from '@/lib/graph/types'
+import { GraphNode, GraphEdge, GraphData, DEFAULT_CONFIG } from '@/lib/graph/types'
 import { fetchGraphData, getNeighborIds, searchNodes } from '@/lib/graph/data-source'
 import { createLiveSimulation } from '@/lib/graph/layout-engine'
 import { Loader2, Search, Moon, Sun, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react'
@@ -42,36 +42,66 @@ interface GraphCanvasProps {
 export function GraphCanvas({ className = '', initialNightMode = false }: GraphCanvasProps) {
     const router = useRouter()
     const canvasRef = useRef<HTMLCanvasElement>(null)
-    const containerRef = useRef<HTMLDivElement>(null)
 
-    // Data state
+    // State
     const [data, setData] = useState<GraphData | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
-
-    // View state
     const [zoom, setZoom] = useState(1)
     const [pan, setPan] = useState({ x: 0, y: 0 })
     const [hoveredNode, setHoveredNode] = useState<GraphNode | null>(null)
     const [highlightedIds, setHighlightedIds] = useState<Set<string>>(new Set())
     const [nightMode, setNightMode] = useState(initialNightMode)
     const [searchQuery, setSearchQuery] = useState('')
+    const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 })
 
-    // Refs for animation
+    // Refs
     const nodesRef = useRef<GraphNode[]>([])
     const edgesRef = useRef<GraphEdge[]>([])
     const rafRef = useRef<number>(0)
     const isDraggingRef = useRef(false)
     const lastMouseRef = useRef({ x: 0, y: 0 })
+    const simulationStopRef = useRef<(() => void) | null>(null)
+    const isFirstLayoutRef = useRef(true)
 
     const colors = nightMode ? COLORS.dark : COLORS.light
+    const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1
 
-    // Load data
+    // 1. Setup canvas size based on window with HiDPI support
+    useEffect(() => {
+        const updateSize = () => {
+            const width = window.innerWidth
+            const height = window.innerHeight
+            const ratio = window.devicePixelRatio || 1
+
+            setCanvasSize({ width, height })
+
+            const canvas = canvasRef.current
+            if (canvas) {
+                // Set canvas buffer size (for crisp rendering)
+                canvas.width = width * ratio
+                canvas.height = height * ratio
+                // Set canvas display size
+                canvas.style.width = width + 'px'
+                canvas.style.height = height + 'px'
+                // Scale context to match
+                const ctx = canvas.getContext('2d')
+                if (ctx) {
+                    ctx.scale(ratio, ratio)
+                }
+            }
+        }
+
+        updateSize()
+        window.addEventListener('resize', updateSize)
+        return () => window.removeEventListener('resize', updateSize)
+    }, [])
+
+    // 2. Load data
     useEffect(() => {
         fetchGraphData()
             .then(graphData => {
                 setData(graphData)
-                nodesRef.current = graphData.nodes
                 edgesRef.current = graphData.edges
                 setLoading(false)
             })
@@ -82,40 +112,124 @@ export function GraphCanvas({ className = '', initialNightMode = false }: GraphC
             })
     }, [])
 
-    // Setup simulation when data loads
-    useEffect(() => {
-        if (!data || !containerRef.current) return
+    // Helper: Fit view to content
+    const fitView = useCallback(() => {
+        const nodes = nodesRef.current
+        const canvas = canvasRef.current
+        if (!canvas || nodes.length === 0) return
 
-        const rect = containerRef.current.getBoundingClientRect()
-        const { simulation, stop } = createLiveSimulation(
-            data.nodes,
+        // Calculate bounding box
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+        nodes.forEach(n => {
+            if (n.x === undefined || n.y === undefined) return
+            minX = Math.min(minX, n.x)
+            minY = Math.min(minY, n.y)
+            maxX = Math.max(maxX, n.x)
+            maxY = Math.max(maxY, n.y)
+        })
+
+        if (minX === Infinity) return
+
+        const contentWidth = maxX - minX
+        const contentHeight = maxY - minY
+        const padding = 100
+
+        // Calculate zoom to fit
+        const scaleX = (canvasSize.width - padding * 2) / contentWidth
+        const scaleY = (canvasSize.height - padding * 2) / contentHeight
+        const newZoom = Math.min(scaleX, scaleY, 1) // Don't zoom in too much initially
+
+        // Center point of content
+        const cx = (minX + maxX) / 2
+        const cy = (minY + maxY) / 2
+
+        // Pan to center
+        // targetPan = center of screen - (center of content * zoom)
+        const newPanX = canvasSize.width / 2 - cx * newZoom
+        const newPanY = canvasSize.height / 2 - cy * newZoom
+
+        setZoom(newZoom)
+        setPan({ x: newPanX, y: newPanY })
+    }, [canvasSize])
+
+    // 3. Setup simulation
+    useEffect(() => {
+        if (!data || canvasSize.width === 0 || canvasSize.height === 0) return
+
+        if (simulationStopRef.current) {
+            simulationStopRef.current()
+        }
+
+        const centerX = canvasSize.width / 2
+        const centerY = canvasSize.height / 2
+
+        // Initialize positions if needed
+        const scaledNodes = data.nodes.map(n => {
+            if (n.x !== undefined && n.y !== undefined) {
+                return { ...n, x: n.x + centerX, y: n.y + centerY } // Simple shift
+            }
+            return {
+                ...n,
+                x: centerX + (Math.random() - 0.5) * 50,
+                y: centerY + (Math.random() - 0.5) * 50,
+            }
+        })
+
+        nodesRef.current = scaledNodes
+
+        const { stop } = createLiveSimulation(
+            scaledNodes,
             data.edges,
-            { width: rect.width, height: rect.height },
+            {
+                width: canvasSize.width,
+                height: canvasSize.height,
+                chargeStrength: -1500,
+                linkDistance: 250,
+                collisionMultiplier: 8,
+            },
             (nodes) => {
                 nodesRef.current = nodes
+                // Auto-fit on first stabilization/tick could be jarring, 
+                // but let's do it once after a few frames if it's the first load
+                if (isFirstLayoutRef.current) {
+                    // fitView() - might be too early, user can click button
+                    isFirstLayoutRef.current = false
+                }
             }
         )
 
-        return () => stop()
-    }, [data])
+        simulationStopRef.current = stop
 
-    // Canvas rendering
+        // Initial fit after a delay to let simulation settle a bit
+        setTimeout(fitView, 500)
+
+        return () => {
+            if (simulationStopRef.current) {
+                simulationStopRef.current()
+            }
+        }
+    }, [data, canvasSize]) // Removed fitView dependency to avoid loops
+
+    // 4. Render loop
     const render = useCallback(() => {
         const canvas = canvasRef.current
         const ctx = canvas?.getContext('2d')
-        if (!canvas || !ctx) return
+        if (!canvas || !ctx || canvas.width === 0) {
+            rafRef.current = requestAnimationFrame(render)
+            return
+        }
 
-        const { width, height } = canvas
+        const { width, height } = canvasSize // Use logical size
+        // Note: ctx is already scaled by dpr
 
-        // Clear
+        // Clear (logical coords)
         ctx.fillStyle = colors.bg
         ctx.fillRect(0, 0, width, height)
 
-        // Apply transform
+        /* --- WORLD SPACE RENDERING (Edges & Nodes) --- */
         ctx.save()
-        ctx.translate(width / 2 + pan.x, height / 2 + pan.y)
+        ctx.translate(pan.x, pan.y)
         ctx.scale(zoom, zoom)
-        ctx.translate(-width / 2, -height / 2)
 
         const nodes = nodesRef.current
         const edges = edgesRef.current
@@ -124,11 +238,9 @@ export function GraphCanvas({ className = '', initialNightMode = false }: GraphC
         edges.forEach(edge => {
             const source = typeof edge.source === 'object' ? edge.source : nodes.find(n => n.id === edge.source)
             const target = typeof edge.target === 'object' ? edge.target : nodes.find(n => n.id === edge.target)
-
             if (!source?.x || !target?.x) return
 
             const isHighlighted = highlightedIds.has(source.id) && highlightedIds.has(target.id)
-
             ctx.beginPath()
             ctx.moveTo(source.x, source.y!)
             ctx.lineTo(target.x, target.y!)
@@ -143,89 +255,125 @@ export function GraphCanvas({ className = '', initialNightMode = false }: GraphC
 
             const isHovered = hoveredNode?.id === node.id
             const isHighlighted = highlightedIds.has(node.id)
-            const radius = (DEFAULT_CONFIG.nodeRadius + node.weight) / zoom
 
-            // Node circle
+            // Node visual radius
+            const baseRadius = 5 + Math.min(node.weight, 10)
+            const radius = baseRadius / Math.pow(zoom, 0.5) // Gentle scaling
+
+            // Glow
+            if (node.weight >= 2) {
+                ctx.beginPath()
+                ctx.arc(node.x, node.y, radius * 1.4, 0, Math.PI * 2)
+                ctx.fillStyle = nightMode ? 'rgba(42, 161, 152, 0.15)' : 'rgba(42, 161, 152, 0.1)'
+                ctx.fill()
+            }
+
+            // Circle
             ctx.beginPath()
             ctx.arc(node.x, node.y, radius, 0, Math.PI * 2)
             ctx.fillStyle = isHovered ? colors.nodeHover : colors.node
             ctx.fill()
 
-            // Highlight ring
+            // Highlight
             if (isHovered || isHighlighted) {
                 ctx.beginPath()
-                ctx.arc(node.x, node.y, radius + 3 / zoom, 0, Math.PI * 2)
+                ctx.arc(node.x, node.y, radius + 2 / zoom, 0, Math.PI * 2)
                 ctx.strokeStyle = colors.nodeHover
                 ctx.lineWidth = 2 / zoom
                 ctx.stroke()
             }
-
-            // Label (show when zoomed or hovered)
-            if (zoom > DEFAULT_CONFIG.labelZoomThreshold || isHovered || node.weight > 5) {
-                ctx.font = `${12 / zoom}px system-ui, sans-serif`
-                ctx.textAlign = 'center'
-                ctx.textBaseline = 'top'
-                ctx.fillStyle = isHovered ? colors.textHover : colors.text
-                ctx.fillText(node.label, node.x, node.y + radius + 4 / zoom)
-            }
         })
 
         ctx.restore()
+        /* --- END WORLD SPACE --- */
+
+        /* --- SCREEN SPACE RENDERING (Text) --- */
+        // Now drawing in screen coordinates (logical pixels)
+        // Guaranteed sharp text
+        nodes.forEach(node => {
+            if (!node.x || !node.y) return
+
+            const isHovered = hoveredNode?.id === node.id
+            const isHighlighted = highlightedIds.has(node.id)
+
+            // Re-calculate screen position
+            const screenX = node.x * zoom + pan.x
+            const screenY = node.y * zoom + pan.y
+
+            // Culling - check if off screen
+            if (screenX < -100 || screenX > width + 100 || screenY < -100 || screenY > height + 100) return
+
+            // Visibility logic
+            const showLabel = isHovered || isHighlighted ||
+                (zoom > 0.6) ||
+                (node.weight > 5 && zoom > 0.4)
+
+            if (showLabel) {
+                let label = node.label
+                const maxLen = isHovered ? 50 : 25
+                if (label.length > maxLen) {
+                    label = label.substring(0, maxLen - 1) + '…'
+                }
+
+                const baseRadius = 5 + Math.min(node.weight, 10)
+                const nodeRadius = baseRadius / Math.pow(zoom, 0.5)
+                const scaledRadius = nodeRadius * zoom // actual screen size of node
+
+                const fontSize = isHovered ? 14 : 12
+                ctx.font = `${fontSize}px 'IBM Plex Serif', Georgia, serif`
+                ctx.textAlign = 'center'
+                ctx.textBaseline = 'top'
+
+                const textY = screenY + scaledRadius + 4
+
+                ctx.strokeStyle = nightMode ? '#002b36' : '#fdf6e3'
+                ctx.lineWidth = 3
+                ctx.lineJoin = 'round'
+                ctx.strokeText(label, screenX, textY)
+
+                ctx.fillStyle = isHovered ? colors.textHover : colors.text
+                ctx.fillText(label, screenX, textY)
+            }
+        })
 
         rafRef.current = requestAnimationFrame(render)
-    }, [zoom, pan, hoveredNode, highlightedIds, colors])
+    }, [zoom, pan, hoveredNode, highlightedIds, colors, nightMode, canvasSize])
 
-    // Start render loop
+    // Loop logic
     useEffect(() => {
         rafRef.current = requestAnimationFrame(render)
         return () => cancelAnimationFrame(rafRef.current)
     }, [render])
 
-    // Handle resize
-    useEffect(() => {
-        const handleResize = () => {
-            const canvas = canvasRef.current
-            const container = containerRef.current
-            if (!canvas || !container) return
-
-            const rect = container.getBoundingClientRect()
-            canvas.width = rect.width
-            canvas.height = rect.height
-        }
-
-        handleResize()
-        window.addEventListener('resize', handleResize)
-        return () => window.removeEventListener('resize', handleResize)
-    }, [])
-
-    // Screen to graph coordinates
+    // Interactions
     const screenToGraph = useCallback((screenX: number, screenY: number) => {
         const canvas = canvasRef.current
         if (!canvas) return { x: 0, y: 0 }
-
-        const rect = canvas.getBoundingClientRect()
-        const x = (screenX - rect.left - rect.width / 2 - pan.x) / zoom + rect.width / 2
-        const y = (screenY - rect.top - rect.height / 2 - pan.y) / zoom + rect.height / 2
-        return { x, y }
+        // Simple inverse, rect.left/top usually 0 in fullscreen
+        return {
+            x: (screenX - pan.x) / zoom,
+            y: (screenY - pan.y) / zoom,
+        }
     }, [zoom, pan])
 
-    // Find node at position
     const findNodeAt = useCallback((graphX: number, graphY: number): GraphNode | null => {
         const nodes = nodesRef.current
         for (let i = nodes.length - 1; i >= 0; i--) {
             const node = nodes[i]
             if (!node.x || !node.y) continue
-            const radius = DEFAULT_CONFIG.nodeRadius + node.weight
+            // Hit testing needs to account for visual size
+            const baseRadius = 5 + Math.min(node.weight, 10)
+            const radius = baseRadius / Math.pow(zoom, 0.5)
+
             const dx = graphX - node.x
             const dy = graphY - node.y
-            if (dx * dx + dy * dy < radius * radius * 4) {
+            if (dx * dx + dy * dy < radius * radius * 4) { // Generous hit area
                 return node
             }
         }
         return null
-    }, [])
+    }, [zoom])
 
-    // Mouse handlers
     const handleMouseMove = useCallback((e: React.MouseEvent) => {
         if (isDraggingRef.current) {
             const dx = e.clientX - lastMouseRef.current.x
@@ -259,10 +407,8 @@ export function GraphCanvas({ className = '', initialNightMode = false }: GraphC
 
     const handleClick = useCallback((e: React.MouseEvent) => {
         if (isDraggingRef.current) return
-
         const { x, y } = screenToGraph(e.clientX, e.clientY)
         const node = findNodeAt(x, y)
-
         if (node && node.type === 'BILLET' && node.slug) {
             router.push(`/billets/${node.slug}`)
         }
@@ -270,34 +416,29 @@ export function GraphCanvas({ className = '', initialNightMode = false }: GraphC
 
     const handleWheel = useCallback((e: React.WheelEvent) => {
         e.preventDefault()
+        // Infinite zoom but clamped to sane values for safety
         const delta = e.deltaY > 0 ? 0.9 : 1.1
-        setZoom(z => Math.max(0.2, Math.min(5, z * delta)))
+        setZoom(z => Math.max(0.01, Math.min(10, z * delta)))
     }, [])
 
-    // Search
     const handleSearch = useCallback((query: string) => {
         setSearchQuery(query)
         if (!data) return
-
         const found = searchNodes(query, data.nodes)
         if (found && found.x && found.y) {
-            const canvas = canvasRef.current
-            if (!canvas) return
-
+            const targetZoom = 2
             setPan({
-                x: canvas.width / 2 - found.x * zoom,
-                y: canvas.height / 2 - found.y * zoom,
+                x: canvasSize.width / 2 - found.x * targetZoom,
+                y: canvasSize.height / 2 - found.y * targetZoom,
             })
-            setZoom(2)
+            setZoom(targetZoom)
             setHoveredNode(found)
             setHighlightedIds(getNeighborIds(found.id, data.edges))
         }
-    }, [data, zoom])
+    }, [data, canvasSize])
 
-    // Zoom controls
-    const zoomIn = () => setZoom(z => Math.min(5, z * 1.3))
-    const zoomOut = () => setZoom(z => Math.max(0.2, z / 1.3))
-    const resetView = () => { setZoom(1); setPan({ x: 0, y: 0 }) }
+    const zoomIn = () => setZoom(z => Math.min(10, z * 1.3))
+    const zoomOut = () => setZoom(z => Math.max(0.01, z / 1.3))
 
     if (loading) {
         return (
@@ -317,11 +458,11 @@ export function GraphCanvas({ className = '', initialNightMode = false }: GraphC
     }
 
     return (
-        <div ref={containerRef} className={`relative w-full h-full overflow-hidden ${className}`} style={{ background: colors.bg }}>
-            {/* Canvas */}
+        <div className={`relative w-full h-full overflow-hidden ${className}`} style={{ background: colors.bg }}>
             <canvas
                 ref={canvasRef}
-                className="absolute inset-0 cursor-grab active:cursor-grabbing"
+                className="block cursor-grab active:cursor-grabbing"
+                style={{ width: '100%', height: '100%' }}
                 onMouseMove={handleMouseMove}
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
@@ -332,7 +473,6 @@ export function GraphCanvas({ className = '', initialNightMode = false }: GraphC
 
             {/* Controls */}
             <div className="absolute top-4 left-4 z-10 flex flex-col gap-2 w-64">
-                {/* Search */}
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: colors.text }} />
                     <input
@@ -344,12 +484,10 @@ export function GraphCanvas({ className = '', initialNightMode = false }: GraphC
                         style={{
                             background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
                             color: colors.text,
-                            borderColor: 'transparent',
                         }}
                     />
                 </div>
 
-                {/* Hovered node info */}
                 {hoveredNode && (
                     <div
                         className="rounded-lg p-3 backdrop-blur-sm"
@@ -364,58 +502,24 @@ export function GraphCanvas({ className = '', initialNightMode = false }: GraphC
                 )}
             </div>
 
-            {/* Right controls */}
+            {/* Bottom controls */}
             <div className="absolute bottom-4 right-4 z-10 flex gap-2">
-                <button
-                    onClick={() => setNightMode(n => !n)}
-                    className="p-2 rounded-lg transition-colors"
-                    style={{
-                        background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                        color: colors.text,
-                    }}
-                >
+                <button onClick={() => setNightMode(n => !n)} className="p-2 rounded-lg" style={{ background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', color: colors.text }}>
                     {nightMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </button>
-                <button
-                    onClick={resetView}
-                    className="p-2 rounded-lg transition-colors"
-                    style={{
-                        background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                        color: colors.text,
-                    }}
-                >
+                <button onClick={fitView} className="p-2 rounded-lg" style={{ background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', color: colors.text }}>
                     <Maximize2 className="w-5 h-5" />
                 </button>
-                <button
-                    onClick={zoomOut}
-                    className="p-2 rounded-lg transition-colors"
-                    style={{
-                        background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                        color: colors.text,
-                    }}
-                >
+                <button onClick={zoomOut} className="p-2 rounded-lg" style={{ background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', color: colors.text }}>
                     <ZoomOut className="w-5 h-5" />
                 </button>
-                <button
-                    onClick={zoomIn}
-                    className="p-2 rounded-lg transition-colors"
-                    style={{
-                        background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                        color: colors.text,
-                    }}
-                >
+                <button onClick={zoomIn} className="p-2 rounded-lg" style={{ background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', color: colors.text }}>
                     <ZoomIn className="w-5 h-5" />
                 </button>
             </div>
 
             {/* Zoom indicator */}
-            <div
-                className="absolute bottom-4 left-4 text-xs px-2 py-1 rounded"
-                style={{
-                    background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                    color: colors.text,
-                }}
-            >
+            <div className="absolute bottom-4 left-4 text-xs px-2 py-1 rounded" style={{ background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', color: colors.text }}>
                 {Math.round(zoom * 100)}%
             </div>
         </div>

@@ -50,11 +50,14 @@ export interface GraphConfig {
     linkOpacity: number
     /** Enable night mode */
     nightMode: boolean
+    /** Minimum degree for labels to be always visible */
+    minDegreeForLabel: number
 }
 
 export const DEFAULT_CONFIG: GraphConfig = {
-    labelZoomThreshold: 1.2,
-    nodeRadius: 6,
-    linkOpacity: 0.3,
+    labelZoomThreshold: 0.8,
+    nodeRadius: 10,
+    linkOpacity: 0.25,
     nightMode: false,
+    minDegreeForLabel: 2,
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { GraphCanvas } from '@/components/graph/GraphCanvas'
+import { ForceGraphCanvas } from '@/components/graph/ForceGraphCanvas'
 
 export const metadata: Metadata = {
   title: 'Constellation',
@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 
 export default function ConstellationPage() {
   return (
-    <div className="h-screen w-screen">
-      <GraphCanvas className="h-full w-full" />
+    <div className="fixed inset-0 z-40">
+      <ForceGraphCanvas className="w-full h-full" />
     </div>
   )
 }
