@@ -22,9 +22,9 @@ import {
 } from 'lucide-react'
 import { GlassDashboard } from './components/GlassDashboard'
 import { TimelineSidebar } from './components/TimelineSidebar'
-import { StatsPanel } from './components/StatsPanel'
+import { StatsPanel } from '@/lib/archive/feu-humain/components/StatsPanel'
 import { MediaGrid } from './components/MediaGrid'
-import { WelcomeIntro } from './components/WelcomeIntro'
+import { WelcomeIntro } from '@/lib/archive/feu-humain/components/WelcomeIntro'
 
 interface Archive {
   id: string
