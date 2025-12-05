@@ -1,0 +1,21 @@
+# Large data directories - not needed in serverless functions
+FEU/
+LUCE/
+
+# Development/testing files
+*.bib
+clean_feu_humain.py
+clean_feu.sh
+test-*.sh
+debug-encoding.ts
+test-encoding.js
+
+# Editor/IDE
+.claude/
+.swc/
+.npm-cache/
+
+# Test outputs
+playwright-report/
+test-results/
+coverage/
