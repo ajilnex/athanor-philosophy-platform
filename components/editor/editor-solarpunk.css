@@ -3,25 +3,17 @@
    Based on Solarized palette with organic, biologically-inspired touches
    ═══════════════════════════════════════════════════════════════════ */
 
-/* ─── Solarized Palette ─────────────────────────────────────────────── */
-.editor-solarpunk {
+/* ─── Global Solarized Palette (available everywhere) ───────────────── */
+:root {
     /* Base tones */
     --base03: #002b36;
-    /* Deep background (night mode) */
     --base02: #073642;
-    /* Dark background */
     --base01: #586e75;
-    /* Muted content */
     --base00: #657b83;
-    /* Body text (dark theme) */
     --base0: #839496;
-    /* Body text (light theme) */
     --base1: #93a1a1;
-    /* Secondary content */
     --base2: #eee8d5;
-    /* Highlight background */
     --base3: #fdf6e3;
-    /* Main background */
 
     /* Accent colors */
     --yellow: #b58900;
@@ -32,7 +24,10 @@
     --blue: #268bd2;
     --cyan: #2aa198;
     --green: #859900;
+}
 
+/* ─── Editor-specific tokens ────────────────────────────────────────── */
+.editor-solarpunk {
     /* Semantic tokens */
     --editor-bg: var(--base3);
     --editor-bg-alt: var(--base2);
