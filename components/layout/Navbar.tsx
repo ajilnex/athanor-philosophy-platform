@@ -6,17 +6,16 @@ import { useSession, signOut } from 'next-auth/react'
 import { useEffect, useRef, useState } from 'react'
 import { Menu, X } from 'lucide-react'
 
-function NavItem({ href, children }: { href: string; children: React.ReactNode }) {
+function NavItem({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) {
   const pathname = usePathname()
   const active = pathname === href
   return (
     <Link
       href={href}
-      className={`px-3 py-2 text-sm font-light transition-all duration-200 ${
-        active
-          ? 'text-foreground underline underline-offset-4 decoration-1'
-          : 'text-subtle hover:text-foreground'
-      }`}
+      className={`px-3 py-2 text-sm font-light transition-all duration-200 ${active
+        ? 'text-foreground underline underline-offset-4 decoration-1'
+        : 'text-subtle hover:text-foreground'
+        } ${className || ''}`}
     >
       {children}
     </Link>
@@ -70,6 +69,7 @@ export function Navbar() {
           <NavItem href="/billets">Billets</NavItem>
           <NavItem href="/publications">Publications</NavItem>
           <NavItem href="/constellation">Constellation</NavItem>
+          <NavItem href="/archive" className="!text-[color-mix(in_srgb,var(--foreground)_85%,#38bdf8_15%)]">Archive</NavItem>
           <NavItem href="/search">Recherche</NavItem>
           {session ? (
             <button
@@ -149,6 +149,13 @@ export function Navbar() {
                 className="px-3 py-2 text-base rounded hover:bg-muted transition"
               >
                 Constellation
+              </Link>
+              <Link
+                href="/archive"
+                onClick={() => setOpen(false)}
+                className="px-3 py-2 text-base rounded hover:bg-muted transition text-[color-mix(in_srgb,currentColor_85%,#38bdf8_15%)]"
+              >
+                Archive
               </Link>
               <Link
                 href="/search"

@@ -4,11 +4,10 @@ import FeuHumainClient from './client'
 import { Loader2 } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Archive FEU HUMAIN | Administration',
+  title: 'Archive FEU HUMAIN | Athanor',
   description:
     "Archive complète de la conversation légendaire FEU HUMAIN - Une œuvre d'art numérique préservant les moments partagés",
   keywords: 'archive, conversation, messenger, feu humain, art numérique, mémoire collective',
-  robots: 'noindex, nofollow',
 }
 
 function LoadingFallback() {

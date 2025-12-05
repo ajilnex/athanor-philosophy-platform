@@ -1,13 +1,5 @@
 import { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './feu-humain.css'
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-sans',
-  display: 'swap',
-})
 
 export const metadata: Metadata = {
   title: 'Archive FEU HUMAIN',
@@ -23,10 +15,8 @@ export const metadata: Metadata = {
 }
 
 export default function ArchiveLayout({ children }: { children: React.ReactNode }) {
-  // Archive uses its own full-screen immersive layout
-  // Completely separate from the main site design
   return (
-    <div className={`archive-root ${inter.variable}`}>
+    <div className="archive-root">
       {children}
     </div>
   )

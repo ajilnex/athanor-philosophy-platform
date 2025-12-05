@@ -24,7 +24,6 @@ import { GlassDashboard } from './components/GlassDashboard'
 import { TimelineSidebar } from './components/TimelineSidebar'
 import { StatsPanel } from './components/StatsPanel'
 import { MediaGrid } from './components/MediaGrid'
-import { WelcomeIntro } from './components/WelcomeIntro'
 
 interface Archive {
   id: string
@@ -35,6 +34,16 @@ interface Archive {
     id: string
     name: string
     messageCount: number
+    firstActivity?: string | null
+    lastActivity?: string | null
+  }>
+  departedParticipants?: Array<{
+    id: string
+    name: string
+    messageCount: number
+    firstActivity?: string | null
+    lastActivity?: string | null
+    isDeparted: boolean
   }>
   stats: {
     totalMessages: number
@@ -88,13 +97,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [selectedMedia, setSelectedMedia] = useState<any>(null)
   const [showStats, setShowStats] = useState(false)
-  const [showWelcome, setShowWelcome] = useState(() => {
-    // Check if user has already seen the welcome screen
-    if (typeof window !== 'undefined') {
-      return !localStorage.getItem('archive-welcome-dismissed')
-    }
-    return true
-  })
+  const [filterBySender, setFilterBySender] = useState<string | null>(null)
 
   // Derive current filters from URL or state
   const startDate = searchParams.get('startDate')
@@ -161,6 +164,13 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
 
         if (startDate) {
           params.append('startDate', startDate)
+        } else if (!debouncedSearch && !filterBySender && filterType === 'all') {
+          // No filters: load from beginning to show intro
+          params.append('fromBeginning', 'true')
+        }
+
+        if (filterBySender) {
+          params.append('sender', filterBySender)
         }
 
         const res = await fetch(`/api/archive/${archiveSlug}/messages?${params}`)
@@ -168,6 +178,8 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
 
         setMessages(data.messages)
         setHasMore(data.pagination.hasNext)
+        // hasPrev is true if we navigated to a specific date (not at the beginning)
+        setHasPrev(startDate ? true : (data.pagination.hasPrev || false))
         setPage(1)
 
         // Scroll to top when filter changes
@@ -188,7 +200,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
     }
 
     loadFilteredMessages()
-  }, [filterType, debouncedSearch, archiveSlug, archive, startDate])
+  }, [filterType, debouncedSearch, archiveSlug, archive, startDate, filterBySender])
 
   // Charger plus de messages (vers le bas / futur)
   const loadMore = useCallback(async () => {
@@ -227,7 +239,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
 
   // Charger les messages précédents (vers le haut / passé)
   const [loadingPrev, setLoadingPrev] = useState(false)
-  const [hasPrev, setHasPrev] = useState(true) // Assume true initially if we started from a date
+  const [hasPrev, setHasPrev] = useState(() => !!searchParams.get('startDate')) // Only true if started from a specific date
   const loadPrevRef = useRef<HTMLDivElement>(null)
 
   const loadPrevious = useCallback(async () => {
@@ -394,20 +406,6 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
 
   return (
     <GlassDashboard>
-      {/* Welcome Intro - Shows on first visit */}
-      {showWelcome && archive && (
-        <WelcomeIntro
-          archiveTitle={archive.title}
-          messageCount={archive.stats.totalMessages}
-          participantCount={archive.stats.participantCount}
-          startYear={archive.stats.startDate?.split('-')[0] || '2015'}
-          endYear={archive.stats.endDate?.split('-')[0] || '2024'}
-          onDismiss={() => {
-            setShowWelcome(false)
-            localStorage.setItem('archive-welcome-dismissed', 'true')
-          }}
-        />
-      )}
 
       {/* Header */}
       <header className="h-16 glass-header flex items-center justify-between px-6 z-50 shrink-0">
@@ -563,17 +561,66 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
                   </div>
                 )}
 
-                {/* Participants */}
+                {/* Participants - clickable to filter */}
                 {archive.participants && archive.participants.length > 0 && (
                   <div className="stat-card">
-                    <p className="hud-label mb-3">Participants ({archive.participants.length})</p>
-                    <div className="space-y-2">
-                      {archive.participants.map((p: { id: string; name: string; messageCount: number }) => (
-                        <div key={p.id} className="flex items-center justify-between">
-                          <span className="text-sm text-[var(--text-secondary)] truncate max-w-[160px]">{p.name}</span>
-                          <span className="text-xs text-[var(--accent)] font-mono ml-2">{p.messageCount.toLocaleString()}</span>
-                        </div>
-                      ))}
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="hud-label">Participants ({archive.participants.length})</p>
+                      {filterBySender && (
+                        <button
+                          onClick={() => setFilterBySender(null)}
+                          className="text-[10px] text-[var(--warm)] hover:text-[var(--accent)] transition"
+                        >
+                          Effacer filtre
+                        </button>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      {[
+                        ...archive.participants.map((p: any) => ({ ...p })),
+                        ...(archive.departedParticipants || []).map((p: any) => ({ ...p }))
+                      ].sort((a, b) => (b.messageCount + (b.reactionCount || 0)) - (a.messageCount + (a.reactionCount || 0))).map((p: { id: string; name: string; messageCount: number; reactionCount?: number; isDeparted?: boolean; lastActivity?: string | null }) => {
+                        const departDate = p.isDeparted && p.lastActivity
+                          ? new Date(p.lastActivity).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })
+                          : null
+                        const totalActivity = p.messageCount + (p.reactionCount || 0)
+                        return (
+                          <button
+                            key={p.id}
+                            onClick={() => setFilterBySender(filterBySender === p.name ? null : p.name)}
+                            className={`w-full flex items-center justify-between px-2 py-1.5 rounded-lg transition text-left ${filterBySender === p.name
+                              ? p.isDeparted
+                                ? 'bg-[var(--warm-dim)] border border-[var(--warm)]'
+                                : 'bg-[var(--accent-dim)] border border-[var(--accent)]'
+                              : 'hover:bg-[var(--abyss)] border border-transparent'
+                              }`}
+                          >
+                            <div className="flex flex-col min-w-0">
+                              <span className={`text-sm truncate max-w-[140px] ${filterBySender === p.name
+                                ? p.isDeparted ? 'text-[var(--warm)] font-medium' : 'text-[var(--accent)] font-medium'
+                                : p.isDeparted ? 'text-[var(--text-tertiary)]' : 'text-[var(--text-secondary)]'
+                                }`}>
+                                {p.name}
+                              </span>
+                              {departDate && (
+                                <span className="text-[10px] text-[var(--text-ghost)]">
+                                  Parti en {departDate}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex flex-col items-end">
+                              <span className={`text-xs font-mono ${p.isDeparted ? 'text-[var(--text-ghost)]' : 'text-[var(--accent)]'}`}>
+                                {totalActivity.toLocaleString()}
+                              </span>
+                              {p.reactionCount && p.reactionCount > 0 && (
+                                <span className="text-[9px] text-[var(--text-ghost)]">
+                                  {p.messageCount} + {p.reactionCount}
+                                </span>
+                              )}
+                            </div>
+                          </button>
+                        )
+                      })}
                     </div>
                   </div>
                 )}
@@ -590,23 +637,94 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
           ref={messageStreamRef}
         >
           <div className="max-w-4xl mx-auto px-4 py-8 min-h-full">
+            {/* Intro Header - Only visible at beginning of archive */}
+            {!hasPrev && messages.length > 0 && (
+              <div className="py-12 mb-8">
+                <div className="max-w-2xl mx-auto text-center mb-12 px-4">
+                  <p className="text-[10px] text-[var(--accent)] font-mono uppercase tracking-[0.3em] mb-4 opacity-60">
+                    Vous entrez dans l'archive
+                  </p>
+                  <h2 className="text-2xl md:text-3xl font-medium text-[var(--text-bright)] mb-6 leading-relaxed">
+                    {archive.title}
+                  </h2>
+
+                  <div className="space-y-4 text-[var(--text-secondary)] text-sm md:text-base leading-relaxed">
+                    <p>
+                      Ici reposent <span className="text-[var(--accent)] font-mono">{archive.stats.totalMessages.toLocaleString()}</span> fragments
+                      d'une conversation qui s'étend sur <span className="text-[var(--accent)] font-mono">{parseInt(archive.stats.endDate?.split('-')[0] || '2024') - parseInt(archive.stats.startDate?.split('-')[0] || '2015')}</span> années.
+                    </p>
+
+                    <p className="text-[var(--text-tertiary)] italic">
+                      Ne vous y trompez pas : si une seule main a tapé la plupart de ces mots,
+                      <span className="text-[var(--warm)]"> {archive.participants.length} esprits</span> ont possédé
+                      ce corps tour à tour, insufflant chacun leur part d'absurde,
+                      de tendresse et de chaos dans ce flux textuel.
+                    </p>
+
+                    <p className="text-xs text-[var(--text-ghost)]">
+                      Chaque message est un nœud dans un réseau de significations.
+                      Naviguez dans le temps avec la timeline, ou laissez-vous porter par le courant.
+                    </p>
+                  </div>
+
+                  {/* Stats mini */}
+                  <div className="flex justify-center gap-8 mt-8 pt-6 border-t border-[var(--border-subtle)]">
+                    <div className="text-center">
+                      <p className="text-xl hud-value">{archive.stats.totalMessages.toLocaleString()}</p>
+                      <p className="text-[10px] text-[var(--text-ghost)] uppercase tracking-wider">messages</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xl hud-value">{archive.stats.photos + archive.stats.videos}</p>
+                      <p className="text-[10px] text-[var(--text-ghost)] uppercase tracking-wider">médias</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xl hud-value">{archive.stats.startDate?.split('-')[0]}–{archive.stats.endDate?.split('-')[0]}</p>
+                      <p className="text-[10px] text-[var(--text-ghost)] uppercase tracking-wider">période</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Separator */}
+                <div className="flex items-center gap-4 max-w-md mx-auto">
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent to-[var(--border-subtle)]" />
+                  <p className="text-[10px] font-mono text-[var(--text-ghost)] uppercase tracking-widest">
+                    {hasPrev ? 'Suite de l\'archive' : 'Début de l\'archive'}
+                  </p>
+                  <div className="flex-1 h-px bg-gradient-to-l from-transparent to-[var(--border-subtle)]" />
+                </div>
+              </div>
+            )}
+
+            {/* Active Filter Banner */}
+            {filterBySender && (
+              <div className="mb-6 p-4 rounded-xl bg-[var(--accent-dim)] border border-[var(--accent)] flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-[var(--text-bright)]">
+                    Affichage des messages de <span className="font-semibold text-[var(--accent)]">{filterBySender}</span>
+                  </p>
+                  <p className="text-xs text-[var(--text-tertiary)] mt-0.5">
+                    Cliquez sur un message pour voir son contexte dans l'archive
+                  </p>
+                </div>
+                <button
+                  onClick={() => setFilterBySender(null)}
+                  className="px-3 py-1.5 rounded-lg bg-[var(--card)] border border-[var(--border-default)] text-xs text-[var(--text-secondary)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition"
+                >
+                  Voir tout
+                </button>
+              </div>
+            )}
+
             <div className="space-y-1">
               {/* Auto-load trigger for PREVIOUS messages */}
               {hasPrev && messages.length > 0 && (
                 <div ref={loadPrevRef} className="py-4 flex justify-center">
                   {loadingPrev && (
-                    <div className="flex items-center gap-2 text-[#00f0ff]/50 font-mono text-xs">
+                    <div className="flex items-center gap-2 text-[var(--accent)]/50 font-mono text-xs">
                       <Loader2 className="w-3 h-3 animate-spin" />
-                      LOADING_HISTORY...
+                      Chargement...
                     </div>
                   )}
-                </div>
-              )}
-
-              {!hasPrev && messages.length > 0 && (
-                <div className="py-8 text-center">
-                  <div className="w-full h-px bg-gradient-to-r from-transparent via-[#00f0ff]/20 to-transparent mb-4" />
-                  <p className="text-xs font-mono text-[#00f0ff]/40">BEGINNING OF ARCHIVE</p>
                 </div>
               )}
 
@@ -624,6 +742,15 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
                     showHeader={showHeader}
                     formatDate={formatDate}
                     onMediaClick={setSelectedMedia}
+                    isFiltered={!!filterBySender}
+                    onGoToContext={() => {
+                      // Clear filter and navigate to message date
+                      const dateOnly = message.date.split('T')[0]
+                      setFilterBySender(null)
+                      const params = new URLSearchParams(searchParams.toString())
+                      params.set('startDate', dateOnly)
+                      router.push(`${pathname}?${params.toString()}`)
+                    }}
                   />
                 )
               })}
@@ -660,22 +787,6 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
               </div>
             )}
           </div>
-
-          {/* Scroll Controls */}
-          <div className="fixed bottom-8 right-8 flex flex-col gap-2 z-50">
-            <button
-              onClick={scrollToTop}
-              className="p-3 bg-black/50 backdrop-blur border border-[#00f0ff]/20 rounded-full text-[#00f0ff]/50 hover:text-[#00f0ff] hover:border-[#00f0ff] transition shadow-lg"
-            >
-              <ArrowLeft className="w-4 h-4 rotate-90" />
-            </button>
-            <button
-              onClick={scrollToBottom}
-              className="p-3 bg-black/50 backdrop-blur border border-[#00f0ff]/20 rounded-full text-[#00f0ff]/50 hover:text-[#00f0ff] hover:border-[#00f0ff] transition shadow-lg"
-            >
-              <ArrowLeft className="w-4 h-4 -rotate-90" />
-            </button>
-          </div>
         </main>
       </div>
 
@@ -700,11 +811,14 @@ function FilterButton({ active, onClick, label, icon }: any) {
   )
 }
 
-function MessageItem({ message, showHeader, formatDate, onMediaClick }: any) {
+function MessageItem({ message, showHeader, formatDate, onMediaClick, isFiltered, onGoToContext }: any) {
   const isMe = message.sender === 'Aubin Robert'
 
   return (
-    <div className={`group animate-fadeIn ${showHeader ? 'mt-6' : 'mt-0.5'}`}>
+    <div
+      className={`group animate-fadeIn ${showHeader ? 'mt-6' : 'mt-0.5'} ${isFiltered ? 'cursor-pointer' : ''}`}
+      onClick={isFiltered ? onGoToContext : undefined}
+    >
       {showHeader && (
         <div className="flex items-baseline gap-3 mb-1.5 px-4">
           <span
@@ -713,11 +827,16 @@ function MessageItem({ message, showHeader, formatDate, onMediaClick }: any) {
             {message.sender}
           </span>
           <span className="text-xs text-[var(--text-ghost)]">{formatDate(message.date)}</span>
+          {isFiltered && (
+            <span className="text-[10px] text-[var(--accent)] opacity-0 group-hover:opacity-100 transition-opacity">
+              → Voir le contexte
+            </span>
+          )}
         </div>
       )}
 
       <div
-        className={`message-block px-4 py-1.5 transition-colors ${showHeader ? 'border-l-2 border-[var(--border-subtle)]' : 'border-l-2 border-transparent ml-[2px]'}`}
+        className={`message-block px-4 py-1.5 transition-colors ${showHeader ? 'border-l-2 border-[var(--border-subtle)]' : 'border-l-2 border-transparent ml-[2px]'} ${isFiltered ? 'group-hover:bg-[var(--accent-dim)] group-hover:border-[var(--accent)]' : ''}`}
       >
         {/* Text Content */}
         {message.content && (
@@ -727,20 +846,28 @@ function MessageItem({ message, showHeader, formatDate, onMediaClick }: any) {
         )}
 
         {/* Media Grid */}
-        <MediaGrid media={message.media} onMediaClick={onMediaClick} />
+        <MediaGrid media={message.media} onMediaClick={(m: any) => {
+          // Prevent navigation when clicking media
+          if (!isFiltered) onMediaClick(m)
+        }} />
 
-        {/* Reactions */}
+        {/* Reactions - show who reacted */}
         {message.reactions.length > 0 && (
-          <div className="flex gap-1.5 mt-2">
-            {message.reactions.map((r: any, i: number) => (
-              <span
-                key={i}
-                className="text-xs bg-[var(--elevated)] px-2 py-0.5 rounded text-[var(--text-secondary)] border border-[var(--border-subtle)]"
-                title={r.actor}
-              >
-                {r.reaction}
-              </span>
-            ))}
+          <div className="flex flex-wrap gap-1.5 mt-2" onClick={(e) => e.stopPropagation()}>
+            {message.reactions.map((r: any, i: number) => {
+              // Extract first name only
+              const firstName = r.actor?.split(' ')[0] || 'Quelqu\'un'
+              return (
+                <span
+                  key={i}
+                  className="inline-flex items-center gap-1 text-xs bg-[var(--card)] px-2 py-0.5 rounded-full border border-[var(--border-subtle)] hover:border-[var(--accent)] transition-colors cursor-default"
+                  title={r.actor}
+                >
+                  <span className="text-sm">{r.reaction}</span>
+                  <span className="text-[var(--text-tertiary)] text-[10px]">{firstName}</span>
+                </span>
+              )
+            })}
           </div>
         )}
       </div>

@@ -1,50 +1,63 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   ARCHIVE DESIGN SYSTEM — Premium Sci-Fi Aesthetic
-   Inspired by: Blade Runner 2049, Dune, Ex Machina UI
+   ARCHIVE DESIGN SYSTEM — Solarpunk Light Aesthetic
+   Inspired by: Solarized Light, Solarpunk, Optimistic Futures
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   COLOR PALETTE — Sophisticated Sci-Fi
+   COLOR PALETTE — Warm Light with Natural Accents
    ───────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Core Background Layers */
-  --void: #030304;
-  --abyss: #08090b;
-  --surface: #0d0e11;
-  --elevated: #12141a;
-  --card: #181b23;
+  /* Core Background Layers - Warm Cream/Paper tones */
+  --void: #fdf6e3;
+  /* Base — warm cream (Solarized base3) */
+  --abyss: #eee8d5;
+  /* Secondary — slightly darker */
+  --surface: #f5efe0;
+  /* Cards, elevated surfaces */
+  --elevated: #fdf6e3;
+  /* Elevated elements */
+  --card: #fffbf0;
+  /* Pure cards — almost white */
 
-  /* Primary Accent — Electric Teal (sophisticated, not harsh) */
-  --accent: #40e0d0;
-  --accent-bright: #5ff5e6;
-  --accent-dim: rgba(64, 224, 208, 0.15);
-  --accent-glow: rgba(64, 224, 208, 0.4);
+  /* Primary Accent — Teal/Cyan (Solarized cyan) */
+  --accent: #2aa198;
+  --accent-bright: #35bcb0;
+  --accent-dim: rgba(42, 161, 152, 0.12);
+  --accent-glow: rgba(42, 161, 152, 0.25);
 
-  /* Secondary Accent — Warm Amber (for contrast moments) */
-  --warm: #f4a261;
-  --warm-dim: rgba(244, 162, 97, 0.15);
+  /* Secondary Accent — Warm Orange (Solarpunk energy) */
+  --warm: #cb4b16;
+  --warm-dim: rgba(203, 75, 22, 0.1);
 
-  /* Tertiary — Subtle Violet (for depth) */
-  --violet: #9d8cff;
-  --violet-dim: rgba(157, 140, 255, 0.1);
+  /* Tertiary — Violet/Magenta (Solarized violet) */
+  --violet: #6c71c4;
+  --violet-dim: rgba(108, 113, 196, 0.08);
 
   /* Status Colors */
-  --success: #4ade80;
-  --warning: #fbbf24;
-  --error: #f87171;
+  --success: #859900;
+  /* Solarized green */
+  --warning: #b58900;
+  /* Solarized yellow */
+  --error: #dc322f;
+  /* Solarized red */
 
-  /* Text Hierarchy */
-  --text-bright: rgba(255, 255, 255, 0.95);
-  --text-primary: rgba(255, 255, 255, 0.85);
-  --text-secondary: rgba(255, 255, 255, 0.55);
-  --text-tertiary: rgba(255, 255, 255, 0.35);
-  --text-ghost: rgba(255, 255, 255, 0.15);
+  /* Text Hierarchy - Dark on light */
+  --text-bright: #073642;
+  /* Solarized base02 — primary text */
+  --text-primary: #586e75;
+  /* Solarized base01 — body text */
+  --text-secondary: #657b83;
+  /* Solarized base00 — secondary */
+  --text-tertiary: #93a1a1;
+  /* Solarized base1 — muted */
+  --text-ghost: #c5c8c6;
+  /* Very faint */
 
   /* Borders & Dividers */
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.10);
-  --border-strong: rgba(255, 255, 255, 0.18);
-  --border-accent: rgba(64, 224, 208, 0.3);
+  --border-subtle: rgba(7, 54, 66, 0.06);
+  --border-default: rgba(7, 54, 66, 0.12);
+  --border-strong: rgba(7, 54, 66, 0.20);
+  --border-accent: rgba(42, 161, 152, 0.4);
 
   /* Typography */
   --font-mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
@@ -121,28 +134,6 @@
   }
 }
 
-@keyframes glow-pulse {
-
-  0%,
-  100% {
-    box-shadow: 0 0 8px var(--accent-dim);
-  }
-
-  50% {
-    box-shadow: 0 0 20px var(--accent-glow);
-  }
-}
-
-@keyframes scan {
-  0% {
-    background-position: 0% 0%;
-  }
-
-  100% {
-    background-position: 0% 100%;
-  }
-}
-
 .animate-fadeIn {
   animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -157,40 +148,40 @@
 
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   GLASSMORPHISM — Refined
+   GLASSMORPHISM — Light Mode Version
    ───────────────────────────────────────────────────────────────────────────── */
 .glass-panel {
   background: linear-gradient(135deg,
-      rgba(18, 20, 26, 0.9) 0%,
-      rgba(13, 14, 17, 0.95) 100%);
-  backdrop-filter: blur(24px) saturate(150%);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
+      rgba(255, 251, 240, 0.95) 0%,
+      rgba(253, 246, 227, 0.9) 100%);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
   border: 1px solid var(--border-subtle);
   box-shadow:
-    0 4px 24px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    0 4px 24px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .glass-header {
   background: linear-gradient(180deg,
-      rgba(8, 9, 11, 0.95) 0%,
-      rgba(8, 9, 11, 0.9) 100%);
+      rgba(253, 246, 227, 0.98) 0%,
+      rgba(253, 246, 227, 0.95) 100%);
   backdrop-filter: blur(20px) saturate(120%);
   -webkit-backdrop-filter: blur(20px) saturate(120%);
   border-bottom: 1px solid var(--border-subtle);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .glass-sidebar {
   background: linear-gradient(90deg,
-      rgba(8, 9, 11, 0.98) 0%,
-      rgba(12, 13, 17, 0.95) 100%);
+      rgba(238, 232, 213, 0.95) 0%,
+      rgba(245, 239, 224, 0.9) 100%);
   border-right: 1px solid var(--border-subtle);
 }
 
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   TECH ELEMENTS — Subtle Cyberpunk
+   TECH ELEMENTS — Subtle Organic
    ───────────────────────────────────────────────────────────────────────────── */
 .tech-border {
   border: 1px solid var(--border-default);
@@ -204,7 +195,7 @@
   width: 6px;
   height: 6px;
   border-color: var(--accent);
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
 .tech-border::before {
@@ -227,7 +218,7 @@
     linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
   background-size: 48px 48px;
   background-position: center top;
-  opacity: 0.5;
+  opacity: 0.4;
   pointer-events: none;
 }
 
@@ -240,11 +231,11 @@
 
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   SCROLLBAR — Minimal
+   SCROLLBAR — Minimal Light
    ───────────────────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -253,7 +244,7 @@
 
 ::-webkit-scrollbar-thumb {
   background: var(--border-strong);
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -280,21 +271,21 @@
 
 .message-block:hover {
   background: linear-gradient(90deg,
-      rgba(64, 224, 208, 0.03) 0%,
+      rgba(42, 161, 152, 0.05) 0%,
       transparent 60%);
   border-left-color: var(--accent);
 }
 
 .message-content {
   font-size: 0.938rem;
-  line-height: 1.7;
+  line-height: 1.75;
   color: var(--text-primary);
   font-weight: 400;
 }
 
 .message-sender {
   color: var(--accent);
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.875rem;
 }
 
@@ -311,12 +302,12 @@
 .media-grid-item {
   position: relative;
   overflow: hidden;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid var(--border-subtle);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   aspect-ratio: 1 / 1;
   width: 100%;
-  background: var(--surface);
+  background: var(--abyss);
 }
 
 .media-grid-item:hover {
@@ -324,8 +315,8 @@
   border-color: var(--accent);
   box-shadow:
     0 0 0 1px var(--accent),
-    0 8px 32px rgba(64, 224, 208, 0.15),
-    0 16px 48px rgba(0, 0, 0, 0.4);
+    0 8px 32px rgba(42, 161, 152, 0.12),
+    0 16px 48px rgba(0, 0, 0, 0.08);
   z-index: 10;
 }
 
@@ -337,8 +328,7 @@
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   color: var(--accent);
-  font-weight: 500;
-  text-shadow: 0 0 20px var(--accent-dim);
+  font-weight: 600;
 }
 
 .hud-label {
@@ -350,16 +340,17 @@
 }
 
 .stat-card {
-  background: var(--elevated);
+  background: var(--card);
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 16px;
   transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .stat-card:hover {
   border-color: var(--border-accent);
-  background: var(--card);
+  box-shadow: 0 4px 12px rgba(42, 161, 152, 0.08);
 }
 
 
@@ -370,7 +361,7 @@
   background: transparent;
   border: 1px solid var(--border-default);
   color: var(--text-secondary);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 8px 16px;
   font-size: 0.75rem;
   font-weight: 500;
@@ -381,9 +372,9 @@
 }
 
 .btn-ghost:hover {
-  background: var(--elevated);
+  background: var(--abyss);
   border-color: var(--border-strong);
-  color: var(--text-primary);
+  color: var(--text-bright);
 }
 
 .btn-ghost.active {
@@ -395,8 +386,8 @@
 .btn-primary {
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-bright) 100%);
   border: none;
-  color: var(--void);
-  border-radius: 6px;
+  color: white;
+  border-radius: 8px;
   padding: 10px 20px;
   font-size: 0.75rem;
   font-weight: 600;
@@ -404,12 +395,12 @@
   letter-spacing: 0.05em;
   transition: all 0.2s ease;
   cursor: pointer;
-  box-shadow: 0 4px 16px var(--accent-dim);
+  box-shadow: 0 2px 8px var(--accent-dim);
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 24px var(--accent-glow);
+  box-shadow: 0 4px 16px var(--accent-glow);
 }
 
 
@@ -418,7 +409,7 @@
    ───────────────────────────────────────────────────────────────────────────── */
 ::selection {
   background: var(--accent-dim);
-  color: var(--accent-bright);
+  color: var(--text-bright);
 }
 
 

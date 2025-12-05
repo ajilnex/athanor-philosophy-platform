@@ -28,17 +28,33 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // Construire les conditions de recherche
     const where: any = { archiveId: archive.id }
 
-    // Filtre par participant
+    // Filtre par participant (by ID)
     if (participantId) {
       where.participantId = participantId
     }
 
+    // Filtre par sender name - includes messages they wrote OR reacted to
+    const senderName = searchParams.get('sender')
+    if (senderName) {
+      where.OR = [
+        { senderName: senderName },
+        { reactions: { some: { actorName: senderName } } }
+      ]
+    }
+
     // Recherche textuelle
     if (search) {
-      where.OR = [
+      const searchConditions = [
         { content: { contains: search, mode: 'insensitive' } },
         { senderName: { contains: search, mode: 'insensitive' } },
       ]
+      // If we already have OR conditions (from sender filter), we need to use AND
+      if (where.OR) {
+        where.AND = [{ OR: where.OR }, { OR: searchConditions }]
+        delete where.OR
+      } else {
+        where.OR = searchConditions
+      }
     }
 
     // Filtre par type de contenu
@@ -60,13 +76,46 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       }
     }
 
+    // Filtre par date
+    const startDate = searchParams.get('startDate')
+    const endDate = searchParams.get('endDate')
+    // Cursor-based pagination for infinite scroll (more precise than date)
+    const beforeTimestamp = searchParams.get('beforeTimestamp')
+    const afterTimestamp = searchParams.get('afterTimestamp')
+
+    if (startDate || endDate || beforeTimestamp || afterTimestamp) {
+      // Use timestamp for cursor-based pagination (more precise)
+      if (beforeTimestamp) {
+        where.timestamp = { ...where.timestamp, lt: BigInt(beforeTimestamp) }
+      }
+      if (afterTimestamp) {
+        where.timestamp = { ...where.timestamp, gt: BigInt(afterTimestamp) }
+      }
+
+      // Use timestampDate for date-based filtering
+      if (startDate || endDate) {
+        where.timestampDate = {}
+        if (startDate) {
+          where.timestampDate.gte = new Date(startDate)
+        }
+        if (endDate) {
+          // Use lt (strictly less than) to avoid including the boundary message
+          where.timestampDate.lt = new Date(endDate)
+        }
+      }
+    }
+
+    // Pagination et requête
+    // Sort order
+    const sortOrder = searchParams.get('sort') === 'desc' ? 'desc' : 'asc'
+
     // Pagination et requête
     const [messages, totalCount] = await Promise.all([
       prisma.conversationMessage.findMany({
         where,
         skip: (page - 1) * limit,
         take: limit,
-        orderBy: { timestamp: 'asc' },
+        orderBy: { timestamp: sortOrder },
         include: {
           media: {
             select: {

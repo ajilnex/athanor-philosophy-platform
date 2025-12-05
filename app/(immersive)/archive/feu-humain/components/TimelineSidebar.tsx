@@ -117,25 +117,27 @@ export function TimelineSidebar({
     return Math.max(...allItems.map(d => d.count))
   }, [allItems])
 
-  // Color: Embers (carmine) -> Blue flame
-  const getIntensityColor = (intensity: number) => {
-    const r = Math.round(150 - 150 * intensity)
-    const g = Math.round(240 * intensity)
-    const b = Math.round(24 + 231 * intensity)
-    const alpha = 0.5 + 0.5 * intensity
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`
+  // Color: Teal gradient for Solarized Light theme
+  const getIntensityColor = (intensity: number, isHovered: boolean = false) => {
+    if (isHovered) {
+      return `rgba(42, 161, 152, 1)` // Full teal
+    }
+    // From light teal to deep teal based on intensity
+    const alpha = 0.2 + 0.7 * intensity
+    return `rgba(42, 161, 152, ${alpha})`
   }
 
-  // Layout calculation with MICROSCOPE-like fisheye
+  // Layout calculation with WAVE-like fisheye - SHARPER decay
   const layout = useMemo(() => {
     if (allItems.length === 0) return []
 
     const ITEM_COUNT = allItems.length
 
-    // MICROSCOPE ZOOM CONFIG
-    const LENS_RADIUS = 12 // Number of items directly affected by strong zoom
-    const STABILITY_RADIUS = 17 // Beyond this, items DON'T MOVE AT ALL (reduced from 50)
-    const MAX_ZOOM = 120 // Even higher zoom at focal point
+    // WAVE ZOOM CONFIG - Sharper focus
+    const LENS_RADIUS = 8 // Core items with strong zoom (reduced from 12)
+    const FALLOFF_RADIUS = 15 // Smooth transition zone
+    const STABILITY_RADIUS = 25 // Beyond this, items DON'T MOVE AT ALL
+    const MAX_ZOOM = 150 // Higher zoom at focal point
 
     const heights = new Float32Array(ITEM_COUNT)
     const baseHeight = CONTAINER_HEIGHT / ITEM_COUNT
@@ -148,8 +150,7 @@ export function TimelineSidebar({
       const hoverRatio = Math.max(0, Math.min(1, mouseY / CONTAINER_HEIGHT))
       const targetIndex = Math.round(hoverRatio * (ITEM_COUNT - 1))
 
-      // Calculate total "extra" height to distribute
-      // Items within STABILITY_RADIUS will share this, others stay fixed
+      // Calculate zoom factors with VERY SHARP falloff
       let extraHeightBudget = 0
       const zoomFactors = new Float32Array(ITEM_COUNT)
 
@@ -161,25 +162,28 @@ export function TimelineSidebar({
           zoomFactors[i] = 1
           heights[i] = baseHeight
         } else if (dist <= LENS_RADIUS) {
-          // Inside lens: EXPONENTIAL CUBIC decay (very sharp)
-          // exp(-x³) falls off much faster than exp(-x²)
+          // Inside lens: SUPER SHARP quartic decay
+          // exp(-x⁴) is even sharper than exp(-x³)
           const normalized = dist / LENS_RADIUS
-          const decay = Math.exp(-Math.pow(normalized, 3) * 3)
+          const decay = Math.exp(-Math.pow(normalized, 4) * 4)
           zoomFactors[i] = 1 + (MAX_ZOOM - 1) * decay
           extraHeightBudget += (zoomFactors[i] - 1) * baseHeight
+        } else if (dist <= FALLOFF_RADIUS) {
+          // Fast falloff zone
+          const normalized = (dist - LENS_RADIUS) / (FALLOFF_RADIUS - LENS_RADIUS)
+          const decay = Math.exp(-normalized * 3) // Fast exponential drop
+          zoomFactors[i] = 1 + decay * 1.5 // Small residual zoom
+          extraHeightBudget += (zoomFactors[i] - 1) * baseHeight
         } else {
-          // Transition zone: linear blend to stability
-          // From LENS_RADIUS to STABILITY_RADIUS, zoom gradually goes to 1
-          const transitionProgress = (dist - LENS_RADIUS) / (STABILITY_RADIUS - LENS_RADIUS)
-          // Ease out for smooth transition
-          const eased = 1 - Math.pow(1 - transitionProgress, 2)
-          zoomFactors[i] = 1 + (1 - eased) * 0.5 // Small residual zoom
+          // Transition zone: gentle blend to stability
+          const transitionProgress = (dist - FALLOFF_RADIUS) / (STABILITY_RADIUS - FALLOFF_RADIUS)
+          const eased = 1 - Math.pow(1 - transitionProgress, 3) // Cubic ease out
+          zoomFactors[i] = 1 + (1 - eased) * 0.2 // Tiny residual
           extraHeightBudget += (zoomFactors[i] - 1) * baseHeight
         }
       }
 
-      // Now we need to "steal" height from the zoomed zone to fit everything
-      // Distribute the compression ONLY within the affected zone
+      // Compress to fit
       const compressionFactor = CONTAINER_HEIGHT / (CONTAINER_HEIGHT + extraHeightBudget)
 
       for (let i = 0; i < ITEM_COUNT; i++) {
@@ -187,7 +191,6 @@ export function TimelineSidebar({
         if (dist <= STABILITY_RADIUS) {
           heights[i] = baseHeight * zoomFactors[i] * compressionFactor
         } else {
-          // Keep exactly base height - STABLE
           heights[i] = baseHeight
         }
       }
@@ -224,7 +227,7 @@ export function TimelineSidebar({
   const handleMouseLeave = () => setMouseY(null)
 
   return (
-    <div className={`w-44 border-r border-[rgba(255,255,255,0.08)] bg-[rgba(5,5,5,0.7)] backdrop-blur-md flex flex-col items-center py-3 ${className}`}>
+    <div className={`w-44 border-r border-[var(--border-subtle)] bg-[var(--abyss)] flex flex-col items-center py-3 ${className}`}>
 
       {/* Fixed Year Labels - Always visible on the left */}
       <div className="relative w-full flex-1">
@@ -247,12 +250,12 @@ export function TimelineSidebar({
                 style={{ top: startY, height }}
               >
                 {/* Year label */}
-                <span className="text-[10px] font-mono font-bold text-[#00f0ff] pl-1 leading-none">
+                <span className="text-[10px] font-mono font-bold text-[var(--accent)] pl-1 leading-none">
                   {marker.year}
                 </span>
                 {/* Vertical line for this year's span */}
                 <div
-                  className="absolute left-0 w-px bg-[#00f0ff]/30"
+                  className="absolute left-0 w-px bg-[var(--accent)]/30"
                   style={{ top: 12, height: Math.max(0, height - 14) }}
                 />
               </div>
@@ -277,7 +280,7 @@ export function TimelineSidebar({
           }}
         >
           {/* Baseline */}
-          <div className="absolute top-0 bottom-0 left-0 w-px bg-[rgba(255,255,255,0.15)]" />
+          <div className="absolute top-0 bottom-0 left-0 w-px bg-[var(--border-default)]" />
 
           {/* SVG Waveform */}
           <svg
@@ -285,37 +288,67 @@ export function TimelineSidebar({
             viewBox={`0 0 100 ${CONTAINER_HEIGHT}`}
             preserveAspectRatio="none"
           >
-            {/* Glow filter for intense bars */}
+            {/* Glow filter for hovered bar */}
             <defs>
-              <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="2" result="blur" />
+              <filter id="waveGlow" x="-100%" y="-100%" width="300%" height="300%">
+                <feGaussianBlur stdDeviation="3" result="blur" />
                 <feMerge>
                   <feMergeNode in="blur" />
                   <feMergeNode in="SourceGraphic" />
                 </feMerge>
               </filter>
+              {/* Gradient for intensity wave effect */}
+              <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="var(--accent)" stopOpacity="0.3" />
+              </linearGradient>
             </defs>
 
-            {layout.map((p) => {
+            {layout.map((p, idx) => {
               const { item, y, height } = p
               const intensity = Math.min(item.count / (maxCount * 0.5), 1)
-              const barWidth = Math.max(intensity * 90 + 5, 5)
-              const barColor = getIntensityColor(intensity)
+              const barWidth = Math.max(intensity * 85 + 8, 8)
 
               if (height < 0.15 && intensity < 0.15) return null
 
               const isHovered = hoveredItem?.item.timestamp === item.timestamp
+
+              // Calculate distance from hover for wave effect
+              let waveOpacity = 0.15 + 0.5 * intensity
+              if (mouseY !== null && hoveredItem) {
+                const hoveredIdx = layout.findIndex(l => l.item.timestamp === hoveredItem.item.timestamp)
+                const distFromHover = Math.abs(idx - hoveredIdx)
+
+                if (distFromHover === 0) {
+                  waveOpacity = 1
+                } else if (distFromHover <= 3) {
+                  // Sharp decay near hover
+                  waveOpacity = 0.7 * Math.exp(-distFromHover * 0.8)
+                } else if (distFromHover <= 8) {
+                  // Gentler decay further out
+                  waveOpacity = 0.2 * Math.exp(-(distFromHover - 3) * 0.4)
+                } else {
+                  waveOpacity = 0.08 + 0.3 * intensity
+                }
+              }
+
+              const barColor = isHovered
+                ? 'var(--warm)'
+                : `rgba(42, 161, 152, ${waveOpacity})`
 
               return (
                 <rect
                   key={item.timestamp}
                   x="0"
                   y={y}
-                  width={barWidth}
+                  width={isHovered ? Math.max(barWidth + 10, 50) : barWidth}
                   height={Math.max(height, 0.3)}
-                  fill={isHovered ? '#ffffff' : barColor}
-                  filter={intensity > 0.7 ? 'url(#glow)' : undefined}
-                  style={{ transition: 'fill 0.1s' }}
+                  fill={barColor}
+                  rx={isHovered ? 2 : 0}
+                  filter={isHovered ? 'url(#waveGlow)' : undefined}
+                  style={{
+                    transition: 'fill 0.08s ease-out, width 0.08s ease-out',
+                  }}
                 />
               )
             })}
@@ -324,10 +357,10 @@ export function TimelineSidebar({
           {/* Tooltip - shows hour when using hourly data */}
           {hoveredItem && mouseY !== null && (
             <div
-              className="absolute left-full ml-2 z-50 px-2 py-1 bg-black/95 border border-[#00f0ff]/30 rounded text-[10px] font-mono text-[#00f0ff] whitespace-nowrap pointer-events-none shadow-lg shadow-[#00f0ff]/10"
-              style={{ top: mouseY - 8 }}
+              className="absolute left-full ml-3 z-50 px-3 py-1.5 bg-[var(--card)] border border-[var(--border-accent)] rounded-lg text-xs font-mono text-[var(--text-bright)] whitespace-nowrap pointer-events-none shadow-lg"
+              style={{ top: mouseY - 12 }}
             >
-              <span className="text-white/80">
+              <span className="text-[var(--text-primary)]">
                 {new Date(hoveredItem.item.timestamp).toLocaleDateString('fr-FR', {
                   weekday: 'short',
                   day: 'numeric',
@@ -336,27 +369,17 @@ export function TimelineSidebar({
                 })}
                 {/* Show hour if available (hourly data) */}
                 {hoveredItem.item.hour !== undefined && (
-                  <span className="text-[#00f0ff] ml-1">
+                  <span className="text-[var(--accent)] ml-1 font-semibold">
                     {String(hoveredItem.item.hour).padStart(2, '0')}:00
                   </span>
                 )}
               </span>
-              <span className="mx-2 text-white/30">•</span>
-              <span className="text-[#00f0ff] font-bold">{hoveredItem.item.count}</span>
-              <span className="text-white/50 ml-1">msgs</span>
+              <span className="mx-2 text-[var(--text-ghost)]">·</span>
+              <span className="text-[var(--warm)] font-bold">{hoveredItem.item.count}</span>
+              <span className="text-[var(--text-tertiary)] ml-1">msgs</span>
             </div>
           )}
         </div>
-      </div>
-
-      {/* Controls */}
-      <div className="mt-3 pt-3 border-t border-[rgba(255,255,255,0.1)] w-full flex justify-center gap-2 shrink-0">
-        <button
-          onClick={() => onYearSelect?.('LATEST')}
-          className="px-3 py-1 rounded border border-[rgba(255,255,255,0.2)] text-[9px] font-mono text-[rgba(255,255,255,0.5)] hover:border-[#00f0ff] hover:text-[#00f0ff] transition-all bg-black/40"
-        >
-          RESET
-        </button>
       </div>
     </div>
   )
