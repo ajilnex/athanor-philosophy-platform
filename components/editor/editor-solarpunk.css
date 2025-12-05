@@ -368,7 +368,40 @@
     transition: width 300ms ease-out;
 }
 
-/* Exit button */
+/* Exit button - always visible version */
+.salle-exit-always {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.06);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 200ms, background 200ms;
+    color: var(--base01);
+}
+
+.salle-exit-always:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.salle-du-temps.night .salle-exit-always {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--base1);
+}
+
+.salle-du-temps.night .salle-exit-always:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Exit button - appears on hover */
 .salle-exit {
     position: fixed;
     top: 1.5rem;

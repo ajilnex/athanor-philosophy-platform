@@ -90,7 +90,8 @@ export function EditorSolarpunk({
 }: EditorSolarpunkProps) {
     const router = useRouter()
     const editorRef = useRef<any>(null)
-    const [writingStartTime] = useState(() => Date.now())
+    // Stable draft slug - generated once per session
+    const [currentDraftSlug] = useState(() => draftSlug || initialData?.slug || `draft-${Date.now()}`)
 
     // Main state
     const [title, setTitle] = useState(initialData?.title || '')
@@ -110,7 +111,7 @@ export function EditorSolarpunk({
     const [showExitButton, setShowExitButton] = useState(false)
     const hideExitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-    const [writingTime, setWritingTime] = useState(0)
+
 
     // Modals
     const [showImageUpload, setShowImageUpload] = useState(false)
@@ -122,28 +123,9 @@ export function EditorSolarpunk({
     const stats = useDocumentStats(content)
     const sections = useSections(content)
 
-    // Determine phase
-    const phase = useMemo(() => {
-        if (!content.trim()) return 'draft'
-        if (stats.words < 100) return 'draft'
-        if (stats.words < 500) return 'revision'
-        return 'ready'
-    }, [content, stats.words])
 
-    // Writing timer
-    useEffect(() => {
-        if (!isImmersive) return
-        const interval = setInterval(() => {
-            setWritingTime(Math.floor((Date.now() - writingStartTime) / 1000))
-        }, 1000)
-        return () => clearInterval(interval)
-    }, [isImmersive, writingStartTime])
 
-    const formatTime = (seconds: number) => {
-        const m = Math.floor(seconds / 60)
-        const s = seconds % 60
-        return `${m}:${s.toString().padStart(2, '0')}`
-    }
+
 
     // Auto-save
     useEffect(() => {
@@ -156,7 +138,7 @@ export function EditorSolarpunk({
         autoSaveTimerRef.current = setTimeout(async () => {
             setIsAutoSaving(true)
             try {
-                const slug = draftSlug || initialData?.slug || 'draft-' + Date.now()
+                const slug = currentDraftSlug
                 await fetch('/api/drafts', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -352,25 +334,23 @@ export function EditorSolarpunk({
     // SALLE DU TEMPS (Immersive mode)
     // ═══════════════════════════════════════════════════════════════════════
     if (isImmersive) {
-        const progress = Math.min(100, (stats.words / 1500) * 100)
-
         return (
             <div className={`salle-du-temps ${nightMode ? 'night' : ''}`}>
-                {/* Exit button */}
+                {/* Exit button - always slightly visible */}
                 <button
                     onClick={exitImmersive}
-                    className={`salle-exit ${showExitButton ? 'visible' : ''}`}
+                    className="salle-exit-always"
                     title="Quitter (Échap)"
                 >
-                    <X style={{ width: 20, height: 20, color: nightMode ? '#93a1a1' : '#586e75' }} />
+                    <X style={{ width: 18, height: 18 }} />
                 </button>
 
                 {/* Night mode toggle */}
                 <button
                     onClick={() => setNightMode(n => !n)}
-                    className="salle-exit"
-                    style={{ right: '70px', opacity: showExitButton ? 0.6 : 0 }}
-                    title="Mode nuit"
+                    className="salle-exit-always"
+                    style={{ right: '56px' }}
+                    title={nightMode ? 'Mode jour' : 'Mode nuit'}
                 >
                     {nightMode ? '☀️' : '🌙'}
                 </button>
@@ -390,16 +370,6 @@ export function EditorSolarpunk({
                         className="h-full w-full"
                         height="100%"
                     />
-                </div>
-
-                {/* Writing timer */}
-                <div className="salle-timer">
-                    {formatTime(writingTime)} · {stats.words} mots
-                </div>
-
-                {/* Progress bar */}
-                <div className="salle-progress">
-                    <div className="salle-progress-bar" style={{ width: `${progress}%` }} />
                 </div>
             </div>
         )
@@ -520,24 +490,7 @@ export function EditorSolarpunk({
                         />
                     </div>
 
-                    {/* Phase indicator */}
-                    <div className="editor-sidebar-section">
-                        <label className="editor-sidebar-label">
-                            <AlignLeft className="h-3 w-3" /> Phase
-                        </label>
-                        <div className="editor-phase">
-                            <span className={`editor-phase-dot ${phase === 'draft' ? 'active' : ''}`} />
-                            <span className={`editor-phase-line ${phase !== 'draft' ? 'filled' : ''}`} />
-                            <span className={`editor-phase-dot ${phase === 'revision' ? 'active' : phase === 'ready' ? 'active' : ''}`} />
-                            <span className={`editor-phase-line ${phase === 'ready' ? 'filled' : ''}`} />
-                            <span className={`editor-phase-dot ${phase === 'ready' ? 'active' : ''}`} />
-                        </div>
-                        <div className="flex justify-between text-xs mt-1" style={{ color: 'var(--base1)' }}>
-                            <span>Brouillon</span>
-                            <span>Révision</span>
-                            <span>Prêt</span>
-                        </div>
-                    </div>
+
 
                     {/* Stats */}
                     <div className="editor-sidebar-section">
