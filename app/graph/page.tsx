@@ -1,11 +1,9 @@
-import { Metadata } from 'next'
-import GraphContainer from '@/components/graph/GraphContainer'
-
-export const metadata: Metadata = {
-  title: 'Cerveau Numérique | Athanor',
-  description: 'Visualisation dynamique des connaissances et des connexions entre chercheurs.',
-}
+import { GraphCanvas } from '@/components/graph/GraphCanvas'
 
 export default function GraphPage() {
-  return <GraphContainer />
+  return (
+    <div className="h-screen w-screen">
+      <GraphCanvas className="h-full w-full" />
+    </div>
+  )
 }
