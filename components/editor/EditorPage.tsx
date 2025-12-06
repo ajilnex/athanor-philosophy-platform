@@ -460,7 +460,7 @@ Commencez à écrire pour faire disparaître ce guide...`
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header fixe */}
-      <header className="border-b border-subtle/20 backdrop-blur-sm sticky top-0 z-10" style={{ backgroundColor: 'rgba(238, 232, 213, 0.9)' }}>
+      <header className="sticky top-0 z-10" style={{ backgroundColor: 'var(--sol-base3)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Navigation */}
@@ -483,11 +483,10 @@ Commencez à écrire pour faire disparaître ce guide...`
               <button
                 type="button"
                 onClick={() => setShowPreview(p => !p)}
-                className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all ${showPreview
-                  ? 'text-white'
-                  : 'border text-foreground hover:bg-muted'
-                  }`}
-                style={showPreview ? { backgroundColor: 'var(--sol-base03)', color: 'var(--sol-base2)' } : { backgroundColor: 'var(--sol-base2)', borderColor: 'var(--sol-base01)' }}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all"
+                style={showPreview
+                  ? { backgroundColor: 'var(--sol-yellow)', color: 'var(--sol-base03)' }
+                  : { backgroundColor: 'var(--sol-base2)', color: 'var(--sol-base01)', border: '1px solid var(--sol-base1)' }}
               >
                 {showPreview ? (
                   <EyeOff className="h-4 w-4 mr-2" />
