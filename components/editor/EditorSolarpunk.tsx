@@ -93,6 +93,33 @@ export function EditorSolarpunk({
     // Stable draft slug - generated once per session
     const [currentDraftSlug] = useState(() => draftSlug || initialData?.slug || `draft-${Date.now()}`)
 
+    // Markdown tutorial placeholder
+    const markdownTutorial = `# Bienvenue dans l'éditeur
+
+Écrivez votre billet ici en Markdown...
+
+## Syntaxe de base
+
+- **Gras** : **texte important**
+- *Italique* : *texte nuancé*
+- Liste : utilisez - ou * au début de ligne
+- Lien : [texte du lien](https://exemple.org)
+
+## Fonctionnalités spéciales
+
+- Backlink vers un autre billet : [[slug-du-billet]]
+- Backlink avec alias : [[slug|Texte affiché]]
+- Citation Zotero : <Cite item="CléBiblio" />
+
+## Images
+
+Utilisez le bouton dans la barre latérale
+ou écrivez directement : ![description](url)
+
+---
+
+Commencez à écrire pour faire disparaître ce guide...`
+
     // Main state
     const [title, setTitle] = useState(initialData?.title || '')
     const [tags, setTags] = useState<string[]>(initialData?.tags || [])
@@ -311,12 +338,12 @@ export function EditorSolarpunk({
                 '&': {
                     fontSize: isImmersive ? '18px' : '16px',
                     height: '100%',
-                    backgroundColor: isImmersive ? bg : 'transparent',
+                    backgroundColor: bg,
                 },
                 '.cm-content': {
                     padding: isImmersive ? '50vh 15% 50vh 15%' : '2rem',
                     caretColor: cursor,
-                    backgroundColor: isImmersive ? bg : 'transparent',
+                    backgroundColor: bg,
                     color: fg,
                     minHeight: isImmersive ? '100vh' : '100%',
                     maxWidth: isImmersive ? '72ch' : 'none',
@@ -328,16 +355,21 @@ export function EditorSolarpunk({
                 },
                 '.cm-focused': { outline: 'none' },
                 '.cm-cursor': { borderLeftColor: cursor, borderLeftWidth: '2px' },
-                '.cm-editor': { height: '100%', backgroundColor: isImmersive ? bg : 'transparent' },
+                '.cm-editor': { height: '100%', backgroundColor: bg },
                 '.cm-scroller': {
                     height: '100%',
-                    backgroundColor: isImmersive ? bg : 'transparent',
+                    backgroundColor: bg,
                     scrollPaddingTop: isImmersive ? '50%' : '0',
                     scrollPaddingBottom: isImmersive ? '50%' : '0',
                 },
                 '.cm-scroller::-webkit-scrollbar': { width: isImmersive ? '0' : '8px' },
                 '.cm-gutters': { display: 'none' },
                 '.cm-selectionBackground': { backgroundColor: `${nightMode ? 'rgba(147,161,161,0.15)' : 'rgba(88,110,117,0.1)'}` },
+                '.cm-activeLine': { backgroundColor: nightMode ? 'rgba(7,54,66,0.5)' : 'rgba(238,232,213,0.6)' },
+                '.cm-placeholder': {
+                    color: nightMode ? '#586e75' : '#93a1a1',
+                    fontStyle: 'italic',
+                },
             })
         ]
     }, [isImmersive, nightMode])
@@ -404,7 +436,7 @@ export function EditorSolarpunk({
                         Billets
                     </Link>
                     <h1 className="text-lg font-light" style={{ color: 'var(--base00)' }}>
-                        {mode === 'create' ? 'φ Nouveau billet' : 'Éditer'}
+                        {mode === 'create' ? 'Nouveau billet' : 'Éditer'}
                     </h1>
                 </div>
 
@@ -452,19 +484,24 @@ export function EditorSolarpunk({
                     </div>
 
                     {/* Salle du Temps */}
-                    <button onClick={enterImmersive} className="editor-btn-secondary">
-                        <Hourglass className="h-4 w-4" />
-                        Salle du Temps
+                    <button
+                        onClick={enterImmersive}
+                        className="inline-flex items-center justify-center w-9 h-9 rounded-lg transition-all hover:bg-[var(--base2)]"
+                        style={{ color: 'var(--cyan)' }}
+                        title="Salle du Temps"
+                    >
+                        <Hourglass className="h-5 w-5" />
                     </button>
 
                     {/* Save */}
                     <button
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="editor-btn-primary"
+                        className="inline-flex items-center justify-center w-9 h-9 rounded-lg transition-all hover:bg-[var(--base2)] disabled:opacity-50"
+                        style={{ color: 'var(--green)' }}
+                        title={isSaving ? 'Publication...' : 'Publier'}
                     >
-                        {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                        {isSaving ? 'Publication...' : 'Publier'}
+                        {isSaving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
                     </button>
                 </div>
             </header>
@@ -578,7 +615,7 @@ export function EditorSolarpunk({
                                     highlightActiveLine: true,
                                 }}
                                 extensions={extensions}
-                                placeholder="Commencez à écrire..."
+                                placeholder={content ? '' : markdownTutorial}
                                 className="h-full"
                                 height="100%"
                             />

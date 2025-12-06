@@ -65,7 +65,7 @@
 .editor-header {
     height: var(--editor-header-height);
     background: var(--editor-bg);
-    border-bottom: 1px solid var(--editor-bg-alt);
+    /* border removed for seamless look */
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -172,7 +172,7 @@
 .editor-sidebar {
     width: var(--editor-sidebar-width);
     background: var(--editor-bg);
-    border-right: 1px solid var(--editor-bg-alt);
+    /* border removed for seamless look */
     height: calc(100vh - var(--editor-header-height));
     overflow-y: auto;
     padding: 1.5rem;
