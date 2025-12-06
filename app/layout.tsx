@@ -25,6 +25,24 @@ const ibmPlexSerif = IBM_Plex_Serif({
 export const metadata: Metadata = {
   title: "L'athanor — Plateforme philosophique",
   description: "L'athanor — Une collection d'articles de philosophie contemporaine",
+  icons: {
+    icon: '/icon.png',
+    apple: '/apple-icon.png',
+  },
+  openGraph: {
+    title: "L'athanor",
+    description: "Une collection d'articles de philosophie contemporaine",
+    siteName: "L'athanor",
+    locale: 'fr_FR',
+    type: 'website',
+    images: ['/images/og-image.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "L'athanor — Plateforme philosophique",
+    description: "Une collection d'articles de philosophie contemporaine",
+    images: ['/images/og-image.png'],
+  },
 }
 
 export const viewport: Viewport = {
