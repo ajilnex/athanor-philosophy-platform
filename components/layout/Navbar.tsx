@@ -74,14 +74,24 @@ export function Navbar() {
           {session ? (
             <button
               onClick={handleSignOut}
-              className="px-3 py-1.5 text-sm font-light bg-slate-900/90 hover:bg-slate-800/95 text-slate-50 rounded-md transition-all duration-200 border border-slate-700/30 backdrop-blur-sm"
+              className="px-3 py-1.5 text-sm font-light rounded-md transition-all duration-200 hover:scale-[1.02] active:scale-95"
+              style={{
+                backgroundColor: 'var(--sol-base03)',
+                color: 'var(--sol-base2)',
+                border: '1px solid var(--sol-base01)',
+              }}
             >
               Se déconnecter
             </button>
           ) : (
             <Link
               href="/auth/signin"
-              className="px-3 py-1.5 text-sm font-light bg-slate-900/90 hover:bg-slate-800/95 text-slate-50 rounded-md transition-all duration-200 border border-slate-700/30 backdrop-blur-sm"
+              className="px-3 py-1.5 text-sm font-light rounded-md transition-all duration-200 hover:scale-[1.02] active:scale-95"
+              style={{
+                backgroundColor: 'var(--sol-base03)',
+                color: 'var(--sol-base2)',
+                border: '1px solid var(--sol-base01)',
+              }}
             >
               Connexion
             </Link>
@@ -170,7 +180,12 @@ export function Navbar() {
                     setOpen(false)
                     await handleSignOut()
                   }}
-                  className="mt-2 px-3 py-2 text-base rounded bg-slate-900/90 text-slate-50 border border-slate-700/30 active:scale-95 transition"
+                  className="mt-2 px-3 py-2 text-base rounded active:scale-95 transition"
+                  style={{
+                    backgroundColor: 'var(--sol-base03)',
+                    color: 'var(--sol-base2)',
+                    border: '1px solid var(--sol-base01)',
+                  }}
                 >
                   Se déconnecter
                 </button>
@@ -178,7 +193,12 @@ export function Navbar() {
                 <Link
                   href="/auth/signin"
                   onClick={() => setOpen(false)}
-                  className="mt-2 px-3 py-2 text-base rounded bg-slate-900/90 text-slate-50 border border-slate-700/30 active:scale-95 transition"
+                  className="mt-2 px-3 py-2 text-base rounded active:scale-95 transition"
+                  style={{
+                    backgroundColor: 'var(--sol-base03)',
+                    color: 'var(--sol-base2)',
+                    border: '1px solid var(--sol-base01)',
+                  }}
                 >
                   Connexion
                 </Link>

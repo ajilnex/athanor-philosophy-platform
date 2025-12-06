@@ -470,11 +470,18 @@
   }
 
   .btn-primary {
-    @apply btn bg-foreground text-background shadow-sm;
+    @apply btn shadow-sm;
+    background: linear-gradient(135deg, var(--sol-cyan), var(--sol-blue));
+    color: var(--sol-base3);
   }
 
   .btn-primary:hover {
-    opacity: 0.9;
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(42, 161, 152, 0.3);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.98);
   }
 
   .btn-secondary {
