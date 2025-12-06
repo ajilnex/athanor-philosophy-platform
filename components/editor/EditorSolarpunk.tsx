@@ -353,9 +353,10 @@ Commencez à écrire pour faire disparaître ce guide...`
                         : 'ui-monospace, SFMono-Regular, monospace',
                     lineHeight: isImmersive ? '1.8' : '1.6',
                 },
-                '.cm-focused': { outline: 'none' },
+                '.cm-focused': { outline: 'none', border: 'none' },
+                '.cm-editor.cm-focused': { outline: 'none', border: 'none' },
                 '.cm-cursor': { borderLeftColor: cursor, borderLeftWidth: '2px' },
-                '.cm-editor': { height: '100%', backgroundColor: bg },
+                '.cm-editor': { height: '100%', backgroundColor: bg, border: 'none' },
                 '.cm-scroller': {
                     height: '100%',
                     backgroundColor: bg,
