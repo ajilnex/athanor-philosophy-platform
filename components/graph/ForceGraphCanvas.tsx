@@ -838,8 +838,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
             className={`relative ${className}`}
             style={{
                 background: colors.bg,
-                opacity: backgroundMode ? 0.45 : 1,
-                pointerEvents: backgroundMode ? 'none' : 'auto',
+                opacity: backgroundMode ? 0.5 : 1,
                 transition: 'opacity 0.3s ease',
             }}
         >
@@ -930,8 +929,8 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                     onNodeDragEnd={handleNodeDragEnd}
                     enableNodeDrag={true}
                     cooldownTicks={100}
-                    d3AlphaDecay={0.05}
-                    d3VelocityDecay={0.4}
+                    d3AlphaDecay={0.08}
+                    d3VelocityDecay={0.35}
                     d3AlphaMin={0.001}
                     warmupTicks={50}
                 />
