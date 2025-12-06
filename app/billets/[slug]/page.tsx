@@ -9,6 +9,36 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { CommentSection } from '@/components/comments/CommentSection'
 import { isFileInTrash } from '@/lib/github.server'
+import { Metadata } from 'next'
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const billet = await getBilletBySlug(slug)
+
+  if (!billet) return { title: 'Billet introuvable' }
+
+  const description = billet.excerpt || `${billet.content.slice(0, 150).replace(/[#*_\[\]]/g, '')}...`
+
+  return {
+    title: `${billet.title} — L'athanor`,
+    description,
+    authors: [{ name: "L'athanor" }],
+    openGraph: {
+      title: billet.title,
+      description,
+      type: 'article',
+      publishedTime: billet.date,
+      tags: billet.tags,
+      siteName: "L'athanor",
+      locale: 'fr_FR',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: billet.title,
+      description,
+    },
+  }
+}
 
 export async function generateStaticParams() {
   const slugs = await getBilletSlugs()
@@ -71,6 +101,21 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      {/* JSON-LD Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'ScholarlyArticle',
+            headline: billet.title,
+            datePublished: billet.date,
+            author: { '@type': 'Person', name: "L'athanor" },
+            publisher: { '@type': 'Organization', name: "L'athanor" },
+            description: billet.excerpt || billet.content.slice(0, 150),
+          }),
+        }}
+      />
       {/* Header */}
       <div className="mb-8">
         <Link

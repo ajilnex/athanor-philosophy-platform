@@ -23,11 +23,17 @@ const ibmPlexSerif = IBM_Plex_Serif({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://athanor.fr'),
   title: "L'athanor — Plateforme philosophique",
   description: "L'athanor — Une collection d'articles de philosophie contemporaine",
   icons: {
     icon: '/icon.png',
     apple: '/apple-icon.png',
+  },
+  alternates: {
+    types: {
+      'application/rss+xml': '/feed.xml',
+    },
   },
   openGraph: {
     title: "L'athanor",
