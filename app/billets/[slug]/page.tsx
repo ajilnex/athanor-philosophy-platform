@@ -4,6 +4,7 @@ import { ArrowLeft, Calendar, Tag, Lock, Download } from 'lucide-react'
 import { getBilletBySlug, getBilletSlugs } from '@/lib/billets'
 import { compileMDX } from '@/lib/mdx'
 import { EditBilletButton } from '@/components/billets/EditBilletButton'
+import { ShareButton } from '@/components/billets/ShareButton'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
@@ -130,6 +131,7 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
           <div className="flex items-start justify-between mb-4">
             <h1 className="text-2xl sm:text-3xl font-light text-foreground">{billet.title}</h1>
             <div className="ml-4 flex-shrink-0 flex items-center gap-2">
+              <ShareButton title={billet.title} />
               <a
                 href={`/api/billets/${slug}/download`}
                 className="text-subtle hover:text-foreground underline text-sm"
