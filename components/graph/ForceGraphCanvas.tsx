@@ -110,6 +110,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
     // Bloom animation state - in backgroundMode, start fully expanded
     const [isExpanded, setIsExpanded] = useState(backgroundMode)
     const [revealPhase, setRevealPhase] = useState(backgroundMode ? 9999 : 0) // 9999 = all visible, 0=collapsed
+    const [showHint, setShowHint] = useState(!backgroundMode) // Show click hint initially
 
     const colors = nightMode ? COLORS.dark : COLORS.light
 
@@ -404,7 +405,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                                     const targetX = Math.cos(angle) * targetR
                                     const targetY = Math.sin(angle) * targetR
 
-                                    const strength = 0.3
+                                    const strength = 0.5  // Stronger force for tighter circle
                                     node.vx = (node.vx || 0) + (targetX - node.x) * strength * alpha
                                     node.vy = (node.vy || 0) + (targetY - node.y) * strength * alpha
                                 } else {
@@ -466,33 +467,63 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
         setIsExpanded(true)
         setRevealPhase(0)
 
-        // Phase 1 to N: Reveal isolated nodes one by one (slower, smoother)
+        // Phase 1 to N: Reveal isolated nodes one by one (faster)
         for (let i = 0; i < numIsolated; i++) {
             setTimeout(() => {
                 setRevealPhase(1 + i)
-            }, 200 + i * 150) // Slower timing, no reheat
+                // Only reheat at first reveal to start movement
+                if (i === 0) fgRef.current?.d3ReheatSimulation()
+            }, 100 + i * 80) // Faster timing
         }
 
         // After isolated nodes, reveal clusters one by one
-        const isolatedDuration = 200 + numIsolated * 150 + 300
+        const isolatedDuration = 100 + numIsolated * 80 + 150
         for (let i = 0; i < numClusters; i++) {
             setTimeout(() => {
                 setRevealPhase(1000 + i) // 1000+ = cluster phases
-            }, isolatedDuration + i * 250) // Slower cluster reveal
+            }, isolatedDuration + i * 120) // Faster cluster reveal
         }
     }, [data])
 
-    // Collapse animation - return to hub
+    // Collapse animation - reverse bloom progressively
     const triggerCollapse = useCallback(() => {
-        setIsExpanded(false)
-        setRevealPhase(0)
+        if (!data) return
+
+        const numClusters = data.nodes.filter(n => n.type === 'BILLET').length > 0 ?
+            Math.ceil(Math.sqrt(data.nodes.filter(n => n.type === 'BILLET').length)) : 3
+        const isolatedCount = data.nodes.filter((n: any) => n.isIsolated).length
+
+        // Single reheat at start
         fgRef.current?.d3ReheatSimulation()
-    }, [])
+
+        // Hide clusters one by one (reverse order)
+        for (let i = numClusters - 1; i >= 0; i--) {
+            setTimeout(() => {
+                setRevealPhase(1000 + i)
+            }, (numClusters - 1 - i) * 150)
+        }
+
+        // Then hide isolated nodes (reverse order)
+        const clusterDuration = numClusters * 150
+        for (let i = isolatedCount; i >= 0; i--) {
+            setTimeout(() => {
+                setRevealPhase(i)
+            }, clusterDuration + (isolatedCount - i) * 80)
+        }
+
+        // Finally set collapsed state
+        const totalDuration = clusterDuration + isolatedCount * 80 + 100
+        setTimeout(() => {
+            setIsExpanded(false)
+            setRevealPhase(0)
+        }, totalDuration)
+    }, [data])
 
     // Handle node click - navigate to billet OR trigger bloom
     const handleNodeClick = useCallback((node: any) => {
         // Click on hub toggles bloom
         if (node.isHub) {
+            setShowHint(false)  // Hide click hint on first interaction
             if (isExpanded) {
                 triggerCollapse()
             } else {
@@ -929,30 +960,15 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                     onNodeDragEnd={handleNodeDragEnd}
                     enableNodeDrag={true}
                     cooldownTicks={100}
-                    d3AlphaDecay={0.08}
-                    d3VelocityDecay={0.35}
+                    d3AlphaDecay={0.12}
+                    d3VelocityDecay={0.3}
                     d3AlphaMin={0.001}
                     warmupTicks={50}
                 />
             )}
 
-            {/* Search & Info Panel - Hidden in background mode */}
+            {/* Info Panel - Hidden in background mode */}
             {!backgroundMode && <div className="absolute top-20 left-4 z-10 flex flex-col gap-2 w-80">
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: colors.text }} />
-                    <input
-                        type="text"
-                        placeholder="Chercher un billet..."
-                        value={searchQuery}
-                        onChange={e => handleSearch(e.target.value)}
-                        className="w-full rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2"
-                        style={{
-                            background: nightMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
-                            color: colors.text,
-                            border: `1px solid ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
-                        }}
-                    />
-                </div>
 
                 {hoverNode && (
                     <div
@@ -992,12 +1008,81 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                 )}
             </div>}
 
+            {/* Click Hint - Shows on first visit, hidden after clicking hub */}
+            {!backgroundMode && showHint && !isExpanded && (
+                <div
+                    className="absolute z-20 pointer-events-none"
+                    style={{
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(50px, -100px)',
+                    }}
+                >
+                    <style>{`
+                        @keyframes drawArrow {
+                            0% { stroke-dashoffset: 100; opacity: 1; }
+                            50% { stroke-dashoffset: 0; opacity: 1; }
+                            70% { stroke-dashoffset: 0; opacity: 1; }
+                            85% { stroke-dashoffset: 0; opacity: 0; }
+                            86% { stroke-dashoffset: 100; opacity: 0; }
+                            100% { stroke-dashoffset: 100; opacity: 0; }
+                        }
+                        @keyframes fadeInArrowHead {
+                            0%, 40% { opacity: 0; }
+                            50% { opacity: 1; }
+                            70% { opacity: 1; }
+                            85%, 100% { opacity: 0; }
+                        }
+                        @keyframes fadeText {
+                            0%, 30% { opacity: 0; }
+                            45% { opacity: 1; }
+                            85% { opacity: 1; }
+                            100% { opacity: 0; }
+                        }
+                        .arrow-path { animation: drawArrow 2.5s ease-in-out infinite; stroke-dasharray: 100; stroke-dashoffset: 100; }
+                        .arrow-head { animation: fadeInArrowHead 2.5s ease-in-out infinite; }
+                        .hint-text { animation: fadeText 2.5s ease-in-out infinite; }
+                    `}</style>
+                    <div className="flex flex-col items-start">
+                        {/* Smooth curved arrow pointing to center */}
+                        <svg width="80" height="80" viewBox="0 0 80 80" className="mb-1">
+                            <path
+                                className="arrow-path"
+                                d="M 65 10 C 50 15, 35 35, 25 65"
+                                fill="none"
+                                stroke="#2aa198"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                            />
+                            {/* Arrow head */}
+                            <polygon
+                                className="arrow-head"
+                                points="20,55 30,70 15,68"
+                                fill="#2aa198"
+                            />
+                        </svg>
+                        <span
+                            className="text-sm font-medium hint-text"
+                            style={{ color: '#2aa198' }}
+                        >
+                            Cliquez ici !
+                        </span>
+                    </div>
+                </div>
+            )}
+
             {/* Settings Panel - Slide-in from Right - Hidden in background mode */}
+            {!backgroundMode && showSettings && (
+                <div
+                    className="fixed inset-0 z-20"
+                    onClick={() => setShowSettings(false)}
+                />
+            )}
             {!backgroundMode && <div
                 className="fixed right-0 z-30 transition-transform duration-300 ease-out"
                 style={{
-                    top: '64px', // Below navbar
-                    height: 'calc(100vh - 64px)',
+                    top: 0,
+                    height: '100vh',
                     transform: showSettings ? 'translateX(0)' : 'translateX(100%)',
                     width: '300px',
                 }}
@@ -1005,20 +1090,14 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                 <div
                     className="h-full overflow-y-auto"
                     style={{
-                        background: nightMode
-                            ? 'rgba(0,43,54,0.98)'
-                            : 'rgba(253,246,227,0.99)',
-                        borderLeft: `1px solid ${nightMode ? 'rgba(42,161,152,0.25)' : 'rgba(42,161,152,0.2)'}`,
-                        boxShadow: '-4px 0 24px rgba(0,0,0,0.12)',
+                        background: nightMode ? '#073642' : '#eee8d5',
                     }}
                 >
                     {/* Header */}
                     <div
                         className="sticky top-0 flex items-center justify-between px-5 py-4 z-10"
                         style={{
-                            borderBottom: `1px solid ${nightMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}`,
-                            background: nightMode ? 'rgba(0,43,54,0.95)' : 'rgba(253,246,227,0.95)',
-                            backdropFilter: 'blur(10px)',
+                            background: nightMode ? '#073642' : '#eee8d5',
                         }}
                     >
                         <div className="flex items-center gap-2">
@@ -1029,30 +1108,18 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                         </div>
                         <button
                             onClick={() => setShowSettings(false)}
-                            className="p-2 rounded-lg transition-all hover:scale-110"
-                            style={{ background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}
+                            className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                            style={{
+                                background: nightMode ? 'rgba(42,161,152,0.2)' : 'rgba(42,161,152,0.15)',
+                                color: '#2aa198',
+                            }}
+                            title="Fermer"
                         >
-                            <X className="w-4 h-4" style={{ color: colors.text }} />
+                            <X className="w-4 h-4" />
                         </button>
                     </div>
 
                     <div className="p-5 space-y-6">
-                        {/* Bloom Button - Sun icon only (matching hub node) */}
-                        <button
-                            onClick={() => {
-                                triggerCollapse()
-                                setTimeout(() => triggerBloom(), 300)
-                            }}
-                            className="w-12 h-12 mx-auto rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
-                            style={{
-                                background: 'linear-gradient(135deg, #268bd2 0%, #2aa198 100%)',
-                                color: '#fdf6e3',
-                                boxShadow: '0 4px 15px rgba(38, 139, 210, 0.3)',
-                            }}
-                            title="Épanouir le graphe"
-                        >
-                            <Sparkles className="w-6 h-6" />
-                        </button>
 
                         {/* Structure Section */}
                         <div>
@@ -1069,7 +1136,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                                             Distance des grappes
                                         </label>
                                         <span className="text-xs font-mono px-2 py-0.5 rounded"
-                                            style={{ background: nightMode ? 'rgba(38,139,210,0.2)' : 'rgba(38,139,210,0.1)', color: '#268bd2' }}>
+                                            style={{ background: nightMode ? 'rgba(42,161,152,0.2)' : 'rgba(42,161,152,0.1)', color: '#2aa198' }}>
                                             {forces.polygonRadius}
                                         </span>
                                     </div>
@@ -1082,7 +1149,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                                         onChange={e => setForces(f => ({ ...f, polygonRadius: Number(e.target.value) }))}
                                         className="w-full h-2 rounded-full appearance-none cursor-pointer"
                                         style={{
-                                            background: `linear-gradient(to right, #268bd2 0%, #268bd2 ${(forces.polygonRadius - 100) / 4}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} ${(forces.polygonRadius - 100) / 4}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 100%)`,
+                                            background: `linear-gradient(to right, #2aa198 0%, #2aa198 ${(forces.polygonRadius - 100) / 4}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} ${(forces.polygonRadius - 100) / 4}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 100%)`,
                                         }}
                                     />
                                 </div>
@@ -1128,7 +1195,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                                             Répulsion
                                         </label>
                                         <span className="text-xs font-mono px-2 py-0.5 rounded"
-                                            style={{ background: nightMode ? 'rgba(38,139,210,0.2)' : 'rgba(38,139,210,0.1)', color: '#268bd2' }}>
+                                            style={{ background: nightMode ? 'rgba(42,161,152,0.2)' : 'rgba(42,161,152,0.1)', color: '#2aa198' }}>
                                             {Math.abs(forces.chargeStrength)}
                                         </span>
                                     </div>
@@ -1140,7 +1207,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                                         onChange={e => setForces(f => ({ ...f, chargeStrength: Number(e.target.value) }))}
                                         className="w-full h-2 rounded-full appearance-none cursor-pointer"
                                         style={{
-                                            background: `linear-gradient(to right, #268bd2 0%, #268bd2 ${(500 + forces.chargeStrength) / 4.9}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} ${(500 + forces.chargeStrength) / 4.9}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 100%)`,
+                                            background: `linear-gradient(to right, #2aa198 0%, #2aa198 ${(500 + forces.chargeStrength) / 4.9}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} ${(500 + forces.chargeStrength) / 4.9}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 100%)`,
                                         }}
                                     />
                                 </div>
@@ -1152,7 +1219,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                                             Rayon de collision
                                         </label>
                                         <span className="text-xs font-mono px-2 py-0.5 rounded"
-                                            style={{ background: nightMode ? 'rgba(38,139,210,0.2)' : 'rgba(38,139,210,0.1)', color: '#268bd2' }}>
+                                            style={{ background: nightMode ? 'rgba(42,161,152,0.2)' : 'rgba(42,161,152,0.1)', color: '#2aa198' }}>
                                             {forces.collisionRadius}
                                         </span>
                                     </div>
@@ -1164,7 +1231,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                                         onChange={e => setForces(f => ({ ...f, collisionRadius: Number(e.target.value) }))}
                                         className="w-full h-2 rounded-full appearance-none cursor-pointer"
                                         style={{
-                                            background: `linear-gradient(to right, #268bd2 0%, #268bd2 ${(forces.collisionRadius - 5) / 0.45}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} ${(forces.collisionRadius - 5) / 0.45}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 100%)`,
+                                            background: `linear-gradient(to right, #2aa198 0%, #2aa198 ${(forces.collisionRadius - 5) / 0.45}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} ${(forces.collisionRadius - 5) / 0.45}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 100%)`,
                                         }}
                                     />
                                 </div>
@@ -1199,7 +1266,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
             </div>}
 
             {/* Controls - Hidden in background mode */}
-            {!backgroundMode && <div className="absolute bottom-4 right-4 z-10 flex gap-2">
+            {!backgroundMode && <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2 items-center">
                 <button
                     onClick={() => setNightMode(n => !n)}
                     className="p-2.5 rounded-xl transition-all hover:scale-105"
@@ -1223,50 +1290,6 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                     title="Paramètres"
                 >
                     <Settings2 className="w-5 h-5" />
-                </button>
-                <button
-                    onClick={toggleSimulation}
-                    className="p-2.5 rounded-xl transition-all hover:scale-105"
-                    style={{
-                        background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                        color: isSimulationRunning ? colors.node : colors.text,
-                    }}
-                    title={isSimulationRunning ? 'Pause simulation' : 'Reprendre simulation'}
-                >
-                    <Sparkles className="w-5 h-5" />
-                </button>
-                <button
-                    onClick={resetView}
-                    className="p-2.5 rounded-xl transition-all hover:scale-105"
-                    style={{
-                        background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                        color: colors.text,
-                    }}
-                    title="Vue d'ensemble"
-                >
-                    <Maximize2 className="w-5 h-5" />
-                </button>
-                <button
-                    onClick={zoomOut}
-                    className="p-2.5 rounded-xl transition-all hover:scale-105"
-                    style={{
-                        background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                        color: colors.text,
-                    }}
-                    title="Zoom arrière"
-                >
-                    <ZoomOut className="w-5 h-5" />
-                </button>
-                <button
-                    onClick={zoomIn}
-                    className="p-2.5 rounded-xl transition-all hover:scale-105"
-                    style={{
-                        background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                        color: colors.text,
-                    }}
-                    title="Zoom avant"
-                >
-                    <ZoomIn className="w-5 h-5" />
                 </button>
             </div>}
 
