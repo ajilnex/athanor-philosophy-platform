@@ -57,7 +57,7 @@ export function Navbar() {
   }, [open])
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[var(--sol-base2)] sm:bg-[var(--sol-base2)]/95 sm:backdrop-blur-lg">
+    <header className="sticky top-0 z-50 w-full bg-[var(--sol-base3)] sm:bg-[var(--sol-base3)]/95 sm:backdrop-blur-lg">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 h-14 flex items-center justify-between">
         {/* Brand -> Home */}
         <Link href="/" className="font-serif text-xl tracking-tight hover:opacity-80 font-medium text-foreground">
@@ -118,7 +118,7 @@ export function Navbar() {
           id="mobile-nav"
           role="dialog"
           aria-modal="true"
-          className="sm:hidden fixed inset-0 z-[70] bg-[var(--sol-base2)] border-t border-subtle fade-in"
+          className="sm:hidden fixed inset-0 z-[70] bg-[var(--sol-base3)] border-t border-subtle fade-in"
         >
           <div className="max-w-5xl mx-auto px-4 py-4 slide-down">
             <div className="flex items-center justify-between h-12">
