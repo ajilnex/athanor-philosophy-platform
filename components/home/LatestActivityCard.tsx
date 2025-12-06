@@ -1,3 +1,5 @@
+'use client'
+
 import { Billet } from '@/lib/billets'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
