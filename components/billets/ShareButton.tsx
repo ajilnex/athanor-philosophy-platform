@@ -42,19 +42,14 @@ export function ShareButton({ title, url, className = '' }: ShareButtonProps) {
     return (
         <button
             onClick={handleShare}
-            className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm text-subtle hover:text-foreground transition-colors rounded-lg hover:bg-muted ${className}`}
+            className={`inline-flex items-center justify-center w-9 h-9 rounded-lg transition-all hover:bg-[var(--sol-base2)] ${className}`}
+            style={{ color: copied ? 'var(--sol-green)' : 'var(--sol-base01)' }}
             title={copied ? 'Lien copié !' : 'Partager ce billet'}
         >
             {copied ? (
-                <>
-                    <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-green-600">Copié !</span>
-                </>
+                <Check className="h-5 w-5" />
             ) : (
-                <>
-                    <Share2 className="h-4 w-4" />
-                    <span>Partager</span>
-                </>
+                <Share2 className="h-5 w-5" />
             )}
         </button>
     )

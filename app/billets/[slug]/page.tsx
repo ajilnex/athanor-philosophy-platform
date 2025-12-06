@@ -134,9 +134,11 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
               <ShareButton title={billet.title} />
               <a
                 href={`/api/billets/${slug}/download`}
-                className="text-subtle hover:text-foreground underline text-sm"
+                className="inline-flex items-center justify-center w-9 h-9 rounded-lg transition-all hover:bg-[var(--sol-base2)]"
+                style={{ color: 'var(--sol-base01)' }}
+                title="Télécharger le fichier .md"
               >
-                <Download className="inline h-4 w-4 mr-1" /> Télécharger .md
+                <Download className="h-5 w-5" />
               </a>
               <EditBilletButton
                 slug={slug}
