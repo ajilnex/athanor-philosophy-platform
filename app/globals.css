@@ -4,15 +4,78 @@
 @tailwind utilities;
 
 @layer base {
+
   /* iA Writer Duo est chargée via next/font/local uniquement dans la Salle du Temps */
   :root {
-    --background: 220 10% 98%; /* Gris très clair, presque blanc */
-    --foreground: 220 15% 20%; /* Noir doux, presque anthracite */
-    --subtle: 220 10% 60%; /* Gris moyen pour les métadonnées */
-    --accent: 220 90% 55%; /* Un bleu encre profond et académique */
-    --destructive: 0 84% 60%; /* Rouge pour erreurs et danger */
-    --success: 142 76% 36%; /* Vert pour succès */
-    --muted: 220 10% 95%; /* Arrière-plans neutres très clairs */
+    /* === SOLARIZED PALETTE === */
+    /* Base tones (monotones) */
+    --sol-base03: #002b36;
+    /* darkest - dark bg */
+    --sol-base02: #073642;
+    /* dark bg highlight */
+    --sol-base01: #586e75;
+    /* dark secondary text */
+    --sol-base00: #657b83;
+    /* light primary text */
+    --sol-base0: #839496;
+    /* dark primary text */
+    --sol-base1: #93a1a1;
+    /* light secondary text */
+    --sol-base2: #eee8d5;
+    /* light bg highlight */
+    --sol-base3: #fdf6e3;
+    /* lightest - light bg */
+
+    /* Accent colors */
+    --sol-yellow: #b58900;
+    --sol-orange: #cb4b16;
+    --sol-red: #dc322f;
+    --sol-magenta: #d33682;
+    --sol-violet: #6c71c4;
+    --sol-blue: #268bd2;
+    --sol-cyan: #2aa198;
+    --sol-green: #859900;
+
+    /* === SEMANTIC TOKENS (Light Mode) === */
+    --background: #fdf6e3;
+    /* sol-base3 */
+    --background-elevated: #eee8d5;
+    /* sol-base2 */
+    --foreground: #657b83;
+    /* sol-base00 */
+    --subtle: #93a1a1;
+    /* sol-base1 */
+    --accent: #2aa198;
+    /* sol-cyan */
+    --accent-hover: #268bd2;
+    /* sol-blue */
+    --destructive: #dc322f;
+    /* sol-red */
+    --success: #859900;
+    /* sol-green */
+    --warning: #b58900;
+    /* sol-yellow */
+    --muted: #eee8d5;
+    /* sol-base2 */
+  }
+
+  /* Dark Mode */
+  .dark,
+  [data-theme="dark"] {
+    --background: #002b36;
+    /* sol-base03 */
+    --background-elevated: #073642;
+    /* sol-base02 */
+    --foreground: #839496;
+    /* sol-base0 */
+    --subtle: #586e75;
+    /* sol-base01 */
+    --accent: #2aa198;
+    /* sol-cyan */
+    --accent-hover: #268bd2;
+    /* sol-blue */
+    --muted: #073642;
+    /* sol-base02 */
   }
 
   /* Smooth scroll global */
@@ -117,6 +180,7 @@
       opacity: 0;
       transform: scale(0.98);
     }
+
     to {
       opacity: 1;
       transform: scale(1);
@@ -128,6 +192,7 @@
       opacity: 1;
       transform: scale(1);
     }
+
     to {
       opacity: 0;
       transform: scale(0.98);
@@ -161,9 +226,11 @@
     0% {
       opacity: 1;
     }
+
     50% {
       opacity: 0;
     }
+
     100% {
       opacity: 1;
     }
@@ -209,12 +276,14 @@
 }
 
 @layer components {
+
   /* Animations légères et réutilisables */
   @keyframes fadeIn {
     from {
       opacity: 0;
       transform: translateY(4px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -226,6 +295,7 @@
       transform: translateY(-8px);
       opacity: 0;
     }
+
     to {
       transform: translateY(0);
       opacity: 1;
@@ -233,10 +303,12 @@
   }
 
   @keyframes subtlePulse {
+
     0%,
     100% {
       opacity: 1;
     }
+
     50% {
       opacity: 0.8;
     }
@@ -249,6 +321,7 @@
   .fade-in {
     animation: fadeIn 200ms ease-out both;
   }
+
   .slide-down {
     animation: slideDown 220ms ease-out both;
   }
@@ -258,19 +331,31 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
   /* UI Verre - Utilitaire glass */
   .glass {
-    @apply bg-background/35 backdrop-blur-md border border-white/10;
+    @apply backdrop-blur-md border border-white/10;
+    background-color: rgba(253, 246, 227, 0.35);
     box-shadow:
       0 4px 6px -1px rgba(0, 0, 0, 0.05),
       0 2px 4px -1px rgba(0, 0, 0, 0.03);
   }
 
+  .dark .glass {
+    background-color: rgba(0, 43, 54, 0.35);
+  }
+
   .glass-light {
-    @apply bg-background/25 backdrop-blur-sm border border-white/10;
+    @apply backdrop-blur-sm border border-white/10;
+    background-color: rgba(253, 246, 227, 0.25);
+  }
+
+  .dark .glass-light {
+    background-color: rgba(0, 43, 54, 0.25);
   }
 
   /* Constellation intégrée v2 - Budget opacité global */
@@ -313,16 +398,19 @@
     from {
       stroke-dashoffset: 10;
     }
+
     to {
       stroke-dashoffset: 0;
     }
   }
 
   @keyframes twinkle {
+
     0%,
     100% {
       opacity: 0.02;
     }
+
     50% {
       opacity: 0.08;
     }
@@ -380,18 +468,34 @@
     @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all duration-200;
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
+
   .btn-primary {
-    @apply btn bg-foreground text-background shadow-sm hover:bg-foreground/90;
+    @apply btn bg-foreground text-background shadow-sm;
   }
+
+  .btn-primary:hover {
+    opacity: 0.9;
+  }
+
   .btn-secondary {
-    @apply btn bg-background border border-subtle/50 text-foreground shadow-sm hover:bg-muted;
+    @apply btn bg-background border border-subtle text-foreground shadow-sm hover:bg-muted;
   }
+
   .btn-danger {
-    @apply btn bg-destructive text-white shadow-sm hover:bg-destructive/90;
+    @apply btn bg-destructive text-white shadow-sm;
+  }
+
+  .btn-danger:hover {
+    opacity: 0.9;
   }
 
   .card {
-    @apply bg-background/80 border border-transparent rounded-lg shadow-sm transition-all duration-300 hover:border-subtle/50 hover:shadow-md backdrop-blur-sm p-6;
+    @apply border border-transparent rounded-lg shadow-sm transition-all duration-300 hover:shadow-md backdrop-blur-sm p-6;
+    background-color: var(--background);
+  }
+
+  .card:hover {
+    border-color: var(--subtle);
   }
 
   .input-field {
@@ -399,12 +503,12 @@
   }
 
   .search-input {
-    @apply glass text-foreground rounded-full outline-none
-           transition-all duration-300;
+    @apply glass text-foreground rounded-full outline-none transition-all duration-300;
   }
+
   .search-input:focus {
-    @apply ring-2 ring-accent/50;
-    border-color: hsl(var(--accent) / 0.4);
+    box-shadow: 0 0 0 2px rgba(42, 161, 152, 0.5);
+    border-color: rgba(42, 161, 152, 0.4);
   }
 
   /* Styles pour les backlinks [[mot]] */
@@ -456,7 +560,9 @@
   .prose li {
     @apply mb-2;
   }
-} /* motif de grille très léger pour le hero */
+}
+
+/* motif de grille très léger pour le hero */
 .grid-pattern {
   background-image:
     radial-gradient(currentColor 1px, transparent 1px),
@@ -469,30 +575,37 @@
     12px 12px;
   color: rgba(0, 0, 0, 0.05);
 }
+
 :root .dark .grid-pattern {
   color: rgba(255, 255, 255, 0.06);
 }
+
 /* QuoteTicker animation */
 .ticker {
   animation: ticker-scroll 40s linear infinite;
 }
+
 @keyframes ticker-scroll {
   0% {
     transform: translateX(0%);
   }
+
   100% {
     transform: translateX(-50%);
   }
 }
+
 @media (prefers-reduced-motion: reduce) {
   .ticker {
     animation: none;
   }
 }
+
 /* --- L'athanor accents (S1 minimal) --- */
 .accent-card {
   position: relative;
 }
+
 .accent-card::before {
   content: '';
   position: absolute;
@@ -502,6 +615,7 @@
   width: 2px;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0));
 }
+
 .dark .accent-card::before {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0));
 }
@@ -529,6 +643,7 @@ a:hover {
     transform: scale(0);
     opacity: 1;
   }
+
   100% {
     transform: scale(4);
     opacity: 0;
@@ -537,7 +652,8 @@ a:hover {
 
 /* Enhanced search result snippet styling */
 .card-search-result strong {
-  @apply font-semibold text-foreground bg-accent/10 px-1 py-0.5 rounded;
+  @apply font-semibold text-foreground px-1 py-0.5 rounded;
+  background-color: rgba(42, 161, 152, 0.1);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }

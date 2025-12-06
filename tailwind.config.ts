@@ -9,13 +9,38 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: 'hsl(var(--background))', // Fond principal
-        foreground: 'hsl(var(--foreground))', // Texte principal
-        subtle: 'hsl(var(--subtle))', // Texte secondaire, bordures
-        accent: 'hsl(var(--accent))', // Couleur d'accentuation (liens, focus)
-        destructive: 'hsl(var(--destructive))', // Couleur d'erreur/danger
-        success: 'hsl(var(--success))', // Couleur de succès
-        muted: 'hsl(var(--muted))', // Arrière-plans neutres
+        // Semantic colors (from CSS variables)
+        background: 'var(--background)',
+        'background-elevated': 'var(--background-elevated)',
+        foreground: 'var(--foreground)',
+        subtle: 'var(--subtle)',
+        accent: 'var(--accent)',
+        'accent-hover': 'var(--accent-hover)',
+        destructive: 'var(--destructive)',
+        success: 'var(--success)',
+        warning: 'var(--warning)',
+        muted: 'var(--muted)',
+
+        // Solarized palette (direct access)
+        sol: {
+          base03: 'var(--sol-base03)',
+          base02: 'var(--sol-base02)',
+          base01: 'var(--sol-base01)',
+          base00: 'var(--sol-base00)',
+          base0: 'var(--sol-base0)',
+          base1: 'var(--sol-base1)',
+          base2: 'var(--sol-base2)',
+          base3: 'var(--sol-base3)',
+          yellow: 'var(--sol-yellow)',
+          orange: 'var(--sol-orange)',
+          red: 'var(--sol-red)',
+          magenta: 'var(--sol-magenta)',
+          violet: 'var(--sol-violet)',
+          blue: 'var(--sol-blue)',
+          cyan: 'var(--sol-cyan)',
+          green: 'var(--sol-green)',
+        },
+
         transparent: 'transparent',
         white: '#ffffff',
         black: '#000000',
