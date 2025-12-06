@@ -123,10 +123,22 @@ export function EditorSolarpunk({
     const stats = useDocumentStats(content)
     const sections = useSections(content)
 
+    // Ref to track if we already started immersive (to prevent double-trigger)
+    const didStartImmersiveRef = useRef(false)
 
-
-
-
+    // Auto-start immersive mode if requested
+    useEffect(() => {
+        if (startImmersive && !didStartImmersiveRef.current) {
+            didStartImmersiveRef.current = true
+            setIsImmersive(true)
+            // Try fullscreen
+            setTimeout(async () => {
+                try {
+                    await document.documentElement.requestFullscreen?.()
+                } catch { }
+            }, 100)
+        }
+    }, [startImmersive])
     // Auto-save
     useEffect(() => {
         if (!content.trim() || isImmersive) return
@@ -349,7 +361,7 @@ export function EditorSolarpunk({
                 <button
                     onClick={() => setNightMode(n => !n)}
                     className="salle-exit-always"
-                    style={{ right: '56px' }}
+                    style={{ right: '72px' }}
                     title={nightMode ? 'Mode jour' : 'Mode nuit'}
                 >
                     {nightMode ? '☀️' : '🌙'}

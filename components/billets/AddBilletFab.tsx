@@ -14,7 +14,12 @@ export function AddBilletFab() {
   return (
     <button
       onClick={handleClick}
-      className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-purple-600 to-violet-500 text-white shadow-lg hover:from-purple-700 hover:to-violet-600 transition-all transform hover:scale-105"
+      className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-lg transition-all transform hover:scale-105 hover:opacity-90"
+      style={{
+        backgroundColor: 'var(--sol-base02)',
+        border: '2px solid var(--sol-base01)',
+        color: 'var(--sol-cyan)',
+      }}
       aria-label="Salle du Temps — Nouveau billet"
       title="Salle du Temps — Nouveau billet"
     >

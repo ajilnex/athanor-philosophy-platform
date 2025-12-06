@@ -83,9 +83,10 @@ interface GraphData {
 
 interface ForceGraphCanvasProps {
     className?: string
+    backgroundMode?: boolean // When true: decorative background with reduced opacity, no controls
 }
 
-export function ForceGraphCanvas({ className = '' }: ForceGraphCanvasProps) {
+export function ForceGraphCanvas({ className = '', backgroundMode = false }: ForceGraphCanvasProps) {
     const router = useRouter()
     const fgRef = useRef<any>(null)
 
@@ -106,9 +107,9 @@ export function ForceGraphCanvas({ className = '' }: ForceGraphCanvasProps) {
     const [showLabels, setShowLabels] = useState(true)
     const [isSimulationRunning, setIsSimulationRunning] = useState(true)
 
-    // Bloom animation state
-    const [isExpanded, setIsExpanded] = useState(false)
-    const [revealPhase, setRevealPhase] = useState(0) // 0=collapsed, 1=isolates, 2+=clusters
+    // Bloom animation state - in backgroundMode, start fully expanded
+    const [isExpanded, setIsExpanded] = useState(backgroundMode)
+    const [revealPhase, setRevealPhase] = useState(backgroundMode ? 9999 : 0) // 9999 = all visible, 0=collapsed
 
     const colors = nightMode ? COLORS.dark : COLORS.light
 
@@ -833,7 +834,15 @@ export function ForceGraphCanvas({ className = '' }: ForceGraphCanvasProps) {
     }
 
     return (
-        <div className={`relative ${className}`} style={{ background: colors.bg }}>
+        <div
+            className={`relative ${className}`}
+            style={{
+                background: colors.bg,
+                opacity: backgroundMode ? 0.45 : 1,
+                pointerEvents: backgroundMode ? 'none' : 'auto',
+                transition: 'opacity 0.3s ease',
+            }}
+        >
             {/* Graph */}
             {graphData && dimensions.width > 0 && (
                 <ForceGraph2D
@@ -928,8 +937,8 @@ export function ForceGraphCanvas({ className = '' }: ForceGraphCanvasProps) {
                 />
             )}
 
-            {/* Search & Info Panel */}
-            <div className="absolute top-20 left-4 z-10 flex flex-col gap-2 w-80">
+            {/* Search & Info Panel - Hidden in background mode */}
+            {!backgroundMode && <div className="absolute top-20 left-4 z-10 flex flex-col gap-2 w-80">
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: colors.text }} />
                     <input
@@ -982,10 +991,10 @@ export function ForceGraphCanvas({ className = '' }: ForceGraphCanvasProps) {
                         )}
                     </div>
                 )}
-            </div>
+            </div>}
 
-            {/* Settings Panel - Slide-in from Right */}
-            <div
+            {/* Settings Panel - Slide-in from Right - Hidden in background mode */}
+            {!backgroundMode && <div
                 className="fixed right-0 z-30 transition-transform duration-300 ease-out"
                 style={{
                     top: '64px', // Below navbar
@@ -1188,10 +1197,10 @@ export function ForceGraphCanvas({ className = '' }: ForceGraphCanvasProps) {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>}
 
-            {/* Controls */}
-            <div className="absolute bottom-4 right-4 z-10 flex gap-2">
+            {/* Controls - Hidden in background mode */}
+            {!backgroundMode && <div className="absolute bottom-4 right-4 z-10 flex gap-2">
                 <button
                     onClick={() => setNightMode(n => !n)}
                     className="p-2.5 rounded-xl transition-all hover:scale-105"
@@ -1260,10 +1269,10 @@ export function ForceGraphCanvas({ className = '' }: ForceGraphCanvasProps) {
                 >
                     <ZoomIn className="w-5 h-5" />
                 </button>
-            </div>
+            </div>}
 
-            {/* Isolated Nodes Panel */}
-            {showIsolated && isolatedNodes.length > 0 && (
+            {/* Isolated Nodes Panel - Also hidden in background mode */}
+            {!backgroundMode && showIsolated && isolatedNodes.length > 0 && (
                 <div
                     className="absolute top-20 right-4 z-20 w-72 max-h-[60vh] overflow-y-auto rounded-xl backdrop-blur-md shadow-xl"
                     style={{
@@ -1323,8 +1332,8 @@ export function ForceGraphCanvas({ className = '' }: ForceGraphCanvasProps) {
                 </div>
             )}
 
-            {/* Stats */}
-            <div
+            {/* Stats - Hidden in background mode */}
+            {!backgroundMode && <div
                 className="absolute bottom-4 left-4 text-xs px-3 py-2 rounded-xl flex items-center gap-3"
                 style={{
                     background: nightMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
@@ -1351,7 +1360,7 @@ export function ForceGraphCanvas({ className = '' }: ForceGraphCanvasProps) {
                         </button>
                     </>
                 )}
-            </div>
+            </div>}
         </div>
     )
 }

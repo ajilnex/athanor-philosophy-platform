@@ -457,7 +457,7 @@ Commencez à écrire pour faire disparaître ce guide...`
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header fixe */}
-      <header className="border-b border-subtle/20 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+      <header className="border-b border-subtle/20 backdrop-blur-sm sticky top-0 z-10" style={{ backgroundColor: 'rgba(238, 232, 213, 0.9)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Navigation */}
@@ -481,9 +481,10 @@ Commencez à écrire pour faire disparaître ce guide...`
                 type="button"
                 onClick={() => setShowPreview(p => !p)}
                 className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all ${showPreview
-                    ? 'bg-foreground text-background hover:bg-foreground/90'
-                    : 'bg-white border border-subtle/50 text-foreground hover:bg-muted'
+                  ? 'text-white'
+                  : 'border text-foreground hover:bg-muted'
                   }`}
+                style={showPreview ? { backgroundColor: 'var(--sol-base03)', color: 'var(--sol-base2)' } : { backgroundColor: 'var(--sol-base2)', borderColor: 'var(--sol-base01)' }}
               >
                 {showPreview ? (
                   <EyeOff className="h-4 w-4 mr-2" />
@@ -502,7 +503,12 @@ Commencez à écrire pour faire disparaître ce guide...`
                     await document.documentElement.requestFullscreen?.()
                   } catch { }
                 }}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 transition-all"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all"
+                style={{
+                  backgroundColor: 'var(--sol-base03)',
+                  color: 'var(--sol-base2)',
+                  border: '1px solid var(--sol-base01)',
+                }}
               >
                 <Sparkles className="h-4 w-4 mr-2" />
                 Salle du Temps
@@ -513,10 +519,14 @@ Commencez à écrire pour faire disparaître ce guide...`
                 type="button"
                 onClick={handleSave}
                 disabled={isSaving}
-                className="inline-flex items-center px-5 py-2 text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-5 py-2 text-sm font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  background: 'linear-gradient(135deg, var(--sol-cyan), var(--sol-blue))',
+                  color: 'var(--sol-base3)',
+                }}
               >
                 <Save className="h-4 w-4 mr-2" />
-                {isSaving ? 'Sauvegarde...' : 'Enregistrer'}
+                {isSaving ? 'Sauvegarde...' : 'Publier'}
               </button>
             </div>
           </div>
@@ -526,7 +536,7 @@ Commencez à écrire pour faire disparaître ce guide...`
       {/* Layout principal avec sidebar */}
       <div className="flex-1 flex">
         {/* Sidebar métadonnées */}
-        <aside className="w-80 border-r border-subtle/20 bg-white p-6 overflow-y-auto">
+        <aside className="w-80 border-r border-subtle/20 p-6 overflow-y-auto" style={{ backgroundColor: 'var(--sol-base2)' }}>
           <div className="space-y-6">
             {/* Titre */}
             <div>
@@ -575,7 +585,8 @@ Commencez à écrire pour faire disparaître ce guide...`
                 <button
                   type="button"
                   onClick={() => setShowImageUpload(true)}
-                  className="w-full inline-flex items-center px-3 py-2 text-sm bg-white border border-subtle/30 text-foreground rounded-lg hover:bg-muted transition-all"
+                  className="w-full inline-flex items-center px-3 py-2 text-sm border border-subtle/30 text-foreground rounded-lg hover:bg-muted transition-all"
+                  style={{ backgroundColor: 'var(--sol-base3)' }}
                 >
                   <ImageIcon className="h-4 w-4 mr-2 text-subtle" />
                   Insérer une image
@@ -584,7 +595,8 @@ Commencez à écrire pour faire disparaître ce guide...`
                 <button
                   type="button"
                   onClick={() => setShowCitationPicker(true)}
-                  className="w-full inline-flex items-center px-3 py-2 text-sm bg-white border border-subtle/30 text-foreground rounded-lg hover:bg-muted transition-all"
+                  className="w-full inline-flex items-center px-3 py-2 text-sm border border-subtle/30 text-foreground rounded-lg hover:bg-muted transition-all"
+                  style={{ backgroundColor: 'var(--sol-base3)' }}
                 >
                   <GraduationCap className="h-4 w-4 mr-2 text-subtle" />
                   Citation Zotero
@@ -596,7 +608,8 @@ Commencez à écrire pour faire disparaître ce guide...`
                     setSelectedTextForBacklink(getSelectedText())
                     setShowBacklinkPicker(true)
                   }}
-                  className="w-full inline-flex items-center px-3 py-2 text-sm bg-white border border-subtle/30 text-foreground rounded-lg hover:bg-muted transition-all"
+                  className="w-full inline-flex items-center px-3 py-2 text-sm border border-subtle/30 text-foreground rounded-lg hover:bg-muted transition-all"
+                  style={{ backgroundColor: 'var(--sol-base3)' }}
                 >
                   <Link2 className="h-4 w-4 mr-2 text-subtle" />
                   Lien vers un billet
@@ -614,7 +627,7 @@ Commencez à écrire pour faire disparaître ce guide...`
         </aside>
 
         {/* Zone de contenu principal */}
-        <main className="flex-1 bg-white">
+        <main className="flex-1" style={{ backgroundColor: 'var(--sol-base3)' }}>
           {showPreview ? (
             // Mode aperçu
             <div className="max-w-4xl mx-auto p-8">
@@ -659,7 +672,7 @@ Commencez à écrire pour faire disparaître ce guide...`
       {/* Modals */}
       {showImageUpload && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-8 z-50">
-          <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg">
+          <div className="rounded-xl shadow-2xl p-6 w-full max-w-lg" style={{ backgroundColor: 'var(--sol-base3)' }}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-foreground">Ajouter une image</h3>
               <button

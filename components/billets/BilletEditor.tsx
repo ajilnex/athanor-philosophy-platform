@@ -184,7 +184,7 @@ export function BilletEditor({
         if (document.fullscreenElement) {
           document
             .exitFullscreen()
-            .catch(() => {})
+            .catch(() => { })
             .finally(() => setIsImmersive(false))
         } else {
           setIsImmersive(false)
@@ -224,7 +224,7 @@ export function BilletEditor({
       if (navbar) navbar.style.display = ''
       window.removeEventListener('keydown', handleKeyDown, true)
       // cleanup listeners & timer
-      const showExitTemporarily = () => {}
+      const showExitTemporarily = () => { }
       window.removeEventListener('mousemove', showExitTemporarily)
       window.removeEventListener('mousedown', showExitTemporarily)
       window.removeEventListener('touchstart', showExitTemporarily)
@@ -242,34 +242,34 @@ export function BilletEditor({
       EditorView.theme({
         '&': {
           fontSize: isImmersive ? '18px' : '15px',
-          backgroundColor: isImmersive ? '#FAFAF8' : 'white',
+          backgroundColor: isImmersive ? '#FAFAF8' : '#fdf6e3',
         },
         '.cm-content': {
           padding: isImmersive ? '3rem 4rem' : '2rem',
-          caretColor: '#333',
-          backgroundColor: isImmersive ? '#FAFAF8' : 'white',
+          caretColor: 'var(--sol-base00)',
+          backgroundColor: isImmersive ? '#FAFAF8' : '#fdf6e3',
           minHeight: isImmersive ? '100vh' : 'auto',
           maxWidth: isImmersive ? '72ch' : 'none',
           margin: isImmersive ? '0 auto' : '0',
         },
         '.cm-focused': {
           outline: 'none',
-          backgroundColor: isImmersive ? '#FAFAF8' : 'white',
+          backgroundColor: isImmersive ? '#FAFAF8' : '#fdf6e3',
         },
         '.cm-cursor, .cm-dropCursor': {
-          borderLeftColor: '#333',
+          borderLeftColor: 'var(--sol-base00)',
           borderLeftWidth: '2px',
         },
         '.cm-editor': {
-          backgroundColor: isImmersive ? '#FAFAF8' : 'white',
+          backgroundColor: isImmersive ? '#FAFAF8' : '#fdf6e3',
         },
         '.cm-scroller': {
-          backgroundColor: isImmersive ? '#FAFAF8' : 'white',
+          backgroundColor: isImmersive ? '#FAFAF8' : '#fdf6e3',
           fontFamily: isImmersive ? 'var(--font-ia-writer)' : 'inherit',
           width: isImmersive ? '100vw' : 'auto',
         },
         '.cm-gutters': {
-          backgroundColor: isImmersive ? '#FAFAF8' : 'white',
+          backgroundColor: isImmersive ? '#FAFAF8' : '#fdf6e3',
           border: 'none',
         },
         '.cm-line': {
@@ -368,10 +368,10 @@ export function BilletEditor({
       style={
         isImmersive
           ? {
-              backgroundColor: '#FAFAF8',
-              color: '#333',
-              animation: 'salleEnter 0.3s ease-out',
-            }
+            backgroundColor: '#FAFAF8',
+            color: '#333',
+            animation: 'salleEnter 0.3s ease-out',
+          }
           : undefined
       }
     >
@@ -380,8 +380,9 @@ export function BilletEditor({
         className={
           isImmersive
             ? 'w-full h-full flex flex-col bg-[#FAFAF8]'
-            : 'bg-white rounded-lg shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col'
+            : 'rounded-lg shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col'
         }
+        style={!isImmersive ? { backgroundColor: 'var(--sol-base3)' } : undefined}
       >
         {!isImmersive && (
           <>
@@ -396,7 +397,7 @@ export function BilletEditor({
             </div>
 
             {/* Toolbar (mobile-friendly) */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4 border-b bg-gray-50">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4 border-b" style={{ backgroundColor: 'var(--sol-base2)' }}>
               <div className="flex flex-wrap items-center gap-2 overflow-x-auto">
                 {/* Actions éditeur */}
                 <button
@@ -431,11 +432,10 @@ export function BilletEditor({
                 <button
                   type="button"
                   onClick={() => setShowPreview(p => !p)}
-                  className={`px-3 py-1.5 text-sm rounded border transition ${
-                    showPreview
+                  className={`px-3 py-1.5 text-sm rounded border transition ${showPreview
                       ? 'bg-foreground text-background border-foreground'
                       : 'border-subtle/50 hover:bg-muted'
-                  }`}
+                    }`}
                   title="Basculer l'aperçu"
                 >
                   {showPreview ? (
@@ -451,9 +451,14 @@ export function BilletEditor({
                     setIsImmersive(true)
                     try {
                       await document.documentElement.requestFullscreen?.()
-                    } catch {}
+                    } catch { }
                   }}
-                  className="px-3 py-1.5 text-sm rounded bg-black/90 text-white hover:bg-black/80 transition flex items-center gap-2"
+                  className="px-3 py-1.5 text-sm rounded transition flex items-center gap-2"
+                  style={{
+                    backgroundColor: 'var(--sol-base03)',
+                    color: 'var(--sol-base2)',
+                    border: '1px solid var(--sol-base01)',
+                  }}
                   title="Entrer dans la Salle du Temps"
                 >
                   <Clock className="h-4 w-4" /> Salle du Temps
@@ -461,11 +466,15 @@ export function BilletEditor({
                 <button
                   type="button"
                   onClick={handleSave}
-                  className="px-3 py-2 text-sm rounded bg-foreground text-background hover:bg-foreground/90 transition flex items-center gap-2 w-full sm:w-auto"
+                  className="px-3 py-2 text-sm rounded transition flex items-center gap-2 w-full sm:w-auto"
+                  style={{
+                    background: 'linear-gradient(135deg, var(--sol-cyan), var(--sol-blue))',
+                    color: 'var(--sol-base3)',
+                  }}
                   disabled={isSaving}
                   title="Enregistrer"
                 >
-                  <Save className="h-4 w-4" /> {isSaving ? 'Sauvegarde…' : 'Enregistrer'}
+                  <Save className="h-4 w-4" /> {isSaving ? 'Sauvegarde…' : 'Publier'}
                 </button>
               </div>
             </div>
@@ -495,7 +504,7 @@ export function BilletEditor({
                     if (document.fullscreenElement) {
                       await document.exitFullscreen()
                     }
-                  } catch {}
+                  } catch { }
                   setIsImmersive(false)
                 }}
                 onFocus={() => setShowExitButton(true)}

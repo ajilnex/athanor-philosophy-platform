@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { getAllBillets } from '@/lib/billets'
 import { LatestActivityCard } from '@/components/home/LatestActivityCard'
-import { InteractiveGraph } from '@/components/graph/InteractiveGraph'
+import { ForceGraphCanvas } from '@/components/graph/ForceGraphCanvas'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { AddBilletFab } from '@/components/billets/AddBilletFab'
@@ -34,9 +34,9 @@ export default async function HomePage() {
   }
   return (
     <>
-      {/* Couche 1: Le Graphe en Arrière-Plan - Constellation intégrée */}
+      {/* Couche 1: Le Graphe Force en Arrière-Plan - Mode décoratif */}
       <div className="fixed inset-0 z-0 overflow-hidden">
-        <InteractiveGraph className="w-full h-full" interactive={false} />
+        <ForceGraphCanvas className="w-full h-full" backgroundMode={true} />
       </div>
 
       {/* Couche 2: Le Contenu au Premier Plan */}

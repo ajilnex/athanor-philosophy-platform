@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import { useEffect, useRef, useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, LogIn, LogOut } from 'lucide-react'
 
 function NavItem({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) {
   const pathname = usePathname()
@@ -12,7 +12,7 @@ function NavItem({ href, children, className }: { href: string; children: React.
   return (
     <Link
       href={href}
-      className={`px-3 py-2 text-sm font-light transition-all duration-200 ${active
+      className={`px-3 py-2 text-sm font-light transition-colors duration-200 ${active
         ? 'text-foreground underline underline-offset-4 decoration-1'
         : 'text-subtle hover:text-foreground'
         } ${className || ''}`}
@@ -74,26 +74,26 @@ export function Navbar() {
           {session ? (
             <button
               onClick={handleSignOut}
-              className="px-3 py-1.5 text-sm font-light rounded-md transition-all duration-200 hover:scale-[1.02] active:scale-95"
+              title="Se déconnecter"
+              className="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 hover:opacity-85 active:opacity-70 group"
               style={{
-                backgroundColor: 'var(--sol-base03)',
-                color: 'var(--sol-base2)',
+                backgroundColor: 'var(--sol-base02)',
                 border: '1px solid var(--sol-base01)',
               }}
             >
-              Se déconnecter
+              <LogOut className="w-4 h-4" style={{ color: 'var(--sol-base1)' }} />
             </button>
           ) : (
             <Link
               href="/auth/signin"
-              className="px-3 py-1.5 text-sm font-light rounded-md transition-all duration-200 hover:scale-[1.02] active:scale-95"
+              title="Se connecter"
+              className="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 hover:opacity-85 active:opacity-70 group"
               style={{
-                backgroundColor: 'var(--sol-base03)',
-                color: 'var(--sol-base2)',
+                backgroundColor: 'var(--sol-base02)',
                 border: '1px solid var(--sol-base01)',
               }}
             >
-              Connexion
+              <LogIn className="w-4 h-4" style={{ color: 'var(--sol-cyan)' }} />
             </Link>
           )}
         </nav>
@@ -180,27 +180,27 @@ export function Navbar() {
                     setOpen(false)
                     await handleSignOut()
                   }}
-                  className="mt-2 px-3 py-2 text-base rounded active:scale-95 transition"
+                  title="Se déconnecter"
+                  className="mt-4 w-10 h-10 flex items-center justify-center rounded-full transition-opacity hover:opacity-85 active:opacity-70"
                   style={{
-                    backgroundColor: 'var(--sol-base03)',
-                    color: 'var(--sol-base2)',
+                    backgroundColor: 'var(--sol-base02)',
                     border: '1px solid var(--sol-base01)',
                   }}
                 >
-                  Se déconnecter
+                  <LogOut className="w-5 h-5" style={{ color: 'var(--sol-base1)' }} />
                 </button>
               ) : (
                 <Link
                   href="/auth/signin"
                   onClick={() => setOpen(false)}
-                  className="mt-2 px-3 py-2 text-base rounded active:scale-95 transition"
+                  title="Se connecter"
+                  className="mt-4 w-10 h-10 flex items-center justify-center rounded-full transition-opacity hover:opacity-85 active:opacity-70"
                   style={{
-                    backgroundColor: 'var(--sol-base03)',
-                    color: 'var(--sol-base2)',
+                    backgroundColor: 'var(--sol-base02)',
                     border: '1px solid var(--sol-base01)',
                   }}
                 >
-                  Connexion
+                  <LogIn className="w-5 h-5" style={{ color: 'var(--sol-cyan)' }} />
                 </Link>
               )}
             </nav>
