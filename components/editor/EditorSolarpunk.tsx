@@ -486,8 +486,8 @@ Commencez à écrire pour faire disparaître ce guide...`
                     {/* Salle du Temps */}
                     <button
                         onClick={enterImmersive}
-                        className="inline-flex items-center justify-center w-9 h-9 rounded-lg transition-all hover:bg-[var(--base2)]"
-                        style={{ color: 'var(--cyan)' }}
+                        className="inline-flex items-center justify-center w-10 h-10 rounded-lg transition-all hover:bg-[var(--base2)]"
+                        style={{ color: 'var(--cyan)', border: '1px solid var(--base1)' }}
                         title="Salle du Temps"
                     >
                         <Hourglass className="h-5 w-5" />
@@ -497,8 +497,8 @@ Commencez à écrire pour faire disparaître ce guide...`
                     <button
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="inline-flex items-center justify-center w-9 h-9 rounded-lg transition-all hover:bg-[var(--base2)] disabled:opacity-50"
-                        style={{ color: 'var(--green)' }}
+                        className="inline-flex items-center justify-center w-10 h-10 rounded-lg transition-all hover:bg-[var(--base2)] disabled:opacity-50"
+                        style={{ color: 'var(--green)', border: '1px solid var(--base1)' }}
                         title={isSaving ? 'Publication...' : 'Publier'}
                     >
                         {isSaving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
