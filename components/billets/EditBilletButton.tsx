@@ -72,23 +72,25 @@ export function EditBilletButton({ slug, title, className = '', onDelete }: Edit
   }
 
   return (
-    <div className={`inline-flex gap-2 ${className}`}>
+    <div className={`inline-flex gap-1 ${className}`}>
       <Link
         href={`/billets/${slug}/editer`}
-        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs bg-white border border-subtle/30 text-foreground rounded-lg hover:bg-muted transition-all"
+        className="inline-flex items-center justify-center w-9 h-9 rounded-lg transition-all hover:bg-[var(--sol-base2)]"
+        style={{ color: 'var(--sol-base01)' }}
+        title={isAdmin ? 'Éditer le billet' : 'Proposer une modification'}
       >
-        <Edit3 className="h-4 w-4" />
-        <span>{isAdmin ? 'Éditer' : 'Proposer modification'}</span>
+        <Edit3 className="h-5 w-5" />
       </Link>
 
       {isAdmin && (
         <button
           onClick={handleDeleteBillet}
           disabled={isDeleting}
-          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs bg-destructive text-white rounded-lg hover:bg-destructive/90 transition-all disabled:opacity-50"
+          className="inline-flex items-center justify-center w-9 h-9 rounded-lg transition-all hover:bg-[var(--sol-base2)] disabled:opacity-50"
+          style={{ color: 'var(--sol-red)' }}
+          title={isDeleting ? 'Suppression...' : 'Supprimer le billet'}
         >
-          <Trash2 className="h-4 w-4" />
-          <span>{isDeleting ? 'Suppression...' : 'Supprimer'}</span>
+          <Trash2 className="h-5 w-5" />
         </button>
       )}
     </div>
