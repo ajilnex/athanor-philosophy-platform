@@ -57,10 +57,10 @@ export function Navbar() {
   }, [open])
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-subtle/30 bg-background sm:bg-background/80 sm:backdrop-blur-lg">
+    <header className="sticky top-0 z-50 w-full border-b border-subtle/30 bg-[var(--sol-base2)] sm:bg-[var(--sol-base2)]/95 sm:backdrop-blur-lg">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 h-14 flex items-center justify-between">
         {/* Brand -> Home */}
-        <Link href="/" className="font-serif text-xl tracking-tight hover:opacity-80 font-medium">
+        <Link href="/" className="font-serif text-xl tracking-tight hover:opacity-80 font-medium text-foreground">
           L'athanor
         </Link>
 
@@ -69,7 +69,7 @@ export function Navbar() {
           <NavItem href="/billets">Billets</NavItem>
           <NavItem href="/publications">Publications</NavItem>
           <NavItem href="/constellation">Constellation</NavItem>
-          <NavItem href="/archive" className="!text-[color-mix(in_srgb,var(--foreground)_85%,#38bdf8_15%)]">Archive</NavItem>
+          <NavItem href="/archive" className="!text-[var(--sol-cyan)]">Archive</NavItem>
           <NavItem href="/search">Recherche</NavItem>
           {session ? (
             <button
@@ -105,7 +105,7 @@ export function Navbar() {
             aria-expanded={open}
             aria-controls="mobile-nav"
             onClick={() => setOpen(o => !o)}
-            className="p-2 rounded-md border border-subtle/40 hover:bg-muted"
+            className="p-2 rounded-md border border-subtle/40 hover:bg-muted text-foreground"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -118,13 +118,13 @@ export function Navbar() {
           id="mobile-nav"
           role="dialog"
           aria-modal="true"
-          className="sm:hidden fixed inset-0 z-[70] bg-background border-t border-subtle fade-in"
+          className="sm:hidden fixed inset-0 z-[70] bg-[var(--sol-base2)] border-t border-subtle fade-in"
         >
           <div className="max-w-5xl mx-auto px-4 py-4 slide-down">
             <div className="flex items-center justify-between h-12">
               <Link
                 href="/"
-                className="font-serif text-lg tracking-tight"
+                className="font-serif text-lg tracking-tight text-foreground"
                 onClick={() => setOpen(false)}
               >
                 L'athanor
@@ -132,7 +132,7 @@ export function Navbar() {
               <button
                 aria-label="Fermer"
                 onClick={() => setOpen(false)}
-                className="p-2 rounded-md border border-subtle/40 active:scale-95 transition bg-muted"
+                className="p-2 rounded-md border border-subtle/40 active:scale-95 transition bg-muted text-foreground"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -142,35 +142,35 @@ export function Navbar() {
                 ref={firstLinkRef}
                 href="/billets"
                 onClick={() => setOpen(false)}
-                className="px-3 py-2 text-base rounded hover:bg-muted transition"
+                className="px-3 py-2 text-base rounded hover:bg-muted transition text-foreground"
               >
                 Billets
               </Link>
               <Link
                 href="/publications"
                 onClick={() => setOpen(false)}
-                className="px-3 py-2 text-base rounded hover:bg-muted transition"
+                className="px-3 py-2 text-base rounded hover:bg-muted transition text-foreground"
               >
                 Publications
               </Link>
               <Link
                 href="/constellation"
                 onClick={() => setOpen(false)}
-                className="px-3 py-2 text-base rounded hover:bg-muted transition"
+                className="px-3 py-2 text-base rounded hover:bg-muted transition text-foreground"
               >
                 Constellation
               </Link>
               <Link
                 href="/archive"
                 onClick={() => setOpen(false)}
-                className="px-3 py-2 text-base rounded hover:bg-muted transition text-[color-mix(in_srgb,currentColor_85%,#38bdf8_15%)]"
+                className="px-3 py-2 text-base rounded hover:bg-muted transition text-[var(--sol-cyan)]"
               >
                 Archive
               </Link>
               <Link
                 href="/search"
                 onClick={() => setOpen(false)}
-                className="px-3 py-2 text-base rounded hover:bg-muted transition"
+                className="px-3 py-2 text-base rounded hover:bg-muted transition text-foreground"
               >
                 Recherche
               </Link>
