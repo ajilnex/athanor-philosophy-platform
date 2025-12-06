@@ -262,12 +262,12 @@ Commencez à écrire pour faire disparaître ce guide...`
         '&': {
           fontSize: isImmersive ? '18px' : '16px',
           height: '100%',
-          backgroundColor: isImmersive ? '#FAFAF8' : 'transparent',
+          backgroundColor: isImmersive ? '#fdf6e3' : 'var(--sol-base3)',
         },
         '.cm-content': {
           padding: isImmersive ? '3rem 4rem' : '2rem 3rem',
-          caretColor: isImmersive ? '#333' : 'hsl(220 15% 20%)',
-          backgroundColor: isImmersive ? '#FAFAF8' : 'transparent',
+          caretColor: '#586e75',
+          backgroundColor: isImmersive ? '#fdf6e3' : 'var(--sol-base3)',
           minHeight: isImmersive ? '100vh' : '100%',
           maxWidth: isImmersive ? '72ch' : 'none',
           margin: isImmersive ? '0 auto' : '0',
@@ -278,35 +278,38 @@ Commencez à écrire pour faire disparaître ce guide...`
         },
         '.cm-focused': {
           outline: 'none',
-          backgroundColor: isImmersive ? '#FAFAF8' : 'transparent',
+          backgroundColor: isImmersive ? '#fdf6e3' : 'var(--sol-base3)',
         },
         '.cm-cursor, .cm-dropCursor': {
-          borderLeftColor: isImmersive ? '#333' : 'hsl(220 15% 20%)',
+          borderLeftColor: '#586e75',
           borderLeftWidth: '2px',
         },
         '.cm-editor': {
           height: '100%',
-          backgroundColor: isImmersive ? '#FAFAF8' : 'transparent',
+          backgroundColor: isImmersive ? '#fdf6e3' : 'var(--sol-base3)',
         },
         '.cm-scroller': {
           height: '100%',
-          backgroundColor: isImmersive ? '#FAFAF8' : 'transparent',
+          backgroundColor: isImmersive ? '#fdf6e3' : 'var(--sol-base3)',
           fontFamily: isImmersive ? 'var(--font-ia-writer)' : 'inherit',
           width: isImmersive ? '100vw' : 'auto',
         },
         '.cm-gutters': {
-          backgroundColor: isImmersive ? '#FAFAF8' : 'transparent',
+          backgroundColor: isImmersive ? '#fdf6e3' : 'var(--sol-base3)',
           border: 'none',
         },
         '.cm-line': {
           paddingLeft: '0',
           paddingRight: '0',
         },
+        '.cm-activeLine': {
+          backgroundColor: 'rgba(238, 232, 213, 0.6)',
+        },
         '.cm-selectionBackground': {
-          backgroundColor: isImmersive ? 'rgba(0, 0, 0, 0.08)' : 'hsl(220 90% 55% / 0.15)',
+          backgroundColor: 'rgba(181, 137, 0, 0.15)',
         },
         '.cm-placeholder': {
-          color: 'hsl(var(--subtle) / 0.5)',
+          color: '#93a1a1',
           fontStyle: 'italic',
         },
       }),
@@ -317,25 +320,25 @@ Commencez à écrire pour faire disparaître ce guide...`
       baseExtensions.push(
         EditorView.theme({
           '&': {
-            backgroundColor: '#FAFAF8',
+            backgroundColor: '#fdf6e3',
             height: '100%',
           },
           '.cm-editor': {
-            backgroundColor: '#FAFAF8',
+            backgroundColor: '#fdf6e3',
             border: 'none',
             height: '100%',
           },
           '.cm-editor.cm-focused': {
-            backgroundColor: '#FAFAF8',
+            backgroundColor: '#fdf6e3',
           },
           '.cm-scroller': {
-            backgroundColor: '#FAFAF8',
+            backgroundColor: '#fdf6e3',
             scrollPaddingTop: '50%',
             scrollPaddingBottom: '50%',
             lineHeight: '1.8',
           },
           '.cm-content': {
-            backgroundColor: '#FAFAF8',
+            backgroundColor: '#fdf6e3',
             padding: '50vh 15% 50vh 15%',
             minHeight: '100vh',
           },
@@ -505,9 +508,9 @@ Commencez à écrire pour faire disparaître ce guide...`
                 }}
                 className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all"
                 style={{
-                  backgroundColor: 'var(--sol-base03)',
-                  color: 'var(--sol-base2)',
-                  border: '1px solid var(--sol-base01)',
+                  backgroundColor: 'var(--sol-base2)',
+                  color: 'var(--sol-base01)',
+                  border: '1px solid var(--sol-base1)',
                 }}
               >
                 <Sparkles className="h-4 w-4 mr-2" />
@@ -521,7 +524,7 @@ Commencez à écrire pour faire disparaître ce guide...`
                 disabled={isSaving}
                 className="inline-flex items-center px-5 py-2 text-sm font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  background: 'linear-gradient(135deg, var(--sol-cyan), var(--sol-blue))',
+                  backgroundColor: 'var(--sol-orange)',
                   color: 'var(--sol-base3)',
                 }}
               >
