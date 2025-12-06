@@ -15,7 +15,7 @@ import {
   FileText,
   Hash,
   Clock,
-  Sparkles,
+  Hourglass,
 } from 'lucide-react'
 import { remark } from 'remark'
 import html from 'remark-html'
@@ -512,7 +512,7 @@ Commencez à écrire pour faire disparaître ce guide...`
                   border: '1px solid var(--sol-base1)',
                 }}
               >
-                <Sparkles className="h-4 w-4 mr-2" />
+                <Hourglass className="h-4 w-4 mr-2" />
                 Salle du Temps
               </button>
 
@@ -523,7 +523,7 @@ Commencez à écrire pour faire disparaître ce guide...`
                 disabled={isSaving}
                 className="inline-flex items-center px-5 py-2 text-sm font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  backgroundColor: 'var(--sol-orange)',
+                  backgroundColor: 'var(--sol-base01)',
                   color: 'var(--sol-base3)',
                 }}
               >
