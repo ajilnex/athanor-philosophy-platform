@@ -443,9 +443,10 @@ Commencez à écrire pour faire disparaître ce guide...`
                     </h1>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    {/* Toolbar */}
+                <div className="flex items-center gap-2">
+                    {/* Unified Toolbar */}
                     <div className="editor-toolbar">
+                        {/* Preview toggle */}
                         <button
                             className={`editor-tool-btn ${showPreview ? 'active' : ''}`}
                             onClick={() => setShowPreview(p => !p)}
@@ -453,7 +454,10 @@ Commencez à écrire pour faire disparaître ce guide...`
                         >
                             {showPreview ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
+
                         <div className="editor-tool-divider" />
+
+                        {/* Insert tools */}
                         <button
                             className="editor-tool-btn"
                             onClick={() => setShowImageUpload(true)}
@@ -478,34 +482,41 @@ Commencez à écrire pour faire disparaître ce guide...`
                         >
                             <Link2 className="h-4 w-4" />
                         </button>
+
+                        <div className="editor-tool-divider" />
+
+                        {/* Salle du Temps */}
+                        <button
+                            className="editor-tool-btn"
+                            onClick={enterImmersive}
+                            title="Salle du Temps"
+                            style={{ color: 'var(--cyan)' }}
+                        >
+                            <Hourglass className="h-4 w-4" />
+                        </button>
+
+                        <div className="editor-tool-divider" />
+
+                        {/* Save status indicator (dot only) */}
+                        <div
+                            className="w-2 h-2 rounded-full mx-1"
+                            style={{
+                                backgroundColor: isAutoSaving ? 'var(--yellow)' : lastSaved ? 'var(--green)' : 'var(--base1)'
+                            }}
+                            title={isAutoSaving ? 'Sauvegarde...' : lastSaved ? `Sauvé ${lastSaved.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}` : 'Non sauvé'}
+                        />
+
+                        {/* Save */}
+                        <button
+                            className="editor-tool-btn"
+                            onClick={handleSave}
+                            disabled={isSaving}
+                            title={isSaving ? 'Publication...' : 'Publier'}
+                            style={{ color: 'var(--green)' }}
+                        >
+                            {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                        </button>
                     </div>
-
-                    {/* Auto-save indicator */}
-                    <div className={`editor-autosave ${isAutoSaving ? 'saving' : ''}`}>
-                        <span className="editor-autosave-dot" />
-                        {isAutoSaving ? 'Sauvegarde...' : lastSaved ? `Sauvé ${lastSaved.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}` : 'Non sauvé'}
-                    </div>
-
-                    {/* Salle du Temps */}
-                    <button
-                        onClick={enterImmersive}
-                        className="inline-flex items-center justify-center w-10 h-10 rounded-lg transition-all hover:bg-[var(--base2)]"
-                        style={{ color: 'var(--cyan)', border: '1px solid var(--base1)' }}
-                        title="Salle du Temps"
-                    >
-                        <Hourglass className="h-5 w-5" />
-                    </button>
-
-                    {/* Save */}
-                    <button
-                        onClick={handleSave}
-                        disabled={isSaving}
-                        className="inline-flex items-center justify-center w-10 h-10 rounded-lg transition-all hover:bg-[var(--base2)] disabled:opacity-50"
-                        style={{ color: 'var(--green)', border: '1px solid var(--base1)' }}
-                        title={isSaving ? 'Publication...' : 'Publier'}
-                    >
-                        {isSaving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
-                    </button>
                 </div>
             </header>
 
@@ -598,7 +609,7 @@ Commencez à écrire pour faire disparaître ce guide...`
                 </aside>
 
                 {/* Main content */}
-                <main className="flex-1" style={{ background: 'var(--base3)' }}>
+                <main className="flex-1" style={{ background: 'var(--base3)', outline: 'none' }}>
                     {showPreview ? (
                         <div className="max-w-3xl mx-auto p-8">
                             <article className="prose prose-lg" style={{ color: 'var(--base00)' }}>
@@ -607,7 +618,7 @@ Commencez à écrire pour faire disparaître ce guide...`
                             </article>
                         </div>
                     ) : (
-                        <div className="h-full">
+                        <div className="h-full" style={{ outline: 'none' }}>
                             <CodeMirror
                                 ref={editorRef}
                                 value={content}

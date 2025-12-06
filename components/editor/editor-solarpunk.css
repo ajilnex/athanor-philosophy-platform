@@ -53,6 +53,17 @@
     --editor-transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Remove all focus outlines from CodeMirror */
+.editor-solarpunk .cm-editor,
+.editor-solarpunk .cm-editor.cm-focused,
+.editor-solarpunk .cm-editor *:focus,
+.editor-solarpunk .cm-scroller,
+.editor-solarpunk .cm-content {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
 /* ─── Night Mode (Salle du Temps alternative) ───────────────────────── */
 .editor-solarpunk.night {
     --editor-bg: var(--base03);
