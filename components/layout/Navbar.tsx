@@ -57,7 +57,7 @@ export function Navbar() {
   }, [open])
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-subtle/30 bg-[var(--sol-base2)] sm:bg-[var(--sol-base2)]/95 sm:backdrop-blur-lg">
+    <header className="sticky top-0 z-50 w-full bg-[var(--sol-base2)] sm:bg-[var(--sol-base2)]/95 sm:backdrop-blur-lg">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 h-14 flex items-center justify-between">
         {/* Brand -> Home */}
         <Link href="/" className="font-serif text-xl tracking-tight hover:opacity-80 font-medium text-foreground">
