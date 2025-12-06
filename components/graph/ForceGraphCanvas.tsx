@@ -1037,21 +1037,21 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                     </div>
 
                     <div className="p-5 space-y-6">
-                        {/* Épanouir Button - Main Animation Trigger */}
+                        {/* Bloom Button - Sun icon only (matching hub node) */}
                         <button
                             onClick={() => {
                                 triggerCollapse()
                                 setTimeout(() => triggerBloom(), 300)
                             }}
-                            className="w-full py-4 px-6 rounded-2xl text-base font-semibold flex items-center justify-center gap-3 transition-all hover:scale-[1.02] active:scale-95"
+                            className="w-12 h-12 mx-auto rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
                             style={{
-                                background: 'linear-gradient(135deg, #d33682 0%, #cb4b16 100%)',
+                                background: 'linear-gradient(135deg, #268bd2 0%, #2aa198 100%)',
                                 color: '#fdf6e3',
-                                boxShadow: '0 4px 15px rgba(211, 54, 130, 0.3)',
+                                boxShadow: '0 4px 15px rgba(38, 139, 210, 0.3)',
                             }}
+                            title="Épanouir le graphe"
                         >
-                            <span style={{ fontSize: '1.2em' }}>✧</span>
-                            Épanouir
+                            <Sparkles className="w-6 h-6" />
                         </button>
 
                         {/* Structure Section */}
@@ -1069,7 +1069,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                                             Distance des grappes
                                         </label>
                                         <span className="text-xs font-mono px-2 py-0.5 rounded"
-                                            style={{ background: nightMode ? 'rgba(203,75,22,0.2)' : 'rgba(203,75,22,0.1)', color: '#cb4b16' }}>
+                                            style={{ background: nightMode ? 'rgba(38,139,210,0.2)' : 'rgba(38,139,210,0.1)', color: '#268bd2' }}>
                                             {forces.polygonRadius}
                                         </span>
                                     </div>
@@ -1082,7 +1082,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                                         onChange={e => setForces(f => ({ ...f, polygonRadius: Number(e.target.value) }))}
                                         className="w-full h-2 rounded-full appearance-none cursor-pointer"
                                         style={{
-                                            background: `linear-gradient(to right, #cb4b16 0%, #cb4b16 ${(forces.polygonRadius - 100) / 4}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} ${(forces.polygonRadius - 100) / 4}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 100%)`,
+                                            background: `linear-gradient(to right, #268bd2 0%, #268bd2 ${(forces.polygonRadius - 100) / 4}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} ${(forces.polygonRadius - 100) / 4}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 100%)`,
                                         }}
                                     />
                                 </div>
@@ -1128,7 +1128,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                                             Répulsion
                                         </label>
                                         <span className="text-xs font-mono px-2 py-0.5 rounded"
-                                            style={{ background: nightMode ? 'rgba(108,113,196,0.2)' : 'rgba(108,113,196,0.1)', color: '#6c71c4' }}>
+                                            style={{ background: nightMode ? 'rgba(38,139,210,0.2)' : 'rgba(38,139,210,0.1)', color: '#268bd2' }}>
                                             {Math.abs(forces.chargeStrength)}
                                         </span>
                                     </div>
@@ -1140,7 +1140,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                                         onChange={e => setForces(f => ({ ...f, chargeStrength: Number(e.target.value) }))}
                                         className="w-full h-2 rounded-full appearance-none cursor-pointer"
                                         style={{
-                                            background: `linear-gradient(to right, #6c71c4 0%, #6c71c4 ${(500 + forces.chargeStrength) / 4.9}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} ${(500 + forces.chargeStrength) / 4.9}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 100%)`,
+                                            background: `linear-gradient(to right, #268bd2 0%, #268bd2 ${(500 + forces.chargeStrength) / 4.9}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} ${(500 + forces.chargeStrength) / 4.9}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 100%)`,
                                         }}
                                     />
                                 </div>
@@ -1152,7 +1152,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                                             Rayon de collision
                                         </label>
                                         <span className="text-xs font-mono px-2 py-0.5 rounded"
-                                            style={{ background: nightMode ? 'rgba(181,137,0,0.2)' : 'rgba(181,137,0,0.1)', color: '#b58900' }}>
+                                            style={{ background: nightMode ? 'rgba(38,139,210,0.2)' : 'rgba(38,139,210,0.1)', color: '#268bd2' }}>
                                             {forces.collisionRadius}
                                         </span>
                                     </div>
@@ -1164,7 +1164,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                                         onChange={e => setForces(f => ({ ...f, collisionRadius: Number(e.target.value) }))}
                                         className="w-full h-2 rounded-full appearance-none cursor-pointer"
                                         style={{
-                                            background: `linear-gradient(to right, #b58900 0%, #b58900 ${(forces.collisionRadius - 5) / 0.45}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} ${(forces.collisionRadius - 5) / 0.45}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 100%)`,
+                                            background: `linear-gradient(to right, #268bd2 0%, #268bd2 ${(forces.collisionRadius - 5) / 0.45}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} ${(forces.collisionRadius - 5) / 0.45}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 100%)`,
                                         }}
                                     />
                                 </div>
