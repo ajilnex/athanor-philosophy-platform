@@ -8,7 +8,16 @@ export function LatestActivityCard({ billet }: { billet: Billet }) {
       <h2 className="font-serif text-lg text-subtle mb-3 text-center">Activité récente</h2>
       <Link
         href={`/billets/${billet.slug}`}
-        className="block p-4 group transition-all duration-300 bg-background/95 backdrop-blur-sm rounded-lg border border-subtle/10"
+        className="block p-4 group transition-all duration-300 bg-background/95 backdrop-blur-sm rounded-lg border border-subtle/10 hover:border-accent/30"
+        style={{
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = '0 4px 16px rgba(42, 161, 152, 0.15)'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.05)'
+        }}
         data-graph-shield
       >
         <div className="flex justify-between items-center">
