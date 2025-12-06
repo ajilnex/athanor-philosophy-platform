@@ -14,7 +14,7 @@ import {
     X,
     FileText,
     Hash,
-    Sparkles,
+    Hourglass,
     Clock,
     AlignLeft,
     Quote,
@@ -452,8 +452,8 @@ export function EditorSolarpunk({
                     </div>
 
                     {/* Salle du Temps */}
-                    <button onClick={enterImmersive} className="editor-btn-primary editor-btn-salle">
-                        <Sparkles className="h-4 w-4" />
+                    <button onClick={enterImmersive} className="editor-btn-secondary">
+                        <Hourglass className="h-4 w-4" />
                         Salle du Temps
                     </button>
 
@@ -462,7 +462,6 @@ export function EditorSolarpunk({
                         onClick={handleSave}
                         disabled={isSaving}
                         className="editor-btn-primary"
-                        style={{ background: 'var(--green)' }}
                     >
                         {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                         {isSaving ? 'Publication...' : 'Publier'}

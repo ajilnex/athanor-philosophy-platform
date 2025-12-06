@@ -147,6 +147,27 @@
     transform: translateY(-1px);
 }
 
+/* Secondary button - subtle cream style */
+.editor-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--base2);
+    color: var(--base00);
+    border: 1px solid var(--base1);
+    border-radius: var(--editor-radius);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--editor-transition);
+}
+
+.editor-btn-secondary:hover {
+    background: var(--base3);
+    border-color: var(--base00);
+}
+
 /* ─── Sidebar ───────────────────────────────────────────────────────── */
 .editor-sidebar {
     width: var(--editor-sidebar-width);
