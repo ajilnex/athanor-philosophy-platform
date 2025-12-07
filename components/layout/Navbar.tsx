@@ -68,6 +68,7 @@ export function Navbar() {
         <nav className="hidden sm:flex items-center gap-2">
           <NavItem href="/billets">Billets</NavItem>
           <NavItem href="/publications">Publications</NavItem>
+          <NavItem href="/edition">Édition</NavItem>
           <NavItem href="/constellation">Constellation</NavItem>
           <NavItem href="/archive" className="!text-[var(--sol-cyan)]">Archive</NavItem>
           <NavItem href="/search">Recherche</NavItem>
@@ -152,6 +153,13 @@ export function Navbar() {
                 className="px-3 py-2 text-base rounded hover:bg-muted transition text-foreground"
               >
                 Publications
+              </Link>
+              <Link
+                href="/edition"
+                onClick={() => setOpen(false)}
+                className="px-3 py-2 text-base rounded hover:bg-muted transition text-foreground"
+              >
+                Édition
               </Link>
               <Link
                 href="/constellation"

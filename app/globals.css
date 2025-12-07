@@ -41,10 +41,10 @@
     /* sol-base3 */
     --background-elevated: #eee8d5;
     /* sol-base2 */
-    --foreground: #657b83;
-    /* sol-base00 */
-    --subtle: #93a1a1;
-    /* sol-base1 */
+    --foreground: #073642;
+    /* sol-base02 - darker for better readability */
+    --subtle: #586e75;
+    /* sol-base01 - secondary text */
     --accent: #2aa198;
     /* sol-cyan */
     --accent-hover: #268bd2;

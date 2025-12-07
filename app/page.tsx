@@ -62,21 +62,6 @@ export default async function HomePage() {
             </form>
           </div>
 
-          {/* Maison d'édition */}
-          <div className="my-12 text-center" data-graph-shield>
-            <Link
-              href="/edition"
-              className="inline-flex items-center px-6 py-3 rounded-lg transition-all duration-200 font-light backdrop-blur-sm hover:scale-[1.02] active:scale-95"
-              style={{
-                backgroundColor: 'var(--sol-base03)',
-                color: 'var(--sol-base2)',
-                border: '1px solid var(--sol-base01)',
-              }}
-            >
-              Maison d'édition
-            </Link>
-          </div>
-
           {/* Activité récente */}
           {latestBillet && (
             <div className="mt-16" data-graph-shield>
