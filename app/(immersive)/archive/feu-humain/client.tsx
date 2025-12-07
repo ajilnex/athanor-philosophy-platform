@@ -24,6 +24,9 @@ import { GlassDashboard } from './components/GlassDashboard'
 import { TimelineSidebar } from './components/TimelineSidebar'
 import { StatsPanel } from '@/lib/archive/feu-humain/components/StatsPanel'
 import { MediaGrid } from './components/MediaGrid'
+import { ArchiveGraph } from '@/components/graph/ArchiveGraph'
+import { StackedNotes, GrapheuNoteContent, getGrapheuNoteContent } from '@/components/graph/StackedNotes'
+import { Sparkles } from 'lucide-react'
 
 interface Archive {
   id: string
@@ -97,7 +100,48 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [selectedMedia, setSelectedMedia] = useState<any>(null)
   const [showStats, setShowStats] = useState(false)
+  const [showGrapheu, setShowGrapheu] = useState(false)
+  const [openNotes, setOpenNotes] = useState<string[]>([]) // Array of note IDs for stacked notes
+  const [focusedNoteIndex, setFocusedNoteIndex] = useState<number>(-1) // Which note is currently expanded
   const [filterBySender, setFilterBySender] = useState<string | null>(null)
+
+  // Stacked notes management
+  const openNote = useCallback((noteId: string) => {
+    setOpenNotes(prev => {
+      // If already open, just focus it
+      const existingIndex = prev.indexOf(noteId)
+      if (existingIndex !== -1) {
+        setFocusedNoteIndex(existingIndex)
+        return prev
+      }
+      // Add new note and focus it
+      const newNotes = [...prev, noteId]
+      setFocusedNoteIndex(newNotes.length - 1)
+      return newNotes
+    })
+  }, [])
+
+  const closeNote = useCallback((noteId: string) => {
+    setOpenNotes(prev => {
+      const newNotes = prev.filter(id => id !== noteId)
+      // Adjust focus if needed
+      setFocusedNoteIndex(current => Math.min(current, newNotes.length - 1))
+      return newNotes
+    })
+  }, [])
+
+  // Focus navigation (doesn't remove notes, just changes which is expanded)
+  const focusPreviousNote = useCallback(() => {
+    setFocusedNoteIndex(prev => Math.max(0, prev - 1))
+  }, [])
+
+  const focusNextNote = useCallback(() => {
+    setFocusedNoteIndex(prev => Math.min(openNotes.length - 1, prev + 1))
+  }, [openNotes.length])
+
+  const focusNoteAt = useCallback((index: number) => {
+    setFocusedNoteIndex(Math.max(0, Math.min(index, openNotes.length - 1)))
+  }, [openNotes.length])
 
   // Derive current filters from URL or state
   const startDate = searchParams.get('startDate')
@@ -477,6 +521,13 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
           >
             <Info className="w-4 h-4" />
           </button>
+          <button
+            onClick={() => setShowGrapheu(true)}
+            className="p-2.5 transition rounded-lg text-[var(--text-tertiary)] hover:bg-[var(--warm-dim)] hover:text-[var(--warm)] flex items-center gap-1.5"
+            title="Ouvrir Grapheu"
+          >
+            <Sparkles className="w-4 h-4" />
+          </button>
         </div>
       </header>
 
@@ -792,6 +843,78 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
 
       {/* Media Modal */}
       {selectedMedia && <MediaModal media={selectedMedia} onClose={() => setSelectedMedia(null)} />}
+
+      {/* Grapheu Overlay - Fullscreen graph visualization */}
+      {showGrapheu && (
+        <div className="fixed inset-0 z-50 bg-[var(--void)]">
+          {/* Graph */}
+          <ArchiveGraph
+            hubLabel="Grapheu"
+            nodes={archive ? [
+              // Participants as isolated nodes around hub
+              ...archive.participants.map((p, i) => ({
+                id: `participant:${p.id}`,
+                label: p.name,
+                type: 'AUTHOR' as const,
+                weight: Math.min(Math.log10(p.messageCount + 1) * 3, 10),
+                degree: Math.min(Math.log10(p.messageCount + 1) * 3, 10),
+              })),
+              // Departed participants (if any)
+              ...(archive.departedParticipants || []).map((p, i) => ({
+                id: `departed:${p.id}`,
+                label: `${p.name} ✝`,
+                type: 'TAG' as const,
+                weight: Math.min(Math.log10(p.messageCount + 1) * 2, 6),
+                degree: Math.min(Math.log10(p.messageCount + 1) * 2, 6),
+              })),
+              // Thematic nodes (sample content in the style of the archive)
+              { id: 'theme:delires', label: 'Délires nocturnes', type: 'BILLET' as const, weight: 4, degree: 4 },
+              { id: 'theme:philosophie', label: 'Philosophie de comptoir', type: 'BILLET' as const, weight: 5, degree: 5 },
+              { id: 'theme:absurde', label: 'Théâtre de l\'absurde', type: 'BILLET' as const, weight: 3, degree: 3 },
+              { id: 'theme:nostalgie', label: 'Nostalgie collective', type: 'BILLET' as const, weight: 4, degree: 4 },
+              { id: 'theme:inside-jokes', label: 'Inside jokes légendaires', type: 'BILLET' as const, weight: 6, degree: 6 },
+              { id: 'theme:debats', label: 'Débats enflammés', type: 'BILLET' as const, weight: 4, degree: 4 },
+              { id: 'theme:confessions', label: 'Confessions 3h du mat\'', type: 'BILLET' as const, weight: 3, degree: 3 },
+              { id: 'theme:projets', label: 'Projets avortés', type: 'BILLET' as const, weight: 2, degree: 2 },
+            ] : []}
+            edges={archive ? [
+              // Connect thematic nodes to form clusters
+              { source: 'theme:delires', target: 'theme:philosophie', type: 'CITATION' },
+              { source: 'theme:delires', target: 'theme:absurde', type: 'CITATION' },
+              { source: 'theme:philosophie', target: 'theme:debats', type: 'CITATION' },
+              { source: 'theme:nostalgie', target: 'theme:inside-jokes', type: 'CITATION' },
+              { source: 'theme:confessions', target: 'theme:nostalgie', type: 'CITATION' },
+              { source: 'theme:inside-jokes', target: 'theme:projets', type: 'CITATION' },
+            ] : []}
+            onNodeClick={(node) => {
+              // Navigate to relevant date or filter when clicking on a node
+              if (node.id.startsWith('participant:') || node.id.startsWith('departed:')) {
+                const name = node.label.replace(' ✝', '')
+                setShowGrapheu(false)
+                setFilterBySender(name)
+              } else if (node.id.startsWith('theme:')) {
+                // Open a stacked note with the content
+                openNote(node.id)
+              }
+            }}
+            onClose={() => setShowGrapheu(false)}
+          />
+
+          {/* Stacked notes panels */}
+          <StackedNotes
+            notes={openNotes.map(id => {
+              const content = getGrapheuNoteContent(id, openNote)
+              return content ? { id, title: content.title, content: content.content } : null
+            }).filter(Boolean) as { id: string; title: string; content: React.ReactNode }[]}
+            focusedIndex={focusedNoteIndex}
+            onCloseNote={closeNote}
+            onCloseAll={() => { setOpenNotes([]); setFocusedNoteIndex(-1) }}
+            onFocusPrevious={focusPreviousNote}
+            onFocusNext={focusNextNote}
+            onFocusAt={focusNoteAt}
+          />
+        </div>
+      )}
     </GlassDashboard>
   )
 }
