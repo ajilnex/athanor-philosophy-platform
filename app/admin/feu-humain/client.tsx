@@ -2,27 +2,20 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import {
   Search,
-  Filter,
   Loader2,
   ArrowLeft,
   ImageIcon,
   Film,
   Music,
-  Maximize2,
   X,
-  MoreHorizontal,
-  Download,
-  Share2,
   Info,
   Terminal,
 } from 'lucide-react'
 import { GlassDashboard } from './components/GlassDashboard'
 import { TimelineSidebar } from './components/TimelineSidebar'
-import { StatsPanel } from '@/lib/archive/feu-humain/components/StatsPanel'
 import { MediaGrid } from './components/MediaGrid'
 import { WelcomeIntro } from '@/lib/archive/feu-humain/components/WelcomeIntro'
 

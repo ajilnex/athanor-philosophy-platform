@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
-import { Download, FileText, FileImage, Share2, Printer, Copy, Check, Loader } from 'lucide-react'
+import { Download, FileText, Printer, Copy, Check, Loader } from 'lucide-react'
 
 interface Message {
   sender_name: string

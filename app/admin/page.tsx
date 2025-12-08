@@ -1,13 +1,11 @@
 import Link from 'next/link'
 import {
-  Plus,
   FileText,
   Settings,
   Upload,
   Lock,
   ShieldAlert,
   LogOut,
-  Edit3,
   Users,
   Clock,
   Flame,
@@ -68,7 +66,7 @@ async function AdminNormalPage() {
   }
 
   // 2) Connecté mais pas admin -> 403 propre
-  if ((session.user as any)?.role !== 'ADMIN') {
+  if (session.user?.role !== 'ADMIN') {
     return (
       <div className="max-w-xl mx-auto px-6 py-16 text-center">
         <ShieldAlert className="h-10 w-10 mx-auto mb-4 text-subtle" />

@@ -2,31 +2,24 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import {
   Search,
-  Filter,
   Loader2,
   ArrowLeft,
   ImageIcon,
   Film,
   Music,
-  Maximize2,
   X,
-  MoreHorizontal,
-  Download,
-  Share2,
   Info,
   Terminal,
+  Sparkles,
 } from 'lucide-react'
 import { GlassDashboard } from './components/GlassDashboard'
 import { TimelineSidebar } from './components/TimelineSidebar'
-import { StatsPanel } from '@/lib/archive/feu-humain/components/StatsPanel'
 import { MediaGrid } from './components/MediaGrid'
 import { ArchiveGraph } from '@/components/graph/ArchiveGraph'
-import { StackedNotes, GrapheuNoteContent, getGrapheuNoteContent } from '@/components/graph/StackedNotes'
-import { Sparkles } from 'lucide-react'
+import { StackedNotes, getGrapheuNoteContent } from '@/components/graph/StackedNotes'
 
 interface Archive {
   id: string
@@ -852,7 +845,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
             hubLabel="Grapheu"
             nodes={archive ? [
               // Participants as isolated nodes around hub
-              ...archive.participants.map((p, i) => ({
+              ...archive.participants.map((p, _i) => ({
                 id: `participant:${p.id}`,
                 label: p.name,
                 type: 'AUTHOR' as const,
@@ -860,7 +853,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
                 degree: Math.min(Math.log10(p.messageCount + 1) * 3, 10),
               })),
               // Departed participants (if any)
-              ...(archive.departedParticipants || []).map((p, i) => ({
+              ...(archive.departedParticipants || []).map((p, _i) => ({
                 id: `departed:${p.id}`,
                 label: `${p.name} ✝`,
                 type: 'TAG' as const,
