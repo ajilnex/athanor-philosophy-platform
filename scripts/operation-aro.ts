@@ -156,21 +156,26 @@ async function runOperationARO(archiveSlug: string, dryRun = false) {
     console.log(`📁 Found archive: ${archive.title}`)
 
     // 2. Get all photos that haven't been processed yet
-    const mediaItems = await prisma.conversationMedia.findMany({
+    // LIMIT to 1000 to stay in Google Vision FREE TIER
+    const FREE_TIER_LIMIT = 1000
+
+    const allMediaItems = await prisma.conversationMedia.findMany({
         where: {
             message: { archiveId: archive.id },
             type: 'photo',
-            note: null // Not yet processed
+            note: { is: null } // Not yet processed
         },
         include: {
             message: true
         },
         orderBy: {
             createdAt: 'asc'
-        }
+        },
+        take: FREE_TIER_LIMIT  // Stay in free tier!
     })
 
-    console.log(`📷 Found ${mediaItems.length} unprocessed photos`)
+    const mediaItems = allMediaItems
+    console.log(`📷 Found ${mediaItems.length} unprocessed photos (limited to ${FREE_TIER_LIMIT} for free tier)`)
 
     if (mediaItems.length === 0) {
         console.log('✅ All photos already processed!')
@@ -180,6 +185,7 @@ async function runOperationARO(archiveSlug: string, dryRun = false) {
     // 3. Initialize Google Vision
     const visionClient = await initVisionClient()
     console.log('🔗 Google Vision API connected')
+    console.log('💰 FREE TIER: Processing max 1000 images - $0 cost')
 
     const stats: ProcessingStats = {
         total: mediaItems.length,
@@ -201,12 +207,12 @@ async function runOperationARO(archiveSlug: string, dryRun = false) {
         for (const media of batch) {
             stats.processed++
 
-            // Resolve local path from originalUri
-            const relativePath = media.originalUri.replace(/^photos\//, '')
-            const localPath = path.join(baseDir, 'photos', relativePath)
+            // Extract filename from originalUri (e.g., "/FEU HUMAIN/photos/filename.jpg" -> "filename.jpg")
+            const filename = path.basename(media.originalUri)
+            const localPath = path.join(baseDir, 'photos', filename)
 
             if (!fs.existsSync(localPath)) {
-                console.log(`  ⚠️ File not found: ${relativePath}`)
+                console.log(`  ⚠️ File not found: ${filename}`)
                 stats.skipped++
                 continue
             }

@@ -98,6 +98,23 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
   const [focusedNoteIndex, setFocusedNoteIndex] = useState<number>(-1) // Which note is currently expanded
   const [filterBySender, setFilterBySender] = useState<string | null>(null)
 
+  // OCR Notes for Grapheu (loaded from API)
+  interface OCRNote {
+    id: string
+    mediaId: string
+    label: string
+    type: 'BILLET'
+    weight: number
+    degree: number
+    keywords: string[]
+    confidence: number | null
+    textLength: number
+    imageUrl: string
+    extractedText?: string
+  }
+  const [ocrNotes, setOcrNotes] = useState<{ nodes: OCRNote[]; edges: { source: string; target: string; type: string }[] }>({ nodes: [], edges: [] })
+  const [loadingNotes, setLoadingNotes] = useState(false)
+
   // Stacked notes management
   const openNote = useCallback((noteId: string) => {
     setOpenNotes(prev => {
@@ -161,6 +178,22 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
       }
     }
   }, [searchTerm])
+
+  // Load OCR notes when Grapheu is opened
+  useEffect(() => {
+    if (showGrapheu && ocrNotes.nodes.length === 0 && !loadingNotes) {
+      setLoadingNotes(true)
+      fetch(`/api/archive/${archiveSlug}/notes`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.nodes) {
+            setOcrNotes({ nodes: data.nodes, edges: data.edges || [] })
+          }
+        })
+        .catch(console.error)
+        .finally(() => setLoadingNotes(false))
+    }
+  }, [showGrapheu, archiveSlug, ocrNotes.nodes.length, loadingNotes])
 
   // Charger les données initiales
   useEffect(() => {
@@ -840,35 +873,32 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
       {/* Grapheu Overlay - Fullscreen graph visualization */}
       {showGrapheu && (
         <div className="fixed inset-0 z-50 bg-[var(--void)]">
+          {/* Loading indicator */}
+          {loadingNotes && (
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <div className="flex flex-col items-center gap-3 bg-[var(--abyss)] p-6 rounded-xl border border-[var(--border-subtle)]">
+                <Loader2 className="w-8 h-8 text-[var(--accent)] animate-spin" />
+                <p className="text-sm text-[var(--text-secondary)]">Chargement des notes OCR...</p>
+              </div>
+            </div>
+          )}
+
           {/* Graph */}
           <ArchiveGraph
             hubLabel="Grapheu"
-            nodes={archive ? [
-              // Thematic nodes - will be replaced by OCR notes later
-              { id: 'theme:delires', label: 'Délires nocturnes', type: 'BILLET' as const, weight: 4, degree: 4 },
-              { id: 'theme:philosophie', label: 'Philosophie de comptoir', type: 'BILLET' as const, weight: 5, degree: 5 },
-              { id: 'theme:absurde', label: 'Théâtre de l\'absurde', type: 'BILLET' as const, weight: 3, degree: 3 },
-              { id: 'theme:nostalgie', label: 'Nostalgie collective', type: 'BILLET' as const, weight: 4, degree: 4 },
-              { id: 'theme:inside-jokes', label: 'Inside jokes légendaires', type: 'BILLET' as const, weight: 6, degree: 6 },
-              { id: 'theme:debats', label: 'Débats enflammés', type: 'BILLET' as const, weight: 4, degree: 4 },
-              { id: 'theme:confessions', label: 'Confessions 3h du mat\'', type: 'BILLET' as const, weight: 3, degree: 3 },
-              { id: 'theme:projets', label: 'Projets avortés', type: 'BILLET' as const, weight: 2, degree: 2 },
-            ] : []}
-            edges={archive ? [
-              // Connect thematic nodes to form clusters
-              { source: 'theme:delires', target: 'theme:philosophie', type: 'CITATION' },
-              { source: 'theme:delires', target: 'theme:absurde', type: 'CITATION' },
-              { source: 'theme:philosophie', target: 'theme:debats', type: 'CITATION' },
-              { source: 'theme:nostalgie', target: 'theme:inside-jokes', type: 'CITATION' },
-              { source: 'theme:confessions', target: 'theme:nostalgie', type: 'CITATION' },
-              { source: 'theme:inside-jokes', target: 'theme:projets', type: 'CITATION' },
-            ] : []}
+            nodes={ocrNotes.nodes.length > 0
+              ? ocrNotes.nodes.map(note => ({
+                id: note.id,
+                label: note.label,
+                type: note.type,
+                weight: note.weight,
+                degree: note.degree,
+              }))
+              : [] // Empty until OCR notes are loaded
+            }
+            edges={ocrNotes.edges}
             onNodeClick={(node) => {
-              if (node.id.startsWith('theme:')) {
-                // Open a stacked note with the content
-                openNote(node.id)
-              } else if (node.id.startsWith('note:')) {
-                // Future: Open OCR note
+              if (node.id.startsWith('note:')) {
                 openNote(node.id)
               }
             }}
@@ -878,6 +908,61 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
           {/* Stacked notes panels */}
           <StackedNotes
             notes={openNotes.map(id => {
+              // Check if this is an OCR note
+              if (id.startsWith('note:')) {
+                const ocrNote = ocrNotes.nodes.find(n => n.id === id)
+                if (ocrNote) {
+                  return {
+                    id,
+                    title: ocrNote.label,
+                    content: (
+                      <div className="space-y-4">
+                        {/* Image */}
+                        {ocrNote.imageUrl && (
+                          <div className="relative rounded-lg overflow-hidden border border-[var(--border-subtle)] bg-[var(--abyss)]">
+                            <img
+                              src={ocrNote.imageUrl}
+                              alt={ocrNote.label}
+                              className="w-full max-h-[300px] object-contain"
+                            />
+                          </div>
+                        )}
+
+                        {/* Confidence badge */}
+                        {ocrNote.confidence && (
+                          <div className="flex items-center gap-2 text-xs text-[var(--text-tertiary)]">
+                            <span className={`px-2 py-0.5 rounded ${ocrNote.confidence > 70 ? 'bg-green-900/30 text-green-400' :
+                                ocrNote.confidence > 50 ? 'bg-yellow-900/30 text-yellow-400' :
+                                  'bg-red-900/30 text-red-400'
+                              }`}>
+                              OCR {Math.round(ocrNote.confidence)}%
+                            </span>
+                            <span>{ocrNote.textLength} caractères</span>
+                          </div>
+                        )}
+
+                        {/* Keywords */}
+                        {ocrNote.keywords && ocrNote.keywords.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {ocrNote.keywords.slice(0, 6).map((kw, i) => (
+                              <span key={i} className="px-2 py-0.5 text-xs rounded bg-[var(--accent-dim)] text-[var(--accent)] border border-[var(--accent)]/30">
+                                {kw}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Full text would be loaded separately if needed */}
+                        <p className="text-[var(--text-secondary)] text-sm italic">
+                          Texte extrait de l&apos;image via OCR.
+                        </p>
+                      </div>
+                    )
+                  }
+                }
+                return null
+              }
+              // Fallback to thematic notes (legacy)
               const content = getGrapheuNoteContent(id, openNote)
               return content ? { id, title: content.title, content: content.content } : null
             }).filter(Boolean) as { id: string; title: string; content: React.ReactNode }[]}

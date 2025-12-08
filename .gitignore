@@ -57,3 +57,10 @@ next-env.d.ts
 # FEU HUMAIN - Protéger les données privées et fichiers volumineux
 /public/FEU HUMAIN/*
 !/public/FEU HUMAIN/.gitkeep
+
+# Tesseract language data
+*.traineddata
+
+# Google Cloud credentials (NEVER commit)
+subtle-*.json
+*-credentials*.json

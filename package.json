@@ -44,6 +44,7 @@
     "clean:feu-humain": "node scripts/clean-messenger-export.js",
     "aro": "npx dotenv-cli -e .env.local -- npx tsx scripts/operation-aro.ts",
     "aro:dry-run": "npx dotenv-cli -e .env.local -- npx tsx scripts/operation-aro.ts --dry-run",
+    "aro:local": "npx dotenv-cli -e .env.local -- npx tsx scripts/operation-aro-tesseract.ts",
     "prepare": "husky"
   },
   "dependencies": {
@@ -81,6 +82,7 @@
     "remark-parse": "^11.0.0",
     "swr": "^2.3.6",
     "tailwind-merge": "^2.2.0",
+    "tesseract.js": "^6.0.1",
     "ts-node": "^10.9.2",
     "use-debounce": "^10.0.5",
     "zod": "^4.0.17"
