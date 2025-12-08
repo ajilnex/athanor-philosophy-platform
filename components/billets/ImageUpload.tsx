@@ -73,9 +73,8 @@ export function ImageUpload({
       if (autoInsert) {
         try {
           await navigator.clipboard.writeText(syntax)
-          console.log('✅ Syntaxe markdown copiée dans le presse-papier')
-        } catch (err) {
-          console.log('⚠️ Impossible de copier dans le presse-papier:', err)
+        } catch {
+          // Clipboard API non disponible - opération silencieuse
         }
       }
     } catch (err) {
@@ -98,9 +97,8 @@ export function ImageUpload({
     if (markdownSyntax) {
       try {
         await navigator.clipboard.writeText(markdownSyntax)
-        console.log('📋 Syntaxe copiée!')
-      } catch (err) {
-        console.error('Erreur copie:', err)
+      } catch {
+        // Clipboard API non disponible
       }
     }
   }

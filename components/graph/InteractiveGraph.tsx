@@ -191,9 +191,8 @@ export function InteractiveGraph({
                   fill="hsl(220, 90%, 55%)" opacity="0.3" filter="url(#clone-glow)"/>
           <circle cx="${cx}" cy="${cy}" r="${r}" 
                   fill="hsl(220, 90%, 55%)" stroke="${stroke || 'hsl(220, 10%, 98%)'}" stroke-width="${strokeWidth || '1'}" opacity="1"/>
-          ${
-            originalText
-              ? `
+          ${originalText
+          ? `
           <text x="${textX}" y="${textY}" 
                 text-anchor="middle" font-size="${cloneFontSize}" 
                 font-family="${fontFamily}" fill="hsl(220, 15%, 20%)"
@@ -201,8 +200,8 @@ export function InteractiveGraph({
                 style="text-decoration: none;">
             ${textContent}
           </text>`
-              : ''
-          }
+          : ''
+        }
         </a>
       `
 
@@ -265,10 +264,8 @@ export function InteractiveGraph({
     function handleMouseOver(e: Event) {
       if (!enabled) return
       const me = e as MouseEvent
-      console.log('MouseOver triggered:', { target: (e.target as Element)?.tagName })
 
       if (isOverShield(me.clientX, me.clientY)) {
-        console.log('Shield detected - blocking interaction')
         return // ➜ ne pas activer le clone
       }
 
@@ -277,7 +274,6 @@ export function InteractiveGraph({
       if (hitArea) {
         const nodeId = hitArea.getAttribute('data-id')
         if (nodeId) {
-          console.log('Activating node:', nodeId)
           if (timeoutId) clearTimeout(timeoutId)
           if (activeNode !== nodeId) {
             if (activeNode) removeClone(activeNode)

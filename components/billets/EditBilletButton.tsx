@@ -24,7 +24,7 @@ export function EditBilletButton({ slug, title, className = '', onDelete }: Edit
   if (status === 'loading') return null
   if (!session?.user) return null
 
-  const userRole = (session.user as any)?.role
+  const userRole = session.user.role
   if (userRole === 'VISITOR') return null
 
   const isAdmin = userRole === 'ADMIN'
@@ -57,8 +57,7 @@ export function EditBilletButton({ slug, title, className = '', onDelete }: Edit
         throw new Error(error.error || 'Erreur lors de la suppression')
       }
 
-      const result = await response.json()
-      console.log('✅ Suppression confirmée côté serveur:', result.message)
+      await response.json()
 
       // Si on est sur la page du billet, rediriger vers la liste
       if (!onDelete) {

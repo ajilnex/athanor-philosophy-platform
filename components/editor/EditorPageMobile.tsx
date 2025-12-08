@@ -125,8 +125,8 @@ export function EditorPageMobile({
           if (document.documentElement.requestFullscreen) {
             await document.documentElement.requestFullscreen()
           }
-        } catch (err) {
-          console.log('Fullscreen API non disponible:', err)
+        } catch {
+          // Fullscreen API non disponible sur ce navigateur
         }
         setTimeout(() => {
           if (editorRef.current?.view) {
@@ -308,8 +308,8 @@ export function EditorPageMobile({
       if (document.documentElement.requestFullscreen) {
         await document.documentElement.requestFullscreen()
       }
-    } catch (err) {
-      console.log('Fullscreen non disponible:', err)
+    } catch {
+      // Fullscreen API non disponible
     }
   }, [])
 
@@ -318,7 +318,7 @@ export function EditorPageMobile({
       if (document.fullscreenElement) {
         await document.exitFullscreen()
       }
-    } catch {}
+    } catch { }
     setIsImmersive(false)
     if (startImmersive) {
       router.replace('/billets/nouveau')
