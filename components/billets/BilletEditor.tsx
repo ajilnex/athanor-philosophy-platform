@@ -28,6 +28,7 @@ import CodeMirror from '@uiw/react-codemirror'
 import { markdown } from '@codemirror/lang-markdown'
 import { EditorView } from '@codemirror/view'
 import { iaWriterDuo } from './immersive-font'
+import { transformCitationsForPreview } from '@/lib/citation-preview'
 
 // ... (interfaces BilletEditorProps, BilletData remain the same)
 interface BilletEditorProps {
@@ -156,10 +157,9 @@ export function BilletEditor({
           (_m, slug, alias) => `[${alias}](/billets/${slug})`
         )
         md = md.replace(/\[\[([^\]]+)\]\]/g, (_m, slug) => `[${slug}](/billets/${slug})`)
-        md = md.replace(
-          /<Cite\s+[^>]*item=["']([^"']+)["'][^>]*\/?>(?:<\/Cite>)?/gi,
-          (_m, key) => `[*${key}*]`
-        )
+
+        // Transform citations to readable format [Author, Year]
+        md = await transformCitationsForPreview(md)
 
         const file = await remark().use(html).process(md)
         setPreviewHtml(String(file))
@@ -433,8 +433,8 @@ export function BilletEditor({
                   type="button"
                   onClick={() => setShowPreview(p => !p)}
                   className={`px-3 py-1.5 text-sm rounded border transition ${showPreview
-                      ? 'bg-foreground text-background border-foreground'
-                      : 'border-subtle/50 hover:bg-muted'
+                    ? 'bg-foreground text-background border-foreground'
+                    : 'border-subtle/50 hover:bg-muted'
                     }`}
                   title="Basculer l'aperçu"
                 >

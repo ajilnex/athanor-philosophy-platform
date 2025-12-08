@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ArrowLeft, ExternalLink, BookOpen, Calendar, Users } from 'lucide-react'
 import fs from 'fs'
 import path from 'path'
+import { BibTeXExport } from '@/components/bibliography/BibTeXExport'
 
 interface BibliographyEntry {
   key: string
@@ -309,6 +310,12 @@ export default async function RefPage({ params }: { params: Promise<{ key: strin
               </div>
             </section>
           )}
+
+          {/* Export BibTeX */}
+          <section>
+            <h3 className="text-base font-serif font-light text-foreground mb-3">Exporter</h3>
+            <BibTeXExport entry={entry} />
+          </section>
         </div>
       </div>
 
