@@ -2,6 +2,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 
+// Validation force mot de passe
+function validatePassword(password: string): { valid: boolean; message?: string } {
+  if (password.length < 8) {
+    return { valid: false, message: 'Le mot de passe doit contenir au moins 8 caractères' }
+  }
+  if (!/[a-z]/.test(password)) {
+    return { valid: false, message: 'Le mot de passe doit contenir au moins une minuscule' }
+  }
+  if (!/[A-Z]/.test(password)) {
+    return { valid: false, message: 'Le mot de passe doit contenir au moins une majuscule' }
+  }
+  if (!/[0-9]/.test(password)) {
+    return { valid: false, message: 'Le mot de passe doit contenir au moins un chiffre' }
+  }
+  return { valid: true }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { name, email, password } = await request.json()
@@ -11,11 +28,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Tous les champs sont obligatoires' }, { status: 400 })
     }
 
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: 'Le mot de passe doit contenir au moins 6 caractères' },
-        { status: 400 }
-      )
+    // Validation email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: 'Format email invalide' }, { status: 400 })
+    }
+
+    // Validation force mot de passe
+    const passwordCheck = validatePassword(password)
+    if (!passwordCheck.valid) {
+      return NextResponse.json({ error: passwordCheck.message }, { status: 400 })
     }
 
     // Vérifier si l'utilisateur existe déjà

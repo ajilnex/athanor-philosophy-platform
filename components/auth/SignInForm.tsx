@@ -43,17 +43,14 @@ export default function SignInForm() {
   }
 
   const handleGitHubSignIn = async () => {
-    console.log('GitHub sign-in clicked')
     setIsGitHubLoading(true)
     setError('')
     try {
-      const result = await signIn('github', {
+      await signIn('github', {
         callbackUrl: '/',
         redirect: true,
       })
-      console.log('GitHub sign-in result:', result)
     } catch (error) {
-      console.error('GitHub sign-in error:', error)
       setError('Erreur de connexion GitHub')
       setIsGitHubLoading(false)
     }

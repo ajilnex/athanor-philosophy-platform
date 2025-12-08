@@ -70,7 +70,7 @@ export default async function HomePage() {
           )}
         </div>
         {/* Admin FAB: Nouveau billet direct en Salle du Temps */}
-        {(session?.user as any)?.role === 'ADMIN' && <AddBilletFab />}
+        {session?.user?.role === 'ADMIN' && <AddBilletFab />}
       </main>
     </>
   )

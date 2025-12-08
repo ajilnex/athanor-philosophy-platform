@@ -1,8 +1,22 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
+
+// Calculate password strength (0-4)
+function getPasswordStrength(pwd: string): { score: number; label: string; color: string } {
+  let score = 0
+  if (pwd.length >= 8) score++
+  if (/[a-z]/.test(pwd)) score++
+  if (/[A-Z]/.test(pwd)) score++
+  if (/[0-9]/.test(pwd)) score++
+
+  const labels = ['Très faible', 'Faible', 'Moyen', 'Bon', 'Excellent']
+  const colors = ['#dc322f', '#cb4b16', '#b58900', '#859900', '#2aa198']
+
+  return { score, label: labels[score], color: colors[score] }
+}
 
 export default function RegisterForm() {
   const [name, setName] = useState('')
@@ -12,6 +26,8 @@ export default function RegisterForm() {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+
+  const passwordStrength = useMemo(() => getPasswordStrength(password), [password])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -106,9 +122,26 @@ export default function RegisterForm() {
             value={password}
             onChange={e => setPassword(e.target.value)}
             className="w-full px-3 py-2 border border-subtle/30 rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent"
-            placeholder="Minimum 6 caractères"
-            minLength={6}
+            placeholder="8 caractères, majuscule, minuscule et chiffre"
+            minLength={8}
           />
+          {/* Password strength indicator */}
+          {password.length > 0 && (
+            <div className="mt-2">
+              <div className="h-1.5 w-full bg-subtle/20 rounded-full overflow-hidden">
+                <div
+                  className="h-full transition-all duration-300"
+                  style={{
+                    width: `${(passwordStrength.score / 4) * 100}%`,
+                    backgroundColor: passwordStrength.color,
+                  }}
+                />
+              </div>
+              <p className="text-xs mt-1" style={{ color: passwordStrength.color }}>
+                {passwordStrength.label}
+              </p>
+            </div>
+          )}
         </div>
 
         <div>

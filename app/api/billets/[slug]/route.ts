@@ -14,7 +14,7 @@ export async function DELETE(
     // Vérification authentification admin OBLIGATOIRE
     const session = await getServerSession(authOptions)
 
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Authentification admin requise' }, { status: 401 })
     }
 

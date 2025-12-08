@@ -16,7 +16,7 @@ export default async function BilletsPage() {
       })
 
       const isSealed = billetRecord?.isSealed || false
-      const isAdmin = (session?.user as any)?.role === 'ADMIN'
+      const isAdmin = session?.user?.role === 'ADMIN'
 
       return {
         ...billet,

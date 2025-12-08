@@ -68,7 +68,7 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
   })
 
   const isSealed = billetRecord?.isSealed || false
-  const isAdmin = (session?.user as any)?.role === 'ADMIN'
+  const isAdmin = session?.user?.role === 'ADMIN'
   const isVisitor = !session // Mode visiteur simple
 
   // Si le billet est scellé et l'utilisateur n'est pas admin, interdire l'accès

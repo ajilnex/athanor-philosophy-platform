@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     // Vérification authentification admin
     const session = await getServerSession(authOptions)
 
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Authentification admin requise' }, { status: 403 })
     }
 

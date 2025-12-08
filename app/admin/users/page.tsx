@@ -12,7 +12,7 @@ export const metadata = {
 export default async function UsersPage() {
   const session = await getServerSession(authOptions)
 
-  if (!session?.user || (session.user as any).role !== 'ADMIN') {
+  if (!session?.user || session.user.role !== 'ADMIN') {
     redirect('/auth/signin')
   }
 
