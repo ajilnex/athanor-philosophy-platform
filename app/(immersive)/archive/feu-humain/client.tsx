@@ -844,23 +844,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
           <ArchiveGraph
             hubLabel="Grapheu"
             nodes={archive ? [
-              // Participants as isolated nodes around hub
-              ...archive.participants.map((p, _i) => ({
-                id: `participant:${p.id}`,
-                label: p.name,
-                type: 'AUTHOR' as const,
-                weight: Math.min(Math.log10(p.messageCount + 1) * 3, 10),
-                degree: Math.min(Math.log10(p.messageCount + 1) * 3, 10),
-              })),
-              // Departed participants (if any)
-              ...(archive.departedParticipants || []).map((p, _i) => ({
-                id: `departed:${p.id}`,
-                label: `${p.name} ✝`,
-                type: 'TAG' as const,
-                weight: Math.min(Math.log10(p.messageCount + 1) * 2, 6),
-                degree: Math.min(Math.log10(p.messageCount + 1) * 2, 6),
-              })),
-              // Thematic nodes (sample content in the style of the archive)
+              // Thematic nodes - will be replaced by OCR notes later
               { id: 'theme:delires', label: 'Délires nocturnes', type: 'BILLET' as const, weight: 4, degree: 4 },
               { id: 'theme:philosophie', label: 'Philosophie de comptoir', type: 'BILLET' as const, weight: 5, degree: 5 },
               { id: 'theme:absurde', label: 'Théâtre de l\'absurde', type: 'BILLET' as const, weight: 3, degree: 3 },
@@ -880,13 +864,11 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
               { source: 'theme:inside-jokes', target: 'theme:projets', type: 'CITATION' },
             ] : []}
             onNodeClick={(node) => {
-              // Navigate to relevant date or filter when clicking on a node
-              if (node.id.startsWith('participant:') || node.id.startsWith('departed:')) {
-                const name = node.label.replace(' ✝', '')
-                setShowGrapheu(false)
-                setFilterBySender(name)
-              } else if (node.id.startsWith('theme:')) {
+              if (node.id.startsWith('theme:')) {
                 // Open a stacked note with the content
+                openNote(node.id)
+              } else if (node.id.startsWith('note:')) {
+                // Future: Open OCR note
                 openNote(node.id)
               }
             }}

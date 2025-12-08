@@ -160,6 +160,7 @@ model ConversationArchive {
 
   participants     ConversationParticipant[]
   messages         ConversationMessage[]
+  notes            ArchiveNote[]             // OCR notes from Operation ARO
 }
 
 model ConversationParticipant {
@@ -216,6 +217,7 @@ model ConversationMedia {
   createdAt         DateTime            @default(now())
 
   message           ConversationMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  note              ArchiveNote?        // Relation 1-1 avec note OCR
 
   @@index([messageId])
   @@index([type])
@@ -234,4 +236,40 @@ model ConversationReaction {
   participant   ConversationParticipant? @relation(fields: [participantId], references: [id], onDelete: SetNull)
 
   @@index([messageId])
+}
+
+// ============================================
+// Archive OCR Notes (Operation ARO)
+// ============================================
+
+model ArchiveNote {
+  id            String   @id @default(cuid())
+  archiveId     String
+  mediaId       String   @unique  // Lien 1-1 avec ConversationMedia
+  
+  // Contenu extrait
+  extractedText String?           // Texte OCR brut
+  summary       String?           // Résumé court pour le graphe
+  keywords      String[]          // Tags auto-générés
+  language      String?           // Langue détectée
+  confidence    Float?            // Score de confiance OCR (0-100)
+  
+  // Métadonnées pour le graphe
+  nodeLabel     String?           // Label affiché dans le graphe
+  nodeWeight    Float   @default(1)  // Poids pour taille du nœud
+  
+  // Statut de traitement
+  status        String  @default("pending")  // pending | processed | error | skipped
+  errorMessage  String?
+  processedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  media         ConversationMedia   @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  archive       ConversationArchive @relation(fields: [archiveId], references: [id], onDelete: Cascade)
+  
+  @@index([archiveId])
+  @@index([status])
+  @@index([keywords])
 }
