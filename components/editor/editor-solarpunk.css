@@ -64,13 +64,6 @@
     box-shadow: none !important;
 }
 
-/* ─── Night Mode (Salle du Temps alternative) ───────────────────────── */
-.editor-solarpunk.night {
-    --editor-bg: var(--base03);
-    --editor-bg-alt: var(--base02);
-    --editor-text: var(--base0);
-    --editor-text-muted: var(--base01);
-}
 
 /* ─── Header / Toolbar ──────────────────────────────────────────────── */
 .editor-header {
@@ -352,16 +345,6 @@
     flex-direction: column;
 }
 
-.salle-du-temps.night {
-    background: var(--base03);
-}
-
-.salle-du-temps.night .cm-content,
-.salle-du-temps.night .cm-editor,
-.salle-du-temps.night .cm-scroller {
-    background: var(--base03) !important;
-    color: var(--base0) !important;
-}
 
 /* Writing timer */
 .salle-timer {
@@ -420,14 +403,6 @@
     background: rgba(0, 0, 0, 0.15);
 }
 
-.salle-du-temps.night .salle-exit-always {
-    background: rgba(255, 255, 255, 0.12);
-    color: #93a1a1;
-}
-
-.salle-du-temps.night .salle-exit-always:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
 
 /* Exit button - appears on hover */
 .salle-exit {

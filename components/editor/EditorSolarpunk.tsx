@@ -26,7 +26,7 @@ import { remark } from 'remark'
 import html from 'remark-html'
 import CodeMirror from '@uiw/react-codemirror'
 import { markdown } from '@codemirror/lang-markdown'
-import { EditorView } from '@codemirror/view'
+import { EditorView, ViewPlugin, ViewUpdate } from '@codemirror/view'
 import toast from 'react-hot-toast'
 import { ImageUpload } from '@/components/billets/ImageUpload'
 import { CitationPicker } from './CitationPicker'
@@ -134,7 +134,7 @@ Commencez à écrire pour faire disparaître ce guide...`
     const [error, setError] = useState<string | null>(null)
     const [previewHtml, setPreviewHtml] = useState<string>('')
     const [isImmersive, setIsImmersive] = useState(false)
-    const [nightMode, setNightMode] = useState(false)
+
     const [showExitButton, setShowExitButton] = useState(false)
     const hideExitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -327,11 +327,36 @@ Commencez à écrire pour faire disparaître ce guide...`
 
     // CodeMirror extensions
     const extensions = useMemo(() => {
-        const bg = nightMode ? '#002b36' : '#fdf6e3'
-        const fg = nightMode ? '#839496' : '#657b83'
-        const cursor = nightMode ? '#93a1a1' : '#586e75'
+        // Couleurs Solarized Light fixes (mode nocturne supprimé)
+        const bg = '#fdf6e3'
+        const fg = '#657b83'
+        const cursor = '#586e75'
 
-        return [
+        // Typewriter scrolling plugin - keeps cursor centered vertically when typing
+        const typewriterPlugin = ViewPlugin.fromClass(class {
+            update(update: ViewUpdate) {
+                // Center cursor only when typing, not when selecting
+                if (update.docChanged) {
+                    const view = update.view
+                    setTimeout(() => {
+                        const head = view.state.selection.main.head
+                        const coords = view.coordsAtPos(head)
+                        if (coords) {
+                            const scroller = view.scrollDOM
+                            const scrollerRect = scroller.getBoundingClientRect()
+                            const targetY = scrollerRect.height / 2
+                            const currentY = coords.top - scrollerRect.top
+                            const diffY = currentY - targetY
+                            if (Math.abs(diffY) > 5) {
+                                scroller.scrollTop += diffY
+                            }
+                        }
+                    }, 0)
+                }
+            }
+        })
+
+        const baseExtensions = [
             markdown(),
             EditorView.lineWrapping,
             EditorView.theme({
@@ -340,14 +365,23 @@ Commencez à écrire pour faire disparaître ce guide...`
                     height: '100%',
                     backgroundColor: bg,
                 },
+                '.cm-scroller': {
+                    height: '100%',
+                    backgroundColor: bg,
+                    overflow: 'auto',
+                },
+                '.cm-scroller::-webkit-scrollbar': { width: isImmersive ? '0' : '8px' },
                 '.cm-content': {
-                    padding: isImmersive ? '50vh 15% 50vh 15%' : '2rem',
+                    padding: isImmersive ? '2rem 0' : '2rem',
+                    paddingLeft: isImmersive ? 'max(15%, calc(50% - 36ch))' : '2rem',
+                    paddingRight: isImmersive ? 'max(15%, calc(50% - 36ch))' : '2rem',
+                    marginTop: isImmersive ? '45vh' : '0',
+                    marginBottom: isImmersive ? '45vh' : '0',
                     caretColor: cursor,
                     backgroundColor: bg,
                     color: fg,
-                    minHeight: isImmersive ? '100vh' : '100%',
-                    maxWidth: isImmersive ? '72ch' : 'none',
-                    margin: isImmersive ? '0 auto' : '0',
+                    minHeight: isImmersive ? '10vh' : '100%',
+                    maxWidth: 'none',
                     fontFamily: isImmersive
                         ? 'var(--font-ia-writer, Georgia, serif)'
                         : 'ui-monospace, SFMono-Regular, monospace',
@@ -355,34 +389,37 @@ Commencez à écrire pour faire disparaître ce guide...`
                 },
                 '.cm-focused': { outline: 'none', border: 'none', boxShadow: 'none' },
                 '.cm-editor.cm-focused': { outline: 'none', border: 'none', boxShadow: 'none' },
-                '.cm-focused .cm-content': { outline: 'none', border: 'none' },
-                '.cm-focused .cm-scroller': { outline: 'none', border: 'none' },
                 '.cm-cursor': { borderLeftColor: cursor, borderLeftWidth: '2px' },
                 '.cm-editor': { height: '100%', backgroundColor: bg, border: 'none', outline: 'none' },
-                '.cm-scroller': {
-                    height: '100%',
-                    backgroundColor: bg,
-                    scrollPaddingTop: isImmersive ? '50%' : '0',
-                    scrollPaddingBottom: isImmersive ? '50%' : '0',
-                },
-                '.cm-scroller::-webkit-scrollbar': { width: isImmersive ? '0' : '8px' },
                 '.cm-gutters': { display: 'none' },
-                '.cm-selectionBackground': { backgroundColor: `${nightMode ? 'rgba(147,161,161,0.15)' : 'rgba(88,110,117,0.1)'}` },
-                '.cm-activeLine': { backgroundColor: nightMode ? 'rgba(7,54,66,0.5)' : 'rgba(238,232,213,0.6)' },
+                '.cm-activeLine': { backgroundColor: 'transparent' },
+                '.cm-selectionBackground': {
+                    backgroundColor: 'rgba(38, 139, 210, 0.4)'
+                },
+                '&.cm-focused .cm-selectionBackground': {
+                    backgroundColor: 'rgba(38, 139, 210, 0.5)'
+                },
                 '.cm-placeholder': {
-                    color: nightMode ? '#586e75' : '#93a1a1',
+                    color: '#93a1a1',
                     fontStyle: 'italic',
                 },
             })
         ]
-    }, [isImmersive, nightMode])
+
+        // Add typewriter plugin only in immersive mode
+        if (isImmersive) {
+            baseExtensions.push(typewriterPlugin)
+        }
+
+        return baseExtensions
+    }, [isImmersive])
 
     // ═══════════════════════════════════════════════════════════════════════
     // SALLE DU TEMPS (Immersive mode)
     // ═══════════════════════════════════════════════════════════════════════
     if (isImmersive) {
         return (
-            <div className={`salle-du-temps ${nightMode ? 'night' : ''}`}>
+            <div className="salle-du-temps">
                 {/* Exit button - always slightly visible */}
                 <button
                     onClick={exitImmersive}
@@ -392,15 +429,7 @@ Commencez à écrire pour faire disparaître ce guide...`
                     <X style={{ width: 18, height: 18 }} />
                 </button>
 
-                {/* Night mode toggle */}
-                <button
-                    onClick={() => setNightMode(n => !n)}
-                    className="salle-exit-always"
-                    style={{ right: '72px' }}
-                    title={nightMode ? 'Mode jour' : 'Mode nuit'}
-                >
-                    {nightMode ? '☀️' : '🌙'}
-                </button>
+
 
                 {/* Editor */}
                 <div className="h-full w-full">
@@ -412,6 +441,18 @@ Commencez à écrire pour faire disparaître ce guide...`
                             lineNumbers: false,
                             foldGutter: false,
                             highlightActiveLine: false,
+                            highlightSelectionMatches: false,
+                            drawSelection: true,
+                            dropCursor: true,
+                            allowMultipleSelections: true,
+                            bracketMatching: false,
+                            closeBrackets: false,
+                            autocompletion: false,
+                            rectangularSelection: true,
+                            crosshairCursor: false,
+                            highlightActiveLineGutter: false,
+                            history: true,
+                            syntaxHighlighting: true,
                         }}
                         extensions={extensions}
                         className="h-full w-full"
@@ -627,6 +668,8 @@ Commencez à écrire pour faire disparaître ce guide...`
                                     lineNumbers: false,
                                     foldGutter: false,
                                     highlightActiveLine: true,
+                                    highlightSelectionMatches: false,
+                                    drawSelection: true,
                                 }}
                                 extensions={extensions}
                                 placeholder={content ? '' : markdownTutorial}

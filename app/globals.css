@@ -200,80 +200,38 @@
     }
   }
 
-  /* Force le fond crème uniforme dans CodeMirror en mode immersif */
-  .salle-du-temps-container .cm-editor,
-  .salle-du-temps-container .cm-scroller,
-  .salle-du-temps-container .cm-content,
-  .salle-du-temps-container .cm-gutters,
-  .salle-du-temps-container .cm-activeLine,
-  .salle-du-temps-container .cm-activeLineGutter {
-    background-color: #fafaf8 !important;
+  /* ══════════════════════════════════════════════════════════════════════
+     SALLE DU TEMPS — Mode écriture immersif
+     ══════════════════════════════════════════════════════════════════════ */
+
+  /* Fond crème uniforme */
+  .salle-du-temps .cm-editor,
+  .salle-du-temps .cm-scroller,
+  .salle-du-temps .cm-content,
+  .salle-du-temps .cm-gutters {
+    background-color: #fdf6e3 !important;
   }
 
-  /* Suppression de toute bordure ou ligne dans la Salle du Temps */
-  .salle-du-temps-container .cm-editor {
+
+
+  /* Suppression des bordures et outlines */
+  .salle-du-temps .cm-editor {
     outline: none !important;
     border: none !important;
   }
 
-  /* Cursor clignotement régulier (pas de saut) */
-  .salle-du-temps-container .cm-cursor {
-    border-left-color: #333 !important;
-    border-left-width: 2px !important;
-    animation: cursorBlink 1s steps(2, start) infinite;
-  }
-
-  @keyframes cursorBlink {
-    0% {
-      opacity: 1;
-    }
-
-    50% {
-      opacity: 0;
-    }
-
-    100% {
-      opacity: 1;
-    }
-  }
-
-  /* Transition douce sur le texte lors du scroll */
-  .salle-du-temps-container .cm-line {
-    transition: opacity 0.15s ease;
-  }
-
-  /* Salle du Temps - immersion totale */
-  .salle-editor .cm-editor {
-    height: 100% !important;
-    background-color: #fafaf8 !important;
-  }
-
-  .salle-editor .cm-scroller {
-    align-items: center !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
-  .salle-editor .cm-content {
-    padding-top: 50vh !important;
-    padding-bottom: 50vh !important;
-  }
-
-  /* Masquer tous les éléments d'interface en mode immersif */
-  .salle-du-temps-container .cm-selectionBackground,
-  .salle-du-temps-container .cm-activeLine,
-  .salle-du-temps-container .cm-activeLineGutter {
+  /* Masquer la ligne active pour un look épuré */
+  .salle-du-temps .cm-activeLine,
+  .salle-du-temps .cm-activeLineGutter {
     background-color: transparent !important;
   }
 
-  /* Sélection de texte subtile */
-  .salle-du-temps-container ::selection {
-    background-color: rgba(0, 0, 0, 0.08);
+  /* Cursor */
+  .salle-du-temps .cm-cursor {
+    border-left-color: #586e75 !important;
+    border-left-width: 2px !important;
   }
 
-  .salle-du-temps-container ::-moz-selection {
-    background-color: rgba(0, 0, 0, 0.08);
-  }
 }
 
 @layer components {
@@ -664,4 +622,28 @@ a:hover {
   background-color: rgba(42, 161, 152, 0.1);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   ÉDITEUR - Styles de sélection haute priorité (en dehors de @layer)
+   Copié de la SDT qui fonctionne
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Mode normal (Solarpunk) */
+.editor-solarpunk .cm-selectionBackground,
+.editor-solarpunk .cm-selectionLayer .cm-selectionBackground,
+.editor-solarpunk .cm-content ::selection {
+  background-color: rgba(38, 139, 210, 0.4) !important;
+}
+
+/* Assurer que la couche de sélection couvre tout le contenu */
+.editor-solarpunk .cm-selectionLayer {
+  z-index: 1;
+}
+
+/* Mode immersif (Salle du Temps) */
+.salle-du-temps .cm-selectionBackground,
+.salle-du-temps .cm-selectionLayer .cm-selectionBackground,
+.salle-du-temps .cm-content ::selection {
+  background-color: rgba(38, 139, 210, 0.4) !important;
 }
