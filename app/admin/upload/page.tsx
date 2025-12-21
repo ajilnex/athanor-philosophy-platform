@@ -144,10 +144,10 @@ export default function UploadPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* File Upload */}
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-foreground mb-2">
               Fichier PDF *
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center hover:border-primary-400 transition-colors">
+            <div className="border-2 border-dashed border-subtle rounded-lg p-4 sm:p-6 text-center hover:border-accent transition-colors">
               <input
                 type="file"
                 accept=".pdf"
@@ -160,7 +160,7 @@ export default function UploadPage() {
                   <div className="flex items-center justify-center space-x-2">
                     <FileText className="h-8 w-8 text-primary-600" />
                     <div>
-                      <p className="text-sm sm:text-lg font-medium text-gray-900">
+                      <p className="text-sm sm:text-lg font-medium text-foreground">
                         {selectedFile.name}
                       </p>
                       <p className="text-xs sm:text-sm text-subtle">
@@ -170,18 +170,18 @@ export default function UploadPage() {
                     <button
                       type="button"
                       onClick={() => setSelectedFile(null)}
-                      className="p-1 hover:bg-gray-100 rounded"
+                      className="p-1 hover:bg-muted rounded transition-colors"
                     >
-                      <X className="h-4 w-4 text-gray-500" />
+                      <X className="h-4 w-4 text-subtle" />
                     </button>
                   </div>
                 ) : (
                   <div>
-                    <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-sm sm:text-lg font-medium text-gray-900 mb-2">
+                    <Upload className="h-12 w-12 text-subtle mx-auto mb-4" />
+                    <p className="text-sm sm:text-lg font-medium text-foreground mb-2">
                       Cliquez pour sélectionner un fichier PDF
                     </p>
-                    <p className="text-xs sm:text-sm text-gray-500">Taille maximale: 50MB</p>
+                    <p className="text-xs sm:text-sm text-subtle">Taille maximale: 50MB</p>
                   </div>
                 )}
               </label>
@@ -263,7 +263,7 @@ export default function UploadPage() {
               className="input-field"
               placeholder="philosophie, éthique, métaphysique (séparés par des virgules)"
             />
-            <p className="text-xs sm:text-xs text-gray-500 mt-1">
+            <p className="text-xs sm:text-xs text-subtle mt-1">
               Séparez les mots-clés par des virgules
             </p>
           </div>

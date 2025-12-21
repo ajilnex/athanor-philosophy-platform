@@ -57,6 +57,24 @@
     /* sol-yellow */
     --muted: #eee8d5;
     /* sol-base2 */
+
+    /* === ALIASES for Design System Consistency === */
+    /* These allow both naming conventions to work */
+    --void: var(--background);
+    --abyss: var(--background-elevated);
+    --surface: var(--background-elevated);
+    --elevated: var(--background);
+    --card: var(--background);
+    --text-bright: var(--foreground);
+    --text-primary: var(--foreground);
+    --text-secondary: var(--subtle);
+    --text-tertiary: var(--subtle);
+    --border-subtle: rgba(7, 54, 66, 0.06);
+    --border-default: rgba(7, 54, 66, 0.12);
+    --border-strong: rgba(7, 54, 66, 0.20);
+    --border-accent: rgba(42, 161, 152, 0.4);
+    --accent-dim: rgba(42, 161, 152, 0.12);
+    --accent-glow: rgba(42, 161, 152, 0.25);
   }
 
   /* Dark Mode */

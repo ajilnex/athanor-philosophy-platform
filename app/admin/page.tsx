@@ -76,9 +76,9 @@ async function AdminNormalPage() {
           <span className="font-medium">{session.user?.email ?? 'utilisateur'}</span>, mais sans
           droits admin.
         </p>
-        <div className="bg-gray-50 text-left text-xs p-3 border border-subtle mb-6 overflow-x-auto">
+        <div className="bg-muted text-left text-xs p-3 border border-subtle rounded mb-6 overflow-x-auto">
           <p className="mb-2">Pour te promouvoir admin (à exécuter côté base) :</p>
-          <code>UPDATE "User" SET role = 'ADMIN' WHERE email = 'ton-email@github';</code>
+          <code className="text-foreground">UPDATE "User" SET role = 'ADMIN' WHERE email = 'ton-email@github';</code>
         </div>
         <Link
           href="/api/auth/signout?callbackUrl=/"

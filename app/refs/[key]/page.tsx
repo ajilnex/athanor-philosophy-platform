@@ -257,7 +257,7 @@ export default async function RefPage({ params }: { params: Promise<{ key: strin
 
               <div>
                 <span className="font-medium text-foreground">Clé de citation : </span>
-                <code className="text-subtle bg-gray-100 px-2 py-1 rounded text-xs font-mono">
+                <code className="text-subtle bg-muted px-2 py-1 rounded text-xs font-mono">
                   {entry.key}
                 </code>
               </div>
@@ -303,7 +303,7 @@ export default async function RefPage({ params }: { params: Promise<{ key: strin
               <h3 className="text-base font-serif font-light text-foreground mb-3">Mots-clés</h3>
               <div className="flex flex-wrap gap-1">
                 {entry.tags.map(tag => (
-                  <span key={tag} className="px-2 py-1 text-xs bg-gray-100 text-foreground rounded">
+                  <span key={tag} className="px-2 py-1 text-xs bg-muted text-foreground rounded">
                     {tag}
                   </span>
                 ))}

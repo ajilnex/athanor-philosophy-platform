@@ -70,7 +70,7 @@ export default async function AdminBilletsPage() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="text-lg font-light text-foreground">{billet.title}</h3>
-                    <span className="px-2 py-1 text-xs bg-gray-100 text-foreground rounded">
+                    <span className="px-2 py-1 text-xs bg-muted text-foreground rounded">
                       {billet.slug}
                     </span>
                   </div>

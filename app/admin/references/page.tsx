@@ -70,7 +70,7 @@ export default async function AdminReferencesPage() {
 
       <div className="overflow-x-auto rounded-lg border border-subtle/20">
         <table className="min-w-full text-sm">
-          <thead className="bg-gray-50 text-left">
+          <thead className="bg-muted text-left">
             <tr>
               <th className="px-4 py-3">Clé</th>
               <th className="px-4 py-3">Titre</th>
@@ -91,7 +91,7 @@ export default async function AdminReferencesPage() {
                 <td className="px-4 py-3 text-subtle">{row.year}</td>
                 <td className="px-4 py-3">
                   <span className="inline-flex items-center gap-2 text-foreground">
-                    <span className="inline-block rounded bg-gray-100 px-2 py-0.5 text-xs">
+                    <span className="inline-block rounded bg-muted px-2 py-0.5 text-xs">
                       {row.count}
                     </span>
                     <span className="text-subtle">billet(s)</span>

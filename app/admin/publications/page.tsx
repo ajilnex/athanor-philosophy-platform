@@ -80,7 +80,7 @@ export default async function AdminPublicationsPage() {
               </thead>
               <tbody className="divide-y divide-subtle">
                 {publications.map(publication => (
-                  <tr key={publication.id} className="hover:bg-gray-50">
+                  <tr key={publication.id} className="hover:bg-muted transition-colors">
                     <td className="py-3 sm:py-4 px-1 sm:px-2">
                       <div>
                         <h3 className="font-light text-foreground mb-1 text-sm sm:text-base">

@@ -123,7 +123,7 @@ export default function ExportButtons({ messages, title, participants }: ExportB
       <button
         onClick={() => handleExport('txt')}
         disabled={isExporting}
-        className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition disabled:opacity-50"
+        className="flex items-center gap-2 px-4 py-2 bg-[var(--abyss)] hover:bg-[var(--surface)] text-[var(--text-primary)] rounded-lg transition disabled:opacity-50"
         title="Exporter en texte brut"
       >
         {isExporting && exportFormat === 'txt' ? (
@@ -137,7 +137,7 @@ export default function ExportButtons({ messages, title, participants }: ExportB
       <button
         onClick={() => handleExport('json')}
         disabled={isExporting}
-        className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition disabled:opacity-50"
+        className="flex items-center gap-2 px-4 py-2 bg-[var(--abyss)] hover:bg-[var(--surface)] text-[var(--text-primary)] rounded-lg transition disabled:opacity-50"
         title="Exporter en JSON"
       >
         {isExporting && exportFormat === 'json' ? (
@@ -148,20 +148,20 @@ export default function ExportButtons({ messages, title, participants }: ExportB
         <span className="hidden sm:inline">JSON</span>
       </button>
 
-      <div className="w-px bg-gray-700 mx-2" />
+      <div className="w-px bg-[var(--border-default)] mx-2" />
 
       <button
         onClick={copyShareLink}
-        className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition"
+        className="flex items-center gap-2 px-4 py-2 bg-[var(--abyss)] hover:bg-[var(--surface)] text-[var(--text-primary)] rounded-lg transition"
         title="Copier le lien"
       >
-        {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+        {copied ? <Check className="w-4 h-4 text-[var(--success)]" /> : <Copy className="w-4 h-4" />}
         <span className="hidden sm:inline">{copied ? 'Copié!' : 'Copier'}</span>
       </button>
 
       <button
         onClick={printConversation}
-        className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition"
+        className="flex items-center gap-2 px-4 py-2 bg-[var(--abyss)] hover:bg-[var(--surface)] text-[var(--text-primary)] rounded-lg transition"
         title="Imprimer"
       >
         <Printer className="w-4 h-4" />

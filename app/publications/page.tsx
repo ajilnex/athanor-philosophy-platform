@@ -117,7 +117,7 @@ export default async function PublicationsPage() {
                       <Tag className="h-4 w-4 text-subtle" />
                       <div className="flex flex-wrap gap-2">
                         {publication.tags.map(tag => (
-                          <span key={tag} className="px-2 py-1 text-xs bg-gray-100 text-foreground">
+                          <span key={tag} className="px-2 py-1 text-xs bg-muted text-foreground rounded">
                             {tag}
                           </span>
                         ))}

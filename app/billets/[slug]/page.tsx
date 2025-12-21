@@ -171,7 +171,7 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
               <Tag className="h-4 w-4 text-subtle" />
               <div className="flex flex-wrap gap-2">
                 {billet.tags.map(tag => (
-                  <span key={tag} className="px-3 py-1 text-sm bg-gray-100 text-foreground">
+                  <span key={tag} className="px-3 py-1 text-sm bg-muted text-foreground rounded">
                     {tag}
                   </span>
                 ))}
