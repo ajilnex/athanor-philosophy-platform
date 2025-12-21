@@ -328,6 +328,9 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
 
   // Observer for loading PREVIOUS messages (when scrolling up)
   useEffect(() => {
+    const scrollContainer = messageStreamRef.current
+    if (!scrollContainer) return
+
     const observer = new IntersectionObserver(
       entries => {
         // Don't trigger during initial load or right after filter change
@@ -335,7 +338,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
           loadPrevious()
         }
       },
-      { threshold: 0.1, rootMargin: '200px' }
+      { threshold: 0.1, rootMargin: '200px', root: scrollContainer }
     )
 
     const target = loadPrevRef.current
@@ -349,13 +352,16 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
 
   // Observer for loading MORE messages (when scrolling down) 
   useEffect(() => {
+    const scrollContainer = messageStreamRef.current
+    if (!scrollContainer) return
+
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting && hasMore && !loadingMore) {
           loadMore()
         }
       },
-      { threshold: 0.1, rootMargin: '200px' }
+      { threshold: 0.1, rootMargin: '200px', root: scrollContainer }
     )
 
     const target = loadMoreRef.current
