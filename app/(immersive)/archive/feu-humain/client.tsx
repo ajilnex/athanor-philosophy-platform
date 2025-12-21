@@ -15,6 +15,7 @@ import {
   Terminal,
   Sparkles,
   BookOpen,
+  RotateCw,
 } from 'lucide-react'
 import { GlassDashboard } from './components/GlassDashboard'
 import { TimelineSidebar } from './components/TimelineSidebar'
@@ -967,11 +968,19 @@ function MessageItem({ message, showHeader, formatDate, onMediaClick, isFiltered
 }
 
 function MediaModal({ media, onClose }: any) {
+  const [rotation, setRotation] = React.useState(0)
+
+  const rotate = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setRotation(prev => (prev + 90) % 360)
+  }
+
   return (
     <div
       className="fixed inset-0 z-[100] bg-[var(--void)]/95 backdrop-blur-xl flex items-center justify-center p-4 animate-fadeIn"
       onClick={onClose}
     >
+      {/* Close button */}
       <button
         onClick={onClose}
         className="absolute top-6 right-6 p-3 bg-[var(--surface)] hover:bg-[var(--accent-dim)] border border-[var(--border-default)] hover:border-[var(--accent)] rounded-full transition group z-[110]"
@@ -979,6 +988,18 @@ function MediaModal({ media, onClose }: any) {
       >
         <X className="w-6 h-6 text-[var(--text-secondary)] group-hover:text-[var(--accent)]" />
       </button>
+
+      {/* Rotate button - only for photos */}
+      {media.type === 'photo' && (
+        <button
+          onClick={rotate}
+          className="absolute top-6 right-20 p-3 bg-[var(--surface)] hover:bg-[var(--accent-dim)] border border-[var(--border-default)] hover:border-[var(--accent)] rounded-full transition group z-[110]"
+          aria-label="Pivoter l'image"
+          title="Pivoter (90°)"
+        >
+          <RotateCw className="w-6 h-6 text-[var(--text-secondary)] group-hover:text-[var(--accent)]" />
+        </button>
+      )}
 
       <div
         className="max-w-7xl max-h-[90vh] w-full flex items-center justify-center"
@@ -988,7 +1009,12 @@ function MediaModal({ media, onClose }: any) {
           onClick={e => e.stopPropagation()}
         >
           {media.type === 'photo' && (
-            <img src={media.url} alt="" className="max-h-[85vh] max-w-full rounded" />
+            <img
+              src={media.url}
+              alt=""
+              className="max-h-[85vh] max-w-full rounded transition-transform duration-300"
+              style={{ transform: `rotate(${rotation}deg)` }}
+            />
           )}
           {media.type === 'video' && (
             <video src={media.url} controls autoPlay className="max-h-[85vh] max-w-full rounded" />
