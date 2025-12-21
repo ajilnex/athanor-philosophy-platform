@@ -98,6 +98,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
   const [openNotes, setOpenNotes] = useState<string[]>([]) // Array of note IDs for stacked notes
   const [focusedNoteIndex, setFocusedNoteIndex] = useState<number>(-1) // Which note is currently expanded
   const [filterBySender, setFilterBySender] = useState<string | null>(null)
+  const [hoveredMessageDate, setHoveredMessageDate] = useState<string | null>(null) // Date du message survolé
 
   // Stacked notes management
   const openNote = useCallback((noteId: string) => {
@@ -547,6 +548,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
           onDateSelect={handleDateSelect}
           distribution={archive?.stats.timelineDistribution}
           hourlyDistribution={archive?.stats.hourlyDistribution}
+          highlightedDate={hoveredMessageDate}
         />
 
         {/* Stats Side Panel - Slides in from right, below archive header */}
@@ -809,6 +811,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
                       params.set('startDate', dateOnly)
                       router.push(`${pathname}?${params.toString()}`)
                     }}
+                    onHover={(date: string | null) => setHoveredMessageDate(date)}
                   />
                 )
               })}
@@ -897,13 +900,15 @@ function FilterButton({ active, onClick, label, icon }: any) {
   )
 }
 
-function MessageItem({ message, showHeader, formatDate, onMediaClick, isFiltered, onGoToContext }: any) {
+function MessageItem({ message, showHeader, formatDate, onMediaClick, isFiltered, onGoToContext, onHover }: any) {
   const isMe = message.sender === 'Aubin Robert'
 
   return (
     <div
       className={`group animate-fadeIn ${showHeader ? 'mt-6' : 'mt-0.5'} ${isFiltered ? 'cursor-pointer' : ''}`}
       onClick={isFiltered ? onGoToContext : undefined}
+      onMouseEnter={() => onHover?.(message.date)}
+      onMouseLeave={() => onHover?.(null)}
     >
       {showHeader && (
         <div className="flex items-baseline gap-3 mb-1.5 px-4">

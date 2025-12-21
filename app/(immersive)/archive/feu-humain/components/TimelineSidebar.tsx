@@ -17,6 +17,7 @@ interface TimelineSidebarProps {
     first_msg?: string
     last_msg?: string
   }>
+  highlightedDate?: string | null // Date du message survolé
 }
 
 interface TimeItem {
@@ -43,6 +44,7 @@ export function TimelineSidebar({
   onDateSelect,
   distribution = [],
   hourlyDistribution = [],
+  highlightedDate,
 }: TimelineSidebarProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [mouseY, setMouseY] = useState<number | null>(null)
@@ -218,6 +220,44 @@ export function TimelineSidebar({
     return layout.find(p => mouseY >= p.y && mouseY < p.y + p.height) || null
   }, [layout, mouseY])
 
+  // Calculate position of highlighted date (from message hover)
+  const highlightedPosition = useMemo(() => {
+    if (!highlightedDate || allItems.length === 0) return null
+
+    const highlightTime = new Date(highlightedDate).getTime()
+
+    // Find the closest item to this date
+    let closestIndex = 0
+    let minDiff = Infinity
+
+    for (let i = 0; i < allItems.length; i++) {
+      const itemTime = new Date(allItems[i].timestamp).getTime()
+      const diff = Math.abs(itemTime - highlightTime)
+      if (diff < minDiff) {
+        minDiff = diff
+        closestIndex = i
+      }
+    }
+
+    // Calculate Y position (linear, no fisheye when just highlighting)
+    const ratio = closestIndex / (allItems.length - 1 || 1)
+    const y = ratio * CONTAINER_HEIGHT
+
+    // Format the date for display
+    const date = new Date(highlightedDate)
+    const formattedDate = date.toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    })
+    const formattedTime = date.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+
+    return { y, formattedDate, formattedTime }
+  }, [highlightedDate, allItems, CONTAINER_HEIGHT])
+
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!containerRef.current) return
     const rect = containerRef.current.getBoundingClientRect()
@@ -353,6 +393,29 @@ export function TimelineSidebar({
               )
             })}
           </svg>
+
+          {/* Highlighted message indicator - shows when hovering a message in the list */}
+          {highlightedPosition && mouseY === null && (
+            <div
+              className="absolute left-0 right-0 pointer-events-none z-40 transition-all duration-150"
+              style={{ top: highlightedPosition.y }}
+            >
+              {/* Horizontal line */}
+              <div className="absolute left-0 right-0 h-px bg-[var(--warm)]" />
+              {/* Small triangle indicator */}
+              <div
+                className="absolute left-0 w-0 h-0 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent border-l-[6px] border-l-[var(--warm)]"
+                style={{ top: -4 }}
+              />
+              {/* Date/time badge */}
+              <div
+                className="absolute left-full ml-2 px-2 py-0.5 bg-[var(--warm)]/10 border border-[var(--warm)]/30 rounded text-[10px] font-mono text-[var(--warm)] whitespace-nowrap"
+                style={{ top: -8 }}
+              >
+                {highlightedPosition.formattedDate} · {highlightedPosition.formattedTime}
+              </div>
+            </div>
+          )}
 
           {/* Tooltip - shows hour when using hourly data */}
           {hoveredItem && mouseY !== null && (
