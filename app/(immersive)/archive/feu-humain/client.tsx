@@ -14,6 +14,7 @@ import {
   Info,
   Terminal,
   Sparkles,
+  BookOpen,
 } from 'lucide-react'
 import { GlassDashboard } from './components/GlassDashboard'
 import { TimelineSidebar } from './components/TimelineSidebar'
@@ -98,23 +99,6 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
   const [focusedNoteIndex, setFocusedNoteIndex] = useState<number>(-1) // Which note is currently expanded
   const [filterBySender, setFilterBySender] = useState<string | null>(null)
 
-  // OCR Notes for Grapheu (loaded from API)
-  interface OCRNote {
-    id: string
-    mediaId: string
-    label: string
-    type: 'BILLET'
-    weight: number
-    degree: number
-    keywords: string[]
-    confidence: number | null
-    textLength: number
-    imageUrl: string
-    extractedText?: string
-  }
-  const [ocrNotes, setOcrNotes] = useState<{ nodes: OCRNote[]; edges: { source: string; target: string; type: string }[] }>({ nodes: [], edges: [] })
-  const [loadingNotes, setLoadingNotes] = useState(false)
-
   // Stacked notes management
   const openNote = useCallback((noteId: string) => {
     setOpenNotes(prev => {
@@ -178,22 +162,6 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
       }
     }
   }, [searchTerm])
-
-  // Load OCR notes when Grapheu is opened
-  useEffect(() => {
-    if (showGrapheu && ocrNotes.nodes.length === 0 && !loadingNotes) {
-      setLoadingNotes(true)
-      fetch(`/api/archive/${archiveSlug}/notes`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.nodes) {
-            setOcrNotes({ nodes: data.nodes, edges: data.edges || [] })
-          }
-        })
-        .catch(console.error)
-        .finally(() => setLoadingNotes(false))
-    }
-  }, [showGrapheu, archiveSlug, ocrNotes.nodes.length, loadingNotes])
 
   // Charger les données initiales
   useEffect(() => {
@@ -554,6 +522,13 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
           >
             <Sparkles className="w-4 h-4" />
           </button>
+          <Link
+            href={`/archive/${archiveSlug}/feuilleter`}
+            className="p-2.5 transition rounded-lg text-[var(--text-tertiary)] hover:bg-[var(--accent-dim)] hover:text-[var(--accent)] flex items-center gap-1.5"
+            title="FEUilleter - Parcourir les textes extraits"
+          >
+            <BookOpen className="w-4 h-4" />
+          </Link>
         </div>
       </header>
 
@@ -873,96 +848,18 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
       {/* Grapheu Overlay - Fullscreen graph visualization */}
       {showGrapheu && (
         <div className="fixed inset-0 z-50 bg-[var(--void)]">
-          {/* Loading indicator */}
-          {loadingNotes && (
-            <div className="absolute inset-0 flex items-center justify-center z-10">
-              <div className="flex flex-col items-center gap-3 bg-[var(--abyss)] p-6 rounded-xl border border-[var(--border-subtle)]">
-                <Loader2 className="w-8 h-8 text-[var(--accent)] animate-spin" />
-                <p className="text-sm text-[var(--text-secondary)]">Chargement des notes OCR...</p>
-              </div>
-            </div>
-          )}
-
-          {/* Graph */}
+          {/* Graph - clean, no OCR notes */}
           <ArchiveGraph
             hubLabel="Grapheu"
-            nodes={ocrNotes.nodes.length > 0
-              ? ocrNotes.nodes.map(note => ({
-                id: note.id,
-                label: note.label,
-                type: note.type,
-                weight: note.weight,
-                degree: note.degree,
-              }))
-              : [] // Empty until OCR notes are loaded
-            }
-            edges={ocrNotes.edges}
-            onNodeClick={(node) => {
-              if (node.id.startsWith('note:')) {
-                openNote(node.id)
-              }
-            }}
+            nodes={[]}
+            edges={[]}
+            onNodeClick={(node) => openNote(node.id)}
             onClose={() => setShowGrapheu(false)}
           />
 
           {/* Stacked notes panels */}
           <StackedNotes
             notes={openNotes.map(id => {
-              // Check if this is an OCR note
-              if (id.startsWith('note:')) {
-                const ocrNote = ocrNotes.nodes.find(n => n.id === id)
-                if (ocrNote) {
-                  return {
-                    id,
-                    title: ocrNote.label,
-                    content: (
-                      <div className="space-y-4">
-                        {/* Image */}
-                        {ocrNote.imageUrl && (
-                          <div className="relative rounded-lg overflow-hidden border border-[var(--border-subtle)] bg-[var(--abyss)]">
-                            <img
-                              src={ocrNote.imageUrl}
-                              alt={ocrNote.label}
-                              className="w-full max-h-[300px] object-contain"
-                            />
-                          </div>
-                        )}
-
-                        {/* Confidence badge */}
-                        {ocrNote.confidence && (
-                          <div className="flex items-center gap-2 text-xs text-[var(--text-tertiary)]">
-                            <span className={`px-2 py-0.5 rounded ${ocrNote.confidence > 70 ? 'bg-green-900/30 text-green-400' :
-                                ocrNote.confidence > 50 ? 'bg-yellow-900/30 text-yellow-400' :
-                                  'bg-red-900/30 text-red-400'
-                              }`}>
-                              OCR {Math.round(ocrNote.confidence)}%
-                            </span>
-                            <span>{ocrNote.textLength} caractères</span>
-                          </div>
-                        )}
-
-                        {/* Keywords */}
-                        {ocrNote.keywords && ocrNote.keywords.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5">
-                            {ocrNote.keywords.slice(0, 6).map((kw, i) => (
-                              <span key={i} className="px-2 py-0.5 text-xs rounded bg-[var(--accent-dim)] text-[var(--accent)] border border-[var(--accent)]/30">
-                                {kw}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Full text would be loaded separately if needed */}
-                        <p className="text-[var(--text-secondary)] text-sm italic">
-                          Texte extrait de l&apos;image via OCR.
-                        </p>
-                      </div>
-                    )
-                  }
-                }
-                return null
-              }
-              // Fallback to thematic notes (legacy)
               const content = getGrapheuNoteContent(id, openNote)
               return content ? { id, title: content.title, content: content.content } : null
             }).filter(Boolean) as { id: string; title: string; content: React.ReactNode }[]}

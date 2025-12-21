@@ -24,22 +24,13 @@ export async function GET(
             return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
         }
 
-        // Get notes that are worth displaying:
-        // - Status = processed (has text)
-        // - Text length > 50 chars (filters out random OCR noise from photos)
-        // - Confidence > 40% (reasonable quality)
+        // Get notes that are worth displaying (limit to 100 for performance)
         const notes = await prisma.archiveNote.findMany({
             where: {
                 archiveId: archive.id,
                 status: 'processed',
-                // Only substantial text content
-                extractedText: {
-                    not: null
-                },
-                // Reasonable confidence
-                confidence: {
-                    gte: 40
-                }
+                extractedText: { not: null },
+                confidence: { gte: 50 } // Higher threshold for quality
             },
             include: {
                 media: {
@@ -51,12 +42,11 @@ export async function GET(
                     }
                 }
             },
-            orderBy: {
-                nodeWeight: 'desc'
-            }
+            orderBy: { nodeWeight: 'desc' },
+            take: 100 // Limit for graph performance
         })
 
-        // Filter in JS for text length (Prisma can't easily filter on string length)
+        // Filter in JS for text length
         // We want notes with substantial text content (book pages, screenshots, etc.)
         const filteredNotes = notes.filter(note => {
             if (!note.extractedText) return false
@@ -90,26 +80,9 @@ export async function GET(
             imageUrl: note.media.cloudinaryUrl || `/FEU HUMAIN/photos/${note.media.originalUri?.split('/').pop()}`
         }))
 
-        // Create edges between notes that share keywords
+        // Skip edge computation for now (O(n²) is too slow)
+        // TODO: Pre-compute edges in database or use keyword index
         const edges: { source: string; target: string; type: string }[] = []
-
-        for (let i = 0; i < graphNodes.length; i++) {
-            for (let j = i + 1; j < graphNodes.length; j++) {
-                const nodeA = graphNodes[i]
-                const nodeB = graphNodes[j]
-
-                // Check for shared keywords
-                const sharedKeywords = nodeA.keywords.filter(k => nodeB.keywords.includes(k))
-
-                if (sharedKeywords.length >= 2) {
-                    edges.push({
-                        source: nodeA.id,
-                        target: nodeB.id,
-                        type: 'KEYWORD_LINK'
-                    })
-                }
-            }
-        }
 
         return NextResponse.json({
             total: notes.length,
