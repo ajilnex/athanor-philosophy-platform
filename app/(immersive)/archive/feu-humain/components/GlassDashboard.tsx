@@ -33,7 +33,7 @@ export function GlassDashboard({ children, className = '' }: GlassDashboardProps
       </div>
 
       {/* Main Content Layer */}
-      <div className="relative z-10 h-full flex flex-col">{children}</div>
+      <div className="relative z-10 h-screen flex flex-col">{children}</div>
     </div>
   )
 }

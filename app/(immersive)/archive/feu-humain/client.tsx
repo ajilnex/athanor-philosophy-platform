@@ -142,38 +142,10 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
   // Derive current filters from URL or state
   const startDate = searchParams.get('startDate')
 
-  const observerRef = useRef<IntersectionObserver | null>(null)
-  const loadMoreRef = useRef<HTMLDivElement>(null)
+  // Refs
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const messageStreamRef = useRef<HTMLDivElement>(null)
   const isInitialLoadRef = useRef(true) // Prevent loadPrevious during initial/filter load
-
-  // State to track when scroll container is mounted (triggers observer setup)
-  const [scrollContainerReady, setScrollContainerReady] = useState(false)
-
-  // Mark scroll container as ready after mount - use RAF to ensure DOM is painted
-  useEffect(() => {
-    // Wait for next frame to ensure DOM is fully ready
-    const checkAndSetReady = () => {
-      if (messageStreamRef.current) {
-        setScrollContainerReady(true)
-      }
-    }
-
-    // Try immediately
-    checkAndSetReady()
-
-    // Also try after a frame (for safety)
-    const rafId = requestAnimationFrame(checkAndSetReady)
-
-    // And after a short delay (for extra safety with SSR hydration)
-    const timeoutId = setTimeout(checkAndSetReady, 100)
-
-    return () => {
-      cancelAnimationFrame(rafId)
-      clearTimeout(timeoutId)
-    }
-  }, [])
 
   // Debounce de la recherche
   useEffect(() => {
@@ -307,7 +279,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
   // Charger les messages précédents (vers le haut / passé)
   const [loadingPrev, setLoadingPrev] = useState(false)
   const [hasPrev, setHasPrev] = useState(() => !!searchParams.get('startDate')) // Only true if started from a specific date
-  const loadPrevRef = useRef<HTMLDivElement>(null)
+
 
   const loadPrevious = useCallback(async () => {
     if (loadingPrev || messages.length === 0 || !hasPrev) return
@@ -355,52 +327,56 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
     }
   }, [loadingPrev, messages, filterType, debouncedSearch, archiveSlug, hasPrev])
 
-  // Observer for loading PREVIOUS messages (when scrolling up)
+  // ============================================================================
+  // SIMPLE SCROLL-BASED INFINITE LOADING
+  // No IntersectionObserver needed - just listen to scroll events directly
+  // ============================================================================
   useEffect(() => {
     const container = messageStreamRef.current
-    if (!container || !scrollContainerReady) return
+    if (!container) return
 
-    const observer = new IntersectionObserver(
-      entries => {
-        // Don't trigger during initial load or right after filter change
-        if (entries[0].isIntersecting && hasPrev && !loadingPrev && messages.length > 0 && !isInitialLoadRef.current) {
-          loadPrevious()
+    let ticking = false
+
+    const handleScroll = () => {
+      if (ticking) return
+      ticking = true
+
+      requestAnimationFrame(() => {
+        const el = messageStreamRef.current
+        if (!el) {
+          ticking = false
+          return
         }
-      },
-      { threshold: 0.1, rootMargin: '200px', root: container }
-    )
 
-    const target = loadPrevRef.current
-    if (target) observer.observe(target)
+        const { scrollTop, scrollHeight, clientHeight } = el
+        const distanceFromBottom = scrollHeight - scrollTop - clientHeight
+        const distanceFromTop = scrollTop
 
-    return () => {
-      if (target) observer.unobserve(target)
-      observer.disconnect()
-    }
-  }, [scrollContainerReady, loadPrevious, hasPrev, loadingPrev, messages.length])
-
-  // Observer for loading MORE messages (when scrolling down) 
-  useEffect(() => {
-    const container = messageStreamRef.current
-    if (!container || !scrollContainerReady) return
-
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+        // Load more when within 600px of the bottom
+        if (distanceFromBottom < 600 && hasMore && !loadingMore) {
           loadMore()
         }
-      },
-      { threshold: 0.1, rootMargin: '200px', root: container }
-    )
 
-    const target = loadMoreRef.current
-    if (target) observer.observe(target)
+        // Load previous when within 400px of the top (but not during initial load)
+        if (distanceFromTop < 400 && hasPrev && !loadingPrev && messages.length > 0 && !isInitialLoadRef.current) {
+          loadPrevious()
+        }
+
+        ticking = false
+      })
+    }
+
+    // Listen to scroll
+    container.addEventListener('scroll', handleScroll, { passive: true })
+
+    // Initial check after a short delay (handles case where content is short)
+    const initialCheckTimeout = setTimeout(handleScroll, 300)
 
     return () => {
-      if (target) observer.unobserve(target)
-      observer.disconnect()
+      container.removeEventListener('scroll', handleScroll)
+      clearTimeout(initialCheckTimeout)
     }
-  }, [scrollContainerReady, loadMore, hasMore, loadingMore])
+  }, [hasMore, loadingMore, loadMore, hasPrev, loadingPrev, loadPrevious, messages.length])
 
   // ... (Refs and Observer remain the same)
 
@@ -568,7 +544,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
       </header>
 
       {/* Main Layout */}
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className="flex-1 min-h-0 flex overflow-hidden relative">
         {/* Timeline Sidebar */}
         <TimelineSidebar
           className="shrink-0 z-40 hidden md:flex"
@@ -720,7 +696,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
 
         {/* Message Stream */}
         <main
-          className={`flex-1 overflow-y-auto relative scroll-smooth transition-all duration-300 ${showStats ? 'mr-80' : ''}`}
+          className={`flex-1 min-h-0 overflow-y-auto relative scroll-smooth transition-all duration-300 ${showStats ? 'mr-80' : ''}`}
           id="message-stream"
           ref={messageStreamRef}
         >
@@ -806,7 +782,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
             <div className="space-y-1">
               {/* Auto-load trigger for PREVIOUS messages */}
               {hasPrev && messages.length > 0 && (
-                <div ref={loadPrevRef} className="py-4 flex justify-center">
+                <div className="py-4 flex justify-center">
                   {loadingPrev && (
                     <div className="flex items-center gap-2 text-[var(--accent)]/50 font-mono text-xs">
                       <Loader2 className="w-3 h-3 animate-spin" />
@@ -847,7 +823,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
 
             {/* Loading State */}
             {hasMore && (
-              <div ref={loadMoreRef} className="py-12 flex justify-center">
+              <div className="py-12 flex justify-center">
                 {loadingMore && (
                   <div className="flex items-center gap-2 text-[#00f0ff] font-mono text-xs">
                     <Loader2 className="w-4 h-4 animate-spin" />
