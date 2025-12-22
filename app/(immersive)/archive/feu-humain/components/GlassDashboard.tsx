@@ -10,10 +10,10 @@ interface GlassDashboardProps {
 export function GlassDashboard({ children, className = '' }: GlassDashboardProps) {
   return (
     <div
-      className={`min-h-screen bg-[var(--void)] text-[var(--text-primary)] selection:bg-[var(--accent-dim)] selection:text-[var(--text-bright)] overflow-hidden relative ${className}`}
+      className={`fixed inset-0 bg-[var(--void)] text-[var(--text-primary)] selection:bg-[var(--accent-dim)] selection:text-[var(--text-bright)] overflow-hidden z-[100] ${className}`}
     >
       {/* Background Layers - Subtle warm texture */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
+      <div className="absolute inset-0 z-0 pointer-events-none">
         {/* Warm gradient overlays */}
         <div
           className="absolute inset-0 opacity-60"
@@ -33,7 +33,7 @@ export function GlassDashboard({ children, className = '' }: GlassDashboardProps
       </div>
 
       {/* Main Content Layer */}
-      <div className="relative z-10 h-screen flex flex-col">{children}</div>
+      <div className="relative z-10 h-full flex flex-col">{children}</div>
     </div>
   )
 }

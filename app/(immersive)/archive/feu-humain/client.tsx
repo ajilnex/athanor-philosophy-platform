@@ -148,6 +148,33 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
   const messageStreamRef = useRef<HTMLDivElement>(null)
   const isInitialLoadRef = useRef(true) // Prevent loadPrevious during initial/filter load
 
+  // State to track when scroll container is mounted (triggers observer setup)
+  const [scrollContainerReady, setScrollContainerReady] = useState(false)
+
+  // Mark scroll container as ready after mount - use RAF to ensure DOM is painted
+  useEffect(() => {
+    // Wait for next frame to ensure DOM is fully ready
+    const checkAndSetReady = () => {
+      if (messageStreamRef.current) {
+        setScrollContainerReady(true)
+      }
+    }
+
+    // Try immediately
+    checkAndSetReady()
+
+    // Also try after a frame (for safety)
+    const rafId = requestAnimationFrame(checkAndSetReady)
+
+    // And after a short delay (for extra safety with SSR hydration)
+    const timeoutId = setTimeout(checkAndSetReady, 100)
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      clearTimeout(timeoutId)
+    }
+  }, [])
+
   // Debounce de la recherche
   useEffect(() => {
     if (searchTimeoutRef.current) {
@@ -330,8 +357,8 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
 
   // Observer for loading PREVIOUS messages (when scrolling up)
   useEffect(() => {
-    const scrollContainer = messageStreamRef.current
-    if (!scrollContainer) return
+    const container = messageStreamRef.current
+    if (!container || !scrollContainerReady) return
 
     const observer = new IntersectionObserver(
       entries => {
@@ -340,7 +367,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
           loadPrevious()
         }
       },
-      { threshold: 0.1, rootMargin: '200px', root: scrollContainer }
+      { threshold: 0.1, rootMargin: '200px', root: container }
     )
 
     const target = loadPrevRef.current
@@ -350,12 +377,12 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
       if (target) observer.unobserve(target)
       observer.disconnect()
     }
-  }, [loadPrevious, hasPrev, loadingPrev, messages.length])
+  }, [scrollContainerReady, loadPrevious, hasPrev, loadingPrev, messages.length])
 
   // Observer for loading MORE messages (when scrolling down) 
   useEffect(() => {
-    const scrollContainer = messageStreamRef.current
-    if (!scrollContainer) return
+    const container = messageStreamRef.current
+    if (!container || !scrollContainerReady) return
 
     const observer = new IntersectionObserver(
       entries => {
@@ -363,7 +390,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
           loadMore()
         }
       },
-      { threshold: 0.1, rootMargin: '200px', root: scrollContainer }
+      { threshold: 0.1, rootMargin: '200px', root: container }
     )
 
     const target = loadMoreRef.current
@@ -373,7 +400,7 @@ export default function FeuHumainClient({ archiveSlug }: FeuHumainClientProps) {
       if (target) observer.unobserve(target)
       observer.disconnect()
     }
-  }, [loadMore, hasMore, loadingMore])
+  }, [scrollContainerReady, loadMore, hasMore, loadingMore])
 
   // ... (Refs and Observer remain the same)
 
