@@ -10,6 +10,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { CommentSection } from '@/components/comments/CommentSection'
 import { isFileInTrash } from '@/lib/github.server'
+import { sanitizeTitle } from '@/lib/utils'
 import { Metadata } from 'next'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -129,9 +130,9 @@ export default async function BilletPage({ params }: { params: Promise<{ slug: s
 
         <div className="mb-6">
           <div className="flex items-start justify-between mb-4">
-            <h1 className="text-2xl sm:text-3xl font-light text-foreground">{billet.title}</h1>
+            <h1 className="text-2xl sm:text-3xl font-light text-foreground">{sanitizeTitle(billet.title, 150)}</h1>
             <div className="ml-4 flex-shrink-0 flex items-center gap-2">
-              <ShareButton title={billet.title} />
+              <ShareButton title={sanitizeTitle(billet.title)} />
               <a
                 href={`/api/billets/${slug}/download`}
                 className="inline-flex items-center justify-center w-9 h-9 rounded-lg transition-all hover:bg-[var(--sol-base2)]"

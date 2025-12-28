@@ -68,22 +68,56 @@ export async function POST(request: NextRequest) {
     // Déterminer titre effectif, avec fallback sur les premiers mots du contenu
     let effectiveTitle: string | undefined = (title && title.trim()) || fmTitle || h1Title
     if (!effectiveTitle) {
-      // Extraire un titre depuis le corps: premières ~8 mots
-      const plain = String(content || '')
-        // enlever code fences et HTML tags simples
-        .replace(/```[\s\S]*?```/g, ' ')
-        .replace(/<[^>]+>/g, ' ')
-        // liens markdown -> texte
-        .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
-        // titres markdown
-        .replace(/^#+\s+/gm, '')
-        .replace(/\s+/g, ' ')
-        .trim()
+      // Extraire un titre depuis le corps en cherchant la première ligne significative
+      const lines = String(content || '').split('\n')
 
-      const words = plain.split(' ').filter(Boolean)
-      if (words.length > 0) {
-        const head = words.slice(0, 8).join(' ')
-        effectiveTitle = head + (words.length > 8 ? '…' : '')
+      // Fonction pour vérifier si une ligne est significative (contient du vrai texte)
+      const isSignificantLine = (line: string): boolean => {
+        // Nettoyer la ligne des caractères décoratifs courants
+        const cleaned = line
+          .replace(/[═─━┃│┌┐└┘├┤┬┴┼╔╗╚╝╠╣╦╩╬▀▄█▌▐░▒▓]/g, '') // box-drawing et blocs
+          .replace(/[*_~`#>|+-]/g, '') // Markdown
+          .replace(/\s+/g, ' ')
+          .trim()
+
+        // Vérifier qu'il reste au moins 3 caractères alphabétiques
+        const alphaCount = (cleaned.match(/[a-zA-ZÀ-ÿ]/g) || []).length
+        return alphaCount >= 3
+      }
+
+      // Trouver la première ligne significative
+      let significantContent = ''
+      for (const line of lines) {
+        // Nettoyer la ligne
+        const processed = line
+          .replace(/```[\s\S]*?```/g, ' ')
+          .replace(/<[^>]+>/g, ' ')
+          .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+          .replace(/^#+\s+/, '')
+          .replace(/[═─━┃│┌┐└┘├┤┬┴┼╔╗╚╝╠╣╦╩╬▀▄█▌▐░▒▓]/g, '') // Supprimer les box-drawing
+          .replace(/\s+/g, ' ')
+          .trim()
+
+        if (isSignificantLine(processed) && processed.length > 0) {
+          significantContent = processed
+          break
+        }
+      }
+
+      if (significantContent) {
+        const words = significantContent.split(' ').filter(Boolean)
+        if (words.length > 0) {
+          const head = words.slice(0, 8).join(' ')
+          effectiveTitle = head + (words.length > 8 ? '…' : '')
+        }
+      }
+    }
+
+    // Validation finale du titre : doit contenir au moins 2 caractères alphabétiques
+    if (effectiveTitle) {
+      const alphaCount = (effectiveTitle.match(/[a-zA-ZÀ-ÿ]/g) || []).length
+      if (alphaCount < 2) {
+        effectiveTitle = undefined
       }
     }
     if (!effectiveTitle) {

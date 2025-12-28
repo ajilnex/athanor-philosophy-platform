@@ -1,10 +1,14 @@
 'use client'
 
 import { Billet } from '@/lib/billets'
+import { sanitizeTitle } from '@/lib/utils'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
+
 export function LatestActivityCard({ billet }: { billet: Billet }) {
+  const displayTitle = sanitizeTitle(billet.title)
+
   return (
     <div className="w-full max-w-lg mx-auto" data-graph-shield>
       <h2 className="font-serif text-lg text-subtle mb-3 text-center">Activité récente</h2>
@@ -26,9 +30,9 @@ export function LatestActivityCard({ billet }: { billet: Billet }) {
         data-graph-shield
       >
         <div className="flex justify-between items-center">
-          <div>
-            <h3 className="font-serif text-xl font-medium text-foreground group-hover:text-accent transition-colors">
-              {billet.title}
+          <div className="flex-1 min-w-0">
+            <h3 className="font-serif text-xl font-medium text-foreground group-hover:text-accent transition-colors truncate">
+              {displayTitle}
             </h3>
             <p className="mt-1 text-xs text-subtle">
               {new Date(billet.date).toLocaleDateString('fr-FR', { month: 'long', day: 'numeric' })}

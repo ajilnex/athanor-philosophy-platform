@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Calendar, Tag, FileText } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import type { Billet } from '@/lib/billets'
+import { sanitizeTitle } from '@/lib/utils'
 // import { EditBilletButton } from './EditBilletButton' // Supprimé : bouton éditer déplacé sur page individuelle
 
 interface BilletsListProps {
@@ -42,7 +43,7 @@ export function BilletsList({ initialBillets }: BilletsListProps) {
         >
           <div className="space-y-3">
             <h2 className="text-lg sm:text-xl font-light text-foreground group-hover:text-accent transition-colors duration-300">
-              <Link href={`/billets/${billet.slug}`}>{billet.title}</Link>
+              <Link href={`/billets/${billet.slug}`}>{sanitizeTitle(billet.title)}</Link>
             </h2>
 
             {billet.excerpt && (
