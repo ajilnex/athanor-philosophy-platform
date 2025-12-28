@@ -6,6 +6,8 @@ import { CommentSection } from '@/components/comments/CommentSection'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { PublicationViewer } from './PublicationViewer'
+import { Metadata } from 'next'
+import { sanitizeTitle } from '@/lib/utils'
 
 async function getPublication(id: string) {
   try {
@@ -14,6 +16,53 @@ async function getPublication(id: string) {
     })
   } catch (error) {
     return null
+  }
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params
+  const publication = await getPublication(id)
+
+  if (!publication) return { title: 'Publication introuvable' }
+
+  const cleanTitle = sanitizeTitle(publication.title, 100)
+  const description = publication.description || `Publication académique — ${cleanTitle}`
+
+  return {
+    title: `${cleanTitle} — L'athanor`,
+    description,
+    authors: publication.author ? [{ name: publication.author }] : [{ name: "L'athanor" }],
+    openGraph: {
+      title: cleanTitle,
+      description,
+      type: 'article',
+      publishedTime: publication.publishedAt.toISOString(),
+      tags: publication.tags || [],
+      siteName: "L'athanor",
+      locale: 'fr_FR',
+      images: [
+        {
+          url: '/images/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: cleanTitle,
+          type: 'image/png',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: cleanTitle,
+      description,
+      images: [
+        {
+          url: '/images/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: cleanTitle,
+        },
+      ],
+    },
   }
 }
 

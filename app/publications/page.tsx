@@ -3,6 +3,41 @@ import { FileText, User, Calendar, Tag, Download } from 'lucide-react'
 import { getPublishedArticles } from '@/lib/articles'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: "Publications — L'athanor",
+  description: "Articles et documents académiques publiés, couvrant une large gamme de sujets philosophiques.",
+  openGraph: {
+    title: "Publications — L'athanor",
+    description: "Articles et documents académiques publiés, couvrant une large gamme de sujets philosophiques.",
+    type: 'website',
+    siteName: "L'athanor",
+    locale: 'fr_FR',
+    images: [
+      {
+        url: '/images/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: "Publications — L'athanor",
+        type: 'image/png',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Publications — L'athanor",
+    description: "Articles et documents académiques publiés, couvrant une large gamme de sujets philosophiques.",
+    images: [
+      {
+        url: '/images/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: "Publications — L'athanor",
+      },
+    ],
+  },
+}
 
 // Publication type definition
 type Publication = {
