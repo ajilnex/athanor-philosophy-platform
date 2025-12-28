@@ -12,8 +12,8 @@ function NavItem({ href, children, className }: { href: string; children: React.
   return (
     <Link
       href={href}
-      className={`px-3 py-2 text-sm font-light transition-colors duration-200 ${active
-        ? 'text-foreground underline underline-offset-4 decoration-1'
+      className={`px-3 py-2 text-sm transition-colors duration-200 ${active
+        ? 'text-foreground underline underline-offset-4 decoration-1 font-medium'
         : 'text-subtle hover:text-foreground'
         } ${className || ''}`}
     >
@@ -70,7 +70,7 @@ export function Navbar() {
           <NavItem href="/publications">Publications</NavItem>
           <NavItem href="/edition">Édition</NavItem>
           <NavItem href="/constellation">Constellation</NavItem>
-          <NavItem href="/archive" className="!text-[var(--sol-cyan)]">Archive</NavItem>
+          <NavItem href="/archive">Archive</NavItem>
           <NavItem href="/search">Recherche</NavItem>
           {session ? (
             <button
@@ -171,7 +171,7 @@ export function Navbar() {
               <Link
                 href="/archive"
                 onClick={() => setOpen(false)}
-                className="px-3 py-2 text-base rounded hover:bg-muted transition text-[var(--sol-cyan)]"
+                className="px-3 py-2 text-base rounded hover:bg-muted transition text-foreground"
               >
                 Archive
               </Link>

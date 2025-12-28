@@ -41,7 +41,7 @@ import { cleanString } from './encoding-utils'
 
 class FeuHumainImporter {
   private batchSize = 50 // Augmenté pour accélérer l'import
-  private uploadToCloudinary = true // Activé pour la production
+  private uploadToCloudinary = process.env.SKIP_CLOUDINARY !== 'true' && process.env.NODE_ENV === 'production'
 
   async import(jsonPath: string): Promise<void> {
     console.log('🔥 Import FEU HUMAIN dans PostgreSQL')
