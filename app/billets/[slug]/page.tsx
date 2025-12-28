@@ -22,6 +22,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const description = billet.excerpt || `${billet.content.slice(0, 150).replace(/[#*_\[\]]/g, '')}...`
   const cleanTitle = sanitizeTitle(billet.title, 100)
 
+  const ogImageUrl = `/api/og?title=${encodeURIComponent(cleanTitle)}&date=${encodeURIComponent(billet.date)}`
+
   return {
     title: `${cleanTitle} — L'athanor`,
     description,
@@ -36,7 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       locale: 'fr_FR',
       images: [
         {
-          url: '/images/og-image.png',
+          url: ogImageUrl,
           width: 1200,
           height: 630,
           alt: cleanTitle,
@@ -50,7 +52,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description,
       images: [
         {
-          url: '/images/og-image.png',
+          url: ogImageUrl,
           width: 1200,
           height: 630,
           alt: cleanTitle,

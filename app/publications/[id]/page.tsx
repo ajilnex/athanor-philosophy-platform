@@ -28,6 +28,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const cleanTitle = sanitizeTitle(publication.title, 100)
   const description = publication.description || `Publication académique — ${cleanTitle}`
 
+  const ogImageUrl = `/api/og?title=${encodeURIComponent(cleanTitle)}&date=${encodeURIComponent(publication.publishedAt.toString())}`
+
   return {
     title: `${cleanTitle} — L'athanor`,
     description,
@@ -42,7 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       locale: 'fr_FR',
       images: [
         {
-          url: '/images/og-image.png',
+          url: ogImageUrl,
           width: 1200,
           height: 630,
           alt: cleanTitle,
@@ -56,7 +58,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       description,
       images: [
         {
-          url: '/images/og-image.png',
+          url: ogImageUrl,
           width: 1200,
           height: 630,
           alt: cleanTitle,
