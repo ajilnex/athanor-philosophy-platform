@@ -20,24 +20,42 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!billet) return { title: 'Billet introuvable' }
 
   const description = billet.excerpt || `${billet.content.slice(0, 150).replace(/[#*_\[\]]/g, '')}...`
+  const cleanTitle = sanitizeTitle(billet.title, 100)
 
   return {
-    title: `${billet.title} — L'athanor`,
+    title: `${cleanTitle} — L'athanor`,
     description,
     authors: [{ name: "L'athanor" }],
     openGraph: {
-      title: billet.title,
+      title: cleanTitle,
       description,
       type: 'article',
       publishedTime: billet.date,
       tags: billet.tags,
       siteName: "L'athanor",
       locale: 'fr_FR',
+      images: [
+        {
+          url: '/images/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: cleanTitle,
+          type: 'image/png',
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
-      title: billet.title,
+      title: cleanTitle,
       description,
+      images: [
+        {
+          url: '/images/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: cleanTitle,
+        },
+      ],
     },
   }
 }

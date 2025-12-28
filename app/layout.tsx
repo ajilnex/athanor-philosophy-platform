@@ -23,7 +23,7 @@ const ibmPlexSerif = IBM_Plex_Serif({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://athanor.fr'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://athanor-philosophy-platform.vercel.app'),
   title: "L'athanor — Plateforme philosophique",
   description: "L'athanor — Une collection d'articles de philosophie contemporaine",
   icons: {
@@ -41,13 +41,32 @@ export const metadata: Metadata = {
     siteName: "L'athanor",
     locale: 'fr_FR',
     type: 'website',
-    images: ['/images/og-image.png'],
+    images: [
+      {
+        url: '/images/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: "L'athanor — Plateforme philosophique",
+        type: 'image/png',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: "L'athanor — Plateforme philosophique",
     description: "Une collection d'articles de philosophie contemporaine",
-    images: ['/images/og-image.png'],
+    images: [
+      {
+        url: '/images/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: "L'athanor — Plateforme philosophique",
+      },
+    ],
+  },
+  // Meta tags supplémentaires pour Facebook
+  other: {
+    'fb:app_id': '', // Optionnel : ID d'app Facebook si tu en as un
   },
 }
 
