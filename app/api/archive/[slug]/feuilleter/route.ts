@@ -31,8 +31,7 @@ export async function GET(
         const total = await prisma.archiveNote.count({
             where: {
                 archiveId: archive.id,
-                status: 'processed',
-                confidence: { gte: 50 }
+                status: 'processed'
             }
         })
 
@@ -40,8 +39,7 @@ export async function GET(
         const notes = await prisma.archiveNote.findMany({
             where: {
                 archiveId: archive.id,
-                status: 'processed',
-                confidence: { gte: 50 }
+                status: 'processed'
             },
             select: {
                 id: true,
@@ -64,7 +62,7 @@ export async function GET(
 
         // Filter and transform
         const result = notes
-            .filter(n => n.extractedText && n.extractedText.length > 50)
+            .filter(n => (n.extractedText && n.extractedText.length > 50) || ((n.confidence || 0) >= 90))
             .map(note => ({
                 id: note.id,
                 mediaId: note.mediaId,

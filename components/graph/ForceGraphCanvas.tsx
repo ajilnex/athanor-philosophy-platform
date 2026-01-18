@@ -1,11 +1,11 @@
 'use client'
 
 /**
- * ForceGraphCanvas - Obsidian-style knowledge graph
- * Features: Draggable nodes, force controls, dynamic physics
+ * ForceGraphCanvas - Obsidian-style knowledge graph for Billets
+ * Refactored to use shared graph modules
  */
 
-import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
+import { useEffect, useCallback, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import {
@@ -13,641 +13,154 @@ import {
     Settings2, X, RotateCcw, Sparkles
 } from 'lucide-react'
 
+// Shared graph modules
+import { GraphNode, GraphData, GRAPH_COLORS, ForceSettings } from './types'
+import { useForceGraph } from './hooks/useForceGraph'
+import { processGraphData, configureForces } from './utils'
+
 // Dynamic import to avoid SSR issues
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false })
 
-// Solarized color palette
-const COLORS = {
-    light: {
-        bg: '#fdf6e3',
-        node: '#2aa198',
-        nodeHover: '#268bd2',
-        link: 'rgba(147, 161, 161, 0.4)',
-        linkHighlight: 'rgba(38, 139, 210, 0.8)',
-        text: '#657b83',
-        textHover: '#073642',
-    },
-    dark: {
-        bg: '#002b36',
-        node: '#2aa198',
-        nodeHover: '#268bd2',
-        link: 'rgba(88, 110, 117, 0.4)',
-        linkHighlight: 'rgba(38, 139, 210, 0.8)',
-        text: '#93a1a1',
-        textHover: '#fdf6e3',
-    },
-}
-
-// Force settings type
-interface ForceSettings {
-    chargeStrength: number
-    linkDistance: number
-    centerForce: number
-    collisionRadius: number
-    polygonRadius: number  // Distance from center for cluster vertices
-}
-
-const DEFAULT_FORCES: ForceSettings = {
-    chargeStrength: -120,   // Stronger repulsion for better spacing
-    linkDistance: 50,       // More space between linked nodes
-    centerForce: 0.08,      // Weaker center pull for wider spread
-    collisionRadius: 15,    // Larger collision for less overlap
-    polygonRadius: 280,     // Larger polygon for cluster spacing
-}
-
-interface GraphNode {
-    id: string
-    label: string
-    type?: 'BILLET' | 'AUTHOR' | 'TAG'
-    slug?: string
-    url?: string
-    weight: number
-    degree?: number
-    x?: number
-    y?: number
-    fx?: number | null
-    fy?: number | null
-    val?: number
-}
-
-interface GraphEdge {
-    source: string | GraphNode
-    target: string | GraphNode
-    type: string
-}
-
-interface GraphData {
-    nodes: GraphNode[]
-    edges: GraphEdge[]
-}
-
 interface ForceGraphCanvasProps {
     className?: string
-    backgroundMode?: boolean // When true: decorative background with reduced opacity, no controls
+    backgroundMode?: boolean
 }
 
 export function ForceGraphCanvas({ className = '', backgroundMode = false }: ForceGraphCanvasProps) {
     const router = useRouter()
-    const fgRef = useRef<any>(null)
 
-    // State
-    const [data, setData] = useState<GraphData | null>(null)
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
-    const [nightMode, setNightMode] = useState(false)
-    const [searchQuery, setSearchQuery] = useState('')
-    const [hoverNode, setHoverNode] = useState<GraphNode | null>(null)
-    const [highlightNodes, setHighlightNodes] = useState<Set<string>>(new Set())
-    const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
+    // Use shared hook for all common state and handlers
+    const graph = useForceGraph({
+        hubId: '__athanor_hub__',
+        hubLabel: 'Athanor',
+        hubPosition: { x: 0, y: 0 },
+        initialExpanded: backgroundMode,
+        onNodeClick: (node) => {
+            // Navigate to billet when clicking non-hub nodes
+            if (node.url) {
+                router.push(node.url)
+            } else if (node.id?.startsWith('billet:')) {
+                const slug = node.id.replace('billet:', '')
+                router.push(`/billets/${slug}`)
+            }
+        },
+    })
 
-    // Obsidian-style features
-    const [showSettings, setShowSettings] = useState(false)
-    const [showIsolated, setShowIsolated] = useState(false)
-    const [forces, setForces] = useState<ForceSettings>(DEFAULT_FORCES)
-    const [showLabels, setShowLabels] = useState(true)
-    const [isSimulationRunning, setIsSimulationRunning] = useState(true)
+    const colors = graph.nightMode ? GRAPH_COLORS.dark : GRAPH_COLORS.light
 
-    // Bloom animation state - in backgroundMode, start fully expanded
-    const [isExpanded, setIsExpanded] = useState(backgroundMode)
-    const [revealPhase, setRevealPhase] = useState(backgroundMode ? 9999 : 0) // 9999 = all visible, 0=collapsed
-    const [showHint, setShowHint] = useState(!backgroundMode) // Show click hint initially
-
-    const colors = nightMode ? COLORS.dark : COLORS.light
-
-    // Load dimensions
-    useEffect(() => {
-        const updateDimensions = () => {
-            setDimensions({
-                width: window.innerWidth,
-                height: window.innerHeight,
-            })
-        }
-        updateDimensions()
-        window.addEventListener('resize', updateDimensions)
-        return () => window.removeEventListener('resize', updateDimensions)
-    }, [])
-
-    // Load graph data with polygon layout for clusters
+    // Load graph data from static JSON
     useEffect(() => {
         fetch('/graph-billets.json')
             .then(res => res.json())
             .then((rawData: GraphData) => {
-                // Create nodes with weight
-                const nodes = rawData.nodes.map((n: any) => ({
-                    ...n,
-                    weight: n.degree || n.weight || 0,
-                    val: (n.degree || n.weight || 0) + 1,
-                }))
-
-                // Create links
-                const links = rawData.edges?.map((e: any) => ({
-                    source: typeof e.source === 'string' ? e.source : e.source.id,
-                    target: typeof e.target === 'string' ? e.target : e.target.id,
-                    type: e.type,
-                })) || []
-
-                // --- Detect clusters using Union-Find ---
-                const parent: Record<string, string> = {}
-                const find = (x: string): string => {
-                    if (!parent[x]) parent[x] = x
-                    if (parent[x] !== x) parent[x] = find(parent[x])
-                    return parent[x]
-                }
-                const union = (a: string, b: string) => {
-                    parent[find(a)] = find(b)
-                }
-
-                // Initialize all nodes
-                nodes.forEach((n: any) => { parent[n.id] = n.id })
-
-                // Union connected nodes
-                links.forEach((link: any) => {
-                    union(link.source, link.target)
+                const processed = processGraphData({
+                    nodes: rawData.nodes || [],
+                    edges: (rawData as any).edges || [],
+                    hubId: '__athanor_hub__',
+                    hubLabel: 'Athanor',
+                    hubPosition: { x: 0, y: 0 },
+                    polygonRadius: graph.forces.polygonRadius,
                 })
-
-                // Group nodes by cluster
-                const clusterMap: Record<string, any[]> = {}
-                nodes.forEach((n: any) => {
-                    const root = find(n.id)
-                    if (!clusterMap[root]) clusterMap[root] = []
-                    clusterMap[root].push(n)
-                })
-
-                // Separate isolated nodes (clusters of size 1 with no links)
-                const clusters = Object.values(clusterMap).filter(c => c.length > 1 ||
-                    links.some((l: any) => l.source === c[0].id || l.target === c[0].id))
-                const isolatedNodes = Object.values(clusterMap)
-                    .filter(c => c.length === 1 && !links.some((l: any) => l.source === c[0].id || l.target === c[0].id))
-                    .flat()
-
-                // --- Position clusters on polygon vertices ---
-                const RADIUS = forces.polygonRadius
-                const numClusters = clusters.length
-
-                // Create polygon vertex nodes (invisible anchors)
-                const polygonNodes: any[] = []
-                const polygonLinks: any[] = []
-
-                clusters.forEach((cluster, i) => {
-                    const angle = (i / numClusters) * Math.PI * 2 - Math.PI / 2 // Start from top
-                    const cx = Math.cos(angle) * RADIUS
-                    const cy = Math.sin(angle) * RADIUS
-
-                    // Create anchor node for this cluster vertex
-                    const anchorId = `__polygon_vertex_${i}__`
-                    polygonNodes.push({
-                        id: anchorId,
-                        label: '',
-                        type: 'POLYGON_VERTEX',
-                        isPolygonVertex: true,
-                        x: cx,
-                        y: cy,
-                        fx: cx, // Fixed position
-                        fy: cy,
-                        weight: 0,
-                        val: 0.1,
-                    })
-
-                    // Position cluster nodes around this vertex AND link them to anchor
-                    cluster.forEach((node: any, j: number) => {
-                        const clusterAngle = (j / cluster.length) * Math.PI * 2
-                        const clusterRadius = Math.min(30 + cluster.length * 3, 80)
-                        node.x = cx + Math.cos(clusterAngle) * clusterRadius
-                        node.y = cy + Math.sin(clusterAngle) * clusterRadius
-                        node.clusterId = i
-
-                        // Link node to its cluster anchor
-                        polygonLinks.push({
-                            source: anchorId,
-                            target: node.id,
-                            type: 'CLUSTER_ANCHOR',
-                        })
-                    })
-                })
-
-                // Draw polygon edges (thin lines between vertices)
-                for (let i = 0; i < numClusters; i++) {
-                    const next = (i + 1) % numClusters
-                    polygonLinks.push({
-                        source: `__polygon_vertex_${i}__`,
-                        target: `__polygon_vertex_${next}__`,
-                        type: 'POLYGON_EDGE',
-                    })
-                }
-
-                // Create central hub for isolated nodes
-                const hubNode = {
-                    id: '__athanor_hub__',
-                    label: '✧ Athanor ✧',
-                    type: 'HUB',
-                    weight: isolatedNodes.length,
-                    val: Math.max(isolatedNodes.length, 5),
-                    isHub: true,
-                    x: 0,
-                    y: 0,
-                    fx: 0, // Fixed at center
-                    fy: 0,
-                }
-
-                // Position isolated nodes around hub
-                isolatedNodes.forEach((node: any, i: number) => {
-                    const angle = (i / isolatedNodes.length) * Math.PI * 2
-                    const r = 50 + Math.random() * 30
-                    node.x = Math.cos(angle) * r
-                    node.y = Math.sin(angle) * r
-                    node.isIsolated = true
-
-                    // Connect isolated node to hub
-                    polygonLinks.push({
-                        source: hubNode.id,
-                        target: node.id,
-                        type: 'HUB_LINK',
-                    })
-                })
-
-                // Note: No links from hub to polygon vertices
-                // Each vertex is just an anchor for its cluster
-                // The hub only connects to isolated nodes
-
-                // Combine all data
-                const allNodes = [...nodes, ...polygonNodes, hubNode]
-                const allLinks = [...links, ...polygonLinks]
-
-                setData({ nodes: allNodes, links: allLinks } as any)
-                setLoading(false)
+                graph.setData(processed)
+                graph.setLoading(false)
 
                 setTimeout(() => {
-                    fgRef.current?.zoomToFit(400, 60)
+                    graph.fgRef.current?.zoomToFit(400, 60)
                 }, 500)
             })
             .catch(err => {
                 console.error('Failed to load graph:', err)
-                setError('Impossible de charger le graphe')
-                setLoading(false)
+                graph.setError('Impossible de charger le graphe')
+                graph.setLoading(false)
             })
-    }, [forces.polygonRadius])
+    }, [graph.forces.polygonRadius])
 
-    // Update forces when settings change or data loads
+    // Configure forces when data changes
     useEffect(() => {
-        if (!data) return
+        if (!graph.data) return
 
-        // Small delay to ensure graph is mounted
         const timer = setTimeout(() => {
-            if (!fgRef.current) return
-
-            const fg = fgRef.current
-            const nodes = (data as any).nodes || []
-
-            // Configure charge force (repulsion)
-            fg.d3Force('charge')?.strength(forces.chargeStrength)
-
-            // Configure link distance
-            fg.d3Force('link')?.distance(forces.linkDistance)
-
-            // Import d3-force functions if available
-            if (typeof window !== 'undefined') {
-                import('d3-force').then(d3 => {
-                    // Find cluster anchors
-                    const anchors: Record<number, { x: number; y: number }> = {}
-                    nodes.forEach((n: any) => {
-                        if (n.isPolygonVertex && n.id.startsWith('__polygon_vertex_')) {
-                            const idx = parseInt(n.id.replace('__polygon_vertex_', '').replace('__', ''))
-                            anchors[idx] = { x: n.fx, y: n.fy }
-                        }
-                    })
-
-                    // Store original vertex positions
-                    const vertexOriginalPos: Record<string, { x: number; y: number }> = {}
-                    const RADIUS = forces.polygonRadius
-                    let numClustersCount = 0
-                    nodes.forEach((n: any) => {
-                        if (n.isPolygonVertex && n.id.startsWith('__polygon_vertex_')) {
-                            const idx = parseInt(n.id.replace('__polygon_vertex_', '').replace('__', ''))
-                            const totalClusters = Object.keys(anchors).length || 1
-                            const angle = (idx / totalClusters) * Math.PI * 2 - Math.PI / 2
-                            vertexOriginalPos[n.id] = {
-                                x: Math.cos(angle) * RADIUS,
-                                y: Math.sin(angle) * RADIUS
-                            }
-                            numClustersCount++
-                        }
-                    })
-
-                    // Bloom animation force - controls reveal phases
-                    const bloomForce = (alpha: number) => {
-                        nodes.forEach((node: any) => {
-                            // Hub always stays at center
-                            if (node.isHub) {
-                                const strength = 0.8
-                                node.vx = (node.vx || 0) + (0 - node.x) * strength * alpha
-                                node.vy = (node.vy || 0) + (0 - node.y) * strength * alpha
-                                return
-                            }
-
-                            // COLLAPSED STATE: Everything pulls to center
-                            if (!isExpanded) {
-                                const strength = 0.7
-                                node.vx = (node.vx || 0) + (0 - node.x) * strength * alpha
-                                node.vy = (node.vy || 0) + (0 - node.y) * strength * alpha
-                                return
-                            }
-
-                            // EXPANDED STATE with phases
-
-                            // Polygon vertices - reveal based on phase (1000+)
-                            if (node.isPolygonVertex && vertexOriginalPos[node.id]) {
-                                const idx = parseInt(node.id.replace('__polygon_vertex_', '').replace('__', ''))
-                                const shouldReveal = revealPhase >= 1000 + idx
-
-                                if (shouldReveal) {
-                                    const orig = vertexOriginalPos[node.id]
-                                    // Elastic spring to target
-                                    const strength = 0.4
-                                    node.vx = (node.vx || 0) + (orig.x - node.x) * strength * alpha
-                                    node.vy = (node.vy || 0) + (orig.y - node.y) * strength * alpha
-                                } else {
-                                    // Stay at center
-                                    const strength = 0.5
-                                    node.vx = (node.vx || 0) + (0 - node.x) * strength * alpha
-                                    node.vy = (node.vy || 0) + (0 - node.y) * strength * alpha
-                                }
-                                return
-                            }
-
-                            // Cluster nodes - reveal with their vertex (1000+)
-                            if (node.clusterId !== undefined && anchors[node.clusterId]) {
-                                const shouldReveal = revealPhase >= 1000 + node.clusterId
-
-                                if (shouldReveal) {
-                                    const anchor = anchors[node.clusterId]
-                                    const strength = 0.35
-                                    node.vx = (node.vx || 0) + (anchor.x - node.x) * strength * alpha
-                                    node.vy = (node.vy || 0) + (anchor.y - node.y) * strength * alpha
-                                } else {
-                                    // Stay at center
-                                    const strength = 0.5
-                                    node.vx = (node.vx || 0) + (0 - node.x) * strength * alpha
-                                    node.vy = (node.vy || 0) + (0 - node.y) * strength * alpha
-                                }
-                                return
-                            }
-
-                            // Isolated nodes - reveal one by one (phases 1 to N)
-                            if (node.isIsolated) {
-                                const idx = node.isolatedIndex ?? 0
-                                const shouldReveal = revealPhase >= 1 + idx
-                                const total = nodes.filter((n: any) => n.isIsolated).length
-
-                                if (shouldReveal) {
-                                    // Spread around hub with more distance
-                                    const angle = (idx / total) * Math.PI * 2
-                                    const targetR = 100 + (idx % 3) * 30  // Larger orbit
-                                    const targetX = Math.cos(angle) * targetR
-                                    const targetY = Math.sin(angle) * targetR
-
-                                    const strength = 0.5  // Stronger force for tighter circle
-                                    node.vx = (node.vx || 0) + (targetX - node.x) * strength * alpha
-                                    node.vy = (node.vy || 0) + (targetY - node.y) * strength * alpha
-                                } else {
-                                    // Stay at center
-                                    const strength = 0.5
-                                    node.vx = (node.vx || 0) + (0 - node.x) * strength * alpha
-                                    node.vy = (node.vy || 0) + (0 - node.y) * strength * alpha
-                                }
-                            }
-                        })
-                    }
-
-                    fg.d3Force('cluster', bloomForce)
-                    fg.d3Force('collide', d3.forceCollide(forces.collisionRadius))
-                    fg.d3ReheatSimulation()
-                })
-            }
+            configureForces(
+                graph.fgRef.current,
+                graph.forces,
+                graph.data!.nodes,
+                { x: 0, y: 0 },
+                graph.isExpanded,
+                graph.revealPhase
+            )
         }, 100)
 
         return () => clearTimeout(timer)
-    }, [forces, data, isExpanded, revealPhase])
+    }, [graph.forces, graph.data, graph.isExpanded, graph.revealPhase])
 
-    // Handle node hover
-    const handleNodeHover = useCallback((node: any) => {
-        setHoverNode(node as GraphNode | null)
+    // Isolated nodes for the panel
+    const isolatedNodes = useMemo(() => {
+        return graph.data?.nodes.filter((n: any) => n.isIsolated) || []
+    }, [graph.data])
 
-        if (node && data) {
-            const neighbors = new Set<string>()
-            neighbors.add(node.id)
-
-                ; (data as any).links?.forEach((link: any) => {
-                    const sourceId = typeof link.source === 'object' ? link.source.id : link.source
-                    const targetId = typeof link.target === 'object' ? link.target.id : link.target
-
-                    if (sourceId === node.id) neighbors.add(targetId)
-                    if (targetId === node.id) neighbors.add(sourceId)
-                })
-
-            setHighlightNodes(neighbors)
-        } else {
-            setHighlightNodes(new Set())
+    // Focus on a specific node
+    const focusOnNode = useCallback((nodeId: string) => {
+        const node = graph.data?.nodes.find(n => n.id === nodeId)
+        if (node && graph.fgRef.current) {
+            graph.fgRef.current.centerAt(node.x, node.y, 1000)
+            graph.fgRef.current.zoom(2.5, 1000)
         }
-    }, [data])
+    }, [graph.data])
 
-    // Trigger bloom animation - staggered reveal
-    const triggerBloom = useCallback(() => {
-        if (!data) return
-
-        const nodes = (data as any).nodes || []
-        const numClusters = nodes.filter((n: any) => n.isPolygonVertex).length
-        const isolatedNodesList = nodes.filter((n: any) => n.isIsolated)
-        const numIsolated = isolatedNodesList.length
-
-        // Mark each isolated node with its index for staggered reveal
-        isolatedNodesList.forEach((node: any, idx: number) => {
-            node.isolatedIndex = idx
-        })
-
-        setIsExpanded(true)
-        setRevealPhase(0)
-
-        // Phase 1 to N: Reveal isolated nodes one by one (faster)
-        for (let i = 0; i < numIsolated; i++) {
-            setTimeout(() => {
-                setRevealPhase(1 + i)
-                // Only reheat at first reveal to start movement
-                if (i === 0) fgRef.current?.d3ReheatSimulation()
-            }, 100 + i * 80) // Faster timing
-        }
-
-        // After isolated nodes, reveal clusters one by one
-        const isolatedDuration = 100 + numIsolated * 80 + 150
-        for (let i = 0; i < numClusters; i++) {
-            setTimeout(() => {
-                setRevealPhase(1000 + i) // 1000+ = cluster phases
-            }, isolatedDuration + i * 120) // Faster cluster reveal
-        }
-    }, [data])
-
-    // Collapse animation - reverse bloom progressively
-    const triggerCollapse = useCallback(() => {
-        if (!data) return
-
-        const numClusters = data.nodes.filter(n => n.type === 'BILLET').length > 0 ?
-            Math.ceil(Math.sqrt(data.nodes.filter(n => n.type === 'BILLET').length)) : 3
-        const isolatedCount = data.nodes.filter((n: any) => n.isIsolated).length
-
-        // Single reheat at start
-        fgRef.current?.d3ReheatSimulation()
-
-        // Hide clusters one by one (reverse order)
-        for (let i = numClusters - 1; i >= 0; i--) {
-            setTimeout(() => {
-                setRevealPhase(1000 + i)
-            }, (numClusters - 1 - i) * 150)
-        }
-
-        // Then hide isolated nodes (reverse order)
-        const clusterDuration = numClusters * 150
-        for (let i = isolatedCount; i >= 0; i--) {
-            setTimeout(() => {
-                setRevealPhase(i)
-            }, clusterDuration + (isolatedCount - i) * 80)
-        }
-
-        // Finally set collapsed state
-        const totalDuration = clusterDuration + isolatedCount * 80 + 100
-        setTimeout(() => {
-            setIsExpanded(false)
-            setRevealPhase(0)
-        }, totalDuration)
-    }, [data])
-
-    // Handle node click - navigate to billet OR trigger bloom
-    const handleNodeClick = useCallback((node: any) => {
-        // Click on hub toggles bloom
-        if (node.isHub) {
-            setShowHint(false)  // Hide click hint on first interaction
-            if (isExpanded) {
-                triggerCollapse()
-            } else {
-                triggerBloom()
-            }
-            return
-        }
-
-        // Regular node click - navigate
-        if (node.url) {
-            router.push(node.url)
-        } else if (node.id?.startsWith('billet:')) {
-            const slug = node.id.replace('billet:', '')
-            router.push(`/billets/${slug}`)
-        }
-    }, [router, isExpanded, triggerBloom, triggerCollapse])
-
-    // Handle node drag end - elastic return to anchor
-    const handleNodeDragEnd = useCallback((node: any) => {
-        // Unpin all nodes - let them return elastically to their anchors
-        node.fx = undefined
-        node.fy = undefined
-
-        // Reheat simulation for elastic snap-back effect
-        fgRef.current?.d3ReheatSimulation()
-    }, [])
-
-    // Unpin all nodes
-    const unpinAllNodes = useCallback(() => {
-        if (!data) return
-            ; (data as any).nodes?.forEach((node: any) => {
-                node.fx = null
-                node.fy = null
-            })
-        fgRef.current?.d3ReheatSimulation()
-    }, [data])
-
-    // Handle search
-    const handleSearch = useCallback((query: string) => {
-        setSearchQuery(query)
-        if (!query || !data) return
-
-        const match = data.nodes.find(n =>
-            n.label.toLowerCase().includes(query.toLowerCase())
-        )
-
-        if (match && fgRef.current) {
-            fgRef.current.centerAt(match.x, match.y, 1000)
-            fgRef.current.zoom(3, 1000)
-            setHoverNode(match)
-        }
-    }, [data])
-
-    // Custom node rendering with Solarpunk aesthetics
+    // Canvas rendering for nodes
     const nodeCanvasObject = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-        // Determine if node should be visible based on bloom phase
+        // Visibility based on bloom phase
         const getNodeVisibility = () => {
-            if (node.isHub) return true // Hub always visible
-            if (!isExpanded) return false // Everything hidden when collapsed
+            if (node.isHub) return true
+            if (!graph.isExpanded) return false
 
-            // Polygon vertices - show when their cluster is revealed (1000+)
             if (node.isPolygonVertex) {
                 const idx = parseInt(node.id.replace('__polygon_vertex_', '').replace('__', ''))
-                return revealPhase >= 1000 + idx
+                return graph.revealPhase >= 1000 + idx
             }
 
-            // Cluster nodes - show when their cluster is revealed (1000+)
             if (node.clusterId !== undefined) {
-                return revealPhase >= 1000 + node.clusterId
+                return graph.revealPhase >= 1000 + node.clusterId
             }
 
-            // Isolated nodes - show one by one (phases 1 to N)
             if (node.isIsolated) {
                 const idx = node.isolatedIndex ?? 0
-                return revealPhase >= 1 + idx
+                return graph.revealPhase >= 1 + idx
             }
 
-            return isExpanded
+            return graph.isExpanded
         }
 
-        const isVisible = getNodeVisibility()
-        if (!isVisible) return // Don't render hidden nodes
+        if (!getNodeVisibility()) return
 
-        // Render polygon vertex nodes as small colored anchor points
+        // Polygon vertex rendering
         if (node.isPolygonVertex) {
             const vertexRadius = 4
-
-            // Glow
             const gradient = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, vertexRadius * 3)
-            gradient.addColorStop(0, nightMode ? 'rgba(211, 54, 130, 0.4)' : 'rgba(211, 54, 130, 0.3)') // Solarized magenta
+            gradient.addColorStop(0, graph.nightMode ? 'rgba(211, 54, 130, 0.4)' : 'rgba(211, 54, 130, 0.3)')
             gradient.addColorStop(1, 'transparent')
             ctx.beginPath()
             ctx.arc(node.x, node.y, vertexRadius * 3, 0, 2 * Math.PI)
             ctx.fillStyle = gradient
             ctx.fill()
 
-            // Core dot
             ctx.beginPath()
             ctx.arc(node.x, node.y, vertexRadius, 0, 2 * Math.PI)
-            ctx.fillStyle = nightMode ? '#d33682' : '#d33682' // Solarized magenta
+            ctx.fillStyle = '#d33682'
             ctx.fill()
-
-            // Inner highlight
-            ctx.beginPath()
-            ctx.arc(node.x, node.y, vertexRadius - 1.5, 0, 2 * Math.PI)
-            ctx.fillStyle = nightMode ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)'
-            ctx.fill()
-
             return
         }
 
-        const isHovered = hoverNode?.id === node.id
-        const isHighlighted = highlightNodes.has(node.id)
-        const isPinned = node.fx !== undefined && node.fx !== null && !node.isHub && !node.isPolygonVertex
-        const isHub = node.isHub || node.id === '__athanor_hub__'
-        const isIsolated = node.isIsolated || ((node.weight === 0 || node.degree === 0) && !isHub)
+        const isHovered = graph.hoverNode?.id === node.id
+        const isHighlighted = graph.highlightNodes.has(node.id)
+        const isHub = node.isHub
+        const isIsolated = node.isIsolated
         const label = node.label || ''
-        const weight = node.weight || node.degree || 0
+        const weight = node.weight || 0
 
-        // Special rendering for the central Hub (Solarpunk Sun)
+        // Hub rendering (sun)
         if (isHub) {
             const hubRadius = 25
-
-            // Outer rays (sun pattern)
             const numRays = 12
             for (let i = 0; i < numRays; i++) {
                 const angle = (i / numRays) * Math.PI * 2
@@ -660,38 +173,28 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
                 ctx.beginPath()
                 ctx.moveTo(x1, y1)
                 ctx.lineTo(x2, y2)
-                ctx.strokeStyle = nightMode ? 'rgba(181, 137, 0, 0.6)' : 'rgba(203, 75, 22, 0.5)'
+                ctx.strokeStyle = graph.nightMode ? 'rgba(181, 137, 0, 0.6)' : 'rgba(203, 75, 22, 0.5)'
                 ctx.lineWidth = 2
                 ctx.stroke()
             }
 
-            // Outer glow
             const gradient = ctx.createRadialGradient(node.x, node.y, hubRadius * 0.3, node.x, node.y, hubRadius * 2)
-            gradient.addColorStop(0, nightMode ? 'rgba(181, 137, 0, 0.4)' : 'rgba(203, 75, 22, 0.3)')
-            gradient.addColorStop(0.5, nightMode ? 'rgba(181, 137, 0, 0.15)' : 'rgba(203, 75, 22, 0.1)')
+            gradient.addColorStop(0, graph.nightMode ? 'rgba(181, 137, 0, 0.4)' : 'rgba(203, 75, 22, 0.3)')
+            gradient.addColorStop(0.5, graph.nightMode ? 'rgba(181, 137, 0, 0.15)' : 'rgba(203, 75, 22, 0.1)')
             gradient.addColorStop(1, 'transparent')
             ctx.beginPath()
             ctx.arc(node.x, node.y, hubRadius * 2, 0, 2 * Math.PI)
             ctx.fillStyle = gradient
             ctx.fill()
 
-            // Main sun circle
             ctx.beginPath()
             ctx.arc(node.x, node.y, hubRadius, 0, 2 * Math.PI)
             const sunGradient = ctx.createRadialGradient(node.x - 5, node.y - 5, 0, node.x, node.y, hubRadius)
-            sunGradient.addColorStop(0, nightMode ? '#b58900' : '#cb4b16')
-            sunGradient.addColorStop(1, nightMode ? '#856000' : '#a03810')
+            sunGradient.addColorStop(0, graph.nightMode ? '#b58900' : '#cb4b16')
+            sunGradient.addColorStop(1, graph.nightMode ? '#856000' : '#a03810')
             ctx.fillStyle = sunGradient
             ctx.fill()
 
-            // Inner ring
-            ctx.beginPath()
-            ctx.arc(node.x, node.y, hubRadius - 4, 0, 2 * Math.PI)
-            ctx.strokeStyle = nightMode ? 'rgba(253, 246, 227, 0.3)' : 'rgba(253, 246, 227, 0.5)'
-            ctx.lineWidth = 1
-            ctx.stroke()
-
-            // Hub sun symbol
             const hubZoomFactor = Math.pow(globalScale, 0.4)
             const sunFontSize = Math.max(Math.min(18 / hubZoomFactor, 30), 10)
             ctx.font = `600 ${sunFontSize}px 'IBM Plex Serif', Georgia, serif`
@@ -700,29 +203,28 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
             ctx.fillStyle = '#fdf6e3'
             ctx.fillText('☀', node.x, node.y)
 
-            // Label below
             if (globalScale > 0.3) {
                 const labelFontSize = Math.max(Math.min(11 / hubZoomFactor, 18), 7)
                 ctx.font = `600 ${labelFontSize}px 'IBM Plex Serif', Georgia, serif`
                 ctx.textBaseline = 'top'
-                ctx.strokeStyle = nightMode ? 'rgba(0,43,54,0.95)' : 'rgba(253,246,227,0.98)'
+                ctx.strokeStyle = graph.nightMode ? 'rgba(0,43,54,0.95)' : 'rgba(253,246,227,0.98)'
                 ctx.lineWidth = Math.max(3 / hubZoomFactor, 1.5)
                 ctx.strokeText('Athanor', node.x, node.y + hubRadius + 6)
-                ctx.fillStyle = nightMode ? '#b58900' : '#cb4b16'
+                ctx.fillStyle = graph.nightMode ? '#b58900' : '#cb4b16'
                 ctx.fillText('Athanor', node.x, node.y + hubRadius + 6)
             }
             return
         }
 
-        // Node radius
+        // Regular node rendering
         const baseRadius = isIsolated ? 4 : (5 + Math.min(weight * 1.5, 12))
         const radius = baseRadius
 
-        // Glow effect
+        // Glow
         const glowRadius = radius + 6
         const glowColor = isIsolated
-            ? (nightMode ? 'rgba(108, 113, 196, 0.3)' : 'rgba(108, 113, 196, 0.2)')
-            : (nightMode ? 'rgba(42, 161, 152, 0.3)' : 'rgba(42, 161, 152, 0.2)')
+            ? (graph.nightMode ? 'rgba(108, 113, 196, 0.3)' : 'rgba(108, 113, 196, 0.2)')
+            : (graph.nightMode ? 'rgba(42, 161, 152, 0.3)' : 'rgba(42, 161, 152, 0.2)')
         const gradient = ctx.createRadialGradient(node.x, node.y, radius * 0.5, node.x, node.y, glowRadius)
         gradient.addColorStop(0, glowColor)
         gradient.addColorStop(1, 'transparent')
@@ -731,14 +233,10 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
         ctx.fillStyle = gradient
         ctx.fill()
 
-        // Main circle
+        // Circle
         ctx.beginPath()
         ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI)
-
-        // Different colors for isolated vs connected nodes
-        const nodeColor = isIsolated
-            ? (nightMode ? '#6c71c4' : '#6c71c4') // Solarized violet for isolated
-            : colors.node
+        const nodeColor = isIsolated ? '#6c71c4' : colors.node
         const hoverColor = isIsolated ? '#268bd2' : colors.nodeHover
 
         if (isHovered) {
@@ -752,14 +250,6 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
         ctx.fill()
         ctx.shadowBlur = 0
 
-        // Pinned indicator
-        if (isPinned) {
-            ctx.beginPath()
-            ctx.arc(node.x, node.y, 2, 0, 2 * Math.PI)
-            ctx.fillStyle = nightMode ? '#fdf6e3' : '#073642'
-            ctx.fill()
-        }
-
         // Highlight ring
         if (isHovered || isHighlighted) {
             ctx.beginPath()
@@ -770,9 +260,8 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
         }
 
         // Labels
-        if (!showLabels) return
+        if (!graph.showLabels) return
 
-        // Smarter visibility based on zoom
         const shouldShowLabel = isHovered ||
             isHighlighted ||
             globalScale > 2 ||
@@ -780,9 +269,7 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
             (weight > 5 && globalScale > 0.5)
 
         if (shouldShowLabel && label) {
-            // Font size that maintains readable screen size
-            // At zoom 1: base size, at zoom 0.5: ~1.5x base, at zoom 2: ~0.7x base
-            const zoomFactor = Math.pow(globalScale, 0.5) // Dampened zoom effect
+            const zoomFactor = Math.pow(globalScale, 0.5)
             const baseFontSize = isHovered ? 13 : (isHighlighted ? 11 : 10)
             const fontSize = Math.max(Math.min(baseFontSize / zoomFactor, 20), 6)
 
@@ -790,7 +277,6 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
             ctx.textAlign = 'center'
             ctx.textBaseline = 'top'
 
-            // Dynamic truncation based on zoom and importance
             let displayLabel = label
             const maxLen = isHovered ? 80 : (globalScale > 1.5 ? 50 : (globalScale > 0.8 ? 30 : 20))
             if (label.length > maxLen) {
@@ -798,591 +284,216 @@ export function ForceGraphCanvas({ className = '', backgroundMode = false }: For
             }
 
             const textY = node.y + radius + 4
-
-            // Outline thickness also scales
-            ctx.strokeStyle = nightMode ? 'rgba(0,43,54,0.95)' : 'rgba(253,246,227,0.98)'
+            ctx.strokeStyle = graph.nightMode ? 'rgba(0,43,54,0.9)' : 'rgba(253,246,227,0.95)'
             ctx.lineWidth = Math.max(3 / zoomFactor, 1.5)
-            ctx.lineJoin = 'round'
             ctx.strokeText(displayLabel, node.x, textY)
-
-            ctx.fillStyle = isHovered ? colors.textHover : (isIsolated ? '#6c71c4' : colors.text)
+            ctx.fillStyle = isHovered ? colors.textHover : colors.text
             ctx.fillText(displayLabel, node.x, textY)
         }
-    }, [hoverNode, highlightNodes, colors, nightMode, showLabels, isExpanded, revealPhase])
+    }, [graph.isExpanded, graph.revealPhase, graph.nightMode, graph.hoverNode, graph.highlightNodes, graph.showLabels, colors])
 
-    // Controls
-    const zoomIn = () => fgRef.current?.zoom(fgRef.current.zoom() * 1.3, 300)
-    const zoomOut = () => fgRef.current?.zoom(fgRef.current.zoom() / 1.3, 300)
-    const resetView = () => fgRef.current?.zoomToFit(400, 80)
+    // Link canvas object
+    const linkCanvasObject = useCallback((link: any, ctx: CanvasRenderingContext2D) => {
+        const sourceVisible = link.source && (link.source.isHub || graph.isExpanded)
+        const targetVisible = link.target && (link.target.isHub || graph.isExpanded)
+        if (!sourceVisible || !targetVisible) return
 
-    const toggleSimulation = () => {
-        if (isSimulationRunning) {
-            fgRef.current?.pauseAnimation()
+        // Hide links to hidden nodes
+        if (link.source.isPolygonVertex || link.target.isPolygonVertex) {
+            const sourceIdx = link.source.isPolygonVertex ? parseInt(link.source.id.replace('__polygon_vertex_', '').replace('__', '')) : -1
+            const targetIdx = link.target.isPolygonVertex ? parseInt(link.target.id.replace('__polygon_vertex_', '').replace('__', '')) : -1
+            if (sourceIdx >= 0 && graph.revealPhase < 1000 + sourceIdx) return
+            if (targetIdx >= 0 && graph.revealPhase < 1000 + targetIdx) return
+        }
+
+        ctx.beginPath()
+        ctx.moveTo(link.source.x, link.source.y)
+        ctx.lineTo(link.target.x, link.target.y)
+
+        if (link.type === 'POLYGON_EDGE') {
+            ctx.strokeStyle = graph.nightMode ? 'rgba(211, 54, 130, 0.15)' : 'rgba(211, 54, 130, 0.1)'
+            ctx.lineWidth = 1
+            ctx.setLineDash([4, 4])
+        } else if (link.type === 'HUB_LINK') {
+            ctx.strokeStyle = graph.nightMode ? 'rgba(181, 137, 0, 0.2)' : 'rgba(203, 75, 22, 0.15)'
+            ctx.lineWidth = 1
+            ctx.setLineDash([])
+        } else if (link.type === 'CLUSTER_ANCHOR') {
+            ctx.strokeStyle = graph.nightMode ? 'rgba(211, 54, 130, 0.1)' : 'rgba(211, 54, 130, 0.08)'
+            ctx.lineWidth = 0.5
+            ctx.setLineDash([2, 2])
         } else {
-            fgRef.current?.resumeAnimation()
-            fgRef.current?.d3ReheatSimulation()
+            const isHighlighted = graph.highlightNodes.has(link.source.id) && graph.highlightNodes.has(link.target.id)
+            ctx.strokeStyle = isHighlighted ? colors.linkHighlight : colors.link
+            ctx.lineWidth = isHighlighted ? 2 : 1
+            ctx.setLineDash([])
         }
-        setIsSimulationRunning(!isSimulationRunning)
-    }
 
-    // Focus on a specific node
-    const focusOnNode = useCallback((nodeId: string) => {
-        const node = data?.nodes.find((n: any) => n.id === nodeId)
-        if (node && fgRef.current) {
-            fgRef.current.centerAt(node.x, node.y, 1000)
-            fgRef.current.zoom(3, 1000)
-            setHoverNode(node as GraphNode)
-        }
-    }, [data])
+        ctx.stroke()
+        ctx.setLineDash([])
+    }, [graph.isExpanded, graph.revealPhase, graph.nightMode, graph.highlightNodes, colors])
 
-    // Get isolated nodes for the panel
-    const isolatedNodes = useMemo(() => {
-        if (!data) return []
-        return (data as any).nodes?.filter((n: any) =>
-            (n.weight === 0 || n.degree === 0) &&
-            !n.isHub &&
-            n.id !== '__athanor_hub__'
-        ) || []
-    }, [data])
-
-    const graphData = useMemo(() => data, [data])
-
-    if (loading) {
+    // Loading state
+    if (graph.loading) {
         return (
-            <div className={`flex items-center justify-center h-full ${className}`} style={{ background: colors.bg }}>
+            <div className={`relative w-full h-screen flex items-center justify-center ${className}`}
+                style={{ background: colors.bg }}>
                 <Loader2 className="w-8 h-8 animate-spin" style={{ color: colors.node }} />
-                <span className="ml-3" style={{ color: colors.text }}>Chargement du graphe...</span>
             </div>
         )
     }
 
-    if (error) {
+    // Error state
+    if (graph.error) {
         return (
-            <div className={`flex items-center justify-center h-full ${className}`} style={{ background: colors.bg }}>
-                <span style={{ color: '#dc322f' }}>{error}</span>
+            <div className={`relative w-full h-screen flex items-center justify-center ${className}`}
+                style={{ background: colors.bg, color: colors.text }}>
+                {graph.error}
             </div>
         )
     }
 
     return (
-        <div
-            className={`relative ${className}`}
-            style={{
-                background: colors.bg,
-                opacity: backgroundMode ? 0.5 : 1,
-                transition: 'opacity 0.3s ease',
-            }}
-        >
-            {/* Graph */}
-            {graphData && dimensions.width > 0 && (
-                <ForceGraph2D
-                    ref={fgRef}
-                    graphData={graphData as any}
-                    width={dimensions.width}
-                    height={dimensions.height}
-                    backgroundColor={colors.bg}
-                    nodeLabel=""
-                    nodeCanvasObject={nodeCanvasObject}
-                    nodePointerAreaPaint={(node: any, color, ctx) => {
-                        const radius = 5 + Math.min(node.weight || 1, 12)
-                        ctx.fillStyle = color
-                        ctx.beginPath()
-                        ctx.arc(node.x, node.y, radius + 8, 0, 2 * Math.PI)
-                        ctx.fill()
-                    }}
-                    linkColor={(link: any) => {
-                        // Hide links when collapsed
-                        if (!isExpanded) return 'transparent'
-
-                        const source = typeof link.source === 'object' ? link.source : null
-                        const target = typeof link.target === 'object' ? link.target : null
-
-                        // Helper to check if a node is visible
-                        const isNodeVisible = (node: any) => {
-                            if (!node) return false
-                            if (node.isHub) return true
-                            if (node.isPolygonVertex) {
-                                const idx = parseInt(node.id?.replace('__polygon_vertex_', '').replace('__', '') || '0')
-                                return revealPhase >= 1000 + idx
-                            }
-                            if (node.clusterId !== undefined) {
-                                return revealPhase >= 1000 + node.clusterId
-                            }
-                            if (node.isIsolated) {
-                                const idx = node.isolatedIndex ?? 0
-                                return revealPhase >= 1 + idx
-                            }
-                            return isExpanded
-                        }
-
-                        // Only show link if both endpoints are visible
-                        if (!isNodeVisible(source) || !isNodeVisible(target)) {
-                            return 'transparent'
-                        }
-
-                        const linkType = link.type
-                        // Polygon edges: very subtle
-                        if (linkType === 'POLYGON_EDGE') {
-                            return nightMode ? 'rgba(88, 110, 117, 0.3)' : 'rgba(147, 161, 161, 0.25)'
-                        }
-                        // Hub to vertex: subtle connecting lines
-                        if (linkType === 'HUB_TO_VERTEX') {
-                            return nightMode ? 'rgba(181, 137, 0, 0.2)' : 'rgba(203, 75, 22, 0.15)'
-                        }
-                        // Hub to isolated nodes: violet tint
-                        if (linkType === 'HUB_LINK') {
-                            return nightMode ? 'rgba(108, 113, 196, 0.35)' : 'rgba(108, 113, 196, 0.25)'
-                        }
-                        // Cluster anchor links: very subtle
-                        if (linkType === 'CLUSTER_ANCHOR') {
-                            return nightMode ? 'rgba(42, 161, 152, 0.15)' : 'rgba(42, 161, 152, 0.1)'
-                        }
-                        const sourceId = typeof link.source === 'object' ? link.source.id : link.source
-                        const targetId = typeof link.target === 'object' ? link.target.id : link.target
-                        const isHighlighted = highlightNodes.has(sourceId) && highlightNodes.has(targetId)
-                        return isHighlighted ? colors.linkHighlight : colors.link
-                    }}
-                    linkWidth={(link: any) => {
-                        const linkType = link.type
-                        // Polygon edges: thin
-                        if (linkType === 'POLYGON_EDGE') return 0.5
-                        if (linkType === 'HUB_TO_VERTEX') return 0.3
-                        if (linkType === 'HUB_LINK') return 0.5
-                        if (linkType === 'CLUSTER_ANCHOR') return 0.2
-
-                        const sourceId = typeof link.source === 'object' ? link.source.id : link.source
-                        const targetId = typeof link.target === 'object' ? link.target.id : link.target
-                        const isHighlighted = highlightNodes.has(sourceId) && highlightNodes.has(targetId)
-                        return isHighlighted ? 2.5 : 1
-                    }}
-                    onNodeHover={handleNodeHover}
-                    onNodeClick={handleNodeClick}
-                    onNodeDragEnd={handleNodeDragEnd}
-                    enableNodeDrag={true}
-                    cooldownTicks={100}
-                    d3AlphaDecay={0.12}
-                    d3VelocityDecay={0.3}
-                    d3AlphaMin={0.001}
-                    warmupTicks={50}
-                />
-            )}
-
-            {/* Info Panel - Hidden in background mode */}
-            {!backgroundMode && <div className="absolute top-20 left-4 z-10 flex flex-col gap-2 w-80">
-
-                {hoverNode && (
-                    <div
-                        className="rounded-xl p-4 backdrop-blur-md shadow-lg"
-                        style={{
-                            background: nightMode ? 'rgba(0,43,54,0.95)' : 'rgba(253,246,227,0.98)',
-                            color: colors.text,
-                            border: `1px solid ${nightMode ? 'rgba(42,161,152,0.3)' : 'rgba(42,161,152,0.2)'}`,
-                        }}
-                    >
-                        <div className="font-semibold text-base leading-snug" style={{ color: colors.textHover }}>
-                            {hoverNode.label}
-                        </div>
-                        <div className="flex items-center gap-2 mt-2">
-                            <span
-                                className="text-xs px-2 py-0.5 rounded-full"
-                                style={{
-                                    background: nightMode ? 'rgba(42,161,152,0.2)' : 'rgba(42,161,152,0.15)',
-                                    color: colors.node,
-                                }}
-                            >
-                                {hoverNode.weight || hoverNode.degree || 0} connexions
-                            </span>
-                        </div>
-                        {(hoverNode.url || hoverNode.id?.startsWith('billet:')) && (
-                            <div
-                                className="text-xs mt-3 pt-2 flex items-center gap-1"
-                                style={{
-                                    borderTop: `1px solid ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                                    color: colors.nodeHover,
-                                }}
-                            >
-                                <span>→</span> Cliquer pour lire
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>}
-
-            {/* Click Hint - Shows on first visit, hidden after clicking hub */}
-            {!backgroundMode && showHint && !isExpanded && (
-                <div
-                    className="absolute z-20 pointer-events-none"
-                    style={{
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(50px, -100px)',
-                    }}
-                >
-                    <style>{`
-                        @keyframes drawArrow {
-                            0% { stroke-dashoffset: 100; opacity: 1; }
-                            50% { stroke-dashoffset: 0; opacity: 1; }
-                            70% { stroke-dashoffset: 0; opacity: 1; }
-                            85% { stroke-dashoffset: 0; opacity: 0; }
-                            86% { stroke-dashoffset: 100; opacity: 0; }
-                            100% { stroke-dashoffset: 100; opacity: 0; }
-                        }
-                        @keyframes fadeInArrowHead {
-                            0%, 40% { opacity: 0; }
-                            50% { opacity: 1; }
-                            70% { opacity: 1; }
-                            85%, 100% { opacity: 0; }
-                        }
-                        @keyframes fadeText {
-                            0%, 30% { opacity: 0; }
-                            45% { opacity: 1; }
-                            85% { opacity: 1; }
-                            100% { opacity: 0; }
-                        }
-                        .arrow-path { animation: drawArrow 2.5s ease-in-out infinite; stroke-dasharray: 100; stroke-dashoffset: 100; }
-                        .arrow-head { animation: fadeInArrowHead 2.5s ease-in-out infinite; }
-                        .hint-text { animation: fadeText 2.5s ease-in-out infinite; }
-                    `}</style>
-                    <div className="flex flex-col items-start">
-                        {/* Smooth curved arrow pointing to center */}
-                        <svg width="80" height="80" viewBox="0 0 80 80" className="mb-1">
-                            <path
-                                className="arrow-path"
-                                d="M 65 10 C 50 15, 35 35, 25 65"
-                                fill="none"
-                                stroke="#2aa198"
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                            />
-                            {/* Arrow head */}
-                            <polygon
-                                className="arrow-head"
-                                points="20,55 30,70 15,68"
-                                fill="#2aa198"
-                            />
-                        </svg>
-                        <span
-                            className="text-sm font-medium hint-text"
-                            style={{ color: '#2aa198' }}
-                        >
-                            Cliquez ici !
-                        </span>
-                    </div>
-                </div>
-            )}
-
-            {/* Settings Panel - Slide-in from Right - Hidden in background mode */}
-            {!backgroundMode && showSettings && (
-                <div
-                    className="fixed inset-0 z-20"
-                    onClick={() => setShowSettings(false)}
-                />
-            )}
-            {!backgroundMode && <div
-                className="fixed right-0 z-30 transition-transform duration-300 ease-out"
-                style={{
-                    top: 0,
-                    height: '100vh',
-                    transform: showSettings ? 'translateX(0)' : 'translateX(100%)',
-                    width: '300px',
+        <div className={`relative w-full h-screen overflow-hidden ${className}`}
+            style={{ background: colors.bg }}>
+            {/* Force Graph */}
+            <ForceGraph2D
+                ref={graph.fgRef}
+                graphData={graph.data as any}
+                nodeCanvasObject={nodeCanvasObject}
+                linkCanvasObject={linkCanvasObject}
+                nodePointerAreaPaint={(node: any, color, ctx) => {
+                    const radius = node.isHub ? 25 : (node.isIsolated ? 8 : 12)
+                    ctx.beginPath()
+                    ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI)
+                    ctx.fillStyle = color
+                    ctx.fill()
                 }}
-            >
-                <div
-                    className="h-full overflow-y-auto"
-                    style={{
-                        background: nightMode ? '#073642' : '#eee8d5',
-                    }}
-                >
-                    {/* Header */}
-                    <div
-                        className="sticky top-0 flex items-center justify-between px-5 py-4 z-10"
+                onNodeHover={graph.handleNodeHover}
+                onNodeClick={graph.handleNodeClick}
+                onNodeDragEnd={graph.handleNodeDragEnd}
+                backgroundColor={colors.bg}
+                width={graph.dimensions.width}
+                height={graph.dimensions.height}
+                enableNodeDrag={true}
+                enableZoomInteraction={true}
+                enablePanInteraction={true}
+                cooldownTime={3000}
+                warmupTicks={50}
+                d3AlphaDecay={0.02}
+                d3VelocityDecay={0.3}
+            />
+
+            {/* Click hint */}
+            {graph.showHint && !backgroundMode && (
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10"
+                    style={{ marginTop: '60px' }}>
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md"
                         style={{
-                            background: nightMode ? '#073642' : '#eee8d5',
-                        }}
-                    >
-                        <div className="flex items-center gap-2">
-                            <Settings2 className="w-4 h-4" style={{ color: colors.node }} />
-                            <span className="font-semibold text-sm" style={{ color: colors.textHover }}>
-                                Paramètres
-                            </span>
-                        </div>
-                        <button
-                            onClick={() => setShowSettings(false)}
-                            className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                            style={{
-                                background: nightMode ? 'rgba(42,161,152,0.2)' : 'rgba(42,161,152,0.15)',
-                                color: '#2aa198',
-                            }}
-                            title="Fermer"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
-                    </div>
-
-                    <div className="p-5 space-y-6">
-
-                        {/* Structure Section */}
-                        <div>
-                            <div className="text-xs font-medium uppercase tracking-wider mb-3 flex items-center gap-2"
-                                style={{ color: nightMode ? 'rgba(147,161,161,0.7)' : 'rgba(101,123,131,0.8)' }}>
-                                <span>◇</span> Structure
-                            </div>
-
-                            <div className="space-y-4">
-                                {/* Polygon Radius */}
-                                <div className="group">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <label className="text-sm" style={{ color: colors.text }}>
-                                            Distance des grappes
-                                        </label>
-                                        <span className="text-xs font-mono px-2 py-0.5 rounded"
-                                            style={{ background: nightMode ? 'rgba(42,161,152,0.2)' : 'rgba(42,161,152,0.1)', color: '#2aa198' }}>
-                                            {forces.polygonRadius}
-                                        </span>
-                                    </div>
-                                    <input
-                                        type="range"
-                                        min="100"
-                                        max="500"
-                                        step="10"
-                                        value={forces.polygonRadius}
-                                        onChange={e => setForces(f => ({ ...f, polygonRadius: Number(e.target.value) }))}
-                                        className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                                        style={{
-                                            background: `linear-gradient(to right, #2aa198 0%, #2aa198 ${(forces.polygonRadius - 100) / 4}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} ${(forces.polygonRadius - 100) / 4}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 100%)`,
-                                        }}
-                                    />
-                                </div>
-
-                                {/* Link Distance */}
-                                <div className="group">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <label className="text-sm" style={{ color: colors.text }}>
-                                            Distance des liens
-                                        </label>
-                                        <span className="text-xs font-mono px-2 py-0.5 rounded"
-                                            style={{ background: nightMode ? 'rgba(42,161,152,0.2)' : 'rgba(42,161,152,0.1)', color: '#2aa198' }}>
-                                            {forces.linkDistance}
-                                        </span>
-                                    </div>
-                                    <input
-                                        type="range"
-                                        min="10"
-                                        max="200"
-                                        value={forces.linkDistance}
-                                        onChange={e => setForces(f => ({ ...f, linkDistance: Number(e.target.value) }))}
-                                        className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                                        style={{
-                                            background: `linear-gradient(to right, #2aa198 0%, #2aa198 ${(forces.linkDistance - 10) / 1.9}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} ${(forces.linkDistance - 10) / 1.9}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 100%)`,
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Physics Section */}
-                        <div>
-                            <div className="text-xs font-medium uppercase tracking-wider mb-3 flex items-center gap-2"
-                                style={{ color: nightMode ? 'rgba(147,161,161,0.7)' : 'rgba(101,123,131,0.8)' }}>
-                                <span>⚡</span> Physique
-                            </div>
-
-                            <div className="space-y-4">
-                                {/* Charge Strength */}
-                                <div className="group">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <label className="text-sm" style={{ color: colors.text }}>
-                                            Répulsion
-                                        </label>
-                                        <span className="text-xs font-mono px-2 py-0.5 rounded"
-                                            style={{ background: nightMode ? 'rgba(42,161,152,0.2)' : 'rgba(42,161,152,0.1)', color: '#2aa198' }}>
-                                            {Math.abs(forces.chargeStrength)}
-                                        </span>
-                                    </div>
-                                    <input
-                                        type="range"
-                                        min="-500"
-                                        max="-10"
-                                        value={forces.chargeStrength}
-                                        onChange={e => setForces(f => ({ ...f, chargeStrength: Number(e.target.value) }))}
-                                        className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                                        style={{
-                                            background: `linear-gradient(to right, #2aa198 0%, #2aa198 ${(500 + forces.chargeStrength) / 4.9}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} ${(500 + forces.chargeStrength) / 4.9}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 100%)`,
-                                        }}
-                                    />
-                                </div>
-
-                                {/* Collision Radius */}
-                                <div className="group">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <label className="text-sm" style={{ color: colors.text }}>
-                                            Rayon de collision
-                                        </label>
-                                        <span className="text-xs font-mono px-2 py-0.5 rounded"
-                                            style={{ background: nightMode ? 'rgba(42,161,152,0.2)' : 'rgba(42,161,152,0.1)', color: '#2aa198' }}>
-                                            {forces.collisionRadius}
-                                        </span>
-                                    </div>
-                                    <input
-                                        type="range"
-                                        min="5"
-                                        max="50"
-                                        value={forces.collisionRadius}
-                                        onChange={e => setForces(f => ({ ...f, collisionRadius: Number(e.target.value) }))}
-                                        className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                                        style={{
-                                            background: `linear-gradient(to right, #2aa198 0%, #2aa198 ${(forces.collisionRadius - 5) / 0.45}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} ${(forces.collisionRadius - 5) / 0.45}%, ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 100%)`,
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Display Section */}
-                        <div>
-                            <div className="text-xs font-medium uppercase tracking-wider mb-3 flex items-center gap-2"
-                                style={{ color: nightMode ? 'rgba(147,161,161,0.7)' : 'rgba(101,123,131,0.8)' }}>
-                                <span>◉</span> Affichage
-                            </div>
-
-                            <label className="flex items-center justify-between cursor-pointer p-3 rounded-xl transition-all hover:scale-[1.02]"
-                                style={{ background: nightMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }}>
-                                <span className="text-sm" style={{ color: colors.text }}>Labels visibles</span>
-                                <div className="relative">
-                                    <input
-                                        type="checkbox"
-                                        checked={showLabels}
-                                        onChange={e => setShowLabels(e.target.checked)}
-                                        className="sr-only peer"
-                                    />
-                                    <div className="w-10 h-5 rounded-full transition-colors peer-checked:bg-[#2aa198]"
-                                        style={{ background: nightMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)' }} />
-                                    <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-5" />
-                                </div>
-                            </label>
-                        </div>
+                            background: graph.nightMode ? 'rgba(0,43,54,0.8)' : 'rgba(253,246,227,0.9)',
+                            color: colors.text,
+                            border: `1px solid ${graph.nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                        }}>
+                        <Sparkles className="w-4 h-4" style={{ color: graph.nightMode ? '#b58900' : '#cb4b16' }} />
+                        <span className="text-sm">Cliquez sur le soleil</span>
                     </div>
                 </div>
-            </div>}
+            )}
 
-            {/* Controls - Hidden in background mode */}
-            {!backgroundMode && <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2 items-center">
-                <button
-                    onClick={() => setNightMode(n => !n)}
-                    className="p-2.5 rounded-xl transition-all hover:scale-105"
-                    style={{
-                        background: nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                        color: colors.text,
-                    }}
-                    title={nightMode ? 'Mode jour' : 'Mode nuit'}
-                >
-                    {nightMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                </button>
-                <button
-                    onClick={() => setShowSettings(s => !s)}
-                    className="p-2.5 rounded-xl transition-all hover:scale-105"
-                    style={{
-                        background: showSettings
-                            ? (nightMode ? 'rgba(42,161,152,0.3)' : 'rgba(42,161,152,0.2)')
-                            : (nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'),
-                        color: colors.text,
-                    }}
-                    title="Paramètres"
-                >
-                    <Settings2 className="w-5 h-5" />
-                </button>
-            </div>}
+            {/* Search Bar - Hidden in background mode */}
+            {!backgroundMode && (
+                <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                            style={{ color: colors.text }} />
+                        <input
+                            type="text"
+                            placeholder="Rechercher..."
+                            value={graph.searchQuery}
+                            onChange={(e) => graph.handleSearch(e.target.value)}
+                            className="pl-9 pr-4 py-2 w-64 rounded-xl text-sm transition-shadow focus:outline-none focus:ring-2"
+                            style={{
+                                background: graph.nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                color: colors.text,
+                                border: 'none',
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
 
-            {/* Isolated Nodes Panel - Also hidden in background mode */}
-            {!backgroundMode && showIsolated && isolatedNodes.length > 0 && (
-                <div
-                    className="absolute top-20 right-4 z-20 w-72 max-h-[60vh] overflow-y-auto rounded-xl backdrop-blur-md shadow-xl"
-                    style={{
-                        background: nightMode ? 'rgba(0,43,54,0.95)' : 'rgba(253,246,227,0.98)',
-                        border: `1px solid ${nightMode ? 'rgba(108,113,196,0.3)' : 'rgba(108,113,196,0.2)'}`,
-                    }}
-                >
-                    <div
-                        className="sticky top-0 p-4 flex items-center justify-between"
+            {/* Zoom Controls - Hidden in background mode */}
+            {!backgroundMode && (
+                <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
+                    <button onClick={graph.zoomIn}
+                        className="p-2.5 rounded-xl transition-all hover:scale-105"
+                        style={{ background: graph.nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', color: colors.text }}>
+                        <ZoomIn className="w-5 h-5" />
+                    </button>
+                    <button onClick={graph.zoomOut}
+                        className="p-2.5 rounded-xl transition-all hover:scale-105"
+                        style={{ background: graph.nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', color: colors.text }}>
+                        <ZoomOut className="w-5 h-5" />
+                    </button>
+                    <button onClick={graph.resetView}
+                        className="p-2.5 rounded-xl transition-all hover:scale-105"
+                        style={{ background: graph.nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', color: colors.text }}>
+                        <Maximize2 className="w-5 h-5" />
+                    </button>
+                    <button onClick={graph.unpinAllNodes}
+                        className="p-2.5 rounded-xl transition-all hover:scale-105"
+                        style={{ background: graph.nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', color: colors.text }}
+                        title="Réinitialiser positions">
+                        <RotateCcw className="w-5 h-5" />
+                    </button>
+                </div>
+            )}
+
+            {/* Bottom Controls - Hidden in background mode */}
+            {!backgroundMode && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2 items-center">
+                    <button
+                        onClick={graph.toggleNightMode}
+                        className="p-2.5 rounded-xl transition-all hover:scale-105"
+                        style={{ background: graph.nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', color: colors.text }}>
+                        {graph.nightMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                    </button>
+                    <button
+                        onClick={graph.toggleSettings}
+                        className="p-2.5 rounded-xl transition-all hover:scale-105"
                         style={{
-                            background: nightMode ? 'rgba(0,43,54,0.98)' : 'rgba(253,246,227,0.98)',
-                            borderBottom: `1px solid ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                        }}
-                    >
-                        <div className="flex items-center gap-2">
-                            <span
-                                className="w-3 h-3 rounded-full"
-                                style={{ background: '#6c71c4' }}
-                            />
-                            <span className="font-semibold text-sm" style={{ color: colors.textHover }}>
-                                Billets isolés
-                            </span>
-                            <span
-                                className="text-xs px-1.5 py-0.5 rounded-full"
-                                style={{
-                                    background: nightMode ? 'rgba(108,113,196,0.2)' : 'rgba(108,113,196,0.15)',
-                                    color: '#6c71c4',
-                                }}
-                            >
-                                {isolatedNodes.length}
-                            </span>
-                        </div>
-                        <button
-                            onClick={() => setShowIsolated(false)}
-                            className="opacity-60 hover:opacity-100"
-                        >
-                            <X className="w-4 h-4" style={{ color: colors.text }} />
-                        </button>
-                    </div>
-                    <div className="p-2">
-                        {isolatedNodes.map((node: any) => (
-                            <button
-                                key={node.id}
-                                onClick={() => {
-                                    focusOnNode(node.id)
-                                    setShowIsolated(false)
-                                }}
-                                className="w-full text-left p-3 rounded-lg transition-colors hover:bg-black/5 dark:hover:bg-white/5"
-                                style={{ color: colors.text }}
-                            >
-                                <div className="text-sm font-medium line-clamp-2" style={{ color: '#6c71c4' }}>
-                                    {node.label}
-                                </div>
-                            </button>
-                        ))}
-                    </div>
+                            background: graph.showSettings
+                                ? (graph.nightMode ? 'rgba(42,161,152,0.3)' : 'rgba(42,161,152,0.2)')
+                                : (graph.nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'),
+                            color: colors.text,
+                        }}>
+                        <Settings2 className="w-5 h-5" />
+                    </button>
                 </div>
             )}
 
             {/* Stats - Hidden in background mode */}
-            {!backgroundMode && <div
-                className="absolute bottom-4 left-4 text-xs px-3 py-2 rounded-xl flex items-center gap-3"
-                style={{
-                    background: nightMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
-                    color: colors.text,
-                    border: `1px solid ${nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
-                }}
-            >
-                <span>{data?.nodes.length} nœuds</span>
-                <span className="opacity-40">•</span>
-                <span>{(data as any)?.links?.length || 0} liens</span>
-                {isolatedNodes.length > 0 && (
-                    <>
-                        <span className="opacity-40">•</span>
-                        <button
-                            onClick={() => setShowIsolated(s => !s)}
-                            className="flex items-center gap-1 hover:opacity-80 transition-opacity"
-                            style={{ color: showIsolated ? '#6c71c4' : colors.text }}
-                        >
-                            <span
-                                className="w-2 h-2 rounded-full"
-                                style={{ background: '#6c71c4' }}
-                            />
-                            {isolatedNodes.length} isolés
-                        </button>
-                    </>
-                )}
-            </div>}
+            {!backgroundMode && (
+                <div className="absolute bottom-4 left-4 text-xs px-3 py-2 rounded-xl flex items-center gap-3"
+                    style={{
+                        background: graph.nightMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+                        color: colors.text,
+                        border: `1px solid ${graph.nightMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
+                    }}>
+                    <span>{graph.data?.nodes.length} nœuds</span>
+                    <span className="opacity-40">•</span>
+                    <span>{(graph.data as any)?.links?.length || 0} liens</span>
+                    {isolatedNodes.length > 0 && (
+                        <>
+                            <span className="opacity-40">•</span>
+                            <span className="flex items-center gap-1" style={{ color: '#6c71c4' }}>
+                                <span className="w-2 h-2 rounded-full" style={{ background: '#6c71c4' }} />
+                                {isolatedNodes.length} isolés
+                            </span>
+                        </>
+                    )}
+                </div>
+            )}
         </div>
     )
 }
