@@ -50,6 +50,9 @@ export default function WallClient() {
     const [uploading, setUploading] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
+    // Lightbox state
+    const [lightboxImage, setLightboxImage] = useState<string | null>(null)
+
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (!file) return
@@ -410,11 +413,17 @@ export default function WallClient() {
                                 {/* Image */}
                                 {post.imageUrl && (
                                     <div className="px-6 pb-6">
-                                        <img
-                                            src={post.imageUrl}
-                                            alt=""
-                                            className="w-full max-h-[500px] object-cover border border-[var(--sol-base01)]"
-                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setLightboxImage(post.imageUrl!)}
+                                            className="block w-full cursor-zoom-in group"
+                                        >
+                                            <img
+                                                src={post.imageUrl}
+                                                alt=""
+                                                className="w-full max-h-[600px] object-contain bg-[var(--sol-base2)] border border-[var(--sol-base01)] group-hover:border-[var(--sol-base02)] transition"
+                                            />
+                                        </button>
                                     </div>
                                 )}
 
@@ -482,6 +491,27 @@ export default function WallClient() {
                     Le Mur · Athanor
                 </p>
             </footer>
+
+            {/* Lightbox */}
+            {lightboxImage && (
+                <div
+                    className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 cursor-zoom-out"
+                    onClick={() => setLightboxImage(null)}
+                >
+                    <button
+                        onClick={() => setLightboxImage(null)}
+                        className="absolute top-4 right-4 p-2 text-white/70 hover:text-white transition z-10"
+                    >
+                        <X className="w-8 h-8" />
+                    </button>
+                    <img
+                        src={lightboxImage}
+                        alt=""
+                        className="max-w-full max-h-full object-contain"
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                </div>
+            )}
         </div>
     )
 }
