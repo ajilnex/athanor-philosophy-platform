@@ -66,6 +66,7 @@ export function Navbar() {
 
         {/* Nav */}
         <nav className="hidden sm:flex items-center gap-2">
+          <NavItem href="/mur">Mur</NavItem>
           <NavItem href="/billets">Billets</NavItem>
           <NavItem href="/publications">Publications</NavItem>
           <NavItem href="/edition">Édition</NavItem>
@@ -141,6 +142,13 @@ export function Navbar() {
             <nav className="mt-4 flex flex-col gap-2">
               <Link
                 ref={firstLinkRef}
+                href="/mur"
+                onClick={() => setOpen(false)}
+                className="px-3 py-2 text-base rounded hover:bg-muted transition text-foreground"
+              >
+                Mur
+              </Link>
+              <Link
                 href="/billets"
                 onClick={() => setOpen(false)}
                 className="px-3 py-2 text-base rounded hover:bg-muted transition text-foreground"

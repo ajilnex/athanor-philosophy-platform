@@ -58,6 +58,8 @@ model User {
   sessions       Session[]
   comments       Comment[]
   drafts         Draft[]
+  wallPosts      WallPost[]
+  wallReactions  WallReaction[]
 }
 
 model Account {
@@ -272,4 +274,54 @@ model ArchiveNote {
   @@index([archiveId])
   @@index([status])
   @@index([keywords])
+}
+
+// ============================================
+// Mur (Social Wall)
+// ============================================
+
+model WallPost {
+  id          String   @id @default(cuid())
+  content     String   // Markdown content
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Optional media
+  imageUrl    String?
+  linkUrl     String?
+  linkPreview Json?    // OpenGraph metadata
+  
+  // Threads (self-referential)
+  parentId    String?
+  parent      WallPost?  @relation("WallReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     WallPost[] @relation("WallReplies")
+  
+  // Reactions
+  reactions   WallReaction[]
+  
+  // Visibility & pinning
+  isPinned    Boolean  @default(false)
+  isVisible   Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([authorId, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+  @@index([parentId])
+}
+
+model WallReaction {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  type      String   @default("like") // like, heart, fire, etc.
+  
+  post      WallPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([postId, userId, type])
+  @@index([postId])
 }
