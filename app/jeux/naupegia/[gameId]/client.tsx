@@ -529,38 +529,46 @@ function BattleGrid({
     // Create grid state
     const gridState: string[][] = Array.from({ length: 10 }, () => Array(10).fill('empty'))
 
+    // Helper to safely set grid state
+    const safeSetGrid = (pos: Position | undefined, value: string) => {
+        if (pos && typeof pos.x === 'number' && typeof pos.y === 'number' &&
+            pos.x >= 0 && pos.x < 10 && pos.y >= 0 && pos.y < 10) {
+            gridState[pos.y][pos.x] = value
+        }
+    }
+
     // Mark ships
     if (showShips) {
         for (const ship of ships) {
+            if (!Array.isArray(ship.positions)) continue
             for (const pos of ship.positions) {
-                gridState[pos.y][pos.x] = ship.sunk ? 'sunk' : 'ship'
+                safeSetGrid(pos, ship.sunk ? 'sunk' : 'ship')
             }
             // Mark hits on our ships
-            for (const hit of ship.hits || []) {
-                gridState[hit.y][hit.x] = 'hit'
+            if (Array.isArray(ship.hits)) {
+                for (const hit of ship.hits) {
+                    safeSetGrid(hit, 'hit')
+                }
             }
         }
     }
 
     // Mark sunk opponent ships
     for (const ship of ships.filter(s => s.sunk)) {
+        if (!Array.isArray(ship.positions)) continue
         for (const pos of ship.positions) {
-            gridState[pos.y][pos.x] = 'sunk'
+            safeSetGrid(pos, 'sunk')
         }
     }
 
     // Mark our moves (firing at opponent)
     for (const move of moves) {
-        gridState[move.y][move.x] = move.hit ? 'hit' : 'miss'
+        safeSetGrid(move, move.hit ? 'hit' : 'miss')
     }
 
     // Mark opponent moves (hits on our ships)
     for (const move of opponentMoves) {
-        if (move.hit) {
-            gridState[move.y][move.x] = 'hit'
-        } else {
-            gridState[move.y][move.x] = 'miss'
-        }
+        safeSetGrid(move, move.hit ? 'hit' : 'miss')
     }
 
     // Preview positions
@@ -579,8 +587,8 @@ function BattleGrid({
     // Check if preview is valid
     const isValidPreview = previewPositions.length === previewShip?.size &&
         !previewPositions.some(p => {
-            if (gridState[p.y][p.x] !== 'empty') return true
-            return ships.some(s => s.positions.some(sp => sp.x === p.x && sp.y === p.y))
+            if (gridState[p.y]?.[p.x] !== 'empty') return true
+            return ships.some(s => Array.isArray(s.positions) && s.positions.some(sp => sp.x === p.x && sp.y === p.y))
         })
 
     return (
@@ -608,10 +616,10 @@ function BattleGrid({
 
                     {/* Cells */}
                     {Array.from({ length: 10 }, (_, x) => {
-                        const state = gridState[y][x]
+                        const state = gridState[y]?.[x] || 'empty'
                         const isPreview = previewPositions.some(p => p.x === x && p.y === y)
                         const isLastHit = lastHit && lastHit.x === x && lastHit.y === y
-                        const isShipCell = ships.some(s => s.positions.some(p => p.x === x && p.y === y))
+                        const isShipCell = ships.some(s => Array.isArray(s.positions) && s.positions.some(p => p.x === x && p.y === y))
 
                         let bgColor = 'var(--sol-base2)'
                         let content = null
