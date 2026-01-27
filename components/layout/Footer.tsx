@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
+import { Dodecahedron } from '@/components/ui/PlatonicIcons'
 
 export function Footer({ className = '' }: { className?: string }) {
   const { data: session } = useSession()
@@ -18,7 +19,7 @@ export function Footer({ className = '' }: { className?: string }) {
               aub.robert@gmail.com
             </a>
           </p>
-          <div className="mt-4 flex justify-center gap-4">
+          <div className="mt-4 flex justify-center items-center gap-4">
             <Link
               href="/a-propos"
               className="text-subtle text-xs hover:text-foreground transition-colors"
@@ -33,9 +34,18 @@ export function Footer({ className = '' }: { className?: string }) {
                 Admin
               </Link>
             )}
+            {/* Easter Egg - Dodecahedron */}
+            <Link
+              href="/jeux"
+              className="text-[var(--sol-base1)] hover:text-[var(--sol-orange)] transition-all duration-300 hover:rotate-180 hover:scale-125"
+              title="?"
+            >
+              <Dodecahedron className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </div>
     </footer>
   )
 }
+

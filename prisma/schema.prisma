@@ -325,3 +325,56 @@ model WallReaction {
   @@unique([postId, userId, type])
   @@index([postId])
 }
+
+// ============================================
+// Jeux - Naupēgia (Bataille Navale)
+// ============================================
+
+model BattleGame {
+  id           String   @id @default(cuid())
+  player1Id    String
+  player2Id    String?
+  status       String   @default("waiting") // waiting, setup, playing, finished
+  currentTurn  String?  // userId du joueur dont c'est le tour
+  winner       String?  // null, player1Id, player2Id, ou "draw"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  ships        BattleShip[]
+  moves        BattleMove[]
+  
+  @@index([status])
+  @@index([player1Id])
+  @@index([player2Id])
+}
+
+model BattleShip {
+  id         String  @id @default(cuid())
+  gameId     String
+  playerId   String
+  shipType   String  // tetra(2), hexa(3), octa(3), dodeca(4), icosa(5)
+  positions  String  // JSON: [{x: number, y: number}]
+  hits       String  @default("[]") // JSON: positions touchées
+  sunk       Boolean @default(false)
+  
+  game       BattleGame @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  
+  @@index([gameId])
+  @@index([playerId])
+}
+
+model BattleMove {
+  id        String   @id @default(cuid())
+  gameId    String
+  playerId  String
+  x         Int
+  y         Int
+  hit       Boolean
+  sunkShip  String?  // shipType if this move sunk a ship
+  createdAt DateTime @default(now())
+  
+  game      BattleGame @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  
+  @@index([gameId, createdAt])
+  @@index([playerId])
+}
