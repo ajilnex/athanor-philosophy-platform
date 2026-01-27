@@ -6,16 +6,15 @@ import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import {
-    Heart,
     Send,
     Loader2,
     Pin,
     Trash2,
     ArrowLeft,
-    Flame,
     ImagePlus,
     X,
 } from 'lucide-react'
+import { PLATONIC_REACTIONS } from '@/components/ui/PlatonicIcons'
 
 interface WallPost {
     id: string
@@ -427,40 +426,33 @@ export default function WallClient() {
                                     </div>
                                 )}
 
-                                {/* Reactions */}
-                                <div className="flex items-center gap-1 px-6 py-3 border-t border-[var(--sol-base1)]/30 bg-[var(--sol-base2)]/50">
-                                    <button
-                                        onClick={() => session && toggleReaction(post.id, 'like')}
-                                        disabled={!session}
-                                        className={`
-                      inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition
-                      ${post.userReactions.some(r => r.type === 'like' && r.userId === userId)
-                                                ? 'bg-[var(--sol-red)] text-white'
-                                                : 'text-[var(--sol-base01)] hover:bg-[var(--sol-base2)] hover:text-[var(--sol-red)]'
-                                            }
-                    `}
-                                    >
-                                        <Heart className={`w-3.5 h-3.5 ${post.userReactions.some(r => r.type === 'like' && r.userId === userId)
-                                            ? 'fill-current' : ''
-                                            }`} />
-                                        {post.reactions.like || 0}
-                                    </button>
-                                    <button
-                                        onClick={() => session && toggleReaction(post.id, 'fire')}
-                                        disabled={!session}
-                                        className={`
-                      inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition
-                      ${post.userReactions.some(r => r.type === 'fire' && r.userId === userId)
-                                                ? 'bg-[var(--sol-orange)] text-white'
-                                                : 'text-[var(--sol-base01)] hover:bg-[var(--sol-base2)] hover:text-[var(--sol-orange)]'
-                                            }
-                    `}
-                                    >
-                                        <Flame className={`w-3.5 h-3.5 ${post.userReactions.some(r => r.type === 'fire' && r.userId === userId)
-                                            ? 'fill-current' : ''
-                                            }`} />
-                                        {post.reactions.fire || 0}
-                                    </button>
+                                {/* Reactions - Platonic Constellations */}
+                                <div className="flex items-center gap-0.5 px-6 py-3 border-t border-[var(--sol-base1)]/30 bg-[var(--sol-base2)]/50">
+                                    {PLATONIC_REACTIONS.map(({ type, Icon, color }) => {
+                                        const hasReacted = post.userReactions.some(
+                                            (r: { type: string; userId: string }) => r.type === type && r.userId === userId
+                                        )
+                                        const count = post.reactions[type] || 0
+                                        return (
+                                            <button
+                                                key={type}
+                                                onClick={() => session && toggleReaction(post.id, type)}
+                                                disabled={!session}
+                                                title={type}
+                                                className={`
+                                                    inline-flex items-center gap-1 px-2 py-1.5 font-mono text-xs transition rounded-sm
+                                                    ${hasReacted
+                                                        ? 'text-white'
+                                                        : 'hover:bg-[var(--sol-base2)]'
+                                                    }
+                                                `}
+                                                style={hasReacted ? { backgroundColor: color, color: 'white' } : { color }}
+                                            >
+                                                <Icon className="w-4 h-4" filled={hasReacted} />
+                                                {count > 0 && <span>{count}</span>}
+                                            </button>
+                                        )
+                                    })}
                                 </div>
                             </article>
                         ))}
