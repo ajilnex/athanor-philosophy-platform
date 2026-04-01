@@ -3,6 +3,7 @@ import { FileText, User, Calendar, Tag, Download } from 'lucide-react'
 import { getPublishedArticles } from '@/lib/articles'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
+import { sanitizeTitle } from '@/lib/utils'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -111,7 +112,7 @@ export default async function PublicationsPage() {
                       href={`/publications/${publication.id}`}
                       className="hover:text-subtle transition-colors"
                     >
-                      {publication.title}
+                      {sanitizeTitle(publication.title)}
                     </Link>
                   </h2>
 

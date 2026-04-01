@@ -79,11 +79,11 @@ export function Navbar() {
               title="Se déconnecter"
               className="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 hover:opacity-85 active:opacity-70 group"
               style={{
-                backgroundColor: 'var(--sol-base02)',
-                border: '1px solid var(--sol-base01)',
+                backgroundColor: 'var(--sol-base2)',
+                border: '1px solid var(--border-default)',
               }}
             >
-              <LogOut className="w-4 h-4" style={{ color: 'var(--sol-base1)' }} />
+              <LogOut className="w-4 h-4" style={{ color: 'var(--sol-base01)' }} />
             </button>
           ) : (
             <Link
@@ -91,11 +91,11 @@ export function Navbar() {
               title="Se connecter"
               className="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 hover:opacity-85 active:opacity-70 group"
               style={{
-                backgroundColor: 'var(--sol-base02)',
-                border: '1px solid var(--sol-base01)',
+                backgroundColor: 'var(--sol-base2)',
+                border: '1px solid var(--border-default)',
               }}
             >
-              <LogIn className="w-4 h-4" style={{ color: 'var(--sol-cyan)' }} />
+              <LogIn className="w-4 h-4" style={{ color: 'var(--sol-base01)' }} />
             </Link>
           )}
         </nav>
@@ -199,11 +199,11 @@ export function Navbar() {
                   title="Se déconnecter"
                   className="mt-4 w-10 h-10 flex items-center justify-center rounded-full transition-opacity hover:opacity-85 active:opacity-70"
                   style={{
-                    backgroundColor: 'var(--sol-base02)',
-                    border: '1px solid var(--sol-base01)',
+                    backgroundColor: 'var(--sol-base2)',
+                    border: '1px solid var(--border-default)',
                   }}
                 >
-                  <LogOut className="w-5 h-5" style={{ color: 'var(--sol-base1)' }} />
+                  <LogOut className="w-5 h-5" style={{ color: 'var(--sol-base01)' }} />
                 </button>
               ) : (
                 <Link
@@ -212,11 +212,11 @@ export function Navbar() {
                   title="Se connecter"
                   className="mt-4 w-10 h-10 flex items-center justify-center rounded-full transition-opacity hover:opacity-85 active:opacity-70"
                   style={{
-                    backgroundColor: 'var(--sol-base02)',
-                    border: '1px solid var(--sol-base01)',
+                    backgroundColor: 'var(--sol-base2)',
+                    border: '1px solid var(--border-default)',
                   }}
                 >
-                  <LogIn className="w-5 h-5" style={{ color: 'var(--sol-cyan)' }} />
+                  <LogIn className="w-5 h-5" style={{ color: 'var(--sol-base01)' }} />
                 </Link>
               )}
             </nav>

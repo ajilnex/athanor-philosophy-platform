@@ -159,7 +159,7 @@ export default async function PublicationPage({
 
         <div className="card border-subtle p-8">
           <h1 className="text-2xl sm:text-3xl font-light text-foreground mb-4 sm:mb-6">
-            {publication.title}
+            {sanitizeTitle(publication.title)}
           </h1>
 
           {publication.description && (

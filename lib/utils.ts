@@ -26,6 +26,7 @@ export function sanitizeTitle(title: string, maxLength: number = 80): string {
   // Supprimer les caractères décoratifs (box-drawing, blocs Unicode)
   let cleaned = title
     .replace(/[═─━┃│┌┐└┘├┤┬┴┼╔╗╚╝╠╣╦╩╬▀▄█▌▐░▒▓]/g, '')
+    .replace(/_/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
 
