@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Calendar, Tag, FileText } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import type { Billet } from '@/lib/billets'
-import { sanitizeTitle } from '@/lib/utils'
+import { sanitizeTitle, formatDate } from '@/lib/utils'
 // import { EditBilletButton } from './EditBilletButton' // Supprimé : bouton éditer déplacé sur page individuelle
 
 interface BilletsListProps {
@@ -54,11 +54,7 @@ export function BilletsList({ initialBillets }: BilletsListProps) {
 
             <div className="flex items-center justify-between">
               <time className="text-xs sm:text-sm text-subtle/80" dateTime={billet.date}>
-                {new Date(billet.date).toLocaleString('fr-FR', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
+                {formatDate(billet.date)}
               </time>
 
               <Link

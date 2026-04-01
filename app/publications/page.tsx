@@ -3,7 +3,7 @@ import { FileText, User, Calendar, Tag, Download } from 'lucide-react'
 import { getPublishedArticles } from '@/lib/articles'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { sanitizeTitle } from '@/lib/utils'
+import { sanitizeTitle, formatDate } from '@/lib/utils'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -131,16 +131,7 @@ export default async function PublicationsPage() {
                     )}
                     <div className="flex items-center space-x-1">
                       <Calendar className="h-4 w-4" />
-                      <span>
-                        {(publication.publishedAt instanceof Date
-                          ? publication.publishedAt
-                          : new Date(publication.publishedAt)
-                        ).toLocaleDateString('fr-FR', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}
-                      </span>
+                      <span>{formatDate(publication.publishedAt)}</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <FileText className="h-4 w-4" />

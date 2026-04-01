@@ -7,7 +7,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { PublicationViewer } from './PublicationViewer'
 import { Metadata } from 'next'
-import { sanitizeTitle } from '@/lib/utils'
+import { sanitizeTitle, formatDate } from '@/lib/utils'
 
 async function getPublication(id: string) {
   try {
@@ -177,13 +177,7 @@ export default async function PublicationPage({
             )}
             <div className="flex items-center space-x-2">
               <Calendar className="h-4 w-4" />
-              <span>
-                {new Date(publication.publishedAt).toLocaleDateString('fr-FR', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </span>
+              <span>{formatDate(publication.publishedAt)}</span>
             </div>
             <div className="flex items-center space-x-2">
               <FileText className="h-4 w-4" />

@@ -1,7 +1,7 @@
 'use client'
 
 import { Billet } from '@/lib/billets'
-import { sanitizeTitle } from '@/lib/utils'
+import { sanitizeTitle, formatDate } from '@/lib/utils'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
@@ -35,7 +35,7 @@ export function LatestActivityCard({ billet }: { billet: Billet }) {
               {displayTitle}
             </h3>
             <p className="mt-1 text-xs text-subtle">
-              {new Date(billet.date).toLocaleDateString('fr-FR', { month: 'long', day: 'numeric' })}
+              {formatDate(billet.date, 'short')}
             </p>
           </div>
           <ArrowRight className="h-4 w-4 text-subtle/50 transition-transform duration-300 transform group-hover:translate-x-1" />

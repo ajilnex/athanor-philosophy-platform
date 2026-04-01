@@ -44,6 +44,23 @@ export function sanitizeTitle(title: string, maxLength: number = 80): string {
 }
 
 /**
+ * Formate une date en français.
+ * 'long'  → "31 mars 2026"
+ * 'short' → "31 mars"
+ */
+export function formatDate(
+  date: string | Date,
+  format: 'long' | 'short' = 'long'
+): string {
+  const d = typeof date === 'string' ? new Date(date) : date
+  const options: Intl.DateTimeFormatOptions =
+    format === 'long'
+      ? { day: 'numeric', month: 'long', year: 'numeric' }
+      : { day: 'numeric', month: 'long' }
+  return d.toLocaleDateString('fr-FR', options)
+}
+
+/**
  * Vérifie si une chaîne contient du texte significatif
  * (au moins N caractères alphabétiques)
  */

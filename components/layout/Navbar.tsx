@@ -77,25 +77,17 @@ export function Navbar() {
             <button
               onClick={handleSignOut}
               title="Se déconnecter"
-              className="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 hover:opacity-85 active:opacity-70 group"
-              style={{
-                backgroundColor: 'var(--sol-base2)',
-                border: '1px solid var(--border-default)',
-              }}
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-sol-base2 border border-subtle/20 transition-all duration-200 hover:opacity-85 active:opacity-70"
             >
-              <LogOut className="w-4 h-4" style={{ color: 'var(--sol-base01)' }} />
+              <LogOut className="w-4 h-4 text-sol-base01" />
             </button>
           ) : (
             <Link
               href="/auth/signin"
               title="Se connecter"
-              className="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 hover:opacity-85 active:opacity-70 group"
-              style={{
-                backgroundColor: 'var(--sol-base2)',
-                border: '1px solid var(--border-default)',
-              }}
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-sol-base2 border border-subtle/20 transition-all duration-200 hover:opacity-85 active:opacity-70"
             >
-              <LogIn className="w-4 h-4" style={{ color: 'var(--sol-base01)' }} />
+              <LogIn className="w-4 h-4 text-sol-base01" />
             </Link>
           )}
         </nav>
@@ -197,26 +189,18 @@ export function Navbar() {
                     await handleSignOut()
                   }}
                   title="Se déconnecter"
-                  className="mt-4 w-10 h-10 flex items-center justify-center rounded-full transition-opacity hover:opacity-85 active:opacity-70"
-                  style={{
-                    backgroundColor: 'var(--sol-base2)',
-                    border: '1px solid var(--border-default)',
-                  }}
+                  className="mt-4 w-10 h-10 flex items-center justify-center rounded-full bg-sol-base2 border border-subtle/20 transition-opacity hover:opacity-85 active:opacity-70"
                 >
-                  <LogOut className="w-5 h-5" style={{ color: 'var(--sol-base01)' }} />
+                  <LogOut className="w-5 h-5 text-sol-base01" />
                 </button>
               ) : (
                 <Link
                   href="/auth/signin"
                   onClick={() => setOpen(false)}
                   title="Se connecter"
-                  className="mt-4 w-10 h-10 flex items-center justify-center rounded-full transition-opacity hover:opacity-85 active:opacity-70"
-                  style={{
-                    backgroundColor: 'var(--sol-base2)',
-                    border: '1px solid var(--border-default)',
-                  }}
+                  className="mt-4 w-10 h-10 flex items-center justify-center rounded-full bg-sol-base2 border border-subtle/20 transition-opacity hover:opacity-85 active:opacity-70"
                 >
-                  <LogIn className="w-5 h-5" style={{ color: 'var(--sol-base01)' }} />
+                  <LogIn className="w-5 h-5 text-sol-base01" />
                 </Link>
               )}
             </nav>
