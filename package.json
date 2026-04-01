@@ -46,6 +46,7 @@
     "aro:dry-run": "npx dotenv-cli -e .env.local -- npx tsx scripts/operation-aro.ts --dry-run",
     "aro:local": "npx dotenv-cli -e .env.local -- npx tsx scripts/operation-aro-tesseract.ts",
     "generate-titles": "npx dotenv-cli -e .env.local -- npx tsx scripts/generate-ocr-titles.ts",
+    "backup:feu-humain": "npx dotenv-cli -e .env.local -- npx tsx scripts/backup-feu-humain.ts",
     "prepare": "husky"
   },
   "dependencies": {

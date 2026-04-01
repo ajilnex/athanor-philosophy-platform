@@ -22,26 +22,27 @@ Une plateforme moderne pour publier et consulter des articles de philosophie ave
 
 ### Stack Principal
 
-- **Next.js 15.4.6** - Framework React avec App Router et optimisations
-- **React 19.0.0** - Bibliothèque d'interface utilisateur (version finale)
+- **Next.js** - Framework React avec App Router et optimisations
+- **React 19** - Bibliothèque d'interface utilisateur
 - **TypeScript** - Typage statique strict
-- **Tailwind CSS** - Framework CSS utilitaire
+- **Tailwind CSS** - Framework CSS utilitaire (palette Solarized)
 - **PostgreSQL** - Base de données (Docker local / Neon production)
-- **Prisma 6.14.0** - ORM moderne avec génération type-safe
+- **Prisma** - ORM moderne avec génération type-safe
 
 ### Contenu & Performance
 
-- **MDX natif** - Support MDX via @mdx-js/mdx 3.1.0
+- **MDX natif** - Support MDX via @mdx-js/mdx
 - **next/font** - Optimisation polices (IBM Plex Serif + Inter)
 - **next/image** - Optimisation images automatique
 - **ISR** - Incremental Static Regeneration pour performance
-- **Fuse.js 7.0.0** - Recherche floue avancée
+- **Fuse.js + Lunr** - Recherche floue et plein texte
 
 ### Services & Intégrations
 
-- **NextAuth.js 4.24.5** - Authentification (GitHub OAuth + Credentials)
+- **NextAuth.js** - Authentification (GitHub OAuth + Credentials)
 - **Cloudinary** - Stockage et optimisation PDF/images
 - **Zotero API** - Bibliographie et citations automatiques
+- **Google Cloud Vision / Tesseract** - OCR pour les archives
 - **Playwright** - Tests E2E automatisés avec capture de logs
 - **Vercel** - Déploiement avec auto-build sur push
 
@@ -224,6 +225,7 @@ La section "Billets" fonctionne sur un principe de "Git-as-a-CMS". Toute gestion
 - `npm run graph:build` - Génère le graphe des billets
 - `npm run graph:svg` - Rend le SVG interactif
 - `npm run search:build` - Reconstruit l'index de recherche
+- `npm run backup:feu-humain` - Sauvegarde complète de l'archive FEU HUMAIN (DB → JSON)
 
 Notes index de recherche:
 

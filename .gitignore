@@ -58,6 +58,9 @@ next-env.d.ts
 /public/FEU HUMAIN/*
 !/public/FEU HUMAIN/.gitkeep
 
+# Database backups (local only, can be large)
+/data/backups/
+
 # Tesseract language data
 *.traineddata
 
